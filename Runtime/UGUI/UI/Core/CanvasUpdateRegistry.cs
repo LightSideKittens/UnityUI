@@ -29,6 +29,7 @@ namespace UnityEngine.UI
         private readonly IndexedSet<ICanvasElement> m_LayoutRebuildQueue = new IndexedSet<ICanvasElement>();
         private readonly IndexedSet<ICanvasElement> m_GraphicRebuildQueue = new IndexedSet<ICanvasElement>();
 
+        public static event Action Updated;
         protected CanvasUpdateRegistry()
         {
             Canvas.willRenderCanvases += PerformUpdate;
@@ -102,6 +103,7 @@ namespace UnityEngine.UI
             m_GraphicRebuildQueue.Clear();
             m_PerformingGraphicUpdate = false;
             UISystemProfilerApi.EndSample(UISystemProfilerApi.SampleType.Render);
+            Updated?.Invoke();
         }
 
         private static int ParentCount(Transform child)
