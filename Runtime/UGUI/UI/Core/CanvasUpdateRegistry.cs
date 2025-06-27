@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine.UI.Collections;
 
 namespace UnityEngine.UI
@@ -34,6 +34,7 @@ namespace UnityEngine.UI
         {
             Canvas.willRenderCanvases += PerformUpdate;
         }
+        
         public static CanvasUpdateRegistry instance
         {
             get
@@ -51,6 +52,7 @@ namespace UnityEngine.UI
 
             m_PerformingLayoutUpdate = true;
 
+            RemoveDestroyed(m_LayoutRebuildQueue);
             m_LayoutRebuildQueue.Sort(s_SortLayoutFunction);
 
             for (int i = 0; i <= (int)CanvasUpdate.PostLayout; i++)
@@ -81,7 +83,7 @@ namespace UnityEngine.UI
             UnityEngine.Profiling.Profiler.EndSample();
 
             m_PerformingGraphicUpdate = true;
-
+            RemoveDestroyed(m_GraphicRebuildQueue);
             for (var i = (int)CanvasUpdate.PreRender; i < (int)CanvasUpdate.LatePreRender; i++)
             {
                 UnityEngine.Profiling.Profiler.BeginSample(m_CanvasUpdateProfilerStrings[i]);
@@ -106,6 +108,23 @@ namespace UnityEngine.UI
             Updated?.Invoke();
         }
 
+        [Conditional("UNITY_EDITOR")]
+        private static void RemoveDestroyed(IndexedSet<ICanvasElement> list)
+        {
+            if (Application.isPlaying) return;
+            
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] is Object obj)
+                {
+                    if (obj == null)
+                    {
+                        list.RemoveAt(i--);
+                    }
+                }
+            }       
+        }
+        
         private static int ParentCount(Transform child)
         {
             if (child == null)
