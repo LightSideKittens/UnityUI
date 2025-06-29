@@ -309,6 +309,9 @@ namespace UnityEngine.UI
                 if (rectChildrenCount % cellsPerMainAxis == 1)
                     childrenToMove += 1;
             }
+            
+            var xRemaining = rectChildrenCount % actualCellCountX;
+            var yRemaining = rectChildrenCount % actualCellCountY;
 
             for (int i = 0; i < rectChildrenCount; i++)
             {
@@ -325,6 +328,17 @@ namespace UnityEngine.UI
                     {
                         positionX = i % cellsPerMainAxis;
                         positionY = i / cellsPerMainAxis;
+                        if (rectChildrenCount - i == xRemaining)
+                        {
+                            requiredSpace = new Vector2(
+                                xRemaining * cellSize.x + (xRemaining - 1) * spacing.x,
+                                actualCellCountY * cellSize.y + (actualCellCountY - 1) * spacing.y
+                            );
+                            startOffset = new Vector2(
+                                GetStartOffset(0, requiredSpace.x),
+                                GetStartOffset(1, requiredSpace.y)
+                            );
+                        }
                     }
                 }
                 else
@@ -338,6 +352,17 @@ namespace UnityEngine.UI
                     {
                         positionX = i / cellsPerMainAxis;
                         positionY = i % cellsPerMainAxis;
+                        if (rectChildrenCount - i == yRemaining)
+                        {
+                            requiredSpace = new Vector2(
+                                actualCellCountX * cellSize.x + (actualCellCountX - 1) * spacing.x,
+                                yRemaining * cellSize.y + (yRemaining - 1) * spacing.y
+                            );
+                            startOffset = new Vector2(
+                                GetStartOffset(0, requiredSpace.x),
+                                GetStartOffset(1, requiredSpace.y)
+                            );
+                        }
                     }
                 }
 
