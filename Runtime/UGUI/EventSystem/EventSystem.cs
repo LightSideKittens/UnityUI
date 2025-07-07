@@ -489,6 +489,7 @@ namespace UnityEngine.EventSystems
                 TickModules();
         }
 
+        public static event Action Updated;
         protected virtual void Update()
         {
             if (current != this)
@@ -543,6 +544,7 @@ namespace UnityEngine.EventSystems
                     Debug.LogWarning("There are " + eventSystemCount + " event systems in the scene. Please ensure there is always exactly one event system in the scene");
             }
 #endif
+            Updated?.Invoke();
         }
 
         private void ChangeEventModule(BaseInputModule module)
