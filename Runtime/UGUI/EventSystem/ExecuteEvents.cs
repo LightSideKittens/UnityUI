@@ -4,6 +4,11 @@ using UnityEngine.Pool;
 
 namespace UnityEngine.EventSystems
 {
+    public interface ISubmittableElement
+    {
+        object Submittable { get; }
+    }
+    
     public static class ExecuteEvents
     {
         public delegate void EventFunction<T1>(T1 handler, BaseEventData eventData);
@@ -301,18 +306,6 @@ namespace UnityEngine.EventSystems
             return null;
         }
 
-        private static bool ShouldSendToComponent<T>(Component component) where T : IEventSystemHandler
-        {
-            var valid = component is T;
-            if (!valid)
-                return false;
-
-            var behaviour = component as Behaviour;
-            if (behaviour != null)
-                return behaviour.isActiveAndEnabled;
-            return true;
-        }
-
         /// <summary>
         /// Get the specified object's event event.
         /// </summary>
@@ -325,20 +318,27 @@ namespace UnityEngine.EventSystems
             if (go == null || !go.activeInHierarchy)
                 return;
 
-            var components = ListPool<Component>.Get();
+            var components = ListPool<IEventSystemHandler>.Get();
             go.GetComponents(components);
-
-            var componentsCount = components.Count;
-            for (var i = 0; i < componentsCount; i++)
+            for (var i = 0; i < components.Count; i++)
             {
-                if (!ShouldSendToComponent<T>(components[i]))
-                    continue;
-
-                // Debug.Log(string.Format("{2} found! On {0}.{1}", go, s_GetComponentsScratch[i].GetType(), typeof(T)));
-                results.Add(components[i] as IEventSystemHandler);
+                if (components[i] is T)
+                { 
+                    results.Add(components[i]);
+                }
             }
-            ListPool<Component>.Release(components);
-            // Debug.LogWarning("end GetEventList<" + typeof(T).Name + ">");
+            ListPool<IEventSystemHandler>.Release(components);
+            
+            var components1 = ListPool<ISubmittableElement>.Get();
+            go.GetComponents(components1);
+            for (var i = 0; i < components1.Count; i++)
+            {
+                if (components1[i].Submittable is T handler)
+                { 
+                    results.Add(handler);
+                }
+            }
+            ListPool<ISubmittableElement>.Release(components1);
         }
 
         /// <summary>
