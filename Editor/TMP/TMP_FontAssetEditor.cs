@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using UnityEngine.TextCore;
 using UnityEngine.TextCore.LowLevel;
 using UnityEditor.TextCore.LowLevel;
+using System;
 
 
 namespace TMPro.EditorUtilities
@@ -254,7 +255,6 @@ namespace TMPro.EditorUtilities
         private int errorCode;
 
         private System.DateTime timeStamp;
-
 
         public void OnEnable()
         {
@@ -533,7 +533,18 @@ namespace TMPro.EditorUtilities
                     {
                         EditorGUI.BeginChangeCheck();
                         // TODO: Switch shaders depending on GlyphRenderMode.
-                        EditorGUILayout.PropertyField(m_AtlasRenderMode_prop);
+                        var glyphRenderValues = (GlyphRenderMode[])Enum.GetValues(typeof(GlyphRenderMode));
+                        GlyphRenderMode currentValue = glyphRenderValues[m_AtlasRenderMode_prop.enumValueIndex];
+                        GlyphRenderModeUI selectedUI = (GlyphRenderModeUI)currentValue;
+
+                        selectedUI = (GlyphRenderModeUI)EditorGUILayout.EnumPopup("Render Mode", selectedUI);
+                        GlyphRenderMode updatedValue = (GlyphRenderMode)selectedUI;
+                        if (updatedValue != currentValue)
+                        {
+                            int updatedIndex = Array.IndexOf(glyphRenderValues, updatedValue);
+                            m_AtlasRenderMode_prop.enumValueIndex = updatedIndex;
+                            m_DisplayDestructiveChangeWarning = true;
+                        }
                         EditorGUILayout.PropertyField(m_SamplingPointSize_prop, new GUIContent("Sampling Point Size"));
                         if (EditorGUI.EndChangeCheck())
                         {

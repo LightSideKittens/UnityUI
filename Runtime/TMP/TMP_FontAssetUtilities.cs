@@ -420,6 +420,48 @@ namespace TMPro
             return null;
         }
 
+        /// <summary>
+        /// Extracts a Unicode code point from a string at the specified index, handling surrogate pairs if present.
+        /// </summary>
+        /// <param name="text">The input string containing the characters to process.</param>
+        /// <param name="index">The current index in the string. This will be incremented if a surrogate pair is found.</param>
+        /// <returns>The Unicode code point at the specified index.</returns>
+        internal static uint GetCodePoint(string text, ref int index)
+        {
+            char c = text[index];
+            if (char.IsHighSurrogate(c)
+                && index + 1 < text.Length
+                && char.IsLowSurrogate(text[index + 1]))
+            {
+                uint cp = (uint)char.ConvertToUtf32(c, text[index + 1]);
+                index++;
+                return cp;
+            }
+
+            return c;
+        }
+
+        /// <summary>
+        /// Extracts a Unicode code point from an array of uint values at the specified index, handling surrogate pairs if present.
+        /// </summary>
+        /// <param name="codesPoints">The array of uint values representing characters to process.</param>
+        /// <param name="index">The current index in the array. This will be incremented if a surrogate pair is found.</param>
+        /// <returns>The Unicode code point at the specified index.</returns>
+        internal static uint GetCodePoint(uint[] codesPoints, ref int index)
+        {
+            char c = (char)codesPoints[index];
+            if (char.IsHighSurrogate(c)
+                && index + 1 < codesPoints.Length
+                && char.IsLowSurrogate((char)codesPoints[index + 1]))
+            {
+                uint cp = (uint)char.ConvertToUtf32(c, (char)codesPoints[index + 1]);
+                index++;
+                return cp;
+            }
+
+            return c;
+        }
+
 
         // =====================================================================
         // FONT ENGINE & FONT FILE MANAGEMENT - Fields, Properties and Functions

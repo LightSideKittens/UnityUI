@@ -935,15 +935,15 @@ namespace UnityEngine.UI
 
         internal SecondarySpriteTexture [] secondaryTextures => m_SecondaryTextures; // Internal for testing only
 
-        static void ClearArray(SecondarySpriteTexture[] array)
+        static void ClearArray(ref SecondarySpriteTexture[] array)
         {
-            Array.Resize(ref array, 0);
+            array = Array.Empty<SecondarySpriteTexture>();
         }
 
         bool CheckSecondaryTexturesChanged(Sprite sprite)
         {
             var changed = CheckSecondaryTexturesChanged(sprite, ref s_TempNewSecondaryTextures);
-            ClearArray(s_TempNewSecondaryTextures);
+            ClearArray(ref s_TempNewSecondaryTextures);
             return changed;
         }
 
@@ -979,7 +979,7 @@ namespace UnityEngine.UI
             }
             else
             {
-                ClearArray(newSecondaryTextures);
+                ClearArray(ref newSecondaryTextures);
             }
 
             // If the list of secondary textures has not changed then return
@@ -1017,7 +1017,7 @@ namespace UnityEngine.UI
                 }
             }
 
-            ClearArray(s_TempNewSecondaryTextures);
+            ClearArray(ref s_TempNewSecondaryTextures);
         }
 
         /// <summary>
@@ -1924,6 +1924,12 @@ namespace UnityEngine.UI
             // Convert local coordinates to texture space.
             float x = local.x / activeSprite.texture.width;
             float y = local.y / activeSprite.texture.height;
+
+            // Locations outside the image are always considered valid.
+            // This guarantees that the behavior remains consistent with the case where alphaHitTestMinimumThreshold <= 0.
+            // Without this check, we would continue to sample a pixel outside the texture.
+            if (x < 0 || x > 1 || y < 0 || y > 1)
+                return true;
 
             try
             {

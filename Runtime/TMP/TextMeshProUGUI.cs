@@ -823,8 +823,12 @@ namespace TMPro
             // Load TMP Settings for new text object instances.
             LoadDefaultSettings();
 
-            // Load the font asset and assign material to renderer.
-            LoadFontAsset();
+#if UNITY_EDITOR
+            // We don't want to call LoadFontAsset when building the game since it causes some characters to be added to the atlas, making the build bigger.
+            if (!UnityEditor.BuildPipeline.isBuildingPlayer)
+#endif
+                // Load the font asset and assign material to renderer.
+                LoadFontAsset();
 
             // Allocate our initial buffers.
             if (m_TextProcessingArray == null)

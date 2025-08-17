@@ -675,13 +675,13 @@ namespace TMPro.EditorUtilities
                 //GUILayout.EndHorizontal();
 
                 // Render Mode Selection
-                CheckForLegacyGlyphRenderMode();
-
+                GlyphRenderModeUI selectedUIMode = (GlyphRenderModeUI)m_GlyphRenderMode;
                 EditorGUI.BeginChangeCheck();
-                m_GlyphRenderMode = (GlyphRenderMode)EditorGUILayout.EnumPopup("Render Mode", m_GlyphRenderMode);
+                selectedUIMode = (GlyphRenderModeUI)EditorGUILayout.EnumPopup("Render Mode", selectedUIMode);
                 if (EditorGUI.EndChangeCheck())
                 {
                     m_IsFontAtlasInvalid = true;
+                    m_GlyphRenderMode = (GlyphRenderMode)selectedUIMode;
                 }
 
                 m_IncludeFontFeatures = EditorGUILayout.Toggle("Get Font Features", m_IncludeFontFeatures);
@@ -1183,7 +1183,6 @@ namespace TMPro.EditorUtilities
             if (m_IsFontAtlasInvalid)
                 ClearGeneratedData();
         }
-
 
         /// <summary>
         /// Clear the previously generated data.
