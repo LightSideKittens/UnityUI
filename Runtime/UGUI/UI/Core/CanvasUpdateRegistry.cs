@@ -107,11 +107,20 @@ namespace UnityEngine.UI
             UISystemProfilerApi.EndSample(UISystemProfilerApi.SampleType.Render);
             Updated?.Invoke();
         }
-
+        
+        private static bool lastIsPlaying = false;
+        
         [Conditional("UNITY_EDITOR")]
         private static void RemoveDestroyed(IndexedSet<ICanvasElement> list)
         {
-            if (Application.isPlaying) return;
+            if (!Application.isPlaying)
+            {
+                lastIsPlaying = false;
+            }
+            
+            if (lastIsPlaying) return;
+            
+            lastIsPlaying = Application.isPlaying;
             
             for (int i = 0; i < list.Count; i++)
             {
