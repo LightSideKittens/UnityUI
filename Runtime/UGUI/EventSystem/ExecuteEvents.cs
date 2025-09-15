@@ -4,9 +4,9 @@ using UnityEngine.Pool;
 
 namespace UnityEngine.EventSystems
 {
-    public interface ISubmittableElement
+    public interface IUIControlElement
     {
-        object Submittable { get; }
+        object UIControl { get; }
     }
     
     public static class ExecuteEvents
@@ -329,16 +329,16 @@ namespace UnityEngine.EventSystems
             }
             ListPool<IEventSystemHandler>.Release(components);
             
-            var components1 = ListPool<ISubmittableElement>.Get();
+            var components1 = ListPool<IUIControlElement>.Get();
             go.GetComponents(components1);
             for (var i = 0; i < components1.Count; i++)
             {
-                if (components1[i].Submittable is T handler)
+                if (components1[i].UIControl is T handler)
                 { 
                     results.Add(handler);
                 }
             }
-            ListPool<ISubmittableElement>.Release(components1);
+            ListPool<IUIControlElement>.Release(components1);
         }
 
         /// <summary>
