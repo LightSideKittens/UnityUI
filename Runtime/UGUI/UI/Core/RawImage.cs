@@ -18,7 +18,7 @@ namespace UnityEngine.UI
     public class RawImage : MaskableGraphic
     {
         [FormerlySerializedAs("m_Tex")]
-        [SerializeField] Texture m_Texture;
+        [SerializeField] protected Texture m_Texture;
         [SerializeField] Rect m_UVRect = new Rect(0f, 0f, 1f, 1f);
 
         protected RawImage()
@@ -91,7 +91,6 @@ namespace UnityEngine.UI
                     return;
 
                 m_Texture = value;
-                SetVerticesDirty();
                 SetMaterialDirty();
             }
         }
