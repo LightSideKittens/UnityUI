@@ -287,7 +287,7 @@ namespace TMPro
         public Vector4 maskOffset
         {
             get { return m_maskOffset; }
-            set { m_maskOffset = value; UpdateMask(); m_havePropertiesChanged = true; }
+            set { m_maskOffset = value; UpdateMask(); _havePropertiesChanged = true; }
         }
 
 
@@ -373,7 +373,7 @@ namespace TMPro
         {
             m_padding = ShaderUtilities.GetPadding(m_sharedMaterial, m_enableExtraPadding, m_isUsingBold);
             m_isMaskingEnabled = ShaderUtilities.IsMaskingEnabled(m_sharedMaterial);
-            m_havePropertiesChanged = true;
+            _havePropertiesChanged = true;
             checkPaddingRequired = false;
 
             if (m_textInfo == null) return;
@@ -431,7 +431,7 @@ namespace TMPro
         /// <param name="forceTextReparsing">Force re-parsing of the text.</param>
         public override void ForceMeshUpdate(bool ignoreActiveState = false, bool forceTextReparsing = false)
         {
-            m_havePropertiesChanged = true;
+            _havePropertiesChanged = true;
             m_ignoreActiveState = ignoreActiveState;
 
             if (m_canvas == null)
@@ -686,7 +686,7 @@ namespace TMPro
             m_cached_TextElement = new TMP_Character();
             m_isFirstAllocation = true;
 
-            m_havePropertiesChanged = true;
+            _havePropertiesChanged = true;
 
             m_isAwake = true;
         }
@@ -792,7 +792,7 @@ namespace TMPro
             LoadDefaultSettings();
             LoadFontAsset();
 
-            m_havePropertiesChanged = true;
+            _havePropertiesChanged = true;
         }
 
 
@@ -815,9 +815,8 @@ namespace TMPro
 
             m_padding = GetPaddingForMaterial();
             ComputeMarginSize();
-
-            m_inputSource = TextInputSources.TextInputBox;
-            m_havePropertiesChanged = true;
+            
+            _havePropertiesChanged = true;
             m_isPreferredWidthDirty = true;
             m_isPreferredHeightDirty = true;
 
@@ -920,7 +919,7 @@ namespace TMPro
 
             m_padding = GetPaddingForMaterial();
             ValidateEnvMapProperty();
-            m_havePropertiesChanged = true;
+            _havePropertiesChanged = true;
             SetVerticesDirty();
         }
 
@@ -928,7 +927,7 @@ namespace TMPro
         private void ON_FONT_PROPERTY_CHANGED(bool isChanged, Object font)
         {
             {
-                m_havePropertiesChanged = true;
+                _havePropertiesChanged = true;
 
                 UpdateMeshPadding();
 
@@ -942,7 +941,7 @@ namespace TMPro
         {
             if (obj == this)
             {
-                m_havePropertiesChanged = true;
+                _havePropertiesChanged = true;
 
                 ComputeMarginSize();
                 SetVerticesDirty();
@@ -961,7 +960,7 @@ namespace TMPro
 
                 m_padding = GetPaddingForMaterial();
 
-                m_havePropertiesChanged = true;
+                _havePropertiesChanged = true;
                 SetVerticesDirty();
                 SetMaterialDirty();
             }
@@ -970,7 +969,7 @@ namespace TMPro
 
         private void ON_TEXT_STYLE_CHANGED(bool isChanged)
         {
-            m_havePropertiesChanged = true;
+            _havePropertiesChanged = true;
             SetVerticesDirty();
         }
 
@@ -981,7 +980,7 @@ namespace TMPro
         /// <param name="textObject"></param>
         private void ON_COLOR_GRADIENT_CHANGED(Object gradient)
         {
-            m_havePropertiesChanged = true;
+            _havePropertiesChanged = true;
             SetVerticesDirty();
         }
 
@@ -992,7 +991,7 @@ namespace TMPro
         private void ON_TMP_SETTINGS_CHANGED()
         {
             m_defaultSpriteAsset = null;
-            m_havePropertiesChanged = true;
+            _havePropertiesChanged = true;
             SetAllDirty();
         }
         #endif
@@ -1894,7 +1893,7 @@ namespace TMPro
         /// </summary>
         protected override void OnDidApplyAnimationProperties()
         {
-            m_havePropertiesChanged = true;
+            _havePropertiesChanged = true;
             SetVerticesDirty();
             SetLayoutDirty();
         }
@@ -1923,7 +1922,7 @@ namespace TMPro
             m_canvas = this.canvas;
 
             ComputeMarginSize();
-            m_havePropertiesChanged = true;
+            _havePropertiesChanged = true;
         }
 
 
@@ -1961,7 +1960,7 @@ namespace TMPro
         /// </summary>
         internal override void InternalUpdate()
         {
-            if (m_havePropertiesChanged == false)
+            if (_havePropertiesChanged == false)
             {
                 float lossyScaleY = m_rectTransform.lossyScale.y;
 
@@ -1979,7 +1978,7 @@ namespace TMPro
 
             if (m_isUsingLegacyAnimationComponent)
             {
-                m_havePropertiesChanged = true;
+                _havePropertiesChanged = true;
                 OnPreRenderCanvas();
             }
 
@@ -1998,7 +1997,7 @@ namespace TMPro
             if (m_canvas == null) { m_canvas = this.canvas; if (m_canvas == null) return; }
 
 
-            if (m_havePropertiesChanged || m_isLayoutDirty)
+            if (_havePropertiesChanged || m_isLayoutDirty)
             {
                 if (m_fontAsset == null)
                 {
@@ -2022,7 +2021,7 @@ namespace TMPro
 
                 m_isTextTruncated = false;
 
-                m_havePropertiesChanged = false;
+                _havePropertiesChanged = false;
                 m_isLayoutDirty = false;
                 m_ignoreActiveState = false;
 
@@ -2890,7 +2889,6 @@ namespace TMPro
                                 if (m_linkedTextComponent != null)
                                 {
                                     m_linkedTextComponent.text = text;
-                                    m_linkedTextComponent.m_inputSource = m_inputSource;
                                     m_linkedTextComponent.firstVisibleCharacter = m_characterCount;
                                     m_linkedTextComponent.ForceMeshUpdate();
 
@@ -3183,7 +3181,6 @@ namespace TMPro
                                         if (m_linkedTextComponent != null)
                                         {
                                             m_linkedTextComponent.text = text;
-                                            m_linkedTextComponent.m_inputSource = m_inputSource;
                                             m_linkedTextComponent.firstVisibleCharacter = m_characterCount;
                                             m_linkedTextComponent.ForceMeshUpdate();
 
@@ -3317,7 +3314,6 @@ namespace TMPro
                                     if (m_linkedTextComponent != null)
                                     {
                                         m_linkedTextComponent.text = text;
-                                        m_linkedTextComponent.m_inputSource = m_inputSource;
                                         m_linkedTextComponent.firstVisibleCharacter = m_characterCount;
                                         m_linkedTextComponent.ForceMeshUpdate();
 
@@ -3408,7 +3404,6 @@ namespace TMPro
                             if (m_linkedTextComponent != null)
                             {
                                 m_linkedTextComponent.text = text;
-                                m_linkedTextComponent.m_inputSource = m_inputSource;
                                 m_linkedTextComponent.firstVisibleCharacter = m_characterCount;
                                 m_linkedTextComponent.ForceMeshUpdate();
 
@@ -4735,7 +4730,7 @@ namespace TMPro
         {
             if (scaleDelta == 0 || scaleDelta == float.PositiveInfinity || scaleDelta == float.NegativeInfinity)
             {
-                m_havePropertiesChanged = true;
+                _havePropertiesChanged = true;
                 OnPreRenderCanvas();
                 return;
             }

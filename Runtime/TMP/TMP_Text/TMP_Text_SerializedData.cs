@@ -27,8 +27,7 @@ namespace TMPro
 
                 m_IsTextBackingStringDirty = false;
                 m_text = value;
-                m_inputSource = TextInputSources.TextString;
-                m_havePropertiesChanged = true;
+                _havePropertiesChanged = true;
                 SetVerticesDirty();
                 SetLayoutDirty();
             }
@@ -59,7 +58,7 @@ namespace TMPro
         public bool isRightToLeftText
         {
             get { return m_isRightToLeft; }
-            set { if (m_isRightToLeft == value) return; m_isRightToLeft = value; m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_isRightToLeft == value) return; m_isRightToLeft = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected bool m_isRightToLeft = false;
@@ -71,7 +70,7 @@ namespace TMPro
         public TMP_FontAsset font
         {
             get { return m_fontAsset; }
-            set { if (m_fontAsset == value) return; m_fontAsset = value; LoadFontAsset(); m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_fontAsset == value) return; m_fontAsset = value; LoadFontAsset(); _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected TMP_FontAsset m_fontAsset;
@@ -85,7 +84,7 @@ namespace TMPro
         public virtual Material fontSharedMaterial
         {
             get { return m_sharedMaterial; }
-            set { if (m_sharedMaterial == value) return; SetSharedMaterial(value); m_havePropertiesChanged = true; SetVerticesDirty(); SetMaterialDirty(); }
+            set { if (m_sharedMaterial == value) return; SetSharedMaterial(value); _havePropertiesChanged = true; SetVerticesDirty(); SetMaterialDirty(); }
         }
         [SerializeField]
         protected Material m_sharedMaterial;
@@ -103,7 +102,7 @@ namespace TMPro
         public virtual Material[] fontSharedMaterials
         {
             get { return GetSharedMaterials(); }
-            set { SetSharedMaterials(value); m_havePropertiesChanged = true; SetVerticesDirty(); SetMaterialDirty(); }
+            set { SetSharedMaterials(value); _havePropertiesChanged = true; SetVerticesDirty(); SetMaterialDirty(); }
         }
         [SerializeField]
         protected Material[] m_fontSharedMaterials;
@@ -123,7 +122,7 @@ namespace TMPro
                 m_sharedMaterial = value;
 
                 m_padding = GetPaddingForMaterial();
-                m_havePropertiesChanged = true;
+                _havePropertiesChanged = true;
 
                 SetVerticesDirty();
                 SetMaterialDirty();
@@ -140,7 +139,7 @@ namespace TMPro
         {
             get { return GetMaterials(m_fontSharedMaterials); }
 
-            set { SetSharedMaterials(value); m_havePropertiesChanged = true; SetVerticesDirty(); SetMaterialDirty(); }
+            set { SetSharedMaterials(value); _havePropertiesChanged = true; SetVerticesDirty(); SetMaterialDirty(); }
         }
         [SerializeField]
         protected Material[] m_fontMaterials;
@@ -154,7 +153,7 @@ namespace TMPro
         public override Color color
         {
             get { return m_fontColor; }
-            set { if (m_fontColor == value) return; m_havePropertiesChanged = true; m_fontColor = value; SetVerticesDirty(); }
+            set { if (m_fontColor == value) return; _havePropertiesChanged = true; m_fontColor = value; SetVerticesDirty(); }
         }
 
         [SerializeField]
@@ -173,7 +172,7 @@ namespace TMPro
         public float alpha
         {
             get { return m_fontColor.a; }
-            set { if (m_fontColor.a == value) return; m_fontColor.a = value; m_havePropertiesChanged = true; SetVerticesDirty(); }
+            set { if (m_fontColor.a == value) return; m_fontColor.a = value; _havePropertiesChanged = true; SetVerticesDirty(); }
         }
 
 
@@ -184,7 +183,7 @@ namespace TMPro
         public bool enableVertexGradient
         {
             get { return m_enableVertexGradient; }
-            set { if (m_enableVertexGradient == value) return; m_havePropertiesChanged = true; m_enableVertexGradient = value; SetVerticesDirty(); }
+            set { if (m_enableVertexGradient == value) return; _havePropertiesChanged = true; m_enableVertexGradient = value; SetVerticesDirty(); }
         }
         [SerializeField]
         protected bool m_enableVertexGradient;
@@ -199,7 +198,7 @@ namespace TMPro
         public VertexGradient colorGradient
         {
             get { return m_fontColorGradient; }
-            set { m_havePropertiesChanged = true; m_fontColorGradient = value; SetVerticesDirty(); }
+            set { _havePropertiesChanged = true; m_fontColorGradient = value; SetVerticesDirty(); }
         }
         [SerializeField]
         protected VertexGradient m_fontColorGradient = new VertexGradient(Color.white);
@@ -211,7 +210,7 @@ namespace TMPro
         public TMP_ColorGradient colorGradientPreset
         {
             get { return m_fontColorGradientPreset; }
-            set { m_havePropertiesChanged = true; m_fontColorGradientPreset = value; SetVerticesDirty(); }
+            set { _havePropertiesChanged = true; m_fontColorGradientPreset = value; SetVerticesDirty(); }
         }
         [SerializeField]
         protected TMP_ColorGradient m_fontColorGradientPreset;
@@ -223,7 +222,7 @@ namespace TMPro
         public TMP_SpriteAsset spriteAsset
         {
             get { return m_spriteAsset; }
-            set { m_spriteAsset = value; m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { m_spriteAsset = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected TMP_SpriteAsset m_spriteAsset;
@@ -235,7 +234,7 @@ namespace TMPro
         public bool tintAllSprites
         {
             get { return m_tintAllSprites; }
-            set { if (m_tintAllSprites == value) return; m_tintAllSprites = value; m_havePropertiesChanged = true; SetVerticesDirty(); }
+            set { if (m_tintAllSprites == value) return; m_tintAllSprites = value; _havePropertiesChanged = true; SetVerticesDirty(); }
         }
         [SerializeField]
         protected bool m_tintAllSprites;
@@ -248,7 +247,7 @@ namespace TMPro
         public TMP_StyleSheet styleSheet
         {
             get { return m_StyleSheet; }
-            set { m_StyleSheet = value; m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { m_StyleSheet = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected TMP_StyleSheet m_StyleSheet;
@@ -271,7 +270,7 @@ namespace TMPro
                 return m_TextStyle;
             }
 
-            set { m_TextStyle = value; m_TextStyleHashCode = m_TextStyle.hashCode; m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { m_TextStyle = value; m_TextStyleHashCode = m_TextStyle.hashCode; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         internal TMP_Style m_TextStyle;
         [SerializeField]
@@ -283,7 +282,7 @@ namespace TMPro
         public bool overrideColorTags
         {
             get { return m_overrideHtmlColors; }
-            set { if (m_overrideHtmlColors == value) return; m_havePropertiesChanged = true; m_overrideHtmlColors = value; SetVerticesDirty(); }
+            set { if (m_overrideHtmlColors == value) return; _havePropertiesChanged = true; m_overrideHtmlColors = value; SetVerticesDirty(); }
         }
         [SerializeField]
         protected bool m_overrideHtmlColors = false;
@@ -302,7 +301,7 @@ namespace TMPro
                 return m_faceColor;
             }
 
-            set { if (m_faceColor.Compare(value)) return; SetFaceColor(value); m_havePropertiesChanged = true; m_faceColor = value; SetVerticesDirty(); SetMaterialDirty(); }
+            set { if (m_faceColor.Compare(value)) return; SetFaceColor(value); _havePropertiesChanged = true; m_faceColor = value; SetVerticesDirty(); SetMaterialDirty(); }
         }
         [SerializeField]
         protected Color32 m_faceColor = Color.white;
@@ -321,7 +320,7 @@ namespace TMPro
                 return m_outlineColor;
             }
 
-            set { if (m_outlineColor.Compare(value)) return; SetOutlineColor(value); m_havePropertiesChanged = true; m_outlineColor = value; SetVerticesDirty(); }
+            set { if (m_outlineColor.Compare(value)) return; SetOutlineColor(value); _havePropertiesChanged = true; m_outlineColor = value; SetVerticesDirty(); }
         }
 
         protected Color32 m_outlineColor = Color.black;
@@ -339,7 +338,7 @@ namespace TMPro
                 m_outlineWidth = m_sharedMaterial.GetFloat(ShaderUtilities.ID_OutlineWidth);
                 return m_outlineWidth;
             }
-            set { if (m_outlineWidth == value) return; SetOutlineThickness(value); m_havePropertiesChanged = true; m_outlineWidth = value; SetVerticesDirty(); }
+            set { if (m_outlineWidth == value) return; SetOutlineThickness(value); _havePropertiesChanged = true; m_outlineWidth = value; SetVerticesDirty(); }
         }
         protected float m_outlineWidth = 0.0f;
 
@@ -360,7 +359,7 @@ namespace TMPro
         public float fontSize
         {
             get { return m_fontSize; }
-            set { if (m_fontSize == value) return; m_havePropertiesChanged = true; m_fontSize = value; if (!m_enableAutoSizing) m_fontSizeBase = m_fontSize; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_fontSize == value) return; _havePropertiesChanged = true; m_fontSize = value; if (!m_enableAutoSizing) m_fontSizeBase = m_fontSize; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected float m_fontSize = -99;
@@ -377,7 +376,7 @@ namespace TMPro
         public FontWeight fontWeight
         {
             get { return m_fontWeight; }
-            set { if (m_fontWeight == value) return; m_fontWeight = value; m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_fontWeight == value) return; m_fontWeight = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected FontWeight m_fontWeight = FontWeight.Regular;
@@ -451,7 +450,7 @@ namespace TMPro
         public FontStyles fontStyle
         {
             get { return m_fontStyle; }
-            set { if (m_fontStyle == value) return; m_fontStyle = value; m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_fontStyle == value) return; m_fontStyle = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected FontStyles m_fontStyle = FontStyles.Normal;
@@ -477,7 +476,7 @@ namespace TMPro
 
                 m_HorizontalAlignment = value;
 
-                m_havePropertiesChanged = true;
+                _havePropertiesChanged = true;
                 SetVerticesDirty();
             }
         }
@@ -497,7 +496,7 @@ namespace TMPro
 
                 m_VerticalAlignment = value;
 
-                m_havePropertiesChanged = true;
+                _havePropertiesChanged = true;
                 SetVerticesDirty();
             }
         }
@@ -520,7 +519,7 @@ namespace TMPro
 
                 m_HorizontalAlignment = horizontalAlignment;
                 m_VerticalAlignment = verticalAlignment;
-                m_havePropertiesChanged = true;
+                _havePropertiesChanged = true;
                 SetVerticesDirty();
             }
         }
@@ -543,7 +542,7 @@ namespace TMPro
         public float characterSpacing
         {
             get { return m_characterSpacing; }
-            set { if (m_characterSpacing == value) return; m_havePropertiesChanged = true; m_characterSpacing = value; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_characterSpacing == value) return; _havePropertiesChanged = true; m_characterSpacing = value; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected float m_characterSpacing = 0;
@@ -557,7 +556,7 @@ namespace TMPro
         public float wordSpacing
         {
             get { return m_wordSpacing; }
-            set { if (m_wordSpacing == value) return; m_havePropertiesChanged = true; m_wordSpacing = value; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_wordSpacing == value) return; _havePropertiesChanged = true; m_wordSpacing = value; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected float m_wordSpacing = 0;
@@ -568,7 +567,7 @@ namespace TMPro
         public float lineSpacing
         {
             get { return m_lineSpacing; }
-            set { if (m_lineSpacing == value) return; m_havePropertiesChanged = true; m_lineSpacing = value; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_lineSpacing == value) return; _havePropertiesChanged = true; m_lineSpacing = value; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected float m_lineSpacing = 0;
@@ -583,7 +582,7 @@ namespace TMPro
         public float lineSpacingAdjustment
         {
             get { return m_lineSpacingMax; }
-            set { if (m_lineSpacingMax == value) return; m_havePropertiesChanged = true; m_lineSpacingMax = value; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_lineSpacingMax == value) return; _havePropertiesChanged = true; m_lineSpacingMax = value; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected float m_lineSpacingMax = 0;
@@ -594,7 +593,7 @@ namespace TMPro
         public float paragraphSpacing
         {
             get { return m_paragraphSpacing; }
-            set { if (m_paragraphSpacing == value) return; m_havePropertiesChanged = true; m_paragraphSpacing = value; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_paragraphSpacing == value) return; _havePropertiesChanged = true; m_paragraphSpacing = value; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected float m_paragraphSpacing = 0;
@@ -606,7 +605,7 @@ namespace TMPro
         public float characterWidthAdjustment
         {
             get { return m_charWidthMaxAdj; }
-            set { if (m_charWidthMaxAdj == value) return; m_havePropertiesChanged = true; m_charWidthMaxAdj = value; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_charWidthMaxAdj == value) return; _havePropertiesChanged = true; m_charWidthMaxAdj = value; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected float m_charWidthMaxAdj = 0f;
@@ -620,7 +619,7 @@ namespace TMPro
         public TextWrappingModes textWrappingMode
         {
             get { return m_TextWrappingMode; }
-            set { if (m_TextWrappingMode == value) return; m_havePropertiesChanged = true; m_TextWrappingMode = value; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_TextWrappingMode == value) return; _havePropertiesChanged = true; m_TextWrappingMode = value; SetVerticesDirty(); SetLayoutDirty(); }
         }
 
         
@@ -636,7 +635,7 @@ namespace TMPro
         public float wordWrappingRatios
         {
             get { return m_wordWrappingRatios; }
-            set { if (m_wordWrappingRatios == value) return; m_wordWrappingRatios = value; m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_wordWrappingRatios == value) return; m_wordWrappingRatios = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected float m_wordWrappingRatios = 0.4f;
@@ -653,7 +652,7 @@ namespace TMPro
         public TextOverflowModes overflowMode
         {
             get { return m_overflowMode; }
-            set { if (m_overflowMode == value) return; m_overflowMode = value; m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_overflowMode == value) return; m_overflowMode = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected TextOverflowModes m_overflowMode = TextOverflowModes.Overflow;
@@ -706,7 +705,7 @@ namespace TMPro
                     m_linkedTextComponent.parentLinkedComponent = this;
                 }
 
-                m_havePropertiesChanged = true;
+                _havePropertiesChanged = true;
                 SetVerticesDirty();
                 SetLayoutDirty();
             }
@@ -740,7 +739,7 @@ namespace TMPro
                 if (value == null)
                     return;
 
-                m_havePropertiesChanged = true; m_ActiveFontFeatures = value; SetVerticesDirty(); SetLayoutDirty();
+                _havePropertiesChanged = true; m_ActiveFontFeatures = value; SetVerticesDirty(); SetLayoutDirty();
             }
         }
         [SerializeField]
@@ -752,7 +751,7 @@ namespace TMPro
         public bool extraPadding
         {
             get { return m_enableExtraPadding; }
-            set { if (m_enableExtraPadding == value) return; m_havePropertiesChanged = true; m_enableExtraPadding = value; UpdateMeshPadding(); SetVerticesDirty();
+            set { if (m_enableExtraPadding == value) return; _havePropertiesChanged = true; m_enableExtraPadding = value; UpdateMeshPadding(); SetVerticesDirty();
             }
         }
         [SerializeField]
@@ -767,7 +766,7 @@ namespace TMPro
         public bool richText
         {
             get { return m_isRichText; }
-            set { if (m_isRichText == value) return; m_isRichText = value; m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_isRichText == value) return; m_isRichText = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected bool m_isRichText = true;
@@ -778,7 +777,7 @@ namespace TMPro
         public bool emojiFallbackSupport
         {
             get { return m_EmojiFallbackSupport; }
-            set { if (m_EmojiFallbackSupport == value) return; m_EmojiFallbackSupport = value; m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_EmojiFallbackSupport == value) return; m_EmojiFallbackSupport = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         private bool m_EmojiFallbackSupport = true;
@@ -790,7 +789,7 @@ namespace TMPro
         public bool parseCtrlCharacters
         {
             get { return m_parseCtrlCharacters; }
-            set { if (m_parseCtrlCharacters == value) return; m_parseCtrlCharacters = value; m_havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_parseCtrlCharacters == value) return; m_parseCtrlCharacters = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected bool m_parseCtrlCharacters = true;
@@ -802,7 +801,7 @@ namespace TMPro
         public bool isOverlay
         {
             get { return m_isOverlay; }
-            set { if (m_isOverlay == value) return; m_isOverlay = value; SetShaderDepth(); m_havePropertiesChanged = true; SetVerticesDirty(); }
+            set { if (m_isOverlay == value) return; m_isOverlay = value; SetShaderDepth(); _havePropertiesChanged = true; SetVerticesDirty(); }
         }
         protected bool m_isOverlay = false;
 
@@ -813,7 +812,7 @@ namespace TMPro
         public bool isOrthographic
         {
             get { return m_isOrthographic; }
-            set { if (m_isOrthographic == value) return; m_havePropertiesChanged = true; m_isOrthographic = value; SetVerticesDirty(); }
+            set { if (m_isOrthographic == value) return; _havePropertiesChanged = true; m_isOrthographic = value; SetVerticesDirty(); }
         }
         [SerializeField]
         protected bool m_isOrthographic = false;
@@ -825,7 +824,7 @@ namespace TMPro
         public bool enableCulling
         {
             get { return m_isCullingEnabled; }
-            set { if (m_isCullingEnabled == value) return; m_isCullingEnabled = value; SetCulling(); m_havePropertiesChanged = true; }
+            set { if (m_isCullingEnabled == value) return; m_isCullingEnabled = value; SetCulling(); _havePropertiesChanged = true; }
         }
         [SerializeField]
         protected bool m_isCullingEnabled = false;
@@ -839,7 +838,7 @@ namespace TMPro
         public bool ignoreVisibility
         {
             get { return m_ignoreCulling; }
-            set { if (m_ignoreCulling == value) return; m_havePropertiesChanged = true; m_ignoreCulling = value; }
+            set { if (m_ignoreCulling == value) return; _havePropertiesChanged = true; m_ignoreCulling = value; }
         }
 
         protected bool m_ignoreCulling = true;
@@ -851,7 +850,7 @@ namespace TMPro
         public TextureMappingOptions horizontalMapping
         {
             get { return m_horizontalMapping; }
-            set { if (m_horizontalMapping == value) return; m_havePropertiesChanged = true; m_horizontalMapping = value; SetVerticesDirty(); }
+            set { if (m_horizontalMapping == value) return; _havePropertiesChanged = true; m_horizontalMapping = value; SetVerticesDirty(); }
         }
         [SerializeField]
         protected TextureMappingOptions m_horizontalMapping = TextureMappingOptions.Character;
@@ -863,7 +862,7 @@ namespace TMPro
         public TextureMappingOptions verticalMapping
         {
             get { return m_verticalMapping; }
-            set { if (m_verticalMapping == value) return; m_havePropertiesChanged = true; m_verticalMapping = value; SetVerticesDirty(); }
+            set { if (m_verticalMapping == value) return; _havePropertiesChanged = true; m_verticalMapping = value; SetVerticesDirty(); }
         }
         [SerializeField]
         protected TextureMappingOptions m_verticalMapping = TextureMappingOptions.Character;
@@ -880,7 +879,7 @@ namespace TMPro
         public float mappingUvLineOffset
         {
             get { return m_uvLineOffset; }
-            set { if (m_uvLineOffset == value) return; m_havePropertiesChanged = true; m_uvLineOffset = value; SetVerticesDirty(); }
+            set { if (m_uvLineOffset == value) return; _havePropertiesChanged = true; m_uvLineOffset = value; SetVerticesDirty(); }
         }
         [SerializeField]
         protected float m_uvLineOffset = 0.0f;
@@ -892,7 +891,7 @@ namespace TMPro
         public TextRenderFlags renderMode
         {
             get { return m_renderMode; }
-            set { if (m_renderMode == value) return; m_renderMode = value; m_havePropertiesChanged = true; }
+            set { if (m_renderMode == value) return; m_renderMode = value; _havePropertiesChanged = true; }
         }
         protected TextRenderFlags m_renderMode = TextRenderFlags.Render;
 
@@ -904,7 +903,7 @@ namespace TMPro
         {
             get { return m_geometrySortingOrder; }
 
-            set { m_geometrySortingOrder = value; m_havePropertiesChanged = true; SetVerticesDirty(); }
+            set { m_geometrySortingOrder = value; _havePropertiesChanged = true; SetVerticesDirty(); }
 
         }
         [SerializeField]
@@ -940,7 +939,7 @@ namespace TMPro
         public bool vertexBufferAutoSizeReduction
         {
             get { return m_VertexBufferAutoSizeReduction; }
-            set { m_VertexBufferAutoSizeReduction = value; m_havePropertiesChanged = true; SetVerticesDirty(); }
+            set { m_VertexBufferAutoSizeReduction = value; _havePropertiesChanged = true; SetVerticesDirty(); }
         }
         [SerializeField]
         protected bool m_VertexBufferAutoSizeReduction = false;
@@ -951,7 +950,7 @@ namespace TMPro
         public int firstVisibleCharacter
         {
             get { return m_firstVisibleCharacter; }
-            set { if (m_firstVisibleCharacter == value) return; m_havePropertiesChanged = true; m_firstVisibleCharacter = value; SetVerticesDirty(); }
+            set { if (m_firstVisibleCharacter == value) return; _havePropertiesChanged = true; m_firstVisibleCharacter = value; SetVerticesDirty(); }
         }
 
         protected int m_firstVisibleCharacter;
@@ -962,7 +961,7 @@ namespace TMPro
         public int maxVisibleCharacters
         {
             get { return m_maxVisibleCharacters; }
-            set { if (m_maxVisibleCharacters == value) return; m_havePropertiesChanged = true; m_maxVisibleCharacters = value; SetVerticesDirty(); }
+            set { if (m_maxVisibleCharacters == value) return; _havePropertiesChanged = true; m_maxVisibleCharacters = value; SetVerticesDirty(); }
         }
         protected int m_maxVisibleCharacters = 99999;
 
@@ -973,7 +972,7 @@ namespace TMPro
         public int maxVisibleWords
         {
             get { return m_maxVisibleWords; }
-            set { if (m_maxVisibleWords == value) return; m_havePropertiesChanged = true; m_maxVisibleWords = value; SetVerticesDirty(); }
+            set { if (m_maxVisibleWords == value) return; _havePropertiesChanged = true; m_maxVisibleWords = value; SetVerticesDirty(); }
         }
         protected int m_maxVisibleWords = 99999;
 
@@ -984,7 +983,7 @@ namespace TMPro
         public int maxVisibleLines
         {
             get { return m_maxVisibleLines; }
-            set { if (m_maxVisibleLines == value) return; m_havePropertiesChanged = true; m_maxVisibleLines = value; SetVerticesDirty(); }
+            set { if (m_maxVisibleLines == value) return; _havePropertiesChanged = true; m_maxVisibleLines = value; SetVerticesDirty(); }
         }
         protected int m_maxVisibleLines = 99999;
 
@@ -995,7 +994,7 @@ namespace TMPro
         public bool useMaxVisibleDescender
         {
             get { return m_useMaxVisibleDescender; }
-            set { if (m_useMaxVisibleDescender == value) return; m_havePropertiesChanged = true; m_useMaxVisibleDescender = value; SetVerticesDirty(); }
+            set { if (m_useMaxVisibleDescender == value) return; _havePropertiesChanged = true; m_useMaxVisibleDescender = value; SetVerticesDirty(); }
         }
         [SerializeField]
         protected bool m_useMaxVisibleDescender = true;
@@ -1007,7 +1006,7 @@ namespace TMPro
         public int pageToDisplay
         {
             get { return m_pageToDisplay; }
-            set { if (m_pageToDisplay == value) return; m_havePropertiesChanged = true; m_pageToDisplay = value; SetVerticesDirty(); }
+            set { if (m_pageToDisplay == value) return; _havePropertiesChanged = true; m_pageToDisplay = value; SetVerticesDirty(); }
         }
         [SerializeField]
         protected int m_pageToDisplay = 1;
@@ -1019,7 +1018,7 @@ namespace TMPro
         public virtual Vector4 margin
         {
             get { return m_margin; }
-            set { if (m_margin == value) return; m_margin = value; ComputeMarginSize(); m_havePropertiesChanged = true; SetVerticesDirty(); }
+            set { if (m_margin == value) return; m_margin = value; ComputeMarginSize(); _havePropertiesChanged = true; SetVerticesDirty(); }
         }
         [SerializeField]
         protected Vector4 m_margin = new Vector4(0, 0, 0, 0);
@@ -1052,7 +1051,20 @@ namespace TMPro
         public bool havePropertiesChanged
         {
             get { return m_havePropertiesChanged; }
-            set { if (m_havePropertiesChanged == value) return; m_havePropertiesChanged = value; SetAllDirty(); }
+            set { if (m_havePropertiesChanged == value) return; _havePropertiesChanged = value; SetAllDirty(); }
+        }
+
+        internal bool _havePropertiesChanged
+        {
+            get { return m_havePropertiesChanged; }
+            set
+            {
+                if (m_havePropertiesChanged == value) return;
+                
+                needParseInputText = true;
+                m_havePropertiesChanged = value; 
+                
+            }
         }
 
         protected bool m_havePropertiesChanged;
@@ -1138,7 +1150,7 @@ namespace TMPro
         public bool isVolumetricText
         {
             get { return m_isVolumetricText; }
-            set { if (m_isVolumetricText == value) return; m_havePropertiesChanged = value; m_textInfo.ResetVertexLayout(value); SetVerticesDirty(); SetLayoutDirty(); }
+            set { if (m_isVolumetricText == value) return; _havePropertiesChanged = value; m_textInfo.ResetVertexLayout(value); SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected bool m_isVolumetricText;

@@ -200,10 +200,6 @@ namespace TMPro
             }
         }
 
-        internal enum TextInputSources { TextInputBox = 0, SetText = 1, SetTextArray = 2, TextString = 3 };
-
-        internal TextInputSources m_inputSource;
-
         protected float m_fontScaleMultiplier;
 
         private static char[] m_htmlTag = new char[128];

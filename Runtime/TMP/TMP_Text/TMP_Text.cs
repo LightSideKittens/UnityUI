@@ -3,6 +3,7 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -423,6 +424,21 @@ namespace TMPro
         private TextBackingContainer m_TextBackingArray = new TextBackingContainer(4);
 
 
+        protected bool needParseInputText = true;
+
+        protected bool NeedSetArraySizes
+        {
+            get
+            {
+                for (int i = 0; i < m_textInfo.meshInfo.Length; i++)
+                {
+                    if (m_textInfo.meshInfo[i].vertices == null) return true;
+                }
+                
+                return false;
+            }
+        }
+        
         /// <summary>
         /// Method to parse the input text based on its source
         /// </summary>
@@ -430,24 +446,20 @@ namespace TMPro
         {
             k_ParseTextMarker.Begin();
 
-            switch (m_inputSource)
+            if (needParseInputText)
             {
-                case TextInputSources.TextString:
-                case TextInputSources.TextInputBox:
-                    PopulateTextBackingArray(m_TextPreprocessor == null ? m_text : m_TextPreprocessor.PreprocessText(m_text));
-                    PopulateTextProcessingArray();
-                    break;
-                case TextInputSources.SetText:
-                    break;
-                case TextInputSources.SetTextArray:
-                    break;
+                PopulateTextBackingArray(m_TextPreprocessor == null ? m_text : m_TextPreprocessor.PreprocessText(m_text));
+                PopulateTextProcessingArray();
             }
 
-            SetArraySizes(m_TextProcessingArray);
+            if (needParseInputText || NeedSetArraySizes)
+            {
+                SetArraySizes(m_TextProcessingArray);
+            }
 
             k_ParseTextMarker.End();
+            needParseInputText = false;
         }
-
 
         /// <summary>
         /// Convert source text to Unicode (uint) and populate internal text backing array.
@@ -455,7 +467,7 @@ namespace TMPro
         /// <param name="sourceText">Source text to be converted</param>
         private void PopulateTextBackingArray(string sourceText)
         {
-            int srcLength = sourceText == null ? 0 : sourceText.Length;
+            int srcLength = sourceText?.Length ?? 0;
 
             PopulateTextBackingArray(sourceText, 0, srcLength);
         }
@@ -787,16 +799,10 @@ namespace TMPro
         /// <param name="sourceText"></param>
         private void SetTextInternal(string sourceText)
         {
-            int srcLength = sourceText == null ? 0 : sourceText.Length;
+            int srcLength = sourceText?.Length ?? 0;
 
             PopulateTextBackingArray(sourceText, 0, srcLength);
-
-            TextInputSources currentInputSource = m_inputSource;
-            m_inputSource = TextInputSources.TextString;
-
             PopulateTextProcessingArray();
-
-            m_inputSource = currentInputSource;
         }
 
         /// <summary>
@@ -805,369 +811,15 @@ namespace TMPro
         /// <param name="sourceText">String containing the text.</param>
         public void SetText(string sourceText)
         {
-            int srcLength = sourceText == null ? 0 : sourceText.Length;
+            int srcLength = sourceText?.Length ?? 0;
 
             PopulateTextBackingArray(sourceText, 0, srcLength);
 
             m_text = sourceText;
 
-            m_inputSource = TextInputSources.TextString;
-
             PopulateTextProcessingArray();
 
-            m_havePropertiesChanged = true;
-
-            SetVerticesDirty();
-            SetLayoutDirty();
-        }
-
-        /// <summary>
-        /// <para>Formatted string containing a pattern and a value representing the text to be rendered.</para>
-        /// <para>Ex. TMP_Text.SetText("A = {0}, B = {1:00}, C = {2:000.0}", 10.75f, 10.75f, 10.75f);</para>
-        /// <para>Results "A = 10.75, B = 11, C = 010.8."</para>
-        /// </summary>
-        /// <param name="sourceText">String containing the pattern.</param>
-        /// <param name="arg0">First float value.</param>
-        public void SetText(string sourceText, float arg0)
-        {
-            SetText(sourceText, arg0, 0, 0, 0, 0, 0, 0, 0);
-        }
-
-        /// <summary>
-        /// <para>Formatted string containing a pattern and a value representing the text to be rendered.</para>
-        /// <para>Ex. TMP_Text.SetText("A = {0}, B = {1:00}, C = {2:000.0}", 10.75f, 10.75f, 10.75f);</para>
-        /// <para>Results "A = 10.75, B = 11, C = 010.8."</para>
-        /// </summary>
-        /// <param name="sourceText">String containing the pattern.</param>
-        /// <param name="arg0">First float value.</param>
-        /// <param name="arg1">Second float value.</param>
-        public void SetText(string sourceText, float arg0, float arg1)
-        {
-            SetText(sourceText, arg0, arg1, 0, 0, 0, 0, 0, 0);
-        }
-
-        /// <summary>
-        /// <para>Formatted string containing a pattern and a value representing the text to be rendered.</para>
-        /// <para>Ex. TMP_Text.SetText("A = {0}, B = {1:00}, C = {2:000.0}", 10.75f, 10.75f, 10.75f);</para>
-        /// <para>Results "A = 10.75, B = 11, C = 010.8."</para>
-        /// </summary>
-        /// <param name="sourceText">String containing the pattern.</param>
-        /// <param name="arg0">First float value.</param>
-        /// <param name="arg1">Second float value.</param>
-        /// <param name="arg2">Third float value.</param>
-        public void SetText(string sourceText, float arg0, float arg1, float arg2)
-        {
-            SetText(sourceText, arg0, arg1, arg2, 0, 0, 0, 0, 0);
-        }
-
-        /// <summary>
-        /// <para>Formatted string containing a pattern and a value representing the text to be rendered.</para>
-        /// <para>Ex. TMP_Text.SetText("A = {0}, B = {1:00}, C = {2:000.0}", 10.75f, 10.75f, 10.75f);</para>
-        /// <para>Results "A = 10.75, B = 11, C = 010.8."</para>
-        /// </summary>
-        /// <param name="sourceText">String containing the pattern.</param>
-        /// <param name="arg0">First float value.</param>
-        /// <param name="arg1">Second float value.</param>
-        /// <param name="arg2">Third float value.</param>
-        /// <param name="arg3">Forth float value.</param>
-        public void SetText(string sourceText, float arg0, float arg1, float arg2, float arg3)
-        {
-            SetText(sourceText, arg0, arg1, arg2, arg3, 0, 0, 0, 0);
-        }
-
-        /// <summary>
-        /// <para>Formatted string containing a pattern and a value representing the text to be rendered.</para>
-        /// <para>Ex. TMP_Text.SetText("A = {0}, B = {1:00}, C = {2:000.0}", 10.75f, 10.75f, 10.75f);</para>
-        /// <para>Results "A = 10.75, B = 11, C = 010.8."</para>
-        /// </summary>
-        /// <param name="sourceText">String containing the pattern.</param>
-        /// <param name="arg0">First float value.</param>
-        /// <param name="arg1">Second float value.</param>
-        /// <param name="arg2">Third float value.</param>
-        /// <param name="arg3">Forth float value.</param>
-        /// <param name="arg4">Fifth float value.</param>
-        public void SetText(string sourceText, float arg0, float arg1, float arg2, float arg3, float arg4)
-        {
-            SetText(sourceText, arg0, arg1, arg2, arg3, arg4, 0, 0, 0);
-        }
-
-        /// <summary>
-        /// <para>Formatted string containing a pattern and a value representing the text to be rendered.</para>
-        /// <para>Ex. TMP_Text.SetText("A = {0}, B = {1:00}, C = {2:000.0}", 10.75f, 10.75f, 10.75f);</para>
-        /// <para>Results "A = 10.75, B = 11, C = 010.8."</para>
-        /// </summary>
-        /// <param name="sourceText">String containing the pattern.</param>
-        /// <param name="arg0">First float value.</param>
-        /// <param name="arg1">Second float value.</param>
-        /// <param name="arg2">Third float value.</param>
-        /// <param name="arg3">Forth float value.</param>
-        /// <param name="arg4">Fifth float value.</param>
-        /// <param name="arg5">Sixth float value.</param>
-        public void SetText(string sourceText, float arg0, float arg1, float arg2, float arg3, float arg4, float arg5)
-        {
-            SetText(sourceText, arg0, arg1, arg2, arg3, arg4, arg5, 0, 0);
-        }
-
-        /// <summary>
-        /// <para>Formatted string containing a pattern and a value representing the text to be rendered.</para>
-        /// <para>Ex. TMP_Text.SetText("A = {0}, B = {1:00}, C = {2:000.0}", 10.75f, 10.75f, 10.75f);</para>
-        /// <para>Results "A = 10.75, B = 11, C = 010.8."</para>
-        /// </summary>
-        /// <param name="sourceText">String containing the pattern.</param>
-        /// <param name="arg0">First float value.</param>
-        /// <param name="arg1">Second float value.</param>
-        /// <param name="arg2">Third float value.</param>
-        /// <param name="arg3">Forth float value.</param>
-        /// <param name="arg4">Fifth float value.</param>
-        /// <param name="arg5">Sixth float value.</param>
-        /// <param name="arg6">Seventh float value.</param>
-        public void SetText(string sourceText, float arg0, float arg1, float arg2, float arg3, float arg4, float arg5, float arg6)
-        {
-            SetText(sourceText, arg0, arg1, arg2, arg3, arg4, arg5, arg6, 0);
-        }
-
-        /// <summary>
-        /// <para>Formatted string containing a pattern and a value representing the text to be rendered.</para>
-        /// <para>Ex. TMP_Text.SetText("A = {0}, B = {1:00}, C = {2:000.0}", 10.75f, 10.75f, 10.75f);</para>
-        /// <para>Results "A = 10.75, B = 11, C = 010.8."</para>
-        /// </summary>
-        /// <param name="sourceText">String containing the pattern.</param>
-        /// <param name="arg0">First float value.</param>
-        /// <param name="arg1">Second float value.</param>
-        /// <param name="arg2">Third float value.</param>
-        /// <param name="arg3">Forth float value.</param>
-        /// <param name="arg4">Fifth float value.</param>
-        /// <param name="arg5">Sixth float value.</param>
-        /// <param name="arg6">Seventh float value.</param>
-        /// <param name="arg7">Eighth float value.</param>
-        public void SetText(string sourceText, float arg0, float arg1, float arg2, float arg3, float arg4, float arg5, float arg6, float arg7)
-        {
-            int argIndex = 0;
-            int padding = 0;
-            int decimalPrecision = 0;
-
-            int readFlag = 0;
-
-            int readIndex = 0;
-            int writeIndex = 0;
-
-            for (; readIndex < sourceText.Length; readIndex++)
-            {
-                char c = sourceText[readIndex];
-
-                if (c == '{')
-                {
-                    readFlag = 1;
-                    continue;
-                }
-
-                if (c == '}')
-                {
-                    switch (argIndex)
-                    {
-                        case 0:
-                            AddFloatToInternalTextBackingArray(arg0, padding, decimalPrecision, ref writeIndex);
-                            break;
-                        case 1:
-                            AddFloatToInternalTextBackingArray(arg1, padding, decimalPrecision, ref writeIndex);
-                            break;
-                        case 2:
-                            AddFloatToInternalTextBackingArray(arg2, padding, decimalPrecision, ref writeIndex);
-                            break;
-                        case 3:
-                            AddFloatToInternalTextBackingArray(arg3, padding, decimalPrecision, ref writeIndex);
-                            break;
-                        case 4:
-                            AddFloatToInternalTextBackingArray(arg4, padding, decimalPrecision, ref writeIndex);
-                            break;
-                        case 5:
-                            AddFloatToInternalTextBackingArray(arg5, padding, decimalPrecision, ref writeIndex);
-                            break;
-                        case 6:
-                            AddFloatToInternalTextBackingArray(arg6, padding, decimalPrecision, ref writeIndex);
-                            break;
-                        case 7:
-                            AddFloatToInternalTextBackingArray(arg7, padding, decimalPrecision, ref writeIndex);
-                            break;
-                    }
-
-                    argIndex = 0;
-                    readFlag = 0;
-                    padding = 0;
-                    decimalPrecision = 0;
-                    continue;
-                }
-
-                if (readFlag == 1)
-                {
-                    if (c >= '0' && c <= '8')
-                    {
-                        argIndex = c - 48;
-                        readFlag = 2;
-                        continue;
-                    }
-                }
-
-                if (readFlag == 2)
-                {
-                    if (c == ':')
-                        continue;
-
-                    if (c == '.')
-                    {
-                        readFlag = 3;
-                        continue;
-                    }
-
-                    if (c == '#')
-                    {
-                        continue;
-                    }
-
-                    if (c == '0')
-                    {
-                        padding += 1;
-                        continue;
-                    }
-
-                    if (c == ',')
-                    {
-                        continue;
-                    }
-
-                    if (c >= '1' && c <= '9')
-                    {
-                        decimalPrecision = c - 48;
-                        continue;
-                    }
-                }
-
-                if (readFlag == 3)
-                {
-                    if (c == '0')
-                    {
-                        decimalPrecision += 1;
-                        continue;
-                    }
-                }
-
-                m_TextBackingArray[writeIndex] = c;
-                writeIndex += 1;
-            }
-
-            m_TextBackingArray[writeIndex] = 0;
-            m_TextBackingArray.Count = writeIndex;
-
-            m_IsTextBackingStringDirty = true;
-
-            #if UNITY_EDITOR
-            m_text = InternalTextBackingArrayToString();
-            #endif
-
-            m_inputSource = TextInputSources.SetText;
-
-            PopulateTextProcessingArray();
-
-            m_havePropertiesChanged = true;
-
-            SetVerticesDirty();
-            SetLayoutDirty();
-        }
-
-        /// <summary>
-        /// Set the text using a StringBuilder object as the source.
-        /// </summary>
-        /// <description>
-        /// Using a StringBuilder instead of concatenating strings prevents memory allocations with temporary objects.
-        /// </description>
-        /// <param name="sourceText">The StringBuilder object containing the source text.</param>
-        public void SetText(StringBuilder sourceText)
-        {
-            int srcLength = sourceText == null ? 0 : sourceText.Length;
-
-            SetText(sourceText, 0, srcLength);
-        }
-
-        /// <summary>
-        /// Set the text using a StringBuilder object and specifying the starting character index and length.
-        /// </summary>
-        /// <param name="sourceText">The StringBuilder object containing the source text.</param>
-        /// <param name="start">The index of the first character to read from in the array.</param>
-        /// <param name="length">The number of characters in the array to be read.</param>
-        private void SetText(StringBuilder sourceText, int start, int length)
-        {
-            PopulateTextBackingArray(sourceText, start, length);
-
-            m_IsTextBackingStringDirty = true;
-
-            #if UNITY_EDITOR
-            m_text = InternalTextBackingArrayToString();
-            #endif
-
-            m_inputSource = TextInputSources.SetTextArray;
-
-            PopulateTextProcessingArray();
-
-            m_havePropertiesChanged = true;
-
-            SetVerticesDirty();
-            SetLayoutDirty();
-        }
-
-        /// <summary>
-        /// Set the text using a char array.
-        /// </summary>
-        /// <param name="sourceText">Source char array containing the Unicode characters of the text.</param>
-        public void SetText(char[] sourceText)
-        {
-            int srcLength = sourceText == null ? 0 : sourceText.Length;
-
-            SetCharArray(sourceText, 0, srcLength);
-        }
-
-        /// <summary>
-        /// Set the text using a char array and specifying the starting character index and length.
-        /// </summary>
-        /// <param name="sourceText">Source char array containing the Unicode characters of the text.</param>
-        /// <param name="start">Index of the first character to read from in the array.</param>
-        /// <param name="length">The number of characters in the array to be read.</param>
-        public void SetText(char[] sourceText, int start, int length)
-        {
-            SetCharArray(sourceText, start, length);
-        }
-
-        /// <summary>
-        /// Set the text using a char array.
-        /// </summary>
-        /// <param name="sourceText">Source char array containing the Unicode characters of the text.</param>
-        public void SetCharArray(char[] sourceText)
-        {
-            int srcLength = sourceText == null ? 0 : sourceText.Length;
-
-            SetCharArray(sourceText, 0, srcLength);
-        }
-
-        /// <summary>
-        /// Set the text using a char array and specifying the starting character index and length.
-        /// </summary>
-        /// <param name="sourceText">Source char array containing the Unicode characters of the text.</param>
-        /// <param name="start">The index of the first character to read from in the array.</param>
-        /// <param name="length">The number of characters in the array to be read.</param>
-        public void SetCharArray(char[] sourceText, int start, int length)
-        {
-            PopulateTextBackingArray(sourceText, start, length);
-
-            m_IsTextBackingStringDirty = true;
-
-            #if UNITY_EDITOR
-            m_text = InternalTextBackingArrayToString();
-            #endif
-
-            m_inputSource = TextInputSources.SetTextArray;
-
-            PopulateTextProcessingArray();
-
-            m_havePropertiesChanged = true;
+            _havePropertiesChanged = true;
 
             SetVerticesDirty();
             SetLayoutDirty();
@@ -2051,7 +1703,7 @@ namespace TMPro
             #region Setup UVs
 
             Glyph altGlyph = m_textInfo.characterInfo[m_characterCount].alternativeGlyph;
-            GlyphRect glyphRect = altGlyph == null ? m_cached_TextElement.m_Glyph.glyphRect : altGlyph.glyphRect;
+            GlyphRect glyphRect = altGlyph?.glyphRect ?? m_cached_TextElement.m_Glyph.glyphRect;
 
             Vector2 uv0;
             uv0.x = (glyphRect.x - padding - style_padding) / m_currentFontAsset.m_AtlasWidth;
