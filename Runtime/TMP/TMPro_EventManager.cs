@@ -11,7 +11,6 @@ namespace TMPro
     {
         public static readonly FastAction<object, Compute_DT_EventArgs> COMPUTE_DT_EVENT = new FastAction<object, Compute_DT_EventArgs>();
 
-        // Event & Delegate used to notify TextMesh Pro objects that Material properties have been changed.
         public static readonly FastAction<bool, Material> MATERIAL_PROPERTY_EVENT = new FastAction<bool, Material>();
 
         public static readonly FastAction<bool, Object> FONT_PROPERTY_EVENT = new FastAction<bool, Object>();
@@ -33,8 +32,6 @@ namespace TMPro
         public static readonly FastAction<bool, Object> TEXTMESHPRO_UGUI_PROPERTY_EVENT = new FastAction<bool, Object>();
 
         public static readonly FastAction<Object> TEXT_CHANGED_EVENT = new FastAction<Object>();
-
-        //public static readonly FastAction WILL_RENDER_CANVASES = new FastAction();
 
         public static void ON_MATERIAL_PROPERTY_CHANGED(bool isChanged, Material mat)
         {
@@ -91,17 +88,6 @@ namespace TMPro
         {
             TEXTMESHPRO_UGUI_PROPERTY_EVENT.Call(isChanged, obj);
         }
-
-        //public static void ON_BASE_MATERIAL_CHANGED(Material mat)
-        //{
-        //    BASE_MATERIAL_EVENT.Call(mat);
-        //}
-
-        //public static void ON_PROGRESSBAR_UPDATE(Progress_Bar_EventTypes event_type, Progress_Bar_EventArgs eventArgs)
-        //{
-        //    if (PROGRESS_BAR_EVENT != null)
-        //        PROGRESS_BAR_EVENT(event_type, eventArgs);
-        //}
 
         public static void ON_COMPUTE_DT_EVENT(object Sender, Compute_DT_EventArgs e)
         {

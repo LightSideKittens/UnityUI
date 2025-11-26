@@ -10,11 +10,10 @@ namespace TMPro
 
 
     [RequireComponent(typeof(RectTransform))]
-    //[AddComponentMenu("Layout/Text Container")]
     public class TextContainer : UIBehaviour
     {
 
-        #pragma warning disable 0618 // Disabled warning related to deprecated properties. This is for backwards compatibility.
+        #pragma warning disable 0618
 
         public bool hasChanged
         {
@@ -24,11 +23,11 @@ namespace TMPro
         private bool m_hasChanged;
 
 
-        // Pivot / Transform Position
         public Vector2 pivot
         {
             get { return m_pivot; }
-            set { /*Debug.Log("Pivot has changed.");*/ if (m_pivot != value) { m_pivot = value; m_anchorPosition = GetAnchorPosition(m_pivot); m_hasChanged = true; OnContainerChanged(); } }
+            set {
+                if (m_pivot != value) { m_pivot = value; m_anchorPosition = GetAnchorPosition(m_pivot); m_hasChanged = true; OnContainerChanged(); } }
         }
         [SerializeField]
         private Vector2 m_pivot;
@@ -37,17 +36,19 @@ namespace TMPro
         public TextContainerAnchors anchorPosition
         {
             get { return m_anchorPosition; }
-            set { /*Debug.Log("Anchor has changed.");*/ if (m_anchorPosition != value) { m_anchorPosition = value; m_pivot = GetPivot(m_anchorPosition); m_hasChanged = true; OnContainerChanged(); } }
+            set {
+                if (m_anchorPosition != value) { m_anchorPosition = value; m_pivot = GetPivot(m_anchorPosition); m_hasChanged = true; OnContainerChanged(); } }
         }
         [SerializeField]
         private TextContainerAnchors m_anchorPosition = TextContainerAnchors.Middle;
 
 
-        // Rect which defines the Rectangle 
         public Rect rect
         {
             get { return m_rect; }
-            set { /*Debug.Log("Rectangle has changed.");*/ if (m_rect != value) { m_rect = value; /*m_size = new Vector2(m_rect.width, m_rect.height);*/ m_hasChanged = true; OnContainerChanged(); } }
+            set {
+                if (m_rect != value) { m_rect = value;
+                    m_hasChanged = true; OnContainerChanged(); } }
         }
         [SerializeField]
         private Rect m_rect;
@@ -56,19 +57,19 @@ namespace TMPro
         public Vector2 size
         {
             get { return new Vector2(m_rect.width, m_rect.height); }
-            set { /*Debug.Log("Size has changed.");*/ if (new Vector2(m_rect.width, m_rect.height) != value) { SetRect(value); m_hasChanged = true; m_isDefaultWidth = false; m_isDefaultHeight = false; OnContainerChanged(); } }
+            set {
+                if (new Vector2(m_rect.width, m_rect.height) != value) { SetRect(value); m_hasChanged = true; m_isDefaultWidth = false; m_isDefaultHeight = false; OnContainerChanged(); } }
         }
-      
 
-        // Sets the width of the Text Container.
+
         public float width
         {
             get { return m_rect.width; }
-            set { /*Debug.Log("Width has changed.");*/ SetRect(new Vector2(value, m_rect.height)); m_hasChanged = true; m_isDefaultWidth = false; OnContainerChanged(); }
+            set {
+                SetRect(new Vector2(value, m_rect.height)); m_hasChanged = true; m_isDefaultWidth = false; OnContainerChanged(); }
         }
 
 
-        // Sets the height of the Text Container.
         public float height
         {
             get { return m_rect.height; }
@@ -76,14 +77,12 @@ namespace TMPro
         }
 
 
-        // Used to determine if the user has changed the width of the Text Container.
         public bool isDefaultWidth
         {
             get { return m_isDefaultWidth; }
         }
         private bool m_isDefaultWidth;
 
-        // Used to determine if the user has changed the height of the Text Container.
         public bool isDefaultHeight
         {
             get { return m_isDefaultHeight; }
@@ -99,7 +98,6 @@ namespace TMPro
         private bool m_isAutoFitting = false;
 
 
-        // Corners of the Text Container
         public Vector3[] corners
         {
             get { return m_corners; }
@@ -114,18 +112,11 @@ namespace TMPro
         private Vector3[] m_worldCorners = new Vector3[4];
 
 
-        //public Vector3 normal
-        //{
-        //    get { return m_normal; }
-        //}
-        //private Vector3 m_normal;
-
-
-        // The margin offset from the Rectangle Bounds
         public Vector4 margins
         {
             get { return m_margins; }
-            set { if (m_margins != value) { /*Debug.Log("Margins have changed.");*/ m_margins = value; m_hasChanged = true; OnContainerChanged(); } }
+            set { if (m_margins != value) {
+                m_margins = value; m_hasChanged = true; OnContainerChanged(); } }
         }
         [SerializeField]
         private Vector4 m_margins;
@@ -146,8 +137,6 @@ namespace TMPro
         private RectTransform m_rectTransform;
 
 
-        //private Transform m_transform;
-        //private bool m_isAddingRectTransform;
         private static Vector2 k_defaultSize = new Vector2(100, 100);
 
 
@@ -178,8 +167,6 @@ namespace TMPro
         /// </summary>
         protected override void OnEnable()
         {
-            //Debug.Log("Text Container OnEnable() called.");
-
             OnContainerChanged();
         }
 
@@ -189,19 +176,15 @@ namespace TMPro
         /// </summary>
         protected override void OnDisable()
         {
-            //Debug.Log("OnDisable() called.");
         }
 
 
         /// <summary>
         /// 
         /// </summary>
-        void OnContainerChanged()
+        private void OnContainerChanged()
         {
-            //Debug.Log("OnContainerChanged");
-
             UpdateCorners();
-            //UpdateWorldCorners();
 
             if (this.m_rectTransform != null)
             {
@@ -223,22 +206,10 @@ namespace TMPro
         /// </summary>
         protected override void OnValidate()
         {
-            //Debug.Log("OnValidate() called.");
             m_hasChanged = true;
             OnContainerChanged();
         }
 #endif
-
-
-        /*
-        void LateUpdate()
-        {
-            // Used by the Run Time Text Input Component ... This will have to be changed.
-            if (m_transform.hasChanged)
-                UpdateWorldCorners();
-        }
-        */
-
 
 
         /// <summary>
@@ -246,7 +217,6 @@ namespace TMPro
         /// </summary>
         protected override void OnRectTransformDimensionsChange()
         {
-            // Required to add a RectTransform to objects created in previous releases.
             if (this.rectTransform == null) m_rectTransform = gameObject.AddComponent<RectTransform>();
 
             if (m_rectTransform.sizeDelta != k_defaultSize)
@@ -262,7 +232,6 @@ namespace TMPro
         private void SetRect(Vector2 size)
         {
             m_rect = new Rect(m_rect.x, m_rect.y, size.x, size.y);
-            //UpdateCorners();
         }
 
         private void UpdateCorners()
@@ -271,37 +240,13 @@ namespace TMPro
             m_corners[1] = new Vector3(-m_pivot.x * m_rect.width, (1 - m_pivot.y) * m_rect.height);
             m_corners[2] = new Vector3((1 - m_pivot.x) * m_rect.width, (1 - m_pivot.y) * m_rect.height);
             m_corners[3] = new Vector3((1 - m_pivot.x) * m_rect.width, (- m_pivot.y) * m_rect.height);
-            //Debug.Log("Pivot " + m_pivot + "  Corners 0: " + m_corners[0] + "  1: " + m_corners[1] + "  2: " + m_corners[2] + "  3: " + m_corners[3]);
 
             if (m_rectTransform != null)
                 m_rectTransform.pivot = m_pivot;
         }
 
 
-        //private void UpdateWorldCorners()
-        //{
-        //    if (m_transform == null)
-        //        return;
-
-        //    Vector3 position = m_transform.position;
-        //    m_worldCorners[0] = position + m_transform.TransformDirection(m_corners[0]);
-        //    m_worldCorners[1] = position + m_transform.TransformDirection(m_corners[1]);
-        //    m_worldCorners[2] = position + m_transform.TransformDirection(m_corners[2]);
-        //    m_worldCorners[3] = position + m_transform.TransformDirection(m_corners[3]);
-
-        //    m_normal = Vector3.Cross(worldCorners[1] - worldCorners[0], worldCorners[3] - worldCorners[0]);
-        //}
-
-
-        //public Vector3[] GetWorldCorners()
-        //{
-        //    UpdateWorldCorners();
-
-        //    return m_worldCorners;
-        //}
-
-
-        Vector2 GetPivot(TextContainerAnchors anchor)
+        private Vector2 GetPivot(TextContainerAnchors anchor)
         {
             Vector2 pivot = Vector2.zero;
 
@@ -340,8 +285,7 @@ namespace TMPro
         }
 
 
-        // Method which returns the Anchor position based on pivot value.
-        TextContainerAnchors GetAnchorPosition(Vector2 pivot)
+        private TextContainerAnchors GetAnchorPosition(Vector2 pivot)
         {
 
             if (pivot == new Vector2(0, 1))

@@ -10,15 +10,11 @@ namespace TMPro
         public Vector3 position;
         public Vector4 uv;
         public Vector2 uv2;
-        //public Vector2 uv4;
         public Color32 color;
 
         public static TMP_Vertex zero { get { return k_Zero; } }
 
-        //public Vector3 normal;
-        //public Vector4 tangent;
-
-        static readonly TMP_Vertex k_Zero = new TMP_Vertex();
+        private static readonly TMP_Vertex k_Zero = new TMP_Vertex();
     }
 
     /// <summary>
@@ -43,16 +39,12 @@ namespace TMPro
         /// </summary>
         public static TMP_Offset zero { get { return k_ZeroOffset; } }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
+        private float m_Left;
+        private float m_Right;
+        private float m_Top;
+        private float m_Bottom;
 
-        float m_Left;
-        float m_Right;
-        float m_Top;
-        float m_Bottom;
-
-        static readonly TMP_Offset k_ZeroOffset = new TMP_Offset(0F, 0F, 0F, 0F);
+        private static readonly TMP_Offset k_ZeroOffset = new TMP_Offset(0F, 0F, 0F, 0F);
 
         /// <summary>
         ///
@@ -164,7 +156,7 @@ namespace TMPro
     {
         public TMP_TextElementType elementType;
 
-        public char character; // Should be changed to an uint to handle UTF32
+        public char character;
 
         /// <summary>
         /// Index of the character in the source text.
@@ -181,9 +173,7 @@ namespace TMPro
 
         public float pointSize;
 
-        //public short wordNumber;
         public int lineNumber;
-        //public short charNumber;
         public int pageNumber;
 
 
@@ -218,6 +208,5 @@ namespace TMPro
         public HighlightState highlightState;
         public FontStyles style;
         public bool isVisible;
-        //public bool isIgnoringAlignment;
     }
 }

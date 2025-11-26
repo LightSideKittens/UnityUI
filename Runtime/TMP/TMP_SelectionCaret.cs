@@ -17,8 +17,6 @@ namespace TMPro
         /// <param name="validRect"></param>
         public override void Cull(Rect clipRect, bool validRect)
         {
-            //Debug.Log("***** Cull (" + clipRect + ")   Valid Rect: " + validRect + "   Cull: " + canvasRenderer.cull + " *****");
-
             if (validRect)
             {
                 canvasRenderer.cull = false;
@@ -31,7 +29,6 @@ namespace TMPro
 
         protected override void UpdateGeometry()
         {
-            // Function overridden as Caret and text Selection Highlight is controlled by the Input Field.
         }
     }
 }

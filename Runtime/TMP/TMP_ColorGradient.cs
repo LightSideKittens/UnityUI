@@ -21,8 +21,8 @@ namespace TMPro
         public Color bottomLeft;
         public Color bottomRight;
 
-        const ColorMode k_DefaultColorMode = ColorMode.FourCornersGradient;
-        static readonly Color k_DefaultColor = Color.white;
+        private const ColorMode k_DefaultColorMode = ColorMode.FourCornersGradient;
+        private static readonly Color k_DefaultColor = Color.white;
 
         /// <summary>
         /// Default Constructor which sets each of the colors as white.

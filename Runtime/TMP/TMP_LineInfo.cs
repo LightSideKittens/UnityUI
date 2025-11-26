@@ -36,17 +36,5 @@
         /// Function returning the current line of text.
         /// </summary>
         /// <returns></returns>
-        //public string GetLineText()
-        //{
-        //    string word = string.Empty;
-        //    TMP_CharacterInfo[] charInfo = textComponent.textInfo.characterInfo;
-
-        //    for (int i = firstCharacterIndex; i < lastCharacterIndex + 1; i++)
-        //    {
-        //        word += charInfo[i].character;
-        //    }
-
-        //    return word;
-        //}
     }
 }

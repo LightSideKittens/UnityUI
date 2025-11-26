@@ -18,16 +18,8 @@ namespace TMPro
             set { m_Name = value; }
         }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
-
         [SerializeField]
         private string m_Name;
-
-        // ********************
-        // CONSTRUCTORS
-        // ********************
 
         /// <summary>
         /// Default constructor.

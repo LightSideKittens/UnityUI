@@ -5,19 +5,13 @@ using UnityEngine.TextCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-#pragma warning disable 0649 // Disabled warnings related to serialized fields not assigned in this script but used in the editor.
+#pragma warning disable 0649
 
 namespace TMPro
 {
     /// <summary>
     /// Scaling options for the sprites
     /// </summary>
-    //public enum SpriteRelativeScaling
-    //{
-    //    RelativeToPrimary   = 0x1,
-    //    RelativeToCurrent   = 0x2,
-    //}
-
     [System.Serializable][ExcludeFromPresetAttribute]
     [HelpURL("https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/TextMeshPro/Settings.html")]
     public class TMP_Settings : ScriptableObject
@@ -341,13 +335,6 @@ namespace TMPro
         /// <summary>
         /// Determines if sprites will be scaled relative to the primary font asset assigned to the text object or relative to the current font asset.
         /// </summary>
-        //public static SpriteRelativeScaling spriteRelativeScaling
-        //{
-        //    get { return instance.m_SpriteRelativeScaling; }
-        //    set { instance.m_SpriteRelativeScaling = value; }
-        //}
-        //[SerializeField]
-        //private SpriteRelativeScaling m_SpriteRelativeScaling = SpriteRelativeScaling.RelativeToCurrent;
 
         /// <summary>
         /// The relative path to a Resources folder in the project that contains Color Gradient Presets.
@@ -416,22 +403,6 @@ namespace TMPro
         [SerializeField]
         private LineBreakingTable m_linebreakingRules;
 
-        // TODO : Potential new feature to explore where multiple font assets share the same atlas texture.
-        //internal static TMP_DynamicAtlasTextureGroup managedAtlasTextures
-        //{
-        //    get
-        //    {
-        //        if (instance.m_DynamicAtlasTextureGroup == null)
-        //        {
-        //            instance.m_DynamicAtlasTextureGroup = TMP_DynamicAtlasTextureGroup.CreateDynamicAtlasTextureGroup();
-        //        }
-
-        //        return instance.m_DynamicAtlasTextureGroup;
-        //    }
-        //}
-        //[SerializeField]
-        //private TMP_DynamicAtlasTextureGroup m_DynamicAtlasTextureGroup;
-
         /// <summary>
         /// Determines if Modern or Traditional line breaking rules should be used for Korean text.
         /// </summary>
@@ -455,15 +426,12 @@ namespace TMPro
                     s_Instance = Resources.Load<TMP_Settings>("TMP Settings");
 
                     #if UNITY_EDITOR
-                    // Make sure TextMesh Pro UPM packages resources have been added to the user project
                     if (isTMPSettingsNull && Time.frameCount != 0 || (!isTMPSettingsNull && s_Instance.assetVersion != s_CurrentAssetVersion))
                     {
-						// It needs to open after loading the default Editor layout
                         DelayShowPackageImporterWindow();
                     }
                     #endif
 
-                    // Convert use of the "enableKerning" property to the new "fontFeature" property.
                     if (!isTMPSettingsNull && s_Instance.m_ActiveFontFeatures.Count == 1 && s_Instance.m_ActiveFontFeatures[0] == 0)
                     {
                         s_Instance.m_ActiveFontFeatures.Clear();
@@ -499,7 +467,6 @@ namespace TMPro
         {
             if (s_Instance == null)
             {
-                // Load settings from TMP_Settings file
                 TMP_Settings settings = Resources.Load<TMP_Settings>("TMP Settings");
                 if (settings != null)
                     s_Instance = settings;
@@ -559,8 +526,6 @@ namespace TMPro
 
         public static void LoadLinebreakingRules()
         {
-            //Debug.Log("Loading Line Breaking Rules for Asian Languages.");
-
             if (instance == null) return;
 
             if (s_Instance.m_linebreakingRules == null)

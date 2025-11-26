@@ -161,7 +161,7 @@ namespace TMPro
             return new Color32(GammaToLinear(c.r), GammaToLinear(c.g), GammaToLinear(c.b), c.a);
         }
 
-        static byte GammaToLinear(byte value)
+        private static byte GammaToLinear(byte value)
         {
             float v = value / 255f;
 
@@ -204,13 +204,13 @@ namespace TMPro
             return x && y && z && w;
         }
 
-        //public static void AddElementAtIndex<T>(this T[] array, int writeIndex, T item)
-        //{
-        //    if (writeIndex >= array.Length)
-        //        System.Array.Resize(ref array, Mathf.NextPowerOfTwo(writeIndex + 1));
-
-        //    array[writeIndex] = item;
-        //}
+        /// <summary>
+        /// Insert item into array at index.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="array"></param>
+        /// <param name="index"></param>
+        /// <param name="item"></param>
 
         /// <summary>
         /// Insert item into array at index.
@@ -219,54 +219,6 @@ namespace TMPro
         /// <param name="array"></param>
         /// <param name="index"></param>
         /// <param name="item"></param>
-        //public static void Insert<T>(this T[] array, int index, T item)
-        //{
-        //    if (index > array.Length - 1) return;
-
-        //    T savedItem = item;
-
-        //    for (int i = index; i < array.Length; i++)
-        //    {
-        //        savedItem = array[i];
-
-        //        array[i] = item;
-
-        //        item = savedItem;
-        //    }
-        //}
-
-        /// <summary>
-        /// Insert item into array at index.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="array"></param>
-        /// <param name="index"></param>
-        /// <param name="item"></param>
-        //public static void Insert<T>(this T[] array, int index, T[] items)
-        //{
-        //    if (index > array.Length - 1) return;
-
-        //    System.Array.Resize(ref array, array.Length + items.Length);
-
-        //    int sourceIndex = 0;
-
-        //    T savedItem = items[sourceIndex];
-
-        //    for (int i = index; i < array.Length; i++)
-        //    {
-        //        savedItem = array[i];
-
-        //        array[i] = items[sourceIndex];
-
-        //        items[sourceIndex] = savedItem;
-
-        //        if (sourceIndex < items.Length - 1)
-        //            sourceIndex += 1;
-        //        else
-        //            sourceIndex = 0;
-        //    }
-        //}
-
     }
 
     public static class TMP_Math

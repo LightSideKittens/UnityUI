@@ -41,10 +41,6 @@ namespace TMPro
         /// </summary>
         public float yAdvance { get { return m_YAdvance; } set { m_YAdvance = value; } }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
-
         [SerializeField]
         internal float m_XPlacement;
 
@@ -117,10 +113,6 @@ namespace TMPro
         /// </summary>
         public TMP_GlyphValueRecord glyphValueRecord { get { return m_GlyphValueRecord; } set { m_GlyphValueRecord = value; } }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
-
         [SerializeField]
         internal uint m_GlyphIndex;
 
@@ -165,10 +157,6 @@ namespace TMPro
         ///
         /// </summary>
         public FontFeatureLookupFlags featureLookupFlags { get { return m_FeatureLookupFlags; } set { m_FeatureLookupFlags = value; } }
-
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
 
         [SerializeField]
         internal TMP_GlyphAdjustmentRecord m_FirstAdjustmentRecord;

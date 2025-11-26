@@ -81,7 +81,6 @@ namespace TMPro
             else
                 m_StyleLookupDictionary.Clear();
 
-            // Read Styles from style list and store them into dictionary for faster access.
             for (int i = 0; i < m_StyleList.Count; i++)
             {
                 m_StyleList[i].RefreshStyle();
@@ -90,7 +89,6 @@ namespace TMPro
                     m_StyleLookupDictionary.Add(m_StyleList[i].hashCode, m_StyleList[i]);
             }
 
-            // Add Normal Style if it does not already exists
             int normalStyleHashCode = TMP_TextParsingUtilities.GetHashCode("Normal");
             if (!m_StyleLookupDictionary.ContainsKey(normalStyleHashCode))
             {
@@ -100,7 +98,6 @@ namespace TMPro
             }
 
             #if UNITY_EDITOR
-            //// Event to update objects when styles are changed in the editor.
             TMPro_EventManager.ON_TEXT_STYLE_PROPERTY_CHANGED(true);
             #endif
         }

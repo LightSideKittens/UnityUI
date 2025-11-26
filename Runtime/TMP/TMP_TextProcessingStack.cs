@@ -148,12 +148,12 @@ namespace TMPro
         public T[] itemStack;
         public int index;
 
-        T m_DefaultItem;
-        int m_Capacity;
-        int m_RolloverSize;
-        int m_Count;
+        private T m_DefaultItem;
+        private int m_Capacity;
+        private int m_RolloverSize;
+        private int m_Count;
 
-        const int k_DefaultCapacity = 4;
+        private const int k_DefaultCapacity = 4;
 
 
         /// <summary>
@@ -233,9 +233,6 @@ namespace TMPro
             set
             {
                 m_RolloverSize = value;
-
-                //if (m_Capacity < m_RolloverSize)
-                //    Array.Resize(ref itemStack, m_RolloverSize);
             }
         }
 

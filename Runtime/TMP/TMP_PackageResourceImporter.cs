@@ -11,11 +11,11 @@ namespace TMPro
     [Serializable]
     public class TMP_PackageResourceImporter
     {
-        bool m_EssentialResourcesImported;
-        bool m_ExamplesAndExtrasResourcesImported;
-        bool m_EssentialResourcesNeedUpdate;
-        bool m_ExamplesAndExtrasNeedUpdate;
-        bool m_LogErrors;
+        private bool m_EssentialResourcesImported;
+        private bool m_ExamplesAndExtrasResourcesImported;
+        private bool m_EssentialResourcesNeedUpdate;
+        private bool m_ExamplesAndExtrasNeedUpdate;
+        private bool m_LogErrors;
         internal bool m_IsImportingExamples;
 
         public TMP_PackageResourceImporter(bool logErrors = true)
@@ -32,13 +32,11 @@ namespace TMPro
 
         public void OnGUI()
         {
-            // Check if the resources state has changed.
             m_EssentialResourcesImported = File.Exists("Assets/TextMesh Pro/Resources/TMP Settings.asset");
             m_ExamplesAndExtrasResourcesImported = Directory.Exists("Assets/TextMesh Pro/Examples & Extras");
 
             GUILayout.BeginVertical();
             {
-                // Display options to import Essential resources
                 GUILayout.BeginVertical(EditorStyles.helpBox);
                 {
                     GUILayout.Label("TMP Essentials", EditorStyles.boldLabel);
@@ -68,7 +66,6 @@ namespace TMPro
                 }
                 GUILayout.EndVertical();
 
-                // Display options to import Examples & Extras
                 GUILayout.BeginVertical(EditorStyles.helpBox);
                 {
                     GUILayout.Label("TMP Examples & Extras", EditorStyles.boldLabel);
@@ -81,12 +78,8 @@ namespace TMPro
                     GUI.enabled = (m_EssentialResourcesImported && !m_ExamplesAndExtrasResourcesImported) || m_ExamplesAndExtrasNeedUpdate;
                     if (GUILayout.Button("Import TMP Examples & Extras"))
                     {
-                        // Set flag to get around importing scripts as per of this package which results in an assembly reload which in turn prevents / clears any callbacks.
                         m_IsImportingExamples = true;
                         m_ExamplesAndExtrasNeedUpdate = false;
-
-                        // Disable AssetDatabase refresh until examples have been imported.
-                        //AssetDatabase.DisallowAutoRefresh();
 
                         string packageFullPath = GetPackageFullPath();
                         AssetDatabase.ImportPackage(packageFullPath + "/Package Resources/TMP Examples & Extras.unitypackage", false);
@@ -111,15 +104,12 @@ namespace TMPro
 
         internal void PreparePackageImport()
         {
-            // Check if the TMP Settings asset is already present in the project.
             string[] settings = AssetDatabase.FindAssets("t:TMP_Settings");
 
             if (settings.Length > 0)
             {
-                // Save assets just in case the TMP Setting were modified before import.
                 AssetDatabase.SaveAssets();
 
-                // Copy existing TMP Settings asset to a byte[]
                 k_SettingsFilePath = AssetDatabase.GUIDToAssetPath(settings[0]);
                 k_SettingsBackup = File.ReadAllBytes(k_SettingsFilePath);
             }
@@ -129,13 +119,12 @@ namespace TMPro
         ///
         /// </summary>
         /// <param name="packageName"></param>
-        void ImportCallback(string packageName)
+        private void ImportCallback(string packageName)
         {
             if (packageName == "TMP Essential Resources")
             {
                 if (m_EssentialResourcesImported)
                 {
-                    // Restore backup of TMP Settings from byte[]
                     File.WriteAllBytes(k_SettingsFilePath, k_SettingsBackup);
                     AssetDatabase.Refresh();
 
@@ -154,7 +143,6 @@ namespace TMPro
             {
                 m_ExamplesAndExtrasResourcesImported = true;
                 m_IsImportingExamples = false;
-                //AssetDatabase.AllowAutoRefresh();
             }
 
             Debug.Log("[" + packageName + "] have been imported.");
@@ -162,9 +150,8 @@ namespace TMPro
             AssetDatabase.importPackageCompleted -= ImportCallback;
         }
 
-        static string GetPackageFullPath()
+        private static string GetPackageFullPath()
         {
-            // Check for potential UPM package
             string packagePath = Path.GetFullPath("Packages/com.unity.ugui");
             if (Directory.Exists(packagePath))
             {
@@ -174,19 +161,16 @@ namespace TMPro
             packagePath = Path.GetFullPath("Assets/..");
             if (Directory.Exists(packagePath))
             {
-                // Search default location for development package
                 if (Directory.Exists(packagePath + "/Assets/Packages/com.unity.ugui/Editor Resources"))
                 {
                     return packagePath + "/Assets/Packages/com.unity.ugui";
                 }
 
-                // Search for default location of normal TextMesh Pro AssetStore package
                 if (Directory.Exists(packagePath + "/Assets/TextMesh Pro/Editor Resources"))
                 {
                     return packagePath + "/Assets/TextMesh Pro";
                 }
 
-                // Search for potential alternative locations in the user project
                 string[] matchingPaths = Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
                 string path = ValidateLocation(matchingPaths, packagePath);
                 if (path != null) return packagePath + path;
@@ -195,11 +179,10 @@ namespace TMPro
             return null;
         }
 
-        static string ValidateLocation(string[] paths, string projectPath)
+        private static string ValidateLocation(string[] paths, string projectPath)
         {
             for (int i = 0; i < paths.Length; i++)
             {
-                // Check if the Editor Resources folder exists.
                 if (Directory.Exists(paths[i] + "/Editor Resources"))
                 {
                     string folderPath = paths[i].Replace(projectPath, "");
@@ -231,10 +214,9 @@ namespace TMPro
 
     public class TMP_PackageResourceImporterWindow : EditorWindow
     {
-        [SerializeField]
-        TMP_PackageResourceImporter m_ResourceImporter;
+        [SerializeField] private TMP_PackageResourceImporter m_ResourceImporter;
 
-        static TMP_PackageResourceImporterWindow m_ImporterWindow;
+        private static TMP_PackageResourceImporterWindow m_ImporterWindow;
 
         public static void ShowPackageImporterWindow()
         {
@@ -246,9 +228,8 @@ namespace TMPro
             }
         }
 
-        void OnEnable()
+        private void OnEnable()
         {
-            // Set Editor Window Size
             SetEditorWindowSize();
 
             if (m_ResourceImporter == null)
@@ -258,17 +239,17 @@ namespace TMPro
                 m_ResourceImporter.RegisterResourceImportCallback();
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             m_ResourceImporter.OnDestroy();
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
             m_ResourceImporter.OnGUI();
         }
 
-        void OnInspectorUpdate()
+        private void OnInspectorUpdate()
         {
             Repaint();
         }
@@ -276,7 +257,7 @@ namespace TMPro
         /// <summary>
         /// Limits the minimum size of the editor window.
         /// </summary>
-        void SetEditorWindowSize()
+        private void SetEditorWindowSize()
         {
             EditorWindow editorWindow = this;
 
@@ -290,9 +271,9 @@ namespace TMPro
     [Serializable]
     internal class TMP_ShaderPackageImporter
     {
-        bool m_ShadersImported;
+        private bool m_ShadersImported;
 
-        const string s_TMPShaderPackageGUID = "e02b76aaf840d38469530d159da03749";
+        private const string s_TMPShaderPackageGUID = "e02b76aaf840d38469530d159da03749";
 
         public void OnDestroy() { }
 
@@ -300,24 +281,12 @@ namespace TMPro
         {
             GUILayout.BeginVertical();
             {
-                // Display options to import Essential resources
                 GUILayout.BeginVertical(EditorStyles.helpBox);
                 {
-                    //GUILayout.Label("TextMeshPro Resources Update", EditorStyles.boldLabel);
                     GUILayout.Label("This release of the TMP package includes updated resources.\n\nPlease use the menu options located in \"Window\\TextMeshPro\\...\" to import the updated\n\"TMP Essential Resources\" and \"TMP Examples & Extras\".\n\nAs usual please be sure to backup any of the files and resources that you may have added or modified in the \"Assets\\TextMesh Pro\\...\" folders.", new GUIStyle(EditorStyles.label) { wordWrap = true } );
                     GUILayout.Space(5f);
 
                     GUI.enabled = !m_ShadersImported;
-                    // if (GUILayout.Button("Update TMP Shaders"))
-                    // {
-                    //     string packagePath = AssetDatabase.GUIDToAssetPath(s_TMPShaderPackageGUID);
-                    //
-                    //     if (string.IsNullOrEmpty(packagePath))
-                    //         return;
-                    //
-                    //     AssetDatabase.importPackageCompleted += ImportCallback;
-                    //     AssetDatabase.ImportPackage(packagePath, true);
-                    // }
                     GUILayout.Space(5f);
                     GUI.enabled = true;
                 }
@@ -331,7 +300,7 @@ namespace TMPro
         ///
         /// </summary>
         /// <param name="packageName"></param>
-        void ImportCallback(string packageName)
+        private void ImportCallback(string packageName)
         {
             if (packageName == "TMP Shaders")
             {
@@ -366,8 +335,7 @@ namespace TMPro
 
     internal class TMP_ShaderPackageImporterWindow : EditorWindow
     {
-        [SerializeField]
-        TMP_ShaderPackageImporter m_ResourceImporter;
+        [SerializeField] private TMP_ShaderPackageImporter m_ResourceImporter;
 
         internal static TMP_ShaderPackageImporterWindow importerWindow;
 
@@ -379,21 +347,20 @@ namespace TMPro
             }
         }
 
-        void OnEnable()
+        private void OnEnable()
         {
-            // Set Editor Window Size
             SetEditorWindowSize();
 
             if (m_ResourceImporter == null)
                 m_ResourceImporter = new TMP_ShaderPackageImporter();
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             m_ResourceImporter.OnDestroy();
         }
 
-        void OnGUI()
+        private void OnGUI()
         {
             Rect p = position;
 
@@ -412,7 +379,7 @@ namespace TMPro
             m_ResourceImporter.OnGUI();
         }
 
-        void OnInspectorUpdate()
+        private void OnInspectorUpdate()
         {
             Repaint();
         }
@@ -420,7 +387,7 @@ namespace TMPro
         /// <summary>
         /// Limits the minimum size of the editor window.
         /// </summary>
-        void SetEditorWindowSize()
+        private void SetEditorWindowSize()
         {
             EditorWindow editorWindow = this;
 

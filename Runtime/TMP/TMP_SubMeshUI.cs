@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
 
-#pragma warning disable 0414 // Disabled a few warnings related to serialized variables not used in this script but used in the editor.
+#pragma warning disable 0414
 
 namespace TMPro
 {
@@ -57,10 +57,8 @@ namespace TMPro
         /// </summary>
         public override Material material
         {
-            // Return a new Instance of the Material if none exists. Otherwise return the current Material Instance.
             get { return GetMaterial(m_sharedMaterial); }
 
-            // Assign new font material
             set
             {
                 if (m_sharedMaterial != null && m_sharedMaterial.GetInstanceID() == value.GetInstanceID())
@@ -251,47 +249,31 @@ namespace TMPro
         /// </summary>
         protected override void OnEnable()
         {
-            //Debug.Log("*** SubObject OnEnable() ***");
-
-            // Register Callbacks for various events.
             if (!m_isRegisteredForEvents)
             {
 
             #if UNITY_EDITOR
                 TMPro_EventManager.MATERIAL_PROPERTY_EVENT.Add(ON_MATERIAL_PROPERTY_CHANGED);
                 TMPro_EventManager.FONT_PROPERTY_EVENT.Add(ON_FONT_PROPERTY_CHANGED);
-                //TMPro_EventManager.TEXTMESHPRO_PROPERTY_EVENT.Add(ON_TEXTMESHPRO_PROPERTY_CHANGED);
                 TMPro_EventManager.DRAG_AND_DROP_MATERIAL_EVENT.Add(ON_DRAG_AND_DROP_MATERIAL);
-                //TMPro_EventManager.TEXT_STYLE_PROPERTY_EVENT.Add(ON_TEXT_STYLE_CHANGED);
                 TMPro_EventManager.SPRITE_ASSET_PROPERTY_EVENT.Add(ON_SPRITE_ASSET_PROPERTY_CHANGED);
-                //TMPro_EventManager.TMP_SETTINGS_PROPERTY_EVENT.Add(ON_TMP_SETTINGS_CHANGED);
-            #endif
+#endif
 
                 m_isRegisteredForEvents = true;
             }
 
-            // Update HideFlags on previously created sub text objects.
             if (hideFlags != HideFlags.DontSave)
                 hideFlags = HideFlags.DontSave;
 
             m_ShouldRecalculateStencil = true;
             RecalculateClipping();
             RecalculateMasking();
-
-            //SetAllDirty();
         }
 
 
         protected override void OnDisable()
         {
-            //Debug.Log("*** SubObject OnDisable() ***");
             base.OnDisable();
-
-            // if (m_MaskMaterial != null)
-            // {
-            //     TMP_MaterialManager.ReleaseStencilMaterial(m_MaskMaterial);
-            //     m_MaskMaterial = null;
-            // }
 
             if (m_fallbackMaterial != null)
             {
@@ -303,9 +285,6 @@ namespace TMPro
 
         protected override void OnDestroy()
         {
-            //Debug.Log("*** OnDestroy() ***");
-
-            // Destroy Mesh
             if (m_mesh != null) DestroyImmediate(m_mesh);
 
             if (m_MaskMaterial != null)
@@ -318,21 +297,16 @@ namespace TMPro
             }
 
             #if UNITY_EDITOR
-            // Unregister the event this object was listening to
             TMPro_EventManager.MATERIAL_PROPERTY_EVENT.Remove(ON_MATERIAL_PROPERTY_CHANGED);
             TMPro_EventManager.FONT_PROPERTY_EVENT.Remove(ON_FONT_PROPERTY_CHANGED);
-            //TMPro_EventManager.TEXTMESHPRO_PROPERTY_EVENT.Remove(ON_TEXTMESHPRO_PROPERTY_CHANGED);
             TMPro_EventManager.DRAG_AND_DROP_MATERIAL_EVENT.Remove(ON_DRAG_AND_DROP_MATERIAL);
-            //TMPro_EventManager.TEXT_STYLE_PROPERTY_EVENT.Remove(ON_TEXT_STYLE_CHANGED);
             TMPro_EventManager.SPRITE_ASSET_PROPERTY_EVENT.Remove(ON_SPRITE_ASSET_PROPERTY_CHANGED);
-            //TMPro_EventManager.TMP_SETTINGS_PROPERTY_EVENT.Remove(ON_TMP_SETTINGS_CHANGED);
-            #endif
+#endif
 
             m_isRegisteredForEvents = false;
 
             RecalculateClipping();
 
-            // Notify parent text object
             if (m_TextComponent != null)
             {
                 m_TextComponent.havePropertiesChanged = true;
@@ -342,10 +316,8 @@ namespace TMPro
 
 
         #if UNITY_EDITOR
-        // Event received when custom material editor properties are changed.
-        void ON_MATERIAL_PROPERTY_CHANGED(bool isChanged, Material mat)
+        private void ON_MATERIAL_PROPERTY_CHANGED(bool isChanged, Material mat)
         {
-            //Debug.Log("*** ON_MATERIAL_PROPERTY_CHANGED ***");
             if (m_sharedMaterial == null)
                 return;
 
@@ -354,7 +326,6 @@ namespace TMPro
             int maskingMaterialID = m_MaskMaterial == null ? 0 : m_MaskMaterial.GetInstanceID();
             int fallbackSourceMaterialID = m_fallbackSourceMaterial == null ? 0 : m_fallbackSourceMaterial.GetInstanceID();
 
-            // Sync culling with parent text object
             bool hasCullModeProperty = m_sharedMaterial.HasProperty(ShaderUtilities.ShaderTag_CullMode);
             float cullMode = 0;
 
@@ -364,16 +335,13 @@ namespace TMPro
                 m_sharedMaterial.SetFloat(ShaderUtilities.ShaderTag_CullMode, cullMode);
             }
 
-            // Filter events and return if the affected material is not this object's material.
             if (m_fallbackMaterial != null && fallbackSourceMaterialID == targetMaterialID && TMP_Settings.matchMaterialPreset)
             {
                 TMP_MaterialManager.CopyMaterialPresetProperties(mat, m_fallbackMaterial);
 
-                // Re-sync culling with parent text object
                 m_fallbackMaterial.SetFloat(ShaderUtilities.ShaderTag_CullMode, cullMode);
             }
 
-            // Make sure material properties are synchronized between the assigned material and masking material.
             if (m_MaskMaterial != null)
             {
                 UnityEditor.Undo.RecordObject(m_MaskMaterial, "Material Property Changes");
@@ -381,7 +349,6 @@ namespace TMPro
 
                 if (targetMaterialID == sharedMaterialID)
                 {
-                    //Debug.Log("Copy base material properties to masking material if not null.");
                     float stencilID = m_MaskMaterial.GetFloat(ShaderUtilities.ID_StencilID);
                     float stencilComp = m_MaskMaterial.GetFloat(ShaderUtilities.ID_StencilComp);
                     m_MaskMaterial.CopyPropertiesFromMaterial(mat);
@@ -392,7 +359,6 @@ namespace TMPro
                 }
                 else if (targetMaterialID == maskingMaterialID)
                 {
-                    // Update the padding
                     GetPaddingForMaterial(mat);
 
                     m_sharedMaterial.CopyPropertiesFromMaterial(mat);
@@ -411,7 +377,6 @@ namespace TMPro
                     m_MaskMaterial.SetFloat(ShaderUtilities.ID_StencilComp, stencilComp);
                 }
 
-                // Re-sync culling with parent text object
                 if (hasCullModeProperty)
                     m_MaskMaterial.SetFloat(ShaderUtilities.ShaderTag_CullMode, cullMode);
             }
@@ -425,16 +390,11 @@ namespace TMPro
         }
 
 
-        // Event to Track Material Changed resulting from Drag-n-drop.
-        void ON_DRAG_AND_DROP_MATERIAL(GameObject obj, Material currentMaterial, Material newMaterial)
+        private void ON_DRAG_AND_DROP_MATERIAL(GameObject obj, Material currentMaterial, Material newMaterial)
         {
-            // Check if event applies to this current object
             if (obj == gameObject || UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(gameObject) == obj)
             {
                 if (!m_isDefaultMaterial) return;
-
-                // Make sure we have a valid reference to the renderer.
-                //if (m_canvasRenderer == null) m_canvasRenderer = GetComponent<CanvasRenderer>();
 
                 UnityEditor.Undo.RecordObject(this, "Material Assignment");
                 UnityEditor.Undo.RecordObject(canvasRenderer, "Material Assignment");
@@ -444,26 +404,18 @@ namespace TMPro
             }
         }
 
-        // Event received when font asset properties are changed in Font Inspector
-        void ON_SPRITE_ASSET_PROPERTY_CHANGED(bool isChanged, UnityEngine.Object obj)
+        private void ON_SPRITE_ASSET_PROPERTY_CHANGED(bool isChanged, UnityEngine.Object obj)
         {
-            //if (spriteSheet != null && (obj as TMP_SpriteAsset == m_spriteAsset || obj as Texture2D == m_spriteAsset.spriteSheet))
-            //{
             if (m_TextComponent != null)
             {
                 m_TextComponent.havePropertiesChanged = true;
-                //m_TextComponent.SetVerticesDirty();
             }
-
-            //}
         }
 
-        // Event received when font asset properties are changed in Font Inspector
-        void ON_FONT_PROPERTY_CHANGED(bool isChanged, Object fontAsset)
+        private void ON_FONT_PROPERTY_CHANGED(bool isChanged, Object fontAsset)
         {
             if (m_fontAsset != null && fontAsset != null && fontAsset.GetInstanceID() == m_fontAsset.GetInstanceID())
             {
-                // Copy Normal and Bold Weight
                 if (m_fallbackMaterial != null)
                 {
                     if (TMP_Settings.matchMaterialPreset)
@@ -478,11 +430,8 @@ namespace TMPro
         /// <summary>
         /// Event received when the TMP Settings are changed.
         /// </summary>
-        void ON_TMP_SETTINGS_CHANGED()
+        private void ON_TMP_SETTINGS_CHANGED()
         {
-            //Debug.Log("TMP Setting have changed.");
-            //SetVerticesDirty();
-            //SetMaterialDirty();
         }
         #endif
 
@@ -568,9 +517,6 @@ namespace TMPro
         /// </summary>
         public override void SetAllDirty()
         {
-            //SetLayoutDirty();
-            //SetVerticesDirty();
-            //SetMaterialDirty();
         }
 
 
@@ -579,7 +525,6 @@ namespace TMPro
         /// </summary>
         public override void SetVerticesDirty()
         {
-            // Do nothing as updates of the text are driven by the parent text component
         }
 
 
@@ -617,7 +562,7 @@ namespace TMPro
             this.rectTransform.pivot = m_TextComponent.rectTransform.pivot;
         }
 
-        Transform GetRootCanvasTransform()
+        private Transform GetRootCanvasTransform()
         {
             if (m_RootCanvasTransform == null)
                 m_RootCanvasTransform = m_TextComponent.canvas.rootCanvas.transform;
@@ -633,7 +578,6 @@ namespace TMPro
         /// <param name="validRect"></param>
         public override void Cull(Rect clipRect, bool validRect)
         {
-            // Do nothing as this functionality is handled by the parent text object.
         }
 
 
@@ -642,8 +586,6 @@ namespace TMPro
         /// </summary>
         protected override void UpdateGeometry()
         {
-            // Need to override to prevent Unity from changing the geometry of the object.
-            //Debug.Log("UpdateGeometry()");
         }
 
 
@@ -677,14 +619,9 @@ namespace TMPro
         /// </summary>
         protected override void UpdateMaterial()
         {
-            //Debug.Log("*** STO-UI - UpdateMaterial() *** FRAME (" + Time.frameCount + ")");
-
             if (m_sharedMaterial == null)
                 return;
 
-            //if (canvasRenderer == null) m_canvasRenderer = this.canvasRenderer;
-
-            // Special handling to keep the Culling of the material in sync with parent text object
             if (m_sharedMaterial.HasProperty(ShaderUtilities.ShaderTag_CullMode) && textComponent.fontSharedMaterial != null)
             {
                 float cullMode = textComponent.fontSharedMaterial.GetFloat(ShaderUtilities.ShaderTag_CullMode);
@@ -693,22 +630,19 @@ namespace TMPro
 
             canvasRenderer.materialCount = 1;
             canvasRenderer.SetMaterial(materialForRendering, 0);
-            //canvasRenderer.SetTexture(materialForRendering.mainTexture);
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             if (m_sharedMaterial != null && gameObject.name != "TMP SubMeshUI [" + m_sharedMaterial.name + "]")
                 gameObject.name = "TMP SubMeshUI [" + m_sharedMaterial.name + "]";
             #endif
         }
 
 
-        // IClippable implementation
         /// <summary>
         /// Method called when the state of a parent changes.
         /// </summary>
         public override void RecalculateClipping()
         {
-            //Debug.Log("*** RecalculateClipping() ***");
             base.RecalculateClipping();
         }
 
@@ -716,53 +650,25 @@ namespace TMPro
         /// <summary>
         ///
         /// </summary>
-        // public override void RecalculateMasking()
-        // {
-        //     //Debug.Log("RecalculateMasking()");
-        //
-        //     this.m_ShouldRecalculateStencil = true;
-        //     SetMaterialDirty();
-        // }
-
 
 
         /// <summary>
         /// Method which returns an instance of the shared material
         /// </summary>
         /// <returns></returns>
-        Material GetMaterial()
+        private Material GetMaterial()
         {
-            // Make sure we have a valid reference to the renderer.
-            //if (m_renderer == null) m_renderer = GetComponent<Renderer>();
-
-            //if (m_material == null || m_isNewSharedMaterial)
-            //{
-            //    m_renderer.material = m_sharedMaterial;
-            //    m_material = m_renderer.material;
-            //    m_sharedMaterial = m_material;
-            //    m_padding = ShaderUtilities.GetPadding(m_sharedMaterial, m_TextMeshPro.extraPadding, false);
-            //    m_isNewSharedMaterial = false;
-            //}
-
             return m_sharedMaterial;
         }
 
 
-        // Function called internally when a new material is assigned via the fontMaterial property.
-        Material GetMaterial(Material mat)
+        private Material GetMaterial(Material mat)
         {
-            // Check in case Object is disabled. If so, we don't have a valid reference to the Renderer.
-            // This can occur when the Duplicate Material Context menu is used on an inactive object.
-            //if (m_renderer == null)
-            //    m_renderer = GetComponent<Renderer>();
-
-            // Create Instance Material only if the new material is not the same instance previously used.
             if (m_material == null || m_material.GetInstanceID() != mat.GetInstanceID())
                 m_material = CreateMaterialInstance(mat);
 
             m_sharedMaterial = m_material;
 
-            // Compute and Set new padding values for this new material.
             m_padding = GetPaddingForMaterial();
 
             SetVerticesDirty();
@@ -777,7 +683,7 @@ namespace TMPro
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        Material CreateMaterialInstance(Material source)
+        private Material CreateMaterialInstance(Material source)
         {
             Material mat = new Material(source);
             mat.shaderKeywords = source.shaderKeywords;
@@ -791,11 +697,8 @@ namespace TMPro
         /// Method returning the shared material assigned to the text object.
         /// </summary>
         /// <returns></returns>
-        Material GetSharedMaterial()
+        private Material GetSharedMaterial()
         {
-            //if (canvasRenderer == null)
-            //    canvasRenderer = GetComponent<CanvasRenderer>();
-
             return canvasRenderer.GetMaterial();
         }
 
@@ -804,28 +707,17 @@ namespace TMPro
         /// Method to set the shared material.
         /// </summary>
         /// <param name="mat"></param>
-        void SetSharedMaterial(Material mat)
+        private void SetSharedMaterial(Material mat)
         {
-            //Debug.Log("*** SetSharedMaterial UI() *** FRAME (" + Time.frameCount + ")");
-
-            // Assign new material.
             m_sharedMaterial = mat;
             m_Material = m_sharedMaterial;
 
-            //m_isDefaultMaterial = false;
-            //if (mat.GetInstanceID() == m_fontAsset.material.GetInstanceID())
-            //    m_isDefaultMaterial = true;
-
-            // Compute and Set new padding values for this new material.
             m_padding = GetPaddingForMaterial();
 
-            //SetVerticesDirty();
             SetMaterialDirty();
 
             #if UNITY_EDITOR
-            //if (m_sharedMaterial != null)
-            //    gameObject.name = "TMP SubMesh [" + m_sharedMaterial.name + "]";
-            #endif
+#endif
         }
     }
 }

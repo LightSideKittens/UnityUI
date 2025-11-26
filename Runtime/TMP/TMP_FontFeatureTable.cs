@@ -58,10 +58,6 @@ namespace TMPro
             set { m_MarkToMarkAdjustmentRecords = value; }
         }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
-
         [SerializeField]
         internal List<MultipleSubstitutionRecord> m_MultipleSubstitutionRecords;
 
@@ -78,10 +74,6 @@ namespace TMPro
         internal List<MarkToMarkAdjustmentRecord> m_MarkToMarkAdjustmentRecords;
 
 
-        // =============================================
-        // Lookup data structures.
-        // =============================================
-
         internal Dictionary<uint, List<LigatureSubstitutionRecord>> m_LigatureSubstitutionRecordLookup;
 
         internal Dictionary<uint, GlyphPairAdjustmentRecord> m_GlyphPairAdjustmentRecordLookup;
@@ -89,10 +81,6 @@ namespace TMPro
         internal Dictionary<uint, MarkToBaseAdjustmentRecord> m_MarkToBaseAdjustmentRecordLookup;
 
         internal Dictionary<uint, MarkToMarkAdjustmentRecord> m_MarkToMarkAdjustmentRecordLookup;
-
-        // =============================================
-        // Constructor(s)
-        // =============================================
 
         public TMP_FontFeatureTable()
         {
@@ -109,16 +97,11 @@ namespace TMPro
             m_MarkToMarkAdjustmentRecordLookup = new Dictionary<uint, MarkToMarkAdjustmentRecord>();
         }
 
-        // =============================================
-        // Utility Functions
-        // =============================================
-
         /// <summary>
         /// Sort the glyph pair adjustment records by glyph index.
         /// </summary>
         public void SortGlyphPairAdjustmentRecords()
         {
-            // Sort List of Kerning Info
             if (m_GlyphPairAdjustmentRecords.Count > 0)
                 m_GlyphPairAdjustmentRecords = m_GlyphPairAdjustmentRecords.OrderBy(s => s.firstAdjustmentRecord.glyphIndex).ThenBy(s => s.secondAdjustmentRecord.glyphIndex).ToList();
         }
@@ -128,7 +111,6 @@ namespace TMPro
         /// </summary>
         public void SortMarkToBaseAdjustmentRecords()
         {
-            // Sort List of Kerning Info
             if (m_MarkToBaseAdjustmentRecords.Count > 0)
                 m_MarkToBaseAdjustmentRecords = m_MarkToBaseAdjustmentRecords.OrderBy(s => s.baseGlyphID).ThenBy(s => s.markGlyphID).ToList();
         }
@@ -138,7 +120,6 @@ namespace TMPro
         /// </summary>
         public void SortMarkToMarkAdjustmentRecords()
         {
-            // Sort List of Kerning Info
             if (m_MarkToMarkAdjustmentRecords.Count > 0)
                 m_MarkToMarkAdjustmentRecords = m_MarkToMarkAdjustmentRecords.OrderBy(s => s.baseMarkGlyphID).ThenBy(s => s.combiningMarkGlyphID).ToList();
         }

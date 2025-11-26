@@ -9,23 +9,17 @@ namespace TMPro
     /// </summary>
     public class TMP_ResourceManager
     {
-        // ======================================================
-        // TEXT SETTINGS MANAGEMENT
-        // ======================================================
-
         private static TMP_Settings s_TextSettings;
 
         internal static TMP_Settings GetTextSettings()
         {
             if (s_TextSettings == null)
             {
-                // Try loading the TMP Settings from a Resources folder in the user project.
-                s_TextSettings = Resources.Load<TMP_Settings>("TextSettings"); // ?? ScriptableObject.CreateInstance<TMP_Settings>();
+                s_TextSettings = Resources.Load<TMP_Settings>("TextSettings");
 
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 if (s_TextSettings == null)
                 {
-                    // Open TMP Resources Importer to enable the user to import the TMP Essential Resources and option TMP Examples & Extras
                     TMP_PackageResourceImporterWindow.ShowPackageImporterWindow();
                 }
                 #endif
@@ -34,11 +28,7 @@ namespace TMPro
             return s_TextSettings;
         }
 
-        // ======================================================
-        // FONT ASSET MANAGEMENT - Fields, Properties and Functions
-        // ======================================================
-
-        struct FontAssetRef
+        private struct FontAssetRef
         {
             public int nameHashCode;
             public int familyNameHashCode;
@@ -48,7 +38,6 @@ namespace TMPro
 
             public FontAssetRef(int nameHashCode, int familyNameHashCode, int styleNameHashCode, TMP_FontAsset fontAsset)
             {
-                // Use familyNameHashCode for font assets created at runtime as these asset do not typically have a names.
                 this.nameHashCode = nameHashCode != 0 ? nameHashCode : familyNameHashCode;
                 this.familyNameHashCode = familyNameHashCode;
                 this.styleNameHashCode = styleNameHashCode;
@@ -57,12 +46,12 @@ namespace TMPro
             }
         }
 
-        static readonly Dictionary<int, FontAssetRef> s_FontAssetReferences = new Dictionary<int, FontAssetRef>();
-        static readonly Dictionary<int, TMP_FontAsset> s_FontAssetNameReferenceLookup = new Dictionary<int, TMP_FontAsset>();
-        static readonly Dictionary<long, TMP_FontAsset> s_FontAssetFamilyNameAndStyleReferenceLookup = new Dictionary<long, TMP_FontAsset>();
-        static readonly List<int> s_FontAssetRemovalList = new List<int>(16);
+        private static readonly Dictionary<int, FontAssetRef> s_FontAssetReferences = new Dictionary<int, FontAssetRef>();
+        private static readonly Dictionary<int, TMP_FontAsset> s_FontAssetNameReferenceLookup = new Dictionary<int, TMP_FontAsset>();
+        private static readonly Dictionary<long, TMP_FontAsset> s_FontAssetFamilyNameAndStyleReferenceLookup = new Dictionary<long, TMP_FontAsset>();
+        private static readonly List<int> s_FontAssetRemovalList = new List<int>(16);
 
-        static readonly int k_RegularStyleHashCode = TMP_TextUtilities.GetHashCode("Regular");
+        private static readonly int k_RegularStyleHashCode = TMP_TextUtilities.GetHashCode("Regular");
 
         /// <summary>
         /// Add font asset to resource manager.
@@ -77,11 +66,9 @@ namespace TMPro
                 FontAssetRef fontAssetRef = new FontAssetRef(fontAsset.hashCode, fontAsset.familyNameHashCode, fontAsset.styleNameHashCode, fontAsset);
                 s_FontAssetReferences.Add(instanceID, fontAssetRef);
 
-                // Add font asset to name reference lookup
                 if (!s_FontAssetNameReferenceLookup.ContainsKey(fontAssetRef.nameHashCode))
                     s_FontAssetNameReferenceLookup.Add(fontAssetRef.nameHashCode, fontAsset);
 
-                // Add font asset to family name and style lookup
                 if (!s_FontAssetFamilyNameAndStyleReferenceLookup.ContainsKey(fontAssetRef.familyNameAndStyleHashCode))
                     s_FontAssetFamilyNameAndStyleReferenceLookup.Add(fontAssetRef.familyNameAndStyleHashCode, fontAsset);
             }
@@ -89,11 +76,9 @@ namespace TMPro
             {
                 FontAssetRef fontAssetRef = s_FontAssetReferences[instanceID];
 
-                // Return if font asset name, family and style name have not changed.
                 if (fontAssetRef.nameHashCode == fontAsset.hashCode && fontAssetRef.familyNameHashCode == fontAsset.familyNameHashCode && fontAssetRef.styleNameHashCode == fontAsset.styleNameHashCode)
                     return;
 
-                // Check if font asset name has changed
                 if (fontAssetRef.nameHashCode != fontAsset.hashCode)
                 {
                     s_FontAssetNameReferenceLookup.Remove(fontAssetRef.nameHashCode);
@@ -104,7 +89,6 @@ namespace TMPro
                         s_FontAssetNameReferenceLookup.Add(fontAssetRef.nameHashCode, fontAsset);
                 }
 
-                // Check if family or style name has changed
                 if (fontAssetRef.familyNameHashCode != fontAsset.familyNameHashCode || fontAssetRef.styleNameHashCode != fontAsset.styleNameHashCode)
                 {
                     s_FontAssetFamilyNameAndStyleReferenceLookup.Remove(fontAssetRef.familyNameAndStyleHashCode);
@@ -182,7 +166,6 @@ namespace TMPro
         /// </summary>
         internal static void RebuildFontAssetCache()
         {
-            // Iterate over loaded font assets to update affected font assets
             foreach (var pair in s_FontAssetReferences)
             {
                 FontAssetRef fontAssetRef = pair.Value;
@@ -191,11 +174,9 @@ namespace TMPro
 
                 if (fontAsset == null)
                 {
-                    // Remove font asset from our lookup dictionaries
                     s_FontAssetNameReferenceLookup.Remove(fontAssetRef.nameHashCode);
                     s_FontAssetFamilyNameAndStyleReferenceLookup.Remove(fontAssetRef.familyNameAndStyleHashCode);
 
-                    // Add font asset to our removal list
                     s_FontAssetRemovalList.Add(pair.Key);
                     continue;
                 }
@@ -204,7 +185,6 @@ namespace TMPro
                 fontAsset.AddSynthesizedCharactersAndFaceMetrics();
             }
 
-            // Remove font assets in our removal list from our font asset references
             for (int i = 0; i < s_FontAssetRemovalList.Count; i++)
             {
                 s_FontAssetReferences.Remove(s_FontAssetRemovalList[i]);
@@ -213,17 +193,5 @@ namespace TMPro
 
             TMPro_EventManager.ON_FONT_PROPERTY_CHANGED(true, null);
         }
-
-        // internal static void RebuildFontAssetCache(int instanceID)
-        // {
-        //     // Iterate over loaded font assets to update affected font assets
-        //     for (int i = 0; i < s_FontAssetReferences.Count; i++)
-        //     {
-        //         TMP_FontAsset fontAsset = s_FontAssetReferences[i];
-        //
-        //         if (fontAsset.FallbackSearchQueryLookup.Contains(instanceID))
-        //             fontAsset.ReadFontAssetDefinition();
-        //     }
-        // }
     }
 }

@@ -20,9 +20,6 @@ namespace TMPro
         private readonly List<ICanvasElement> m_GraphicRebuildQueue = new List<ICanvasElement>();
         private HashSet<int> m_GraphicQueueLookup = new HashSet<int>();
 
-        //private bool m_PerformingLayoutUpdate;
-        //private bool m_PerformingGraphicUpdate;
-
         /// <summary>
         /// Get a singleton instance of the registry
         /// </summary>
@@ -42,7 +39,6 @@ namespace TMPro
         /// </summary>
         protected TMP_UpdateRegistry()
         {
-            //Debug.Log("Adding WillRenderCanvases");
             Canvas.willRenderCanvases += PerformUpdateForCanvasRendererObjects;
         }
 
@@ -98,10 +94,6 @@ namespace TMPro
         /// </summary>
         private void PerformUpdateForCanvasRendererObjects()
         {
-            //Debug.Log("Performing update of CanvasRenderer objects at Frame: " + Time.frameCount);
-
-            // Processing elements that require a layout rebuild.
-            //this.m_PerformingLayoutUpdate = true;
             for (int index = 0; index < m_LayoutRebuildQueue.Count; index++)
             {
                 ICanvasElement element = TMP_UpdateRegistry.instance.m_LayoutRebuildQueue[index];
@@ -115,10 +107,7 @@ namespace TMPro
                 m_LayoutQueueLookup.Clear();
             }
 
-            // Update font assets before graphic rebuild
 
-
-            // Processing elements that require a graphic rebuild.
             for (int index = 0; index < m_GraphicRebuildQueue.Count; index++)
             {
                 ICanvasElement element = TMP_UpdateRegistry.instance.m_GraphicRebuildQueue[index];
@@ -126,7 +115,6 @@ namespace TMPro
                 element.Rebuild(CanvasUpdate.PreRender);
             }
 
-            // If there are no objects in the queue, we don't need to clear the lists again.
             if (m_GraphicRebuildQueue.Count > 0)
             {
                 m_GraphicRebuildQueue.Clear();
@@ -159,7 +147,6 @@ namespace TMPro
         {
             int id = (element as Object).GetInstanceID();
 
-            //element.LayoutComplete();
             TMP_UpdateRegistry.instance.m_LayoutRebuildQueue.Remove(element);
             m_GraphicQueueLookup.Remove(id);
         }
@@ -169,7 +156,6 @@ namespace TMPro
         {
             int id = (element as Object).GetInstanceID();
 
-            //element.GraphicUpdateComplete();
             TMP_UpdateRegistry.instance.m_GraphicRebuildQueue.Remove(element);
             m_LayoutQueueLookup.Remove(id);
         }

@@ -10,9 +10,9 @@ namespace TMPro
     /// </summary>
     public class FastAction
     {
-        LinkedList<System.Action> delegates = new LinkedList<System.Action>();
+        private LinkedList<System.Action> delegates = new LinkedList<System.Action>();
 
-        Dictionary<System.Action, LinkedListNode<System.Action>> lookup = new Dictionary<System.Action, LinkedListNode<System.Action>>();
+        private Dictionary<System.Action, LinkedListNode<System.Action>> lookup = new Dictionary<System.Action, LinkedListNode<System.Action>>();
 
         public void Add(System.Action rhs)
         {
@@ -48,9 +48,9 @@ namespace TMPro
     /// <typeparam name="A">The parameter of the method that this delegate encapsulates.</typeparam>
     public class FastAction<A>
     {
-        LinkedList<System.Action<A>> delegates = new LinkedList<System.Action<A>>();
+        private LinkedList<System.Action<A>> delegates = new LinkedList<System.Action<A>>();
 
-        Dictionary<System.Action<A>, LinkedListNode<System.Action<A>>> lookup = new Dictionary<System.Action<A>, LinkedListNode<System.Action<A>>>();
+        private Dictionary<System.Action<A>, LinkedListNode<System.Action<A>>> lookup = new Dictionary<System.Action<A>, LinkedListNode<System.Action<A>>>();
 
         public void Add(System.Action<A> rhs)
         {
@@ -87,9 +87,9 @@ namespace TMPro
     /// <typeparam name="B">The second parameter of the method that this delegate encapsulates.</typeparam>
     public class FastAction<A, B>
     {
-        LinkedList<System.Action<A, B>> delegates = new LinkedList<System.Action<A, B>>();
+        private LinkedList<System.Action<A, B>> delegates = new LinkedList<System.Action<A, B>>();
 
-        Dictionary<System.Action<A, B>, LinkedListNode<System.Action<A, B>>> lookup = new Dictionary<System.Action<A, B>, LinkedListNode<System.Action<A, B>>>();
+        private Dictionary<System.Action<A, B>, LinkedListNode<System.Action<A, B>>> lookup = new Dictionary<System.Action<A, B>, LinkedListNode<System.Action<A, B>>>();
 
         public void Add(System.Action<A, B> rhs)
         {
@@ -127,9 +127,9 @@ namespace TMPro
     /// <typeparam name="C">The third parameter of the method that this delegate encapsulates.</typeparam>
     public class FastAction<A, B, C>
     {
-        LinkedList<System.Action<A, B, C>> delegates = new LinkedList<System.Action<A, B, C>>();
+        private LinkedList<System.Action<A, B, C>> delegates = new LinkedList<System.Action<A, B, C>>();
 
-        Dictionary<System.Action<A, B, C>, LinkedListNode<System.Action<A, B, C>>> lookup = new Dictionary<System.Action<A, B, C>, LinkedListNode<System.Action<A, B, C>>>();
+        private Dictionary<System.Action<A, B, C>, LinkedListNode<System.Action<A, B, C>>> lookup = new Dictionary<System.Action<A, B, C>, LinkedListNode<System.Action<A, B, C>>>();
 
         public void Add(System.Action<A, B, C> rhs)
         {

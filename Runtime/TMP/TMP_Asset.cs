@@ -5,7 +5,6 @@ using UnityEngine.TextCore;
 
 namespace TMPro
 {
-    // Base class inherited by the various TextMeshPro Assets.
     [Serializable]
     public abstract class TMP_Asset : ScriptableObject
     {
@@ -85,10 +84,6 @@ namespace TMPro
             }
             set => m_MaterialHashCode = value;
         }
-
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
 
         [SerializeField]
         internal string m_Version;

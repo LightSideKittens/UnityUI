@@ -23,7 +23,6 @@ namespace TMPro
         private readonly HashSet<int> m_CullingUpdateLookup = new HashSet<int>();
         private readonly List<TMP_Text> m_CullingUpdateQueue = new List<TMP_Text>();
 
-        // Profiler Marker declarations
         private static ProfilerMarker k_RegisterTextObjectForUpdateMarker = new ProfilerMarker("TMP.RegisterTextObjectForUpdate");
         private static ProfilerMarker k_RegisterTextElementForGraphicRebuildMarker = new ProfilerMarker("TMP.RegisterTextElementForGraphicRebuild");
         private static ProfilerMarker k_RegisterTextElementForCullingUpdateMarker = new ProfilerMarker("TMP.RegisterTextElementForCullingUpdate");
@@ -33,7 +32,7 @@ namespace TMPro
         /// <summary>
         /// Get a singleton instance of the registry
         /// </summary>
-        static TMP_UpdateManager instance
+        private static TMP_UpdateManager instance
         {
             get
             {
@@ -47,7 +46,7 @@ namespace TMPro
         /// <summary>
         /// Register to receive rendering callbacks.
         /// </summary>
-        TMP_UpdateManager()
+        private TMP_UpdateManager()
         {
             Canvas.willRenderCanvases += DoRebuilds;
         }
@@ -143,7 +142,7 @@ namespace TMPro
         /// <summary>
         /// Callback which occurs just before the cam is rendered.
         /// </summary>
-        void OnCameraPreCull()
+        private void OnCameraPreCull()
         {
             DoRebuilds();
         }
@@ -151,15 +150,13 @@ namespace TMPro
         /// <summary>
         /// Process the rebuild requests in the rebuild queues.
         /// </summary>
-        void DoRebuilds()
+        private void DoRebuilds()
         {
-            // Handle text objects the require an update either as a result of scale changes or legacy animation.
             for (int i = 0; i < m_InternalUpdateQueue.Count; i++)
             {
                 m_InternalUpdateQueue[i].InternalUpdate();
             }
 
-            // Handle Layout Rebuild Phase
             for (int i = 0; i < m_LayoutRebuildQueue.Count; i++)
             {
                 m_LayoutRebuildQueue[i].Rebuild(CanvasUpdate.Prelayout);
@@ -171,26 +168,22 @@ namespace TMPro
                 m_LayoutQueueLookup.Clear();
             }
 
-            // Handle Graphic Rebuild Phase
             for (int i = 0; i < m_GraphicRebuildQueue.Count; i++)
             {
                 m_GraphicRebuildQueue[i].Rebuild(CanvasUpdate.PreRender);
             }
 
-            // If there are no objects in the queue, we don't need to clear the lists again.
             if (m_GraphicRebuildQueue.Count > 0)
             {
                 m_GraphicRebuildQueue.Clear();
                 m_GraphicQueueLookup.Clear();
             }
 
-            // Handle Culling Update
             for (int i = 0; i < m_CullingUpdateQueue.Count; i++)
             {
                 m_CullingUpdateQueue[i].UpdateCulling();
             }
 
-            // If there are no objects in the queue, we don't need to clear the lists again.
             if (m_CullingUpdateQueue.Count > 0)
             {
                 m_CullingUpdateQueue.Clear();

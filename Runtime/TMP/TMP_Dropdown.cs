@@ -134,11 +134,10 @@ namespace TMPro
         /// </summary>
         public class DropdownEvent : UnityEvent<int> { }
 
-        static readonly OptionData k_NothingOption = new OptionData { text = "Nothing" };
-        static readonly OptionData k_EverythingOption = new OptionData { text = "Everything" };
-        static readonly OptionData k_MixedOption = new OptionData { text = "Mixed..." };
+        private static readonly OptionData k_NothingOption = new OptionData { text = "Nothing" };
+        private static readonly OptionData k_EverythingOption = new OptionData { text = "Everything" };
+        private static readonly OptionData k_MixedOption = new OptionData { text = "Mixed..." };
 
-        // Template used to create the dropdown.
         [SerializeField]
         private RectTransform m_Template;
 
@@ -147,7 +146,6 @@ namespace TMPro
         /// </summary>
         public RectTransform template { get { return m_Template; } set { m_Template = value; RefreshShownValue(); } }
 
-        // Text to be used as a caption for the current value. It's not required, but it's kept here for convenience.
         [SerializeField]
         private TMP_Text m_CaptionText;
 
@@ -198,11 +196,7 @@ namespace TMPro
         [SerializeField]
         private bool m_MultiSelect;
 
-        [Space]
-
-        // Items that will be visible when the dropdown is shown.
-        // We box this into its own class so we can use a Property Drawer for it.
-        [SerializeField]
+        [Space] [SerializeField]
         private OptionDataList m_Options = new OptionDataList();
 
         /// <summary>
@@ -302,10 +296,7 @@ namespace TMPro
             set { m_Options.options = value; RefreshShownValue(); }
         }
 
-        [Space]
-
-        // Notification triggered when the dropdown changes.
-        [SerializeField]
+        [Space] [SerializeField]
         private DropdownEvent m_OnValueChanged = new DropdownEvent();
 
         /// <summary>
@@ -432,7 +423,7 @@ namespace TMPro
             SetValue(input, false);
         }
 
-        void SetValue(int value, bool sendCallback = true)
+        private void SetValue(int value, bool sendCallback = true)
         {
             if (Application.isPlaying && (value == m_Value || options.Count == 0))
                 return;
@@ -446,7 +437,6 @@ namespace TMPro
 
             if (sendCallback)
             {
-                // Notify all listeners
                 UISystemProfilerApi.AddMarker("Dropdown.value", this);
                 m_OnValueChanged.Invoke(m_Value);
             }
@@ -495,7 +485,6 @@ namespace TMPro
 
         protected override void OnDisable()
         {
-            //Destroy dropdown and blocker in case user deactivates the dropdown when they click an option (case 935649)
             ImmediateDestroyDropdownList();
 
             if (m_Blocker != null)
@@ -686,7 +675,6 @@ namespace TMPro
             item.toggle = itemToggle;
             item.rectTransform = (RectTransform)itemToggle.transform;
 
-            // Find the Canvas that this dropdown is a part of
             Canvas parentCanvas = null;
             Transform parentTransform = m_Template.parent;
             while (parentTransform != null)
@@ -702,7 +690,6 @@ namespace TMPro
             popupCanvas.overrideSorting = true;
             popupCanvas.sortingOrder = 30000;
 
-            // If we have a parent canvas, apply the same raycasters as the parent for consistency.
             if (parentCanvas != null)
             {
                 Component[] components = parentCanvas.GetComponents<BaseRaycaster>();
@@ -785,7 +772,6 @@ namespace TMPro
             if (!IsActive() || !IsInteractable() || m_Dropdown != null)
                 return;
 
-            // Get root Canvas.
             var list = TMP_ListPool<Canvas>.Get();
             gameObject.GetComponentsInParent(false, list);
             if (list.Count == 0)
@@ -812,32 +798,24 @@ namespace TMPro
 
             m_Template.gameObject.SetActive(true);
 
-            // popupCanvas used to assume the root canvas had the default sorting Layer, next line fixes (case 958281 - [UI] Dropdown list does not copy the parent canvas layer when the panel is opened)
             m_Template.GetComponent<Canvas>().sortingLayerID = rootCanvas.sortingLayerID;
 
-            // Instantiate the drop-down template
             m_Dropdown = CreateDropdownList(m_Template.gameObject);
             m_Dropdown.name = "Dropdown List";
             m_Dropdown.SetActive(true);
 
-            // Make drop-down RectTransform have same values as original.
             RectTransform dropdownRectTransform = m_Dropdown.transform as RectTransform;
             dropdownRectTransform.SetParent(m_Template.transform.parent, false);
 
-            // Instantiate the drop-down list items
-
-            // Find the dropdown item and disable it.
             DropdownItem itemTemplate = m_Dropdown.GetComponentInChildren<DropdownItem>();
 
             GameObject content = itemTemplate.rectTransform.parent.gameObject;
             RectTransform contentRectTransform = content.transform as RectTransform;
             itemTemplate.rectTransform.gameObject.SetActive(true);
 
-            // Get the rects of the dropdown and item
             Rect dropdownContentRect = contentRectTransform.rect;
             Rect itemTemplateRect = itemTemplate.rectTransform.rect;
 
-            // Calculate the visual offset between the item's edges and the background's edges
             Vector2 offsetMin = itemTemplateRect.min - dropdownContentRect.min + (Vector2)itemTemplate.rectTransform.localPosition;
             Vector2 offsetMax = itemTemplateRect.max - dropdownContentRect.max + (Vector2)itemTemplate.rectTransform.localPosition;
             Vector2 itemSize = itemTemplateRect.size;
@@ -865,7 +843,6 @@ namespace TMPro
                 everythingToggle.isOn = isEverythingValue;
                 everythingToggle.onValueChanged.AddListener(x => OnSelectItem(everythingToggle));
 
-                // Automatically set up explicit navigation
                 if (prev != null)
                 {
                     Navigation prevNav = prev.navigation;
@@ -890,7 +867,6 @@ namespace TMPro
                 if (item == null)
                     continue;
 
-                // Automatically set up a toggle state change listener
                 if (m_MultiSelect)
                     item.toggle.isOn = (value & (1 << i)) != 0;
                 else
@@ -898,11 +874,9 @@ namespace TMPro
 
                 item.toggle.onValueChanged.AddListener(x => OnSelectItem(item.toggle));
 
-                // Select current option
                 if (item.toggle.isOn)
                     item.toggle.Select();
 
-                // Automatically set up explicit navigation
                 if (prev != null)
                 {
                     Navigation prevNav = prev.navigation;
@@ -921,7 +895,6 @@ namespace TMPro
                 prev = item.toggle;
             }
 
-            // Reposition all items now that all of them have been added
             Vector2 sizeDelta = contentRectTransform.sizeDelta;
             sizeDelta.y = itemSize.y * m_Items.Count + offsetMin.y - offsetMax.y;
             contentRectTransform.sizeDelta = sizeDelta;
@@ -930,9 +903,6 @@ namespace TMPro
             if (extraSpace > 0)
                 dropdownRectTransform.sizeDelta = new Vector2(dropdownRectTransform.sizeDelta.x, dropdownRectTransform.sizeDelta.y - extraSpace);
 
-            // Invert anchoring and position if dropdown is partially or fully outside of canvas rect.
-            // Typically this will have the effect of placing the dropdown above the button instead of below,
-            // but it works as inversion regardless of initial setup.
             Vector3[] corners = new Vector3[4];
             dropdownRectTransform.GetWorldCorners(corners);
 
@@ -964,17 +934,15 @@ namespace TMPro
                 itemRect.sizeDelta = new Vector2(itemRect.sizeDelta.x, itemSize.y);
             }
 
-            // Fade in the popup
             AlphaFadeList(m_AlphaFadeSpeed, 0f, 1f);
 
-            // Make drop-down template and item template inactive
             m_Template.gameObject.SetActive(false);
             itemTemplate.gameObject.SetActive(false);
 
             m_Blocker = CreateBlocker(rootCanvas);
         }
 
-        static bool IsEverythingValue(int count, int value)
+        private static bool IsEverythingValue(int count, int value)
         {
             var result = true;
             for (var i = 0; i < count; i++)
@@ -986,7 +954,7 @@ namespace TMPro
             return result;
         }
 
-        static int EverythingValue(int count)
+        private static int EverythingValue(int count)
         {
             int result = 0;
             for (var i = 0; i < count; i++)
@@ -1007,28 +975,22 @@ namespace TMPro
         /// <returns>The created blocker object</returns>
         protected virtual GameObject CreateBlocker(Canvas rootCanvas)
         {
-            // Create blocker GameObject.
             GameObject blocker = new GameObject("Blocker");
 
-            // Set the game object layer to match the Canvas' game object layer, as not doing this can lead to issues
-            // especially in XR applications like PolySpatial on VisionOS (UUM-62470).
             blocker.layer = rootCanvas.gameObject.layer;
 
-            // Setup blocker RectTransform to cover entire root canvas area.
             RectTransform blockerRect = blocker.AddComponent<RectTransform>();
             blockerRect.SetParent(rootCanvas.transform, false);
             blockerRect.anchorMin = Vector3.zero;
             blockerRect.anchorMax = Vector3.one;
             blockerRect.sizeDelta = Vector2.zero;
 
-            // Make blocker be in separate canvas in same layer as dropdown and in layer just below it.
             Canvas blockerCanvas = blocker.AddComponent<Canvas>();
             blockerCanvas.overrideSorting = true;
             Canvas dropdownCanvas = m_Dropdown.GetComponent<Canvas>();
             blockerCanvas.sortingLayerID = dropdownCanvas.sortingLayerID;
             blockerCanvas.sortingOrder = dropdownCanvas.sortingOrder - 1;
 
-            // Find the Canvas that this dropdown is a part of
             Canvas parentCanvas = null;
             Transform parentTransform = m_Template.parent;
             while (parentTransform != null)
@@ -1040,7 +1002,6 @@ namespace TMPro
                 parentTransform = parentTransform.parent;
             }
 
-            // If we have a parent canvas, apply the same raycasters as the parent for consistency.
             if (parentCanvas != null)
             {
                 Component[] components = parentCanvas.GetComponents<BaseRaycaster>();
@@ -1055,20 +1016,16 @@ namespace TMPro
             }
             else
             {
-                // Add raycaster since it's needed to block.
                 GetOrAddComponent<GraphicRaycaster>(blocker);
             }
 
 
-            // Add image since it's needed to block, but make it clear.
             Image blockerImage = blocker.AddComponent<Image>();
             blockerImage.color = Color.clear;
 
-            // Add button since it's needed to block, and to close the dropdown when blocking area is clicked.
             Button blockerButton = blocker.AddComponent<Button>();
             blockerButton.onClick.AddListener(Hide);
 
-            //add canvas group to ensure clicking outside the dropdown will hide it (UUM-33691)
             CanvasGroup blockerCanvasGroup = blocker.AddComponent<CanvasGroup>();
             blockerCanvasGroup.ignoreParentGroups = true;
 
@@ -1136,10 +1093,8 @@ namespace TMPro
         /// <param name="item">The Item to destroy.</param>
         protected virtual void DestroyItem(DropdownItem item) { }
 
-        // Add a new drop-down list item with the specified values.
         private DropdownItem AddItem(OptionData data, bool selected, DropdownItem itemTemplate, List<DropdownItem> items)
         {
-            // Add a new item to the dropdown.
             DropdownItem item = CreateItem(itemTemplate);
             item.rectTransform.SetParent(itemTemplate.rectTransform.parent, false);
 
@@ -1151,7 +1106,6 @@ namespace TMPro
                 item.toggle.isOn = false;
             }
 
-            // Set the item's data
             if (item.text)
                 item.text.text = data.text;
 
@@ -1203,7 +1157,6 @@ namespace TMPro
                 {
                     AlphaFadeList(m_AlphaFadeSpeed, 0f);
 
-                    // User could have disabled the dropdown during the OnValueChanged call.
                     if (IsActive())
                         m_Coroutine = StartCoroutine(DelayedDestroyDropdownList(m_AlphaFadeSpeed));
                 }
@@ -1242,7 +1195,6 @@ namespace TMPro
             m_Coroutine = null;
         }
 
-        // Change the value and hide the dropdown.
         private void OnSelectItem(Toggle toggle)
         {
             int selectedIndex = -1;
@@ -1252,7 +1204,6 @@ namespace TMPro
             {
                 if (parent.GetChild(i) == tr)
                 {
-                    // Subtract one to account for template child.
                     selectedIndex = i - 1;
                     break;
                 }
@@ -1265,7 +1216,7 @@ namespace TMPro
             {
                 switch (selectedIndex)
                 {
-                    case 0: // Nothing
+                    case 0:
                         value = 0;
                         for (var i = 3; i < parent.childCount; i++)
                         {
@@ -1276,7 +1227,7 @@ namespace TMPro
 
                         toggle.isOn = true;
                         break;
-                    case 1: // Everything
+                    case 1:
                         value = EverythingValue(options.Count);
                         for (var i = 3; i < parent.childCount; i++)
                         {
@@ -1309,7 +1260,7 @@ namespace TMPro
             Hide();
         }
 
-        static int FirstActiveFlagIndex(int value)
+        private static int FirstActiveFlagIndex(int value)
         {
             if (value == 0)
                 return 0;

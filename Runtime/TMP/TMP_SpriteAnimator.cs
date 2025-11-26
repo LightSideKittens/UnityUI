@@ -9,26 +9,23 @@ namespace TMPro
     public class TMP_SpriteAnimator : MonoBehaviour
     {
         private Dictionary<int, bool> m_animations = new Dictionary<int, bool>(16);
-        //private bool isPlaying = false;
 
         private TMP_Text m_TextComponent;
 
 
-        void Awake()
+        private void Awake()
         {
             m_TextComponent = GetComponent<TMP_Text>();
         }
 
 
-        void OnEnable()
+        private void OnEnable()
         {
-            //m_playAnimations = true;
         }
 
 
-        void OnDisable()
+        private void OnDisable()
         {
-            //m_playAnimations = false;
         }
 
 
@@ -43,7 +40,6 @@ namespace TMPro
         {
             bool isPlaying;
 
-            // Need to add tracking of coroutines that have been lunched for this text object.
             if (!m_animations.TryGetValue(currentCharacter, out isPlaying))
             {
                 StartCoroutine(DoSpriteAnimationInternal(currentCharacter, spriteAsset, start, end, framerate));
@@ -52,20 +48,17 @@ namespace TMPro
         }
 
 
-        IEnumerator DoSpriteAnimationInternal(int currentCharacter, TMP_SpriteAsset spriteAsset, int start, int end, int framerate)
+        private IEnumerator DoSpriteAnimationInternal(int currentCharacter, TMP_SpriteAsset spriteAsset, int start, int end, int framerate)
         {
             if (m_TextComponent == null) yield break;
 
-            // We yield otherwise this gets called before the sprite has rendered.
             yield return null;
 
             int currentFrame = start;
 
-            // Make sure end frame does not exceed the number of sprites in the sprite asset.
             if (end > spriteAsset.spriteCharacterTable.Count)
                 end = spriteAsset.spriteCharacterTable.Count - 1;
 
-            // Get a reference to the current character's info
             TMP_CharacterInfo charInfo = m_TextComponent.textInfo.characterInfo[currentCharacter];
 
             int materialIndex = charInfo.materialReferenceIndex;
@@ -84,7 +77,6 @@ namespace TMPro
                 {
                     elapsedTime = 0;
 
-                    // Return if sprite was truncated or replaced by the Ellipsis character.
                     uint character = m_TextComponent.textInfo.characterInfo[currentCharacter].character;
                     if (character == 0x03 || character == 0x2026)
                     {
@@ -92,10 +84,8 @@ namespace TMPro
                         yield break;
                     }
 
-                    // Get a reference to the current sprite
                     TMP_SpriteCharacter spriteCharacter = spriteAsset.spriteCharacterTable[currentFrame];
 
-                    // Update the vertices for the new sprite
                     Vector3[] vertices = meshInfo.vertices;
 
                     Vector2 origin = new Vector2(charInfo.origin, charInfo.baseLine);
@@ -112,7 +102,6 @@ namespace TMPro
                     vertices[vertexIndex + 2] = tr;
                     vertices[vertexIndex + 3] = br;
 
-                    // Update the UV to point to the new sprite
                     Vector4[] uvs0 = meshInfo.uvs0;
 
                     Vector2 uv0 = new Vector2((float)spriteCharacter.glyph.glyphRect.x / spriteAsset.spriteSheet.width, (float)spriteCharacter.glyph.glyphRect.y / spriteAsset.spriteSheet.height);
@@ -125,7 +114,6 @@ namespace TMPro
                     uvs0[vertexIndex + 2] = uv2;
                     uvs0[vertexIndex + 3] = uv3;
 
-                    // Update the modified vertex attributes
                     meshInfo.mesh.vertices = vertices;
                     meshInfo.mesh.SetUVs(0, uvs0);
                     m_TextComponent.UpdateGeometry(meshInfo.mesh, materialIndex);

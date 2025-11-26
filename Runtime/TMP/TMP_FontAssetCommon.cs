@@ -47,7 +47,6 @@ namespace TMPro
     }
 
 
-    // Class which contains the Glyph Info / Character definition for each character contained in the font asset.
     [Serializable]
     public class TMP_Glyph : TMP_TextElement_Legacy
     {
@@ -75,7 +74,6 @@ namespace TMPro
     }
 
 
-    // Structure which holds the font creation settings
     [Serializable]
     public struct FontAssetCreationSettings
     {
@@ -268,7 +266,6 @@ namespace TMPro
         internal void ConvertLegacyKerningData()
         {
             m_FirstGlyphAdjustments.xAdvance = xOffset;
-            //xOffset = 0;
         }
 
     }
@@ -318,7 +315,6 @@ namespace TMPro
                 return 0;
             }
 
-            // Return -1 if Kerning Pair already exists.
             return -1;
         }
 
@@ -340,7 +336,6 @@ namespace TMPro
                 return 0;
             }
 
-            // Return -1 if Kerning Pair already exists.
             return -1;
         }
 
@@ -361,7 +356,6 @@ namespace TMPro
 
         public void SortKerningPairs()
         {
-            // Sort List of Kerning Info
             if (kerningPairs.Count > 0)
                 kerningPairs = kerningPairs.OrderBy(s => s.firstGlyph).ThenBy(s => s.secondGlyph).ToList();
         }
@@ -414,7 +408,6 @@ namespace TMPro
                 if (character.textAsset != null)
                     return font;
 
-                // Remove character from lookup table
                 font.characterLookupTable.Remove(unicode);
             }
 
@@ -427,10 +420,8 @@ namespace TMPro
 
                     int id = temp.GetInstanceID();
 
-                    // Skip over the fallback font asset in the event it is null or if already searched.
                     if (k_searchedFontAssets.Contains(id)) continue;
 
-                    // Add to list of font assets already searched.
                     k_searchedFontAssets.Add(id);
 
                     temp = SearchForCharacterInternal(temp, unicode, out character);

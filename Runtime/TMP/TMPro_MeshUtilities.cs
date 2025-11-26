@@ -23,51 +23,6 @@ namespace TMPro
     /// <summary>
     /// TMP custom data type to represent 32 bit characters.
     /// </summary>
-    //public struct TMP_Char
-    //{
-    //    private int m_value;
-
-    //    private TMP_Char(int value)
-    //    {
-    //        this.m_value = value;
-    //    }
-
-    //    private TMP_Char(TMP_Char value)
-    //    {
-    //        this.m_value = (int)value;
-    //    }
-
-    //    public static implicit operator TMP_Char(int value)
-    //    {
-    //        return new TMP_Char(value);
-    //    }
-
-    //    public static implicit operator TMP_Char(char c)
-    //    {
-    //        return new TMP_Char(c);
-    //    }
-
-    //    public static explicit operator int(TMP_Char value)
-    //    {
-    //        return value.m_value;
-    //    }
-
-    //    public override string ToString()
-    //    {
-    //        return m_value.ToString();
-    //    }
-    //}
-
-
-    //public struct TMP_VertexInfo
-    //{
-    //    public TMP_Vertex topLeft;
-    //    public TMP_Vertex bottomLeft;
-    //    public TMP_Vertex topRight;
-    //    public TMP_Vertex bottomRight;
-    //}
-
-
     [Serializable]
     public struct VertexGradient
     {
@@ -108,7 +63,6 @@ namespace TMPro
         public float ascender;
         public float baseLine;
         public float descender;
-        // public float extents;
     }
 
 
@@ -184,14 +138,11 @@ namespace TMPro
     /// </summary>
     public struct TMP_WordInfo
     {
-        // NOTE: Structure could be simplified by only including the firstCharacterIndex and length.
-
         public TMP_Text textComponent;
 
         public int firstCharacterIndex;
         public int lastCharacterIndex;
         public int characterCount;
-        //public float length;
 
         /// <summary>
         /// Returns the word as a string.
@@ -214,16 +165,10 @@ namespace TMPro
 
     public struct TMP_SpriteInfo
     {
-        public int spriteIndex; // Index of the sprite in the sprite atlas.
-        public int characterIndex; // The characterInfo index which holds the key information about this sprite.
+        public int spriteIndex;
+        public int characterIndex;
         public int vertexIndex;
     }
-
-
-    //public struct SpriteInfo
-    //{
-    //
-    //}
 
 
     public struct Extents
@@ -264,93 +209,11 @@ namespace TMPro
         public override string ToString()
         {
             string s = "Min (" + min.x.ToString("f2") + ", " + min.y.ToString("f2") + ")   Max (" + max.x.ToString("f2") + ", " + max.y.ToString("f2") + ")";
-            //string s = "Center: (" + ")" + "  Extents: (" + ((max.x - min.x) / 2).ToString("f2") + "," + ((max.y - min.y) / 2).ToString("f2") + ").";
             return s;
         }
     }
 
-    // internal struct TMP_TextProcessingState
-    // {
-    //         // Multi Font & Material support related
-    //         public TMP_FontAsset CurrentFontAsset;
-    //         public TMP_SpriteAsset CurrentSpriteAsset;
-    //         public Material CurrentMaterial;
-    //         public int CurrentMaterialIndex;
-    //
-    //         public float CurrentFontSize;
-    //         public float FontScale;
-    //         public float FontScaleMultiplier;
-    //         public FontStyles FontStyle;
-    //         public int ItalicAngle;
-    //
-    //         public float CharacterSpacing;
-    //         public float CharacterMonoSpacing;
-    //         public bool TagNoParsing;
-    //
-    //         public float HorizontalAdvance;
-    //         public float MaxCapHeight;
-    //         public float MaxTextAscender;
-    //         public float MaxTextDescender;
-    //         public float MaxElementAscender;
-    //         public float MaxElementDescender;
-    //         public float StartOfLineAscender;
-    //         public float MaxLineAscender;
-    //         public float MaxLineDescender;
-    //         public float PageAscender;
-    //
-    //         public int PreviousWordBreak;
-    //         public int TotalCharacterCount;
-    //         //public int VisibleCharacterCount;
-    //         //public int VisibleSpriteCount;
-    //         public int VisibleLinkCount;
-    //         public int FirstCharacterIndex;
-    //         public int FirstVisibleCharacterIndex;
-    //         public int LastCharacterIndex;
-    //         public int LastVisibleCharIndex;
-    //
-    //         public int LineNumber;
-    //         public float baselineOffset;
-    //         public float lineOffset;
-    //         public bool isDrivenLineSpacing;
-    //         public bool IsNonBreakingSpace;
-    //
-    //         public HorizontalAlignmentOptions HorizontalAlignment;
-    //         public float MarginLeft;
-    //         public float MarginRight;
-    //
-    //         public float PreferredWidth;
-    //         public float PreferredHeight;
-    //
-    //         public Color32 VertexColor;
-    //         public Color32 UnderlineColor;
-    //         public Color32 StrikethroughColor;
-    //         //public Color32 HighlightColor;
-    //
-    //         public Extents MeshExtents;
-    //         public TMP_LineInfo lineInfo;
-    //
-    //         public int spriteAnimationID;
-    //
-    //         public TMP_FontStyleStack BasicStyleStack;
-    //         public TMP_RichTextTagStack<int> ItalicAngleStack;
-    //         public TMP_RichTextTagStack<Color32> ColorStack;
-    //         public TMP_RichTextTagStack<Color32> UnderlineColorStack;
-    //         public TMP_RichTextTagStack<Color32> StrikethroughColorStack;
-    //         public TMP_RichTextTagStack<Color32> HighlightColorStack;
-    //         public TMP_RichTextTagStack<HighlightState> HighlightStateStack;
-    //         public TMP_RichTextTagStack<TMP_ColorGradient> ColorGradientStack;
-    //         public TMP_RichTextTagStack<float> SizeStack;
-    //         public TMP_RichTextTagStack<float> IndentStack;
-    //         public TMP_RichTextTagStack<FontWeight> FontWeightStack;
-    //
-    //         public TMP_RichTextTagStack<float> BaselineStack;
-    //         //public TMP_RichTextTagStack<int> ActionStack;
-    //         public TMP_RichTextTagStack<MaterialReference> MaterialReferenceStack;
-    //         public TMP_RichTextTagStack<HorizontalAlignmentOptions> LineJustificationStack;
-    // }
 
-
-    // Structure used for Word Wrapping which tracks the state of execution when the last space or carriage return character was encountered.
     internal struct WordWrapState
     {
         public int previous_WordBreak;

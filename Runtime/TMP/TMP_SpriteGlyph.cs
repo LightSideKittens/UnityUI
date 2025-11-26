@@ -16,10 +16,6 @@ namespace TMPro
         public Sprite sprite;
 
 
-        // ********************
-        // CONSTRUCTORS
-        // ********************
-
         public TMP_SpriteGlyph() { }
 
         /// <summary>

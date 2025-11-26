@@ -25,12 +25,8 @@ namespace TMPro
             m_TextElement = textElement;
         }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
-
-        uint m_Unicode;
-        TMP_TextElement m_TextElement;
+        private uint m_Unicode;
+        private TMP_TextElement m_TextElement;
     }
 
     internal struct MarkupAttribute
@@ -71,14 +67,10 @@ namespace TMPro
             set { m_ValueLength = value; }
         }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
-
-        int m_NameHashCode;
-        int m_ValueHashCode;
-        int m_ValueStartIndex;
-        int m_ValueLength;
+        private int m_NameHashCode;
+        private int m_ValueHashCode;
+        private int m_ValueStartIndex;
+        private int m_ValueLength;
     }
 
     internal struct MarkupElement
@@ -149,10 +141,6 @@ namespace TMPro
             m_Attributes[0].ValueStartIndex = startIndex;
             m_Attributes[0].ValueLength = length;
         }
-
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
 
         private MarkupAttribute[] m_Attributes;
     }
@@ -237,16 +225,12 @@ namespace TMPro
             return m_ElementType == TextProcessingElementType.TextCharacterElement ? $"Unicode ({m_CharacterElement.Unicode})   '{(char)m_CharacterElement.Unicode}' " : $"Markup = {(MarkupTag)m_MarkupElement.NameHashCode}";
         }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
+        private TextProcessingElementType m_ElementType;
+        private int m_StartIndex;
+        private int m_Length;
 
-        TextProcessingElementType m_ElementType;
-        int m_StartIndex;
-        int m_Length;
-
-        CharacterElement m_CharacterElement;
-        MarkupElement m_MarkupElement;
+        private CharacterElement m_CharacterElement;
+        private MarkupElement m_MarkupElement;
     }
 
 

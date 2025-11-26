@@ -46,10 +46,6 @@ namespace TMPro
         /// </summary>
         public float scale { get { return m_Scale; } set { m_Scale = value; } }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
-
         [SerializeField]
         internal TextElementType m_ElementType;
 

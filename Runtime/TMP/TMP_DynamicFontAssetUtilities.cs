@@ -45,7 +45,6 @@ namespace TMPro
                 {
                     char c = faceNameAndStyle[i];
 
-                    // Read family name
                     if (readingFlag == 0)
                     {
                         bool isSeparator = i + 2 < length && c == ' ' && faceNameAndStyle[i + 1] == '-' && faceNameAndStyle[i + 2] == ' ';
@@ -64,7 +63,6 @@ namespace TMPro
                         continue;
                     }
 
-                    // Read style name
                     if (readingFlag == 1)
                     {
                         styleNameHashCode = (styleNameHashCode << 5) + styleNameHashCode ^ TMP_TextUtilities.ToUpperFast(c);
@@ -80,7 +78,7 @@ namespace TMPro
         }
 
 
-        void InitializeSystemFontReferenceCache()
+        private void InitializeSystemFontReferenceCache()
         {
             if (s_SystemFontLookup == null)
                 s_SystemFontLookup = new Dictionary<ulong, FontReference>();
@@ -92,7 +90,6 @@ namespace TMPro
 
             for (int i = 0; i < s_SystemFontPaths.Length; i++)
             {
-                // Load font at the given path
                 FontEngineError error = FontEngine.LoadFontFace(s_SystemFontPaths[i]);
                 if (error != FontEngineError.Success)
                 {
@@ -100,27 +97,22 @@ namespace TMPro
                     continue;
                 }
 
-                // Get font faces and styles for this font
                 string[] fontFaces = FontEngine.GetFontFaces();
 
-                // Iterate over each font face
                 for (int j = 0; j < fontFaces.Length; j++)
                 {
                     FontReference fontRef = new FontReference(s_SystemFontPaths[i], fontFaces[j], j);
 
                     if (s_SystemFontLookup.ContainsKey(fontRef.hashCode))
                     {
-                        //Debug.Log("<color=#FFFF80>[" + i + "]</color> Family Name <color=#FFFF80>[" + fontRef.familyName + "]</color>   Style Name <color=#FFFF80>[" + fontRef.styleName + "]</color>   Index [" + fontRef.faceIndex + "]   HashCode [" + fontRef.hashCode + "]    Path [" + fontRef.filePath + "].");
                         continue;
                     }
 
-                    // Add font reference to lookup dictionary
                     s_SystemFontLookup.Add(fontRef.hashCode, fontRef);
 
                     Debug.Log("[" + i + "] Family Name [" + fontRef.familyName + "]   Style Name [" + fontRef.styleName + "]   Index [" + fontRef.faceIndex + "]   HashCode [" + fontRef.hashCode + "]    Path [" + fontRef.filePath + "].");
                 }
 
-                // Unload current font face.
                 FontEngine.UnloadFontFace();
             }
         }
@@ -149,30 +141,26 @@ namespace TMPro
             return s_Instance.TryGetSystemFontReferenceInternal(familyName, styleName, out fontRef);
         }
 
-        bool TryGetSystemFontReferenceInternal(string familyName, string styleName, out FontReference fontRef)
+        private bool TryGetSystemFontReferenceInternal(string familyName, string styleName, out FontReference fontRef)
         {
             if (s_SystemFontLookup == null)
                 InitializeSystemFontReferenceCache();
 
             fontRef = new FontReference();
 
-            // Compute family name hash code
             uint familyNameHashCode = TMP_TextUtilities.GetHashCodeCaseInSensitive(familyName);
             uint styleNameHashCode = string.IsNullOrEmpty(styleName) ? s_RegularStyleNameHashCode : TMP_TextUtilities.GetHashCodeCaseInSensitive(styleName);
             ulong key = (ulong)styleNameHashCode << 32 | familyNameHashCode;
 
-            // Lookup font reference
             if (s_SystemFontLookup.ContainsKey(key))
             {
                 fontRef = s_SystemFontLookup[key];
                 return true;
             }
 
-            // Return if specified family and style name is not found.
             if (styleNameHashCode != s_RegularStyleNameHashCode)
                 return false;
 
-            // Return first potential reference for the given family name
             foreach (KeyValuePair<ulong, FontReference> pair in s_SystemFontLookup)
             {
                 if (pair.Value.familyName == familyName)

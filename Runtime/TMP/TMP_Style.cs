@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-#pragma warning disable 0649 // Disabled warnings.
+#pragma warning disable 0649
 
 namespace TMPro
 {
@@ -19,8 +19,6 @@ namespace TMPro
             }
         }
         internal static TMP_Style k_NormalStyle;
-
-        // PUBLIC PROPERTIES
 
         /// <summary>
         /// The name identifying this style. ex. <style="name">.
@@ -55,7 +53,6 @@ namespace TMPro
         { get { return m_ClosingTagArray; } }
 
 
-        // PRIVATE FIELDS
         [SerializeField]
         private string m_Name;
 

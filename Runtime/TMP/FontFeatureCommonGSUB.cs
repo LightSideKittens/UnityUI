@@ -11,7 +11,6 @@ namespace TMPro
     [Serializable]
     public struct SingleSubstitutionRecord
     {
-        //
     }
 
     /// <summary>
@@ -29,10 +28,6 @@ namespace TMPro
         /// Array that contains the index of the glyphs replacing the single target glyph.
         /// </summary>
         public uint[] substituteGlyphIDs { get { return m_SubstituteGlyphIDs; } set { m_SubstituteGlyphIDs = value; } }
-
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
 
         [SerializeField]
         private uint m_TargetGlyphID;
@@ -66,19 +61,11 @@ namespace TMPro
         /// </summary>
         public uint ligatureGlyphID { get { return m_LigatureGlyphID; } set { m_LigatureGlyphID = value; } }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
-
         [SerializeField]
         private uint[] m_ComponentGlyphIDs;
 
         [SerializeField]
         private uint m_LigatureGlyphID;
-        
-        // =============================================
-        // Operator overrides
-        // =============================================
 
         public static bool operator==(LigatureSubstitutionRecord lhs, LigatureSubstitutionRecord rhs)
         {

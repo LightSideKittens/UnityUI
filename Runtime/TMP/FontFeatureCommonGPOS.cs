@@ -21,10 +21,6 @@ namespace TMPro
         /// </summary>
         public float yCoordinate { get { return m_YCoordinate; } set { m_YCoordinate = value; } }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
-
         [SerializeField]
         private float m_XCoordinate;
 
@@ -60,10 +56,6 @@ namespace TMPro
             m_YPositionAdjustment = y;
         }
 
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
-
         [SerializeField]
         private float m_XPositionAdjustment;
 
@@ -96,10 +88,6 @@ namespace TMPro
         /// The positional adjustment of the mark glyph relative to the anchor point of the base glyph.
         /// </summary>
         public MarkPositionAdjustment markPositionAdjustment { get { return m_MarkPositionAdjustment; } set { m_MarkPositionAdjustment = value; } }
-
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
 
         [SerializeField]
         private uint m_BaseGlyphID;
@@ -139,10 +127,6 @@ namespace TMPro
         /// The positional adjustment of the combining mark glyph relative to the anchor point of the base mark glyph.
         /// </summary>
         public MarkPositionAdjustment combiningMarkPositionAdjustment { get { return m_CombiningMarkPositionAdjustment; } set { m_CombiningMarkPositionAdjustment = value; } }
-
-        // =============================================
-        // Private backing fields for public properties.
-        // =============================================
 
         [SerializeField]
         private uint m_BaseMarkGlyphID;

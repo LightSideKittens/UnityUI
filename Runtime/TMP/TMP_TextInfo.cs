@@ -36,7 +36,6 @@ namespace TMPro
 
         private TMP_MeshInfo[] m_CachedMeshInfo;
 
-        // Default Constructor
         public TMP_TextInfo()
         {
             characterInfo = new TMP_CharacterInfo[8];
@@ -160,7 +159,7 @@ namespace TMPro
         {
             for (int i = 0; i < meshInfo.Length; i++)
             {
-                int start = 0; // materials[i].referenceCount * 4;
+                int start = 0;
                 meshInfo[i].ClearUnusedVertices(start);
             }
         }
@@ -228,7 +227,6 @@ namespace TMPro
             {
                 m_CachedMeshInfo = new TMP_MeshInfo[meshInfo.Length];
 
-                // Initialize all the vertex data arrays
                 for (int i = 0; i < m_CachedMeshInfo.Length; i++)
                 {
                     int length = meshInfo[i].vertices.Length;
@@ -237,10 +235,6 @@ namespace TMPro
                     m_CachedMeshInfo[i].uvs0 = new Vector4[length];
                     m_CachedMeshInfo[i].uvs2 = new Vector2[length];
                     m_CachedMeshInfo[i].colors32 = new Color32[length];
-
-                    //m_CachedMeshInfo[i].normals = new Vector3[length];
-                    //m_CachedMeshInfo[i].tangents = new Vector4[length];
-                    //m_CachedMeshInfo[i].triangles = new int[meshInfo[i].triangles.Length];
                 }
             }
 
@@ -254,22 +248,13 @@ namespace TMPro
                     m_CachedMeshInfo[i].uvs0 = new Vector4[length];
                     m_CachedMeshInfo[i].uvs2 = new Vector2[length];
                     m_CachedMeshInfo[i].colors32 = new Color32[length];
-
-                    //m_CachedMeshInfo[i].normals = new Vector3[length];
-                    //m_CachedMeshInfo[i].tangents = new Vector4[length];
-                    //m_CachedMeshInfo[i].triangles = new int[meshInfo[i].triangles.Length];
                 }
 
 
-                // Only copy the primary vertex data
                 Array.Copy(meshInfo[i].vertices, m_CachedMeshInfo[i].vertices, length);
                 Array.Copy(meshInfo[i].uvs0, m_CachedMeshInfo[i].uvs0, length);
                 Array.Copy(meshInfo[i].uvs2, m_CachedMeshInfo[i].uvs2, length);
                 Array.Copy(meshInfo[i].colors32, m_CachedMeshInfo[i].colors32, length);
-
-                //Array.Copy(meshInfo[i].normals, m_CachedMeshInfo[i].normals, length);
-                //Array.Copy(meshInfo[i].tangents, m_CachedMeshInfo[i].tangents, length);
-                //Array.Copy(meshInfo[i].triangles, m_CachedMeshInfo[i].triangles, meshInfo[i].triangles.Length);
             }
 
             return m_CachedMeshInfo;
@@ -285,7 +270,6 @@ namespace TMPro
         /// <param name="size"></param>
         public static void Resize<T> (ref T[] array, int size)
         {
-            // Allocated to the next power of two
             int newSize = size > 1024 ? size + 256 : Mathf.NextPowerOfTwo(size);
 
             Array.Resize(ref array, newSize);
@@ -304,8 +288,6 @@ namespace TMPro
             if (isBlockAllocated) size = size > 1024 ? size + 256 : Mathf.NextPowerOfTwo(size);
 
             if (size == array.Length) return;
-
-            //Debug.Log("Resizing TextInfo from [" + array.Length + "] to [" + size + "]");
 
             Array.Resize(ref array, size);
         }

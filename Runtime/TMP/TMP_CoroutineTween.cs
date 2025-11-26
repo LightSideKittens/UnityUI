@@ -5,10 +5,6 @@ using System.Collections;
 
 namespace TMPro
 {
-    // Base interface for tweeners,
-    // using an interface instead of
-    // an abstract class as we want the
-    // tweens to be structs.
     internal interface ITweenValue
     {
         void TweenValue(float floatPercentage);
@@ -17,9 +13,6 @@ namespace TMPro
         bool ValidTarget();
     }
 
-    // Color tween class, receives the
-    // TweenValue callback and then sets
-    // the value on the target.
     internal struct ColorTween : ITweenValue
     {
         public enum ColorTweenMode
@@ -113,9 +106,6 @@ namespace TMPro
         }
     }
 
-    // Float tween class, receives the
-    // TweenValue callback and then sets
-    // the value on the target.
     internal struct FloatTween : ITweenValue
     {
         public class FloatTweenCallback : UnityEvent<float> { }
@@ -184,15 +174,11 @@ namespace TMPro
         }
     }
 
-    // Tween runner, executes the given tween.
-    // The coroutine will live within the given
-    // behaviour container.
     internal class TweenRunner<T> where T : struct, ITweenValue
     {
         protected MonoBehaviour m_CoroutineContainer;
         protected IEnumerator m_Tween;
 
-        // utility function for starting the tween
         private static IEnumerator Start(T tweenInfo)
         {
             if (!tweenInfo.ValidTarget())
