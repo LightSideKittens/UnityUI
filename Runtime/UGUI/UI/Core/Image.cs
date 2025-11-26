@@ -598,15 +598,7 @@ namespace UnityEngine.UI
 
         // Whether this is being tracked for Atlas Binding.
         private bool m_Tracked = false;
-
-        [Obsolete("eventAlphaThreshold has been deprecated. Use eventMinimumAlphaThreshold instead (UnityUpgradable) -> alphaHitTestMinimumThreshold")]
-
-        /// <summary>
-        /// Obsolete. You should use UI.Image.alphaHitTestMinimumThreshold instead.
-        /// The alpha threshold specifies the minimum alpha a pixel must have for the event to considered a "hit" on the Image.
-        /// </summary>
-        public float eventAlphaThreshold { get { return 1 - alphaHitTestMinimumThreshold; } set { alphaHitTestMinimumThreshold = 1 - value; } }
-
+        
         /// <summary>
         /// The alpha threshold specifies the minimum alpha a pixel must have for the event to considered a "hit" on the Image.
         /// </summary>
@@ -656,12 +648,7 @@ namespace UnityEngine.UI
         /// Note: If the texture importer's SpriteMeshType property is set to SpriteMeshType.FullRect, it will only generate a quad, and not a tightly fitted sprite mesh, which means this UI image will be drawn using a quad regardless of the value of this property. Therefore, when enabling this property to use a tightly fitted sprite mesh, you must also ensure the texture importer's SpriteMeshType property is set to Tight.
         /// </remarks>
         public bool useSpriteMesh { get { return m_UseSpriteMesh; } set { if (SetPropertyUtility.SetStruct(ref m_UseSpriteMesh, value)) SetVerticesDirty(); } }
-
-
-        protected Image()
-        {
-            useLegacyMeshGeneration = false;
-        }
+        
 
         /// <summary>
         /// Cache of the default Canvas Ericsson Texture Compression 1 (ETC1) and alpha Material.

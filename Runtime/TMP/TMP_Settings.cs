@@ -46,21 +46,7 @@ namespace TMPro
         [FormerlySerializedAs("m_enableWordWrapping")]
         [SerializeField]
         private TextWrappingModes m_TextWrappingMode;
-
-        /// <summary>
-        /// Controls if Kerning is enabled on newly created text objects by default.
-        /// </summary>
-        [System.Obsolete("The \"enableKerning\" property has been deprecated. Use the \"fontFeatures\" property to control what features are enabled by default on newly created text components.")]
-        public static bool enableKerning
-        {
-            get
-            {
-                if (instance.m_ActiveFontFeatures != null)
-                    return instance.m_ActiveFontFeatures.Contains(OTL_FeatureTag.kern);
-
-                return instance.m_enableKerning;
-            }
-        }
+        
         [SerializeField]
         private bool m_enableKerning;
 

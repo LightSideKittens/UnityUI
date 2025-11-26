@@ -727,9 +727,6 @@ namespace UnityEngine.UI
         /// </example>
         public SubmitEvent onSubmit { get { return m_OnSubmit; } set { SetPropertyUtility.SetClass(ref m_OnSubmit, value); } }
 
-        [Obsolete("onValueChange has been renamed to onValueChanged")]
-        public OnChangeEvent onValueChange { get { return onValueChanged; } set { onValueChanged = value; } }
-
         /// <summary>
         /// Accessor to the OnChangeEvent.
         /// </summary>
@@ -1032,12 +1029,6 @@ namespace UnityEngine.UI
         protected int caretPositionInternal { get { return m_CaretPosition + compositionString.Length; } set { m_CaretPosition = value; ClampPos(ref m_CaretPosition); } }
         protected int caretSelectPositionInternal { get { return m_CaretSelectPosition + compositionString.Length; } set { m_CaretSelectPosition = value; ClampPos(ref m_CaretSelectPosition); } }
         private bool hasSelection { get { return caretPositionInternal != caretSelectPositionInternal; } }
-
-#if UNITY_EDITOR
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        [Obsolete("caretSelectPosition has been deprecated. Use selectionFocusPosition instead (UnityUpgradable) -> selectionFocusPosition", true)]
-        public int caretSelectPosition { get { return selectionFocusPosition; } protected set { selectionFocusPosition = value; } }
-#endif
 
         /// <summary>
         /// Get: Returns the focus position as thats the position that moves around even during selection.
@@ -1567,29 +1558,6 @@ namespace UnityEngine.UI
 
                 OnDeselect(null);
             }
-        }
-
-        [Obsolete("This function is no longer used. Please use RectTransformUtility.ScreenPointToLocalPointInRectangle() instead.")]
-        public Vector2 ScreenToLocal(Vector2 screen)
-        {
-            var theCanvas = m_TextComponent.canvas;
-            if (theCanvas == null)
-                return screen;
-
-            Vector3 pos = Vector3.zero;
-            if (theCanvas.renderMode == RenderMode.ScreenSpaceOverlay)
-            {
-                pos = m_TextComponent.transform.InverseTransformPoint(screen);
-            }
-            else if (theCanvas.worldCamera != null)
-            {
-                Ray mouseRay = theCanvas.worldCamera.ScreenPointToRay(screen);
-                float dist;
-                Plane plane = new Plane(m_TextComponent.transform.forward, m_TextComponent.transform.position);
-                plane.Raycast(mouseRay, out dist);
-                pos = m_TextComponent.transform.InverseTransformPoint(mouseRay.GetPoint(dist));
-            }
-            return new Vector2(pos.x, pos.y);
         }
 
         private int GetUnclampedCharacterLineFromPosition(Vector2 pos, TextGenerator generator)

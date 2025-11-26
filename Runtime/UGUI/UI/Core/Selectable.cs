@@ -63,19 +63,6 @@ namespace UnityEngine.UI
         /// </summary>
         public static int allSelectableCount { get { return s_SelectableCount; } }
 
-        /// <summary>
-        /// A List instance of the allSelectablesArray to maintain API compatibility.
-        /// </summary>
-
-        [Obsolete("Replaced with allSelectablesArray to have better performance when disabling a element", false)]
-        public static List<Selectable> allSelectables
-        {
-            get
-            {
-                return new List<Selectable>(allSelectablesArray);
-            }
-        }
-
 
         /// <summary>
         /// Non allocating version for getting the all selectables.

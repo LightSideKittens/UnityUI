@@ -623,24 +623,7 @@ namespace TMPro
             set { if (m_TextWrappingMode == value) return; m_havePropertiesChanged = true; m_TextWrappingMode = value; SetVerticesDirty(); SetLayoutDirty(); }
         }
 
-
-        /// <summary>
-        /// Controls whether or not word wrapping is applied. When disabled, the text will be displayed on a single line.
-        /// </summary>
-        [Obsolete("The enabledWordWrapping property is now obsolete. Please use the textWrappingMode property instead.")]
-        public bool enableWordWrapping
-        {
-            get { return m_TextWrappingMode == TextWrappingModes.Normal || textWrappingMode == TextWrappingModes.PreserveWhitespace; }
-            set
-            {
-                TextWrappingModes mode = (TextWrappingModes)(value ? 1 : 0);
-
-                if (m_TextWrappingMode == mode)
-                    return;
-
-                m_havePropertiesChanged = true; m_TextWrappingMode = mode; SetVerticesDirty(); SetLayoutDirty();
-            }
-        }
+        
         [SerializeField] [FormerlySerializedAs("m_enableWordWrapping")]
         protected TextWrappingModes m_TextWrappingMode;
         protected bool m_isCharacterWrappingEnabled = false;
@@ -741,39 +724,7 @@ namespace TMPro
 
         protected bool m_isTextTruncated;
 
-
-        /// <summary>
-        /// Determines if kerning is enabled or disabled.
-        /// </summary>
-        [Obsolete("The \"enableKerning\" property has been deprecated. Use the \"fontFeatures\" property to control what features are enabled on the text component.")]
-        public bool enableKerning
-        {
-            get { return m_ActiveFontFeatures.Contains(OTL_FeatureTag.kern); }
-            set
-            {
-                if (m_ActiveFontFeatures.Contains(OTL_FeatureTag.kern))
-                {
-                    if (value)
-                        return;
-
-                    m_ActiveFontFeatures.Remove(OTL_FeatureTag.kern);
-                    m_enableKerning = false;
-                }
-                else
-                {
-                    if (!value)
-                        return;
-
-                    m_ActiveFontFeatures.Add(OTL_FeatureTag.kern);
-                    m_enableKerning = true;
-
-                }
-
-                m_havePropertiesChanged = true;
-                SetVerticesDirty();
-                SetLayoutDirty();
-            }
-        }
+        
         [SerializeField]
         protected bool m_enableKerning;
         protected int m_LastBaseGlyphIndex;

@@ -4,17 +4,6 @@ using UnityEngine.EventSystems;
 
 namespace UnityEngine.UI
 {
-    [Obsolete("Use BaseMeshEffect instead", true)]
-    /// <summary>
-    /// Obsolete class use BaseMeshEffect instead.
-    /// </summary>
-    public abstract class BaseVertexEffect
-    {
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        [Obsolete("Use BaseMeshEffect.ModifyMeshes instead", true)] //We can't upgrade automatically since the signature changed.
-        public abstract void ModifyVertices(List<UIVertex> vertices);
-    }
-
     /// <summary>
     /// Base class for effects that modify the generated Mesh.
     /// </summary>
@@ -104,19 +93,6 @@ namespace UnityEngine.UI
         }
 
 #endif
-
-        /// <summary>
-        /// Function that is called when the Graphic is populating the mesh.
-        /// </summary>
-        /// <param name="mesh">The generated mesh of the Graphic element that needs modification.</param>
-        public virtual void ModifyMesh(Mesh mesh)
-        {
-            using (var vh = new VertexHelper(mesh))
-            {
-                ModifyMesh(vh);
-                vh.FillMesh(mesh);
-            }
-        }
 
         public abstract void ModifyMesh(VertexHelper vh);
     }

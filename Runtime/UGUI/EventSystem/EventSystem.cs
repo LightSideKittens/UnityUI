@@ -102,12 +102,6 @@ namespace UnityEngine.EventSystems
             get { return m_CurrentSelected; }
         }
 
-        [Obsolete("lastSelectedGameObject is no longer supported")]
-        public GameObject lastSelectedGameObject
-        {
-            get { return null; }
-        }
-
         private bool m_HasFocus = true;
 
         /// <summary>
@@ -360,50 +354,6 @@ namespace UnityEngine.EventSystems
         }
         private static UIToolkitOverrideConfigOld? s_UIToolkitOverrideConfigOld = null;
 #endif
-
-        /// <summary>
-        /// Sets how UI Toolkit runtime panels receive events and handle selection
-        /// when interacting with other objects that use the EventSystem, such as components from the Unity UI package.
-        /// </summary>
-        /// <remarks>
-        /// This method is obsolete. Use the PanelInputConfiguration component instead.
-        /// </remarks>
-        /// <param name="activeEventSystem">
-        /// The EventSystem used to override UI Toolkit panel events and selection.
-        /// If activeEventSystem is null, UI Toolkit panels will use current enabled EventSystem
-        /// or, if there is none, the default InputManager-based event system will be used.
-        /// </param>
-        /// <param name="sendEvents">
-        /// If true, UI Toolkit events will come from this EventSystem
-        /// instead of the default InputManager-based event system.
-        /// </param>
-        /// <param name="createPanelGameObjectsOnStart">
-        /// If true, UI Toolkit panels' unassigned selectableGameObject will be automatically initialized
-        /// with children GameObjects of this EventSystem on Start.
-        /// </param>
-        [Obsolete("Use PanelInputConfiguration component instead.")]
-        public static void SetUITookitEventSystemOverride(EventSystem activeEventSystem, bool sendEvents = true, bool createPanelGameObjectsOnStart = true)
-        {
-#if PACKAGE_UITOOLKIT
-            s_UIToolkitOverrideConfigOld = activeEventSystem == null && sendEvents && createPanelGameObjectsOnStart ? null : new UIToolkitOverrideConfigOld
-            {
-                activeEventSystem = activeEventSystem,
-                sendEvents = sendEvents,
-                createPanelGameObjectsOnStart = createPanelGameObjectsOnStart,
-            };
-
-            var eventSystem = activeEventSystem != null ? activeEventSystem : EventSystem.current;
-            if (UIElementsRuntimeUtility.activeEventSystem != null && UIElementsRuntimeUtility.activeEventSystem != eventSystem)
-            {
-                ((EventSystem)UIElementsRuntimeUtility.activeEventSystem).uiToolkitInterop.overrideUIToolkitEvents = false;
-            }
-            if (eventSystem != null && eventSystem.isActiveAndEnabled)
-            {
-                eventSystem.uiToolkitInterop.overrideUIToolkitEvents = sendEvents;
-                eventSystem.uiToolkitInterop.handlerTypes = createPanelGameObjectsOnStart ? (UIToolkitInteroperabilityBridge.EventHandlerTypes)~0 : 0;
-            }
-#endif
-        }
 
         protected override void OnEnable()
         {

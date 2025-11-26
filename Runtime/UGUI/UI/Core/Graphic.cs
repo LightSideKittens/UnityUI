@@ -223,8 +223,6 @@ namespace UnityEngine.UI
         [NonSerialized]
         private readonly TweenRunner<ColorTween> m_ColorTweenRunner;
 
-        protected bool useLegacyMeshGeneration { get; set; }
-
         // Called by Unity prior to deserialization,
         // should not be called by users
         protected Graphic()
@@ -232,7 +230,6 @@ namespace UnityEngine.UI
             if (m_ColorTweenRunner == null)
                 m_ColorTweenRunner = new TweenRunner<ColorTween>();
             m_ColorTweenRunner.Init(this);
-            useLegacyMeshGeneration = true;
         }
 
         /// <summary>
@@ -681,14 +678,7 @@ namespace UnityEngine.UI
         /// </summary>
         protected virtual void UpdateGeometry()
         {
-            if (useLegacyMeshGeneration)
-            {
-                DoLegacyMeshGeneration();
-            }
-            else
-            {
-                DoMeshGeneration();
-            }
+            DoMeshGeneration();
         }
 
         private void DoMeshGeneration()
@@ -709,34 +699,7 @@ namespace UnityEngine.UI
             s_VertexHelper.FillMesh(workerMesh);
             canvasRenderer.SetMesh(workerMesh);
         }
-
-        private void DoLegacyMeshGeneration()
-        {
-            if (rectTransform != null && rectTransform.rect.width >= 0 && rectTransform.rect.height >= 0)
-            {
-#pragma warning disable 618
-                OnPopulateMesh(workerMesh);
-#pragma warning restore 618
-            }
-            else
-            {
-                workerMesh.Clear();
-            }
-
-            var components = ListPool<Component>.Get();
-            GetComponents(typeof(IMeshModifier), components);
-
-            for (var i = 0; i < components.Count; i++)
-            {
-#pragma warning disable 618
-                ((IMeshModifier)components[i]).ModifyMesh(workerMesh);
-#pragma warning restore 618
-            }
-
-            ListPool<Component>.Release(components);
-            canvasRenderer.SetMesh(workerMesh);
-        }
-
+        
         protected static Mesh workerMesh
         {
             get
@@ -748,23 +711,6 @@ namespace UnityEngine.UI
                 }
                 return s_Mesh;
             }
-        }
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        [Obsolete("Use OnPopulateMesh instead.", true)]
-        protected virtual void OnFillVBO(System.Collections.Generic.List<UIVertex> vbo) {}
-
-        [Obsolete("Use OnPopulateMesh(VertexHelper vh) instead.", false)]
-        /// <summary>
-        /// Callback function when a UI element needs to generate vertices. Fills the vertex buffer data.
-        /// </summary>
-        /// <param name="m">Mesh to populate with UI data.</param>
-        /// <remarks>
-        /// Used by Text, UI.Image, and RawImage for example to generate vertices specific to their use case.
-        /// </remarks>
-        protected virtual void OnPopulateMesh(Mesh m)
-        {
-            OnPopulateMesh(s_VertexHelper);
-            s_VertexHelper.FillMesh(m);
         }
 
         /// <summary>

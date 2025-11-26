@@ -30,19 +30,6 @@ namespace UnityEngine.EventSystems
         {
         }
 
-        [Obsolete("Mode is no longer needed on input module as it handles both mouse and keyboard simultaneously.", false)]
-        public enum InputMode
-        {
-            Mouse,
-            Buttons
-        }
-
-        [Obsolete("Mode is no longer needed on input module as it handles both mouse and keyboard simultaneously.", false)]
-        public InputMode inputMode
-        {
-            get { return InputMode.Mouse; }
-        }
-
         [SerializeField]
         private string m_HorizontalAxis = "Horizontal";
 
@@ -74,27 +61,6 @@ namespace UnityEngine.EventSystems
         [FormerlySerializedAs("m_AllowActivationOnMobileDevice")]
         [HideInInspector]
         private bool m_ForceModuleActive;
-
-        [Obsolete("allowActivationOnMobileDevice has been deprecated. Use forceModuleActive instead (UnityUpgradable) -> forceModuleActive")]
-        public bool allowActivationOnMobileDevice
-        {
-            get { return m_ForceModuleActive; }
-            set { m_ForceModuleActive = value; }
-        }
-
-        /// <summary>
-        /// Force this module to be active.
-        /// </summary>
-        /// <remarks>
-        /// If there is no module active with higher priority (ordered in the inspector) this module will be forced active even if valid enabling conditions are not met.
-        /// </remarks>
-
-        [Obsolete("forceModuleActive has been deprecated. There is no need to force the module awake as StandaloneInputModule works for all platforms")]
-        public bool forceModuleActive
-        {
-            get { return m_ForceModuleActive; }
-            set { m_ForceModuleActive = value; }
-        }
 
         /// <summary>
         /// Number of keyboard / controller inputs allowed per second.
@@ -532,12 +498,6 @@ namespace UnityEngine.EventSystems
         protected void ProcessMouseEvent()
         {
             ProcessMouseEvent(0);
-        }
-
-        [Obsolete("This method is no longer checked, overriding it with return true does nothing!")]
-        protected virtual bool ForceAutoSelect()
-        {
-            return false;
         }
 
         /// <summary>

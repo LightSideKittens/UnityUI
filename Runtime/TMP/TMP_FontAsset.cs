@@ -427,16 +427,7 @@ namespace TMPro
         public byte tabSize = 10;
 
         internal bool IsFontAssetLookupTablesDirty;
-
-        /// <summary>
-        /// The general information about the font.
-        /// This property and FaceInfo_Legacy type are no longer used in version 1.1.0 of the font asset.
-        /// </summary>
-		[Obsolete("The fontInfo property and underlying type is now obsolete. Please use the faceInfo property and FaceInfo type instead.")]
-        public FaceInfo_Legacy fontInfo
-        {
-            get { return m_fontInfo; }
-        }
+        
 
         [SerializeField]
         private FaceInfo_Legacy m_fontInfo = null;

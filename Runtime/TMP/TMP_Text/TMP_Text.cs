@@ -573,6 +573,7 @@ namespace TMPro
         /// </summary>
         private void PopulateTextProcessingArray()
         {
+            Debug.Log("PopulateTextProcessingArray");
             TMP_TextProcessingStack<int>.SetDefault(m_TextStyleStacks, 0);
 
             int srcLength = m_TextBackingArray.Count;
@@ -803,30 +804,6 @@ namespace TMPro
         /// </summary>
         /// <param name="sourceText">String containing the text.</param>
         public void SetText(string sourceText)
-        {
-            int srcLength = sourceText == null ? 0 : sourceText.Length;
-
-            PopulateTextBackingArray(sourceText, 0, srcLength);
-
-            m_text = sourceText;
-
-            m_inputSource = TextInputSources.TextString;
-
-            PopulateTextProcessingArray();
-
-            m_havePropertiesChanged = true;
-
-            SetVerticesDirty();
-            SetLayoutDirty();
-        }
-
-        /// <summary>
-        /// This function is the same as using the text property to set the text.
-        /// </summary>
-        /// <param name="sourceText">String containing the text.</param>
-        /// <param name="syncTextInputBox">This optional parameter no longer provides any functionality as this function now simple sets the .text property which is reflected in the Text Input Box.</param>
-        [Obsolete("Use the SetText(string) function instead.")]
-        public void SetText(string sourceText, bool syncTextInputBox = true)
         {
             int srcLength = sourceText == null ? 0 : sourceText.Length;
 

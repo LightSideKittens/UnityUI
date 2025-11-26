@@ -21,11 +21,6 @@ namespace UnityEngine.UI
         [SerializeField] protected Texture m_Texture;
         [SerializeField] Rect m_UVRect = new Rect(0f, 0f, 1f, 1f);
 
-        protected RawImage()
-        {
-            useLegacyMeshGeneration = false;
-        }
-
         /// <summary>
         /// Returns the texture used to draw this Graphic.
         /// </summary>

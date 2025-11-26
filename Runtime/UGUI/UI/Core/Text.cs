@@ -27,11 +27,6 @@ namespace UnityEngine.UI
         // We use this flag instead of Unregistering/Registering the callback to avoid allocation.
         [NonSerialized] protected bool m_DisableFontTextureRebuiltCallback = false;
 
-        protected Text()
-        {
-            useLegacyMeshGeneration = false;
-        }
-
         /// <summary>
         /// The cached TextGenerator used when generating visible Text.
         /// </summary>
