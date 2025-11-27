@@ -52,6 +52,8 @@ namespace TMPro
         [SerializeField]
         protected ITextPreprocessor m_TextPreprocessor;
 
+        public string PreprocessedText { get; private set; } 
+
         /// <summary>
         ///
         /// </summary>
@@ -524,7 +526,7 @@ namespace TMPro
             }
         }
         [SerializeField]
-        [UnityEngine.Serialization.FormerlySerializedAs("m_lineJustification")]
+        [FormerlySerializedAs("m_lineJustification")]
         protected TextAlignmentOptions m_textAlignment = TextAlignmentOptions.Converted;
 
         protected HorizontalAlignmentOptions m_lineJustification;

@@ -284,7 +284,7 @@ namespace TMPro
             if (m_fontAsset == null || m_fontAsset.characterLookupTable == null)
             {
                 Debug.LogWarning("Can't Generate Mesh! No Font Asset has been assigned to Object ID: " +
-                                 this.GetInstanceID());
+                                 GetInstanceID());
 
                 m_IsAutoSizePointSizeSet = true;
                 return Vector2.zero;
@@ -1284,11 +1284,6 @@ namespace TMPro
             return new Bounds();
         }
 
-        internal virtual Rect GetCanvasSpaceClippingRect()
-        {
-            return Rect.zero;
-        }
-
         /// <summary>
         /// Method which returns the bounds of the text object;
         /// </summary>
@@ -1417,8 +1412,6 @@ namespace TMPro
         protected static Vector2 k_LargeNegativeVector2 = new Vector2(TMP_Math.INT_MIN, TMP_Math.INT_MIN);
         protected static float k_LargePositiveFloat = TMP_Math.FLOAT_MAX;
         protected static float k_LargeNegativeFloat = TMP_Math.FLOAT_MIN;
-        protected static int k_LargePositiveInt = TMP_Math.INT_MAX;
-        protected static int k_LargeNegativeInt = TMP_Math.INT_MIN;
 
         /// <summary>
         /// Function to force an update of the margin size.

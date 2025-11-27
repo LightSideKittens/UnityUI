@@ -244,8 +244,8 @@ namespace TMPro
             public SpecialCharacter(TMP_Character character, int materialIndex)
             {
                 this.character = character;
-                this.fontAsset = character.textAsset as TMP_FontAsset;
-                this.material = this.fontAsset != null ? this.fontAsset.material : null;
+                fontAsset = character.textAsset as TMP_FontAsset;
+                material = fontAsset != null ? fontAsset.material : null;
                 this.materialIndex = materialIndex;
             }
         }

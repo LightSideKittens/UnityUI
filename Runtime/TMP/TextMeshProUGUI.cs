@@ -1426,11 +1426,6 @@ namespace TMPro
 
             m_textElementType = TMP_TextElementType.Character;
 
-            #region Setup Underline Special Character
-
-            #endregion
-
-
             #region Setup Ellipsis Special Character
             if (m_overflowMode == TextOverflowModes.Ellipsis)
             {
@@ -4643,7 +4638,7 @@ namespace TMPro
         /// Method to return the local corners of the Text Container or RectTransform.
         /// </summary>
         /// <returns></returns>
-        protected override Vector3[] GetTextContainerLocalCorners()
+        protected Vector3[] GetTextContainerLocalCorners()
         {
             if (m_rectTransform == null) m_rectTransform = this.rectTransform;
 
@@ -4657,7 +4652,7 @@ namespace TMPro
         /// Method to Enable or Disable child SubMesh objects.
         /// </summary>
         /// <param name="state"></param>
-        protected override void SetActiveSubMeshes(bool state)
+        protected void SetActiveSubMeshes(bool state)
         {
             for (int i = 1; i < m_subTextObjects.Length && m_subTextObjects[i] != null; i++)
             {
@@ -4670,7 +4665,7 @@ namespace TMPro
         /// <summary>
         /// Destroy Sub Mesh Objects
         /// </summary>
-        protected override void DestroySubMeshObjects()
+        protected void DestroySubMeshObjects()
         {
             for (int i = 1; i < m_subTextObjects.Length && m_subTextObjects[i] != null; i++)
                 DestroyImmediate(m_subTextObjects[i]);
@@ -4702,7 +4697,7 @@ namespace TMPro
             return new Bounds(center, size);
         }
 
-        internal override Rect GetCanvasSpaceClippingRect()
+        internal Rect GetCanvasSpaceClippingRect()
         {
             if (m_canvas == null || m_canvas.rootCanvas == null || m_mesh == null)
                 return Rect.zero;

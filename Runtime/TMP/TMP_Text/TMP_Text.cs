@@ -14,14 +14,6 @@ using UnityEngine.UI;
 
 namespace TMPro
 {
-    public interface ITextElement
-    {
-        Material sharedMaterial { get; }
-
-        void Rebuild(CanvasUpdate update);
-        int GetInstanceID();
-    }
-
     public enum TextAlignmentOptions
     {
         TopLeft = HorizontalAlignmentOptions.Left | VerticalAlignmentOptions.Top,
@@ -170,35 +162,6 @@ namespace TMPro
             return mat;
         }
 
-        protected void SetVertexColorGradient(TMP_ColorGradient gradient)
-        {
-            if (gradient == null) return;
-
-            m_fontColorGradient.bottomLeft = gradient.bottomLeft;
-            m_fontColorGradient.bottomRight = gradient.bottomRight;
-            m_fontColorGradient.topLeft = gradient.topLeft;
-            m_fontColorGradient.topRight = gradient.topRight;
-
-            SetVerticesDirty();
-        }
-
-        /// <summary>
-        /// Function to control the sorting of the geometry of the text object.
-        /// </summary>
-        protected void SetTextSortingOrder(VertexSortingOrder order)
-        {
-
-        }
-
-        /// <summary>
-        /// Function to sort the geometry of the text object in accordance to the provided order.
-        /// </summary>
-        /// <param name="order"></param>
-        protected void SetTextSortingOrder(int[] order)
-        {
-
-        }
-
         /// <summary>
         /// Function called internally to set the face color of the material. This will results in an instance of the material.
         /// </summary>
@@ -265,13 +228,6 @@ namespace TMPro
 
             return m_padding;
         }
-
-
-        /// <summary>
-        /// Method to return the local corners of the Text Container or RectTransform.
-        /// </summary>
-        /// <returns></returns>
-        protected virtual Vector3[] GetTextContainerLocalCorners() { return null; }
 
 
         protected bool m_ignoreActiveState;
@@ -425,41 +381,33 @@ namespace TMPro
 
 
         protected bool needParseInputText = true;
-
-        protected bool NeedSetArraySizes
-        {
-            get
-            {
-                for (int i = 0; i < m_textInfo.meshInfo.Length; i++)
-                {
-                    if (m_textInfo.meshInfo[i].vertices == null) return true;
-                }
-                
-                return false;
-            }
-        }
         
         /// <summary>
         /// Method to parse the input text based on its source
         /// </summary>
         protected void ParseInputText()
         {
+            Debug.Log($"{GetInstanceID()} ParseInputText TryParse");
+            if (!needParseInputText) return;
+            Debug.Log($"{GetInstanceID()} ParseInputText Parsing...");
+            
             k_ParseTextMarker.Begin();
 
-            if (needParseInputText)
+            var text = m_text;
+            if (m_TextPreprocessor != null)
             {
-                PopulateTextBackingArray(m_TextPreprocessor == null ? m_text : m_TextPreprocessor.PreprocessText(m_text));
-                PopulateTextProcessingArray();
+                text = m_TextPreprocessor.PreprocessText(m_text);
+                PreprocessedText = text;
             }
-
-            if (needParseInputText || NeedSetArraySizes)
-            {
-                SetArraySizes(m_TextProcessingArray);
-            }
+            
+            PopulateTextBackingArray(text);
+            PopulateTextProcessingArray();
+            SetArraySizes(m_TextProcessingArray);
 
             k_ParseTextMarker.End();
             needParseInputText = false;
         }
+        
 
         /// <summary>
         /// Convert source text to Unicode (uint) and populate internal text backing array.
@@ -507,85 +455,13 @@ namespace TMPro
             m_TextBackingArray[writeIndex] = 0;
             m_TextBackingArray.Count = writeIndex;
         }
-
-        /// <summary>
-        /// Convert source text to uint and populate internal text backing array.
-        /// </summary>
-        /// <param name="sourceText">char array containing the source text to be converted</param>
-        /// <param name="start">Index of the first element of the source array to be converted and copied to the internal text backing array.</param>
-        /// <param name="length">Number of elements in the array to be converted and copied to the internal text backing array.</param>
-        private void PopulateTextBackingArray(StringBuilder sourceText, int start, int length)
-        {
-            int readIndex;
-            int writeIndex = 0;
-
-            if (sourceText == null)
-            {
-                readIndex = 0;
-                length = 0;
-            }
-            else
-            {
-                readIndex = Mathf.Clamp(start, 0, sourceText.Length);
-                length = Mathf.Clamp(length, 0, start + length < sourceText.Length ? length : sourceText.Length - start);
-            }
-
-            if (length >= m_TextBackingArray.Capacity)
-                m_TextBackingArray.Resize((length));
-
-            int end = readIndex + length;
-            for (; readIndex < end; readIndex++)
-            {
-                m_TextBackingArray[writeIndex] = sourceText[readIndex];
-                writeIndex += 1;
-            }
-
-            m_TextBackingArray[writeIndex] = 0;
-            m_TextBackingArray.Count = writeIndex;
-        }
-
-        /// <summary>
-        /// Convert source text to Unicode (uint) and populate internal text backing array.
-        /// </summary>
-        /// <param name="sourceText">char array containing the source text to be converted</param>
-        /// <param name="start">Index of the first element of the source array to be converted and copied to the internal text backing array.</param>
-        /// <param name="length">Number of elements in the array to be converted and copied to the internal text backing array.</param>
-        private void PopulateTextBackingArray(char[] sourceText, int start, int length)
-        {
-            int readIndex;
-            int writeIndex = 0;
-
-            if (sourceText == null)
-            {
-                readIndex = 0;
-                length = 0;
-            }
-            else
-            {
-                readIndex = Mathf.Clamp(start, 0, sourceText.Length);
-                length = Mathf.Clamp(length, 0, start + length < sourceText.Length ? length : sourceText.Length - start);
-            }
-
-            if (length >= m_TextBackingArray.Capacity)
-                m_TextBackingArray.Resize((length));
-
-            int end = readIndex + length;
-            for (; readIndex < end; readIndex++)
-            {
-                m_TextBackingArray[writeIndex] = sourceText[readIndex];
-                writeIndex += 1;
-            }
-
-            m_TextBackingArray[writeIndex] = 0;
-            m_TextBackingArray.Count = writeIndex;
-        }
+        
 
         /// <summary>
         ///
         /// </summary>
         private void PopulateTextProcessingArray()
         {
-            Debug.Log("PopulateTextProcessingArray");
             TMP_TextProcessingStack<int>.SetDefault(m_TextStyleStacks, 0);
 
             int srcLength = m_TextBackingArray.Count;
@@ -1230,95 +1106,16 @@ namespace TMPro
         {
             int size = Mathf.NextPowerOfTwo(array.Length + 1);
 
-            System.Array.Resize(ref array, size);
+            Array.Resize(ref array, size);
         }
 
         private void ResizeInternalArray<T>(ref T[] array, int size)
         {
             size = Mathf.NextPowerOfTwo(size + 1);
 
-            System.Array.Resize(ref array, size);
+            Array.Resize(ref array, size);
         }
-
-
-        private readonly decimal[] k_Power = { 5e-1m, 5e-2m, 5e-3m, 5e-4m, 5e-5m, 5e-6m, 5e-7m, 5e-8m, 5e-9m, 5e-10m };
-
-
-        private void AddFloatToInternalTextBackingArray(float value, int padding, int precision, ref int writeIndex)
-        {
-            if (value < 0)
-            {
-                m_TextBackingArray[writeIndex] = '-';
-                writeIndex += 1;
-                value = -value;
-            }
-
-            decimal valueD = (decimal)value;
-
-            if (padding == 0 && precision == 0)
-                precision = 9;
-            else
-                valueD += k_Power[Mathf.Min(9, precision)];
-
-            long integer = (long)valueD;
-
-            AddIntegerToInternalTextBackingArray(integer, padding, ref writeIndex);
-
-            if (precision > 0)
-            {
-                valueD -= integer;
-
-                if (valueD != 0)
-                {
-                    m_TextBackingArray[writeIndex++] = '.';
-
-                    for (int p = 0; p < precision; p++)
-                    {
-                        valueD *= 10;
-                        long d = (long)valueD;
-
-                        m_TextBackingArray[writeIndex++] = (char)(d + 48);
-                        valueD -= d;
-
-                        if (valueD == 0)
-                            p = precision;
-                    }
-                }
-            }
-        }
-
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="number"></param>
-        /// <param name="padding"></param>
-        /// <param name="writeIndex"></param>
-        private void AddIntegerToInternalTextBackingArray(double number, int padding, ref int writeIndex)
-        {
-            int integralCount = 0;
-            int i = writeIndex;
-
-            do
-            {
-                m_TextBackingArray[i++] = (char)(number % 10 + 48);
-                number /= 10;
-                integralCount += 1;
-            } while (number > 0.999999999999999d || integralCount < padding);
-
-            int lastIndex = i;
-
-            while (writeIndex + 1 < i)
-            {
-                i -= 1;
-                uint t = m_TextBackingArray[writeIndex];
-                m_TextBackingArray[writeIndex] = m_TextBackingArray[i];
-                m_TextBackingArray[i] = t;
-                writeIndex += 1;
-            }
-            writeIndex = lastIndex;
-        }
-
+        
 
         private string InternalTextBackingArrayToString()
         {
@@ -1857,69 +1654,6 @@ namespace TMPro
             m_textInfo.meshInfo[materialIndex].vertexCount = index_X4 + 4;
         }
 
-
-        protected virtual void FillCharacterVertexBuffers(int i, bool isVolumetric)
-        {
-            int materialIndex = m_textInfo.characterInfo[i].materialReferenceIndex;
-            int index_X4 = m_textInfo.meshInfo[materialIndex].vertexCount;
-
-            if (index_X4 >= m_textInfo.meshInfo[materialIndex].vertices.Length)
-                m_textInfo.meshInfo[materialIndex].ResizeMeshInfo(Mathf.NextPowerOfTwo((index_X4 + (isVolumetric ? 8 : 4)) / 4));
-
-            TMP_CharacterInfo[] characterInfoArray = m_textInfo.characterInfo;
-            m_textInfo.characterInfo[i].vertexIndex = index_X4;
-
-            m_textInfo.meshInfo[materialIndex].vertices[0 + index_X4] = characterInfoArray[i].vertex_BL.position;
-            m_textInfo.meshInfo[materialIndex].vertices[1 + index_X4] = characterInfoArray[i].vertex_TL.position;
-            m_textInfo.meshInfo[materialIndex].vertices[2 + index_X4] = characterInfoArray[i].vertex_TR.position;
-            m_textInfo.meshInfo[materialIndex].vertices[3 + index_X4] = characterInfoArray[i].vertex_BR.position;
-
-            m_textInfo.meshInfo[materialIndex].uvs0[0 + index_X4] = characterInfoArray[i].vertex_BL.uv;
-            m_textInfo.meshInfo[materialIndex].uvs0[1 + index_X4] = characterInfoArray[i].vertex_TL.uv;
-            m_textInfo.meshInfo[materialIndex].uvs0[2 + index_X4] = characterInfoArray[i].vertex_TR.uv;
-            m_textInfo.meshInfo[materialIndex].uvs0[3 + index_X4] = characterInfoArray[i].vertex_BR.uv;
-
-            if (isVolumetric)
-            {
-                m_textInfo.meshInfo[materialIndex].uvs0[4 + index_X4] = characterInfoArray[i].vertex_BL.uv;
-                m_textInfo.meshInfo[materialIndex].uvs0[5 + index_X4] = characterInfoArray[i].vertex_TL.uv;
-                m_textInfo.meshInfo[materialIndex].uvs0[6 + index_X4] = characterInfoArray[i].vertex_TR.uv;
-                m_textInfo.meshInfo[materialIndex].uvs0[7 + index_X4] = characterInfoArray[i].vertex_BR.uv;
-            }
-
-
-            m_textInfo.meshInfo[materialIndex].uvs2[0 + index_X4] = characterInfoArray[i].vertex_BL.uv2;
-            m_textInfo.meshInfo[materialIndex].uvs2[1 + index_X4] = characterInfoArray[i].vertex_TL.uv2;
-            m_textInfo.meshInfo[materialIndex].uvs2[2 + index_X4] = characterInfoArray[i].vertex_TR.uv2;
-            m_textInfo.meshInfo[materialIndex].uvs2[3 + index_X4] = characterInfoArray[i].vertex_BR.uv2;
-
-            if (isVolumetric)
-            {
-                m_textInfo.meshInfo[materialIndex].uvs2[4 + index_X4] = characterInfoArray[i].vertex_BL.uv2;
-                m_textInfo.meshInfo[materialIndex].uvs2[5 + index_X4] = characterInfoArray[i].vertex_TL.uv2;
-                m_textInfo.meshInfo[materialIndex].uvs2[6 + index_X4] = characterInfoArray[i].vertex_TR.uv2;
-                m_textInfo.meshInfo[materialIndex].uvs2[7 + index_X4] = characterInfoArray[i].vertex_BR.uv2;
-            }
-
-
-            m_textInfo.meshInfo[materialIndex].colors32[0 + index_X4] = characterInfoArray[i].vertex_BL.color;
-            m_textInfo.meshInfo[materialIndex].colors32[1 + index_X4] = characterInfoArray[i].vertex_TL.color;
-            m_textInfo.meshInfo[materialIndex].colors32[2 + index_X4] = characterInfoArray[i].vertex_TR.color;
-            m_textInfo.meshInfo[materialIndex].colors32[3 + index_X4] = characterInfoArray[i].vertex_BR.color;
-
-            if (isVolumetric)
-            {
-                Color32 backColor = new Color32(255, 255, 128, 255);
-                m_textInfo.meshInfo[materialIndex].colors32[4 + index_X4] = backColor;
-                m_textInfo.meshInfo[materialIndex].colors32[5 + index_X4] = backColor;
-                m_textInfo.meshInfo[materialIndex].colors32[6 + index_X4] = backColor;
-                m_textInfo.meshInfo[materialIndex].colors32[7 + index_X4] = backColor;
-            }
-
-            m_textInfo.meshInfo[materialIndex].vertexCount = index_X4 + (!isVolumetric ? 4 : 8);
-        }
-
-
         /// <summary>
         /// Fill Vertex Buffers for Sprites
         /// </summary>
@@ -2199,7 +1933,7 @@ namespace TMPro
         {
             if (m_fontSize == -99 || m_isWaitingOnResourceLoad)
             {
-                m_rectTransform = this.rectTransform;
+                m_rectTransform = rectTransform;
 
                 if (TMP_Settings.autoSizeTextContainer)
                 {
@@ -2307,46 +2041,7 @@ namespace TMPro
             if (character != null)
                 m_Underline = new SpecialCharacter(character, 0);
         }
-
-
-        /// <summary>
-        /// Replace a given number of characters (tag) in the array with a new character and shift subsequent characters in the array.
-        /// </summary>
-        /// <param name="chars">Array which contains the text.</param>
-        /// <param name="insertionIndex">The index of where the new character will be inserted</param>
-        /// <param name="tagLength">Length of the tag being replaced.</param>
-        /// <param name="c">The replacement character.</param>
-        protected void ReplaceTagWithCharacter(int[] chars, int insertionIndex, int tagLength, char c)
-        {
-            chars[insertionIndex] = c;
-
-            for (int i = insertionIndex + tagLength; i < chars.Length; i++)
-            {
-                chars[i - 3] = chars[i];
-            }
-        }
-
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
-        protected TMP_FontAsset GetFontAssetForWeight(int fontWeight)
-        {
-            bool isItalic = (m_FontStyleInternal & FontStyles.Italic) == FontStyles.Italic || (m_fontStyle & FontStyles.Italic) == FontStyles.Italic;
-
-            TMP_FontAsset fontAsset = null;
-
-            int weightIndex = fontWeight / 100;
-
-            if (isItalic)
-                fontAsset = m_currentFontAsset.fontWeightTable[weightIndex].italicTypeface;
-            else
-                fontAsset = m_currentFontAsset.fontWeightTable[weightIndex].regularTypeface;
-
-            return fontAsset;
-        }
-
+        
         internal TMP_TextElement GetTextElement(uint unicode, TMP_FontAsset fontAsset, FontStyles fontStyle, FontWeight fontWeight, out bool isUsingAlternativeTypeface)
         {
             TMP_Character character = TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, fontAsset, true, fontStyle, fontWeight, out isUsingAlternativeTypeface);
@@ -2453,19 +2148,6 @@ namespace TMPro
 
 
         /// <summary>
-        /// Method to Enable or Disable child SubMesh objects.
-        /// </summary>
-        /// <param name="state"></param>
-        protected virtual void SetActiveSubMeshes(bool state) { }
-
-
-        /// <summary>
-        /// Destroy Sub Mesh Objects.
-        /// </summary>
-        protected virtual void DestroySubMeshObjects() { }
-
-
-        /// <summary>
         /// Function to clear the geometry of the Primary and Sub Text objects.
         /// </summary>
         public virtual void ClearMesh() { }
@@ -2475,30 +2157,6 @@ namespace TMPro
         /// Function to clear the geometry of the Primary and Sub Text objects.
         /// </summary>
         public virtual void ClearMesh(bool uploadGeometry) { }
-
-
-        /// <summary>
-        /// Function which returns the text after it has been parsed and rich text tags removed.
-        /// </summary>
-        /// <returns></returns>
-        public virtual string GetParsedText()
-        {
-            if (m_textInfo == null)
-                return string.Empty;
-
-            int characterCount = m_textInfo.characterCount;
-
-            char[] buffer = new char[characterCount];
-
-            for (int i = 0; i < characterCount && i < m_textInfo.characterInfo.Length; i++)
-            {
-                buffer[i] = m_textInfo.characterInfo[i].character;
-            }
-
-            return new string(buffer);
-        }
-
-
         internal bool IsSelfOrLinkedAncestor(TMP_Text targetTextComponent)
         {
             if (targetTextComponent == null)
@@ -2510,7 +2168,7 @@ namespace TMPro
                     return true;
             }
 
-            if (this.GetInstanceID() == targetTextComponent.GetInstanceID())
+            if (GetInstanceID() == targetTextComponent.GetInstanceID())
                 return true;
 
             return false;
@@ -2535,50 +2193,6 @@ namespace TMPro
         protected void DoMissingGlyphCallback(int unicode, int stringIndex, TMP_FontAsset fontAsset)
         {
             OnMissingCharacter?.Invoke(unicode, stringIndex, m_text, fontAsset, this);
-        }
-
-
-        /// <summary>
-        /// Function to pack scale information in the UV2 Channel.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="scale"></param>
-        /// <returns></returns>
-
-        /// <summary>
-        /// Function to pack scale information in the UV2 Channel.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="scale"></param>
-        /// <returns></returns>
-        protected Vector2 PackUV(float x, float y, float scale)
-        {
-            Vector2 output;
-
-            output.x = (int)(x * 511);
-            output.y = (int)(y * 511);
-
-            output.x = (output.x * 4096) + output.y;
-            output.y = scale;
-
-            return output;
-        }
-
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-        protected float PackUV(float x, float y)
-        {
-            double x0 = (int)(x * 511);
-            double y0 = (int)(y * 511);
-
-            return (float)((x0 * 4096) + y0);
         }
 
 
