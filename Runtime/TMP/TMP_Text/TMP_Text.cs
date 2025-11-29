@@ -92,7 +92,6 @@ namespace TMPro
 
     public enum TextOverflowModes { Overflow = 0, Ellipsis = 1, Masking = 2, Truncate = 3, ScrollRect = 4, Page = 5, Linked = 6 };
     public enum TextWrappingModes { NoWrap = 0, Normal = 1, PreserveWhitespace = 2, PreserveWhitespaceNoWrap = 3 };
-    public enum MaskingOffsetMode { Percentage = 0, Pixel = 1 };
     public enum TextureMappingOptions { Character = 0, Line = 1, Paragraph = 2, MatchAspect = 3 };
 
     [Flags]
@@ -102,8 +101,98 @@ namespace TMPro
     /// <summary>
     /// Base class which contains common properties and functions shared between the TextMeshPro and TextMeshProUGUI component.
     /// </summary>
-    public abstract partial class TMP_Text : MaskableGraphic
+    public abstract partial class TMP_Text : MaskableGraphic, ITextPreprocessor
     {
+        private string preprocessedText = string.Empty;
+        private TextWrappingModes lastWrapMode;
+        private TextRenderFlags lastRenderMode;
+        private bool isAfterRebuildProcessing;
+        
+        protected void OnBeforeRebuild()
+        {
+            if(isAfterRebuildProcessing) return;
+            var input = m_text;
+            if (string.IsNullOrEmpty(input)) return;
+
+            lastWrapMode = m_TextWrappingMode;
+            lastRenderMode = m_renderMode;
+            m_TextWrappingMode = TextWrappingModes.NoWrap;
+            m_renderMode = TextRenderFlags.DontRender;
+        }
+
+        protected void OnAfterRebuild()
+        {
+            if(isAfterRebuildProcessing) return;
+            var input = m_text;
+            if (string.IsNullOrEmpty(input)) return;
+            
+            input = Normalize();
+
+            var lines = BiDi.WrapAndReorder(input, this);
+            input = BiDi.BuildVisualTextWithNewlines(lines);
+
+            preprocessedText = input;
+            m_TextWrappingMode = lastWrapMode;
+            m_renderMode = lastRenderMode;
+            isAfterRebuildProcessing = true;
+            ForceMeshUpdate();
+            isAfterRebuildProcessing = false;
+            
+            string Normalize()
+            {
+
+                StringBuilder sb = null;
+
+                for (int i = 0; i < input.Length; i++)
+                {
+                    char c = input[i];
+
+                    if (c == '\r' ||
+                        (c == '<' &&
+                         i + 3 < input.Length &&
+                         input[i + 1] == 'b' &&
+                         input[i + 2] == 'r' &&
+                         input[i + 3] == '>'))
+                    {
+                        if (sb == null)
+                        {
+                            sb = new StringBuilder(input.Length);
+                            sb.Append(input, 0, i);
+                        }
+
+                        if (c == '\r')
+                        {
+                            if (i + 1 < input.Length && input[i + 1] == '\n')
+                                i++;
+
+                            sb.Append('\n');
+                        }
+                        else
+                        {
+                            sb.Append('\n');
+                            i += 3;
+                        }
+                    }
+                    else
+                    {
+                        sb?.Append(c);
+                    }
+                }
+
+                return sb?.ToString() ?? input;
+            }
+        }
+        
+        string ITextPreprocessor.PreprocessText(string input)
+        {
+            if (string.IsNullOrEmpty(preprocessedText))
+            {
+                return input;
+            }
+            
+            return preprocessedText;
+        }
+        
         /// <summary>
         /// Method which derived classes need to override to load Font Assets.
         /// </summary>
@@ -235,8 +324,7 @@ namespace TMPro
         /// Function to force regeneration of the text object before its normal process time. This is useful when changes to the text object properties need to be applied immediately.
         /// </summary>
         /// <param name="ignoreActiveState">Ignore Active State of text objects. Inactive objects are ignored by default.</param>
-        /// <param name="forceTextReparsing">Force re-parsing of the text.</param>
-        public virtual void ForceMeshUpdate(bool ignoreActiveState = false, bool forceTextReparsing = false) { }
+        public virtual void ForceMeshUpdate(bool ignoreActiveState = false) { }
 
 
         /// <summary>
@@ -381,6 +469,7 @@ namespace TMPro
 
 
         protected bool needParseInputText = true;
+        protected bool needSetArraySizes = true;
         
         /// <summary>
         /// Method to parse the input text based on its source
@@ -388,26 +477,41 @@ namespace TMPro
         protected void ParseInputText()
         {
             Debug.Log($"{GetInstanceID()} ParseInputText TryParse");
-            if (!needParseInputText) return;
-            Debug.Log($"{GetInstanceID()} ParseInputText Parsing...");
-            
-            k_ParseTextMarker.Begin();
-
-            var text = m_text;
-            if (m_TextPreprocessor != null)
+            if (needParseInputText)
             {
-                text = m_TextPreprocessor.PreprocessText(m_text);
-                PreprocessedText = text;
+                Debug.Log($"{GetInstanceID()} ParseInputText Parsing...");
+            
+                k_ParseTextMarker.Begin();
+
+                var text = m_text;
+                if (m_TextPreprocessor != null)
+                {
+                    text = m_TextPreprocessor.PreprocessText(m_text);
+                    PreprocessedText = text;
+                }
+            
+                PopulateTextBackingArray(text);
+                PopulateTextProcessingArray();
+            }
+
+            if (needSetArraySizes || needParseInputText)
+            {
+                Debug.Log($"{GetInstanceID()} SetArraySizes");
+                SetArraySizes(m_TextProcessingArray);
+                needSetArraySizes = false;
             }
             
-            PopulateTextBackingArray(text);
-            PopulateTextProcessingArray();
-            SetArraySizes(m_TextProcessingArray);
-
             k_ParseTextMarker.End();
             needParseInputText = false;
         }
         
+
+        /// <summary>
+        /// Method used to determine the number of visible characters and required buffer allocations.
+        /// </summary>
+        /// <param name="unicodeChars"></param>
+        /// <returns></returns>
+        internal virtual int SetArraySizes(TextProcessingElement[] unicodeChars) { return 0; }
 
         /// <summary>
         /// Convert source text to Unicode (uint) and populate internal text backing array.
@@ -1135,14 +1239,6 @@ namespace TMPro
 
             return new string(array);
         }
-
-
-        /// <summary>
-        /// Method used to determine the number of visible characters and required buffer allocations.
-        /// </summary>
-        /// <param name="unicodeChars"></param>
-        /// <returns></returns>
-        internal virtual int SetArraySizes(TextProcessingElement[] unicodeChars) { return 0; }
 
 
         /// <summary>
@@ -2633,7 +2729,10 @@ namespace TMPro
                             tagUnitType = TagUnitType.Pixels;
                             tagValueType = m_xmlAttribute[attributeIndex].valueType = TagValueType.StringValue;
                             m_xmlAttribute[attributeIndex].valueStartIndex = tagCharCount - 1;
-                            m_xmlAttribute[attributeIndex].valueHashCode = (m_xmlAttribute[attributeIndex].valueHashCode << 5) + m_xmlAttribute[attributeIndex].valueHashCode ^ TMP_TextUtilities.ToUpperFast((char)unicode);
+                            
+                            m_xmlAttribute[attributeIndex].valueHashCode = (m_xmlAttribute[attributeIndex].valueHashCode << 5) + 
+                                m_xmlAttribute[attributeIndex].valueHashCode ^ TMP_TextUtilities.ToUpperFast((char)unicode);
+                            
                             m_xmlAttribute[attributeIndex].valueLength += 1;
                         }
                     }
@@ -2752,7 +2851,7 @@ namespace TMPro
             }
 
             #region Rich Text Tag Processing
-            #if !RICH_TEXT_ENABLED
+
             if (tag_NoParsing && (m_xmlAttribute[0].nameHashCode != (int)MarkupTag.SLASH_NO_PARSE))
                 return false;
 
@@ -2775,7 +2874,7 @@ namespace TMPro
                 return true;
             }
             else if (m_htmlTag[0] == 35 && tagCharCount == 7)
-            {
+            {                                                                      
                 m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
                 m_colorStack.Add(m_htmlColor);
                 return true;
@@ -3960,7 +4059,6 @@ namespace TMPro
                         return false;
                 }
             }
-            #endif
             #endregion
 
             return false;

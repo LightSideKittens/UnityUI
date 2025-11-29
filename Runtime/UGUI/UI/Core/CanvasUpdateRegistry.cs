@@ -9,8 +9,7 @@ namespace UnityEngine.UI
         Prelayout = 0,
         Layout = 1,
         PostLayout = 2,
-        PreRender = 3,
-        LatePreRender = 4
+        PreRender = 3
     }
     public interface ICanvasElement
     {
@@ -23,7 +22,7 @@ namespace UnityEngine.UI
 
         private bool m_PerformingLayoutUpdate;
         private bool m_PerformingGraphicUpdate;
-        private string[] m_CanvasUpdateProfilerStrings = new string[] { "CanvasUpdate.Prelayout", "CanvasUpdate.Layout", "CanvasUpdate.PostLayout", "CanvasUpdate.PreRender", "CanvasUpdate.LatePreRender" };
+        private string[] m_CanvasUpdateProfilerStrings = new string[] { "CanvasUpdate.Prelayout", "CanvasUpdate.Layout", "CanvasUpdate.PostLayout", "CanvasUpdate.PreRender" };
         private const string m_CullingUpdateProfilerString = "ClipperRegistry.Cull";
 
         private readonly IndexedSet<ICanvasElement> m_LayoutRebuildQueue = new IndexedSet<ICanvasElement>();
@@ -84,23 +83,21 @@ namespace UnityEngine.UI
 
             m_PerformingGraphicUpdate = true;
             RemoveDestroyed(m_GraphicRebuildQueue);
-            for (var i = (int)CanvasUpdate.PreRender; i < (int)CanvasUpdate.LatePreRender; i++)
+            
+            UnityEngine.Profiling.Profiler.BeginSample(m_CanvasUpdateProfilerStrings[3]);
+            for (var k = 0; k < m_GraphicRebuildQueue.Count; k++)
             {
-                UnityEngine.Profiling.Profiler.BeginSample(m_CanvasUpdateProfilerStrings[i]);
-                for (var k = 0; k < m_GraphicRebuildQueue.Count; k++)
+                try
                 {
-                    try
-                    {
-                        var element = m_GraphicRebuildQueue[k];
-                        element.Rebuild((CanvasUpdate)i);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogException(e, m_GraphicRebuildQueue[k].transform);
-                    }
+                    var element = m_GraphicRebuildQueue[k];
+                    element.Rebuild(CanvasUpdate.PreRender);
                 }
-                UnityEngine.Profiling.Profiler.EndSample();
+                catch (Exception e)
+                {
+                    Debug.LogException(e, m_GraphicRebuildQueue[k].transform);
+                }
             }
+            UnityEngine.Profiling.Profiler.EndSample();
 
             m_GraphicRebuildQueue.Clear();
             m_PerformingGraphicUpdate = false;

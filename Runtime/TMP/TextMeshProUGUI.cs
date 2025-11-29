@@ -208,14 +208,9 @@ namespace TMPro
         {
             if (this == null) return;
 
-            if (update == CanvasUpdate.Prelayout)
-            {
-                if (m_autoSizeTextContainer)
-                {
-                    m_rectTransform.sizeDelta = GetPreferredValues(Mathf.Infinity, Mathf.Infinity);
-                }
-            }
-            else if (update == CanvasUpdate.PreRender)
+            base.Rebuild(update);
+            
+            if (update == CanvasUpdate.PreRender)
             {
                 OnPreRenderCanvas();
 
@@ -428,8 +423,7 @@ namespace TMPro
         /// Function to force regeneration of the text object before its normal process time. This is useful when changes to the text object properties need to be applied immediately.
         /// </summary>
         /// <param name="ignoreActiveState">Ignore Active State of text objects. Inactive objects are ignored by default.</param>
-        /// <param name="forceTextReparsing">Force re-parsing of the text.</param>
-        public override void ForceMeshUpdate(bool ignoreActiveState = false, bool forceTextReparsing = false)
+        public override void ForceMeshUpdate(bool ignoreActiveState = false)
         {
             _havePropertiesChanged = true;
             m_ignoreActiveState = ignoreActiveState;
@@ -2000,9 +1994,11 @@ namespace TMPro
                     return;
                 }
 
+                OnBeforeRebuild();
                 if (checkPaddingRequired)
                     UpdateMeshPadding();
 
+                needSetArraySizes = true;
                 ParseInputText();
                 TMP_FontAsset.UpdateFontAssetsInUpdateQueue();
 
@@ -2028,10 +2024,10 @@ namespace TMPro
                     GenerateTextMesh();
                     m_AutoSizeIterationCount += 1;
                 }
+                OnAfterRebuild();
             }
         }
-
-
+        
         /// <summary>
         /// This is the main function that is responsible for creating / displaying the text.
         /// </summary>
@@ -2771,10 +2767,6 @@ namespace TMPro
                     k_HandleVisibleCharacterMarker.Begin();
 
                     m_textInfo.characterInfo[m_characterCount].isVisible = true;
-
-                    #region Experimental Margin Shaper
-
-                    #endregion
 
                     float marginLeft = m_marginLeft;
                     float marginRight = m_marginRight;
@@ -4573,7 +4565,7 @@ namespace TMPro
             k_GenerateTextPhaseIIMarker.End();
 
             k_GenerateTextPhaseIIIMarker.Begin();
-
+            
             if (m_renderMode == TextRenderFlags.Render && IsActive())
             {
                 OnPreRenderText?.Invoke(m_textInfo);

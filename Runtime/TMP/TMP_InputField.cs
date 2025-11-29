@@ -3461,7 +3461,7 @@ namespace TMPro
         {
             switch (update)
             {
-                case CanvasUpdate.LatePreRender:
+                case CanvasUpdate.PreRender:
                     UpdateGeometry();
                     break;
             }

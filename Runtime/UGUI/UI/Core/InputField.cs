@@ -2701,7 +2701,7 @@ namespace UnityEngine.UI
         {
             switch (update)
             {
-                case CanvasUpdate.LatePreRender:
+                case CanvasUpdate.PreRender:
                     UpdateGeometry();
                     break;
             }
