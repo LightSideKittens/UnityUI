@@ -1,14 +1,42 @@
+using System;
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using UnityEngine.TextCore.LowLevel;
+using Object = UnityEngine.Object;
 
 
 namespace TMPro.EditorUtilities
 {
     public abstract class TMP_BaseEditorPanel : Editor
     {
+        static readonly Regex LongPattern = new Regex(@"\\U([0-9a-fA-F]{8})", RegexOptions.Compiled);
+        static readonly Regex ShortPattern = new Regex(@"\\u([0-9a-fA-F]{4})", RegexOptions.Compiled);
+
+        public static string DecodeAndNormalize(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return value;
+
+            value = LongPattern.Replace(value, match =>
+            {
+                int code = Convert.ToInt32(match.Groups[1].Value, 16);
+                return char.ConvertFromUtf32(code);
+            });
+
+            value = ShortPattern.Replace(value, match =>
+            {
+                int code = Convert.ToInt32(match.Groups[1].Value, 16);
+                return ((char)code).ToString();
+            });
+
+            value = value.Normalize(NormalizationForm.FormC);
+            return value;
+        }
+        
         //Labels and Tooltips
         static readonly GUIContent k_RtlToggleLabel = new GUIContent("Enable RTL Editor", "Reverses text direction and allows right to left editing.");
         //static readonly GUIContent k_MainSettingsLabel = new GUIContent("Main Settings");
@@ -470,11 +498,11 @@ namespace TMPro.EditorUtilities
 
                 EditorGUI.BeginChangeCheck();
                 EditorGUILayout.PropertyField(m_TextProp, GUIContent.none);
+                //m_TextProp.stringValue = DecodeUnicodeEscapes(m_TextProp.stringValue);
 
                 // Need to also compare string content due to issue related to scroll bar drag handle
                 if (EditorGUI.EndChangeCheck() && m_TextProp.stringValue != m_TextComponent.text)
                 {
-                    m_TextComponent.m_inputSource = TMP_Text.TextInputSources.TextInputBox;
                     m_HavePropertiesChanged = true;
                 }
 
@@ -504,6 +532,12 @@ namespace TMPro.EditorUtilities
 
                         m_TextProp.stringValue = sourceText;
                     }
+                }
+
+                if (m_TextComponent.textPreprocessor != null)
+                {
+                    GUILayout.Label("Preprocessed Text (Text Preprocessor)");
+                    EditorGUILayout.TextArea(m_TextComponent.PreprocessedText, TMP_UIStyleManager.wrappingTextArea, GUILayout.Height(EditorGUI.GetPropertyHeight(m_TextProp) - EditorGUIUtility.singleLineHeight), GUILayout.ExpandWidth(true));
                 }
 
                 // TEXT STYLE

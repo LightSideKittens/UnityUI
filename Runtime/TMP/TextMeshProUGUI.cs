@@ -2438,6 +2438,7 @@ namespace TMPro
 
                 m_textInfo.characterInfo[m_characterCount].character = (char)charCode;
                 m_textInfo.characterInfo[m_characterCount].pointSize = m_currentFontSize;
+                m_textInfo.characterInfo[m_characterCount].color = m_htmlColor;
                 m_textInfo.characterInfo[m_characterCount].underlineColor = m_underlineColor;
                 m_textInfo.characterInfo[m_characterCount].strikethroughColor = m_strikethroughColor;
                 m_textInfo.characterInfo[m_characterCount].highlightState = m_HighlightState;
@@ -4257,6 +4258,7 @@ namespace TMPro
                 {
                     bool isUnderlineVisible = true;
                     int currentPage = m_textInfo.characterInfo[i].pageNumber;
+                    m_textInfo.characterInfo[i].underlineVertexIndex = last_vert_index;
 
                     if (i > m_maxVisibleCharacters || currentLine > m_maxVisibleLines || (m_overflowMode == TextOverflowModes.Page && currentPage + 1 != m_pageToDisplay))
                         isUnderlineVisible = false;
@@ -4366,6 +4368,7 @@ namespace TMPro
                 if (isStrikethrough)
                 {
                     bool isStrikeThroughVisible = true;
+                    m_textInfo.characterInfo[i].strikethroughVertexIndex = last_vert_index;
 
                     if (i > m_maxVisibleCharacters || currentLine > m_maxVisibleLines || (m_overflowMode == TextOverflowModes.Page && m_textInfo.characterInfo[i].pageNumber + 1 != m_pageToDisplay))
                         isStrikeThroughVisible = false;

@@ -91,6 +91,21 @@ namespace TMPro
         {
             return new TMP_Offset(a.m_Left * b, a.m_Right * b, a.m_Top * b, a.m_Bottom * b);
         }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public bool Equals(TMP_Offset other)
+        {
+            return base.Equals(other);
+        }
     }
 
 
@@ -117,8 +132,22 @@ namespace TMPro
         {
             return !(lhs == rhs);
         }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return base.Equals(obj);
+        }
+
+        public bool Equals(HighlightState other)
+        {
+            return base.Equals(other);
+        }
     }
-    
     /// <summary>
     /// Structure containing information about individual text elements (character or sprites).
     /// </summary>
@@ -170,8 +199,12 @@ namespace TMPro
 
         public float aspectRatio;
         public float scale;
+        public Color32 color;
         public Color32 underlineColor;
+        public int underlineVertexIndex;
         public Color32 strikethroughColor;
+        public int strikethroughVertexIndex;
+        public Color32 highlightColor;
         public HighlightState highlightState;
         public FontStyles style;
         public bool isVisible;

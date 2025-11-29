@@ -373,7 +373,7 @@ public static class BiDi
             }
 
             // Advance-ширина символа: сколько "пера" ушло вперёд после этого глифа.
-            float width = ch.adjustedHorizontalAdvance;
+            float width = ch.xAdvance - ch.origin;
 
             // На случай, если один codepoint даёт несколько глифов (лигатуры и т.п.),
             // аккумулируем сумму.
