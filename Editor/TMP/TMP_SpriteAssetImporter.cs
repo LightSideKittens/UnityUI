@@ -11,7 +11,6 @@ namespace TMPro
 {
     public class TMP_SpriteAssetImporter : EditorWindow
     {
-        // Create Sprite Asset Editor Window
         [MenuItem("Window/TextMeshPro/Sprite Importer", false, 2026)]
         public static void ShowFontAtlasCreatorWindow()
         {
@@ -36,7 +35,6 @@ namespace TMPro
         /// </summary>
         void OnEnable()
         {
-            // Set Editor Window Size
             SetEditorWindowSize();
         }
 
@@ -53,7 +51,6 @@ namespace TMPro
         /// </summary>
         private void OnDisable()
         {
-            // Clean up sprite asset object that may have been created and not saved.
             if (m_SpriteAsset != null && !EditorUtility.IsPersistent(m_SpriteAsset))
                 DestroyImmediate(m_SpriteAsset);
         }
@@ -63,19 +60,16 @@ namespace TMPro
         /// </summary>
         void DrawEditorPanel()
         {
-            // label
             GUILayout.Label("Import Settings", EditorStyles.boldLabel);
 
             EditorGUI.BeginChangeCheck();
 
-            // Sprite Texture Selection
             m_JsonFile = EditorGUILayout.ObjectField("Sprite Data Source", m_JsonFile, typeof(TextAsset), false) as TextAsset;
 
             m_SpriteDataFormat = (SpriteAssetImportFormats)EditorGUILayout.EnumPopup("Import Format", m_SpriteDataFormat);
 
             k_SpriteNameIsUnicodeValue = EditorGUILayout.Toggle(k_ConvertSpriteNameToUnicodeLabel, k_SpriteNameIsUnicodeValue);
 
-            // Sprite Texture Selection
             m_SpriteAtlas = EditorGUILayout.ObjectField("Sprite Texture Atlas", m_SpriteAtlas, typeof(Texture2D), false) as Texture2D;
 
             if (EditorGUI.EndChangeCheck())
@@ -87,16 +81,13 @@ namespace TMPro
 
             GUI.enabled = m_JsonFile != null && m_SpriteAtlas != null && m_SpriteDataFormat != SpriteAssetImportFormats.None;
 
-            // Create Sprite Asset
             if (GUILayout.Button("Create Sprite Asset"))
             {
                 m_CreationFeedback = string.Empty;
 
-                // Clean up sprite asset object that may have been previously created.
                 if (m_SpriteAsset != null && !EditorUtility.IsPersistent(m_SpriteAsset))
                     DestroyImmediate(m_SpriteAsset);
 
-                // Read json data file
                 if (m_JsonFile != null)
                 {
                     switch (m_SpriteDataFormat)
@@ -116,14 +107,11 @@ namespace TMPro
                             {
                                 int spriteCount = jsonData.frames.Count;
 
-                                // Update import results
                                 m_CreationFeedback = "<b>Import Results</b>\n--------------------\n";
                                 m_CreationFeedback += "<color=#C0ffff><b>" + spriteCount + "</b></color> Sprites were imported from file.";
 
-                                // Create new Sprite Asset
                                 m_SpriteAsset = CreateInstance<TMP_SpriteAsset>();
 
-                                // Assign sprite sheet / atlas texture to sprite asset
                                 m_SpriteAsset.spriteSheet = m_SpriteAtlas;
 
                                 List<TMP_SpriteGlyph> spriteGlyphTable = new List<TMP_SpriteGlyph>();
@@ -141,7 +129,6 @@ namespace TMPro
 
             GUI.enabled = true;
 
-            // Creation Feedback
             GUILayout.Space(5);
             GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.Height(60));
             {
@@ -190,7 +177,6 @@ namespace TMPro
 
                 TMP_SpriteCharacter spriteCharacter = new TMP_SpriteCharacter(0xFFFE, spriteGlyph);
 
-                // Special handling for .notdef sprite name
                 string fileNameToLowerInvariant = spriteData.filename.ToLowerInvariant();
                 if (fileNameToLowerInvariant == ".notdef" || fileNameToLowerInvariant == "notdef")
                 {
@@ -218,7 +204,7 @@ namespace TMPro
         /// <param name="filePath"></param>
         void SaveSpriteAsset(string filePath)
         {
-            filePath = filePath.Substring(0, filePath.Length - 6); // Trim file extension from filePath.
+            filePath = filePath.Substring(0, filePath.Length - 6);
 
             string dataPath = Application.dataPath;
 
@@ -233,16 +219,12 @@ namespace TMPro
             string fileName = Path.GetFileNameWithoutExtension(relativeAssetPath);
             string pathNoExt = dirName + "/" + fileName;
 
-            // Save Sprite Asset
             AssetDatabase.CreateAsset(m_SpriteAsset, pathNoExt + ".asset");
 
-            // Set version number
             m_SpriteAsset.version = "1.1.0";
 
-            // Compute the hash code for the sprite asset.
             m_SpriteAsset.hashCode = TMP_TextUtilities.GetSimpleHashCode(m_SpriteAsset.name);
 
-            // Add new default material for sprite asset.
             AddDefaultMaterial(m_SpriteAsset);
         }
 

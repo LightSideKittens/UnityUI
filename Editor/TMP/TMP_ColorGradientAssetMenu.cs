@@ -28,13 +28,9 @@ namespace TMPro.EditorUtilities
 
             filePath = AssetDatabase.GenerateUniqueAssetPath(filePath);
 
-            // Create new Color Gradient Asset.
             TMP_ColorGradient colorGradient = ScriptableObject.CreateInstance<TMP_ColorGradient>();
 
-            // Create Asset
             AssetDatabase.CreateAsset(colorGradient, filePath);
-
-            //EditorUtility.SetDirty(colorGradient);
 
             AssetDatabase.SaveAssets();
 

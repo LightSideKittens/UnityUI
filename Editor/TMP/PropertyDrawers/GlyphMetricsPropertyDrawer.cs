@@ -25,7 +25,6 @@ namespace TMPro.EditorUtilities
             SerializedProperty prop_HoriBearingY = property.FindPropertyRelative("m_HorizontalBearingY");
             SerializedProperty prop_HoriAdvance = property.FindPropertyRelative("m_HorizontalAdvance");
 
-            // We get Rect since a valid position may not be provided by the caller.
             Rect rect = new Rect(position.x, position.y, position.width, 49);
 
             EditorGUI.LabelField(new Rect(rect.x, rect.y - 2.5f, rect.width, 18), k_GlyphMetricLabel);
@@ -33,12 +32,9 @@ namespace TMPro.EditorUtilities
             EditorGUIUtility.labelWidth = 20f;
             EditorGUIUtility.fieldWidth = 15f;
 
-            //GUI.enabled = false;
             float width = (rect.width - 75f) / 2;
             EditorGUI.PropertyField(new Rect(rect.x + width * 0, rect.y + 20, width - 5f, 18), prop_Width, k_WidthPropertyLabel);
             EditorGUI.PropertyField(new Rect(rect.x + width * 1, rect.y + 20, width - 5f, 18), prop_Height, k_HeightPropertyLabel);
-
-            //GUI.enabled = true;
 
             width = (rect.width - 75f) / 3;
             EditorGUI.BeginChangeCheck();

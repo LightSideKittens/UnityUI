@@ -141,7 +141,6 @@ namespace TMPro.EditorUtilities
                 var controlArea = EditorGUI.PrefixLabel(position, id, label);
 
                 var horizontalAligment = new Rect(controlArea.x, controlArea.y, k_GroupWidth, k_AlignmentButtonHeight);
-                //var verticalAligment = new Rect(!(EditorGUIUtility.currentViewWidth > k_WideViewWidth) ? controlArea.x : horizontalAligment.xMax + k_ControlsSpacing, !(EditorGUIUtility.currentViewWidth > k_WideViewWidth) ? controlArea.y + k_AlignmentButtonHeight + 3 : controlArea.y, k_GroupWidth, k_AlignmentButtonHeight);
 
                 EditorGUI.BeginChangeCheck();
 
@@ -222,7 +221,6 @@ namespace TMPro.EditorUtilities
 
                 EditorGUI.BeginChangeCheck();
 
-                //var selectedHorizontal = DoHorizontalAligmentControl(horizontalAligment, property);
                 var selectedVertical = DoVerticalAligmentControl(verticalAligment, property);
 
                 if (EditorGUI.EndChangeCheck())

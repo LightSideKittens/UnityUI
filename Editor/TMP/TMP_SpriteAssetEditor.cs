@@ -79,7 +79,6 @@ namespace TMPro.EditorUtilities
             m_SpriteCharacterTableProperty = serializedObject.FindProperty("m_SpriteCharacterTable");
             m_SpriteGlyphTableProperty = serializedObject.FindProperty("m_GlyphTable");
 
-            // Fallback TMP Sprite Asset list
             m_fallbackSpriteAssetList = new ReorderableList(serializedObject, serializedObject.FindProperty("fallbackSpriteAssets"), true, true, true, true);
 
             m_fallbackSpriteAssetList.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
@@ -94,22 +93,18 @@ namespace TMPro.EditorUtilities
                 EditorGUI.LabelField(rect, new GUIContent("Fallback Sprite Asset List", "Select the Sprite Assets that will be searched and used as fallback when a given sprite is missing from this sprite asset."));
             };
 
-            // Clear glyph proxy lookups
             TMP_PropertyDrawerUtilities.ClearGlyphProxyLookups();
         }
 
 
         public override void OnInspectorGUI()
         {
-
-            //Debug.Log("OnInspectorGUI Called.");
             Event currentEvent = Event.current;
-            string evt_cmd = currentEvent.commandName; // Get Current Event CommandName to check for Undo Events
+            string evt_cmd = currentEvent.commandName;
 
             serializedObject.Update();
 
 
-            // TEXTMESHPRO SPRITE INFO PANEL
             #region Display Sprite Asset Face Info
             Rect rect = EditorGUILayout.GetControlRect(false, 24);
 
@@ -128,7 +123,6 @@ namespace TMPro.EditorUtilities
 
             EditorGUILayout.PropertyField(m_PointSizeProperty);
             EditorGUILayout.PropertyField(m_ScaleProperty);
-            //EditorGUILayout.PropertyField(m_LineHeightProperty);
             EditorGUILayout.PropertyField(m_AscentLineProperty);
             EditorGUILayout.PropertyField(m_BaselineProperty);
             EditorGUILayout.PropertyField(m_DescentLineProperty);
@@ -136,7 +130,6 @@ namespace TMPro.EditorUtilities
             #endregion
 
 
-            // ATLAS TEXTURE & MATERIAL
             #region Display Atlas Texture and Material
             rect = EditorGUILayout.GetControlRect(false, 24);
 
@@ -151,7 +144,6 @@ namespace TMPro.EditorUtilities
                 EditorGUILayout.PropertyField(m_spriteAtlas_prop, new GUIContent("Sprite Atlas"));
                 if (EditorGUI.EndChangeCheck())
                 {
-                    // Assign the new sprite atlas texture to the current material
                     Texture2D tex = m_spriteAtlas_prop.objectReferenceValue as Texture2D;
                     if (tex != null)
                     {
@@ -167,7 +159,6 @@ namespace TMPro.EditorUtilities
             #endregion
 
 
-            // FALLBACK SPRITE ASSETS
             #region Display Sprite Fallbacks
             rect = EditorGUILayout.GetControlRect(false, 24);
             EditorGUI.indentLevel = 0;
@@ -184,7 +175,6 @@ namespace TMPro.EditorUtilities
             #endregion
 
 
-            // SPRITE CHARACTER TABLE
             #region Display Sprite Character Table
             EditorGUI.indentLevel = 0;
             rect = EditorGUILayout.GetControlRect(false, 24);
@@ -199,10 +189,8 @@ namespace TMPro.EditorUtilities
                 int arraySize = m_SpriteCharacterTableProperty.arraySize;
                 int itemsPerPage = 10;
 
-                // Display Glyph Management Tools
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.ExpandWidth(true));
                 {
-                    // Search Bar implementation
                     #region DISPLAY SEARCH BAR
                     EditorGUILayout.BeginHorizontal();
                     {
@@ -213,10 +201,8 @@ namespace TMPro.EditorUtilities
                         {
                             if (string.IsNullOrEmpty(searchPattern) == false)
                             {
-                                //GUIUtility.keyboardControl = 0;
                                 m_CharacterSearchPattern = searchPattern.ToLower(System.Globalization.CultureInfo.InvariantCulture).Trim();
 
-                                // Search Glyph Table for potential matches
                                 SearchCharacterTable(m_CharacterSearchPattern, ref m_CharacterSearchList);
                             }
                             else
@@ -235,21 +221,17 @@ namespace TMPro.EditorUtilities
                     EditorGUILayout.EndHorizontal();
                     #endregion
 
-                    // Display Page Navigation
                     if (!string.IsNullOrEmpty(m_CharacterSearchPattern))
                         arraySize = m_CharacterSearchList.Count;
 
-                    // Display Page Navigation
                     DisplayPageNavigation(ref m_CurrentCharacterPage, arraySize, itemsPerPage);
                 }
                 EditorGUILayout.EndVertical();
 
                 if (arraySize > 0)
                 {
-                    // Display each SpriteInfo entry using the SpriteInfo property drawer.
                     for (int i = itemsPerPage * m_CurrentCharacterPage; i < arraySize && i < itemsPerPage * (m_CurrentCharacterPage + 1); i++)
                     {
-                        // Define the start of the selection region of the element.
                         Rect elementStartRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
                         int elementIndex = i;
@@ -268,10 +250,8 @@ namespace TMPro.EditorUtilities
                         }
                         EditorGUILayout.EndVertical();
 
-                        // Define the end of the selection region of the element.
                         Rect elementEndRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
-                        // Check for Item selection
                         Rect selectionArea = new Rect(elementStartRegion.x, elementStartRegion.y, elementEndRegion.width, elementEndRegion.y - elementStartRegion.y);
                         if (DoSelectionCheck(selectionArea))
                         {
@@ -289,17 +269,13 @@ namespace TMPro.EditorUtilities
                             }
                         }
 
-                        // Draw & Handle Section Area
                         if (m_selectedElement == i && m_isCharacterSelected)
                         {
-                            // Draw selection highlight
                             TMP_EditorUtility.DrawBox(selectionArea, 2f, new Color32(40, 192, 255, 255));
 
-                            // Draw options to MoveUp, MoveDown, Add or Remove Sprites
                             Rect controlRect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * 1f);
                             controlRect.width /= 8;
 
-                            // Move sprite up.
                             bool guiEnabled = GUI.enabled;
                             if (i == 0) { GUI.enabled = false; }
                             if (GUI.Button(controlRect, "Up"))
@@ -308,7 +284,6 @@ namespace TMPro.EditorUtilities
                             }
                             GUI.enabled = guiEnabled;
 
-                            // Move sprite down.
                             controlRect.x += controlRect.width;
                             if (i == arraySize - 1) { GUI.enabled = false; }
                             if (GUI.Button(controlRect, "Down"))
@@ -317,19 +292,16 @@ namespace TMPro.EditorUtilities
                             }
                             GUI.enabled = guiEnabled;
 
-                            // Move sprite to new index
                             controlRect.x += controlRect.width * 2;
-                            //if (i == arraySize - 1) { GUI.enabled = false; }
                             m_moveToIndex = EditorGUI.IntField(controlRect, m_moveToIndex);
                             controlRect.x -= controlRect.width;
                             if (GUI.Button(controlRect, "Goto"))
                             {
                                 MoveCharacterToIndex(i, m_moveToIndex);
                             }
-                            //controlRect.x += controlRect.width;
+
                             GUI.enabled = guiEnabled;
 
-                            // Add new Sprite
                             controlRect.x += controlRect.width * 4;
                             if (GUI.Button(controlRect, "+"))
                             {
@@ -339,16 +311,13 @@ namespace TMPro.EditorUtilities
 
                                 SerializedProperty spriteInfo_prop = m_SpriteCharacterTableProperty.GetArrayElementAtIndex(index);
 
-                                // Copy properties of the selected element
                                 CopyCharacterSerializedProperty(m_SpriteCharacterTableProperty.GetArrayElementAtIndex(elementIndex), ref spriteInfo_prop);
 
-                                //spriteInfo_prop.FindPropertyRelative("m_Index").intValue = index;
                                 serializedObject.ApplyModifiedProperties();
 
                                 m_IsCharacterSearchDirty = true;
                             }
 
-                            // Delete selected Sprite
                             controlRect.x += controlRect.width;
                             if (m_selectedElement == -1) GUI.enabled = false;
                             if (GUI.Button(controlRect, "-"))
@@ -375,44 +344,14 @@ namespace TMPro.EditorUtilities
 
                 GUILayout.Space(5f);
 
-                // GLOBAL TOOLS
                 #region Global Tools
-                /*
-                GUI.enabled = true;
-                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-                rect = EditorGUILayout.GetControlRect(false, 40);
 
-                float width = (rect.width - 75f) / 4;
-                EditorGUI.LabelField(rect, "Global Offsets & Scale", EditorStyles.boldLabel);
-
-
-                rect.x += 70;
-                bool old_ChangedState = GUI.changed;
-
-                GUI.changed = false;
-                m_xOffset = EditorGUI.FloatField(new Rect(rect.x + 5f + width * 0, rect.y + 20, width - 5f, 18), new GUIContent("OX:"), m_xOffset);
-                if (GUI.changed) UpdateGlobalProperty("m_HorizontalBearingX", m_xOffset);
-
-                m_yOffset = EditorGUI.FloatField(new Rect(rect.x + 5f + width * 1, rect.y + 20, width - 5f, 18), new GUIContent("OY:"), m_yOffset);
-                if (GUI.changed) UpdateGlobalProperty("m_HorizontalBearingY", m_yOffset);
-
-                m_xAdvance = EditorGUI.FloatField(new Rect(rect.x + 5f + width * 2, rect.y + 20, width - 5f, 18), new GUIContent("ADV."), m_xAdvance);
-                if (GUI.changed) UpdateGlobalProperty("m_HorizontalAdvance", m_xAdvance);
-
-                m_scale = EditorGUI.FloatField(new Rect(rect.x + 5f + width * 3, rect.y + 20, width - 5f, 18), new GUIContent("SF."), m_scale);
-                if (GUI.changed) UpdateGlobalProperty("m_Scale", m_scale);
-
-                EditorGUILayout.EndVertical();
-
-                GUI.changed = old_ChangedState;
-                */
                 #endregion
 
             }
             #endregion
 
 
-            // SPRITE GLYPH TABLE
             #region Display Sprite Glyph Table
             EditorGUI.indentLevel = 0;
             rect = EditorGUILayout.GetControlRect(false, 24);
@@ -427,10 +366,8 @@ namespace TMPro.EditorUtilities
                 int arraySize = m_SpriteGlyphTableProperty.arraySize;
                 int itemsPerPage = 10;
 
-                // Display Glyph Management Tools
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.ExpandWidth(true));
                 {
-                    // Search Bar implementation
                     #region DISPLAY SEARCH BAR
                     EditorGUILayout.BeginHorizontal();
                     {
@@ -441,10 +378,8 @@ namespace TMPro.EditorUtilities
                         {
                             if (string.IsNullOrEmpty(searchPattern) == false)
                             {
-                                //GUIUtility.keyboardControl = 0;
                                 m_GlyphSearchPattern = searchPattern.ToLower(System.Globalization.CultureInfo.InvariantCulture).Trim();
 
-                                // Search Glyph Table for potential matches
                                 SearchCharacterTable(m_GlyphSearchPattern, ref m_GlyphSearchList);
                             }
                             else
@@ -463,21 +398,17 @@ namespace TMPro.EditorUtilities
                     EditorGUILayout.EndHorizontal();
                     #endregion
 
-                    // Display Page Navigation
                     if (!string.IsNullOrEmpty(m_GlyphSearchPattern))
                         arraySize = m_GlyphSearchList.Count;
 
-                    // Display Page Navigation
                     DisplayPageNavigation(ref m_CurrentGlyphPage, arraySize, itemsPerPage);
                 }
                 EditorGUILayout.EndVertical();
 
                 if (arraySize > 0)
                 {
-                    // Display each SpriteInfo entry using the SpriteInfo property drawer.
                     for (int i = itemsPerPage * m_CurrentGlyphPage; i < arraySize && i < itemsPerPage * (m_CurrentGlyphPage + 1); i++)
                     {
-                        // Define the start of the selection region of the element.
                         Rect elementStartRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
                         int elementIndex = i;
@@ -496,10 +427,8 @@ namespace TMPro.EditorUtilities
                         }
                         EditorGUILayout.EndVertical();
 
-                        // Define the end of the selection region of the element.
                         Rect elementEndRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
-                        // Check for Item selection
                         Rect selectionArea = new Rect(elementStartRegion.x, elementStartRegion.y, elementEndRegion.width, elementEndRegion.y - elementStartRegion.y);
                         if (DoSelectionCheck(selectionArea))
                         {
@@ -517,17 +446,13 @@ namespace TMPro.EditorUtilities
                             }
                         }
 
-                        // Draw & Handle Section Area
                         if (m_selectedElement == i && m_isSpriteSelected)
                         {
-                            // Draw selection highlight
                             TMP_EditorUtility.DrawBox(selectionArea, 2f, new Color32(40, 192, 255, 255));
 
-                            // Draw options to MoveUp, MoveDown, Add or Remove Sprites
                             Rect controlRect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * 1f);
                             controlRect.width /= 8;
 
-                            // Move sprite up.
                             bool guiEnabled = GUI.enabled;
                             if (i == 0) { GUI.enabled = false; }
                             if (GUI.Button(controlRect, "Up"))
@@ -536,7 +461,6 @@ namespace TMPro.EditorUtilities
                             }
                             GUI.enabled = guiEnabled;
 
-                            // Move sprite down.
                             controlRect.x += controlRect.width;
                             if (i == arraySize - 1) { GUI.enabled = false; }
                             if (GUI.Button(controlRect, "Down"))
@@ -545,19 +469,16 @@ namespace TMPro.EditorUtilities
                             }
                             GUI.enabled = guiEnabled;
 
-                            // Move sprite to new index
                             controlRect.x += controlRect.width * 2;
-                            //if (i == arraySize - 1) { GUI.enabled = false; }
                             m_moveToIndex = EditorGUI.IntField(controlRect, m_moveToIndex);
                             controlRect.x -= controlRect.width;
                             if (GUI.Button(controlRect, "Goto"))
                             {
                                 MoveGlyphToIndex(i, m_moveToIndex);
                             }
-                            //controlRect.x += controlRect.width;
+
                             GUI.enabled = guiEnabled;
 
-                            // Add new Sprite
                             controlRect.x += controlRect.width * 4;
                             if (GUI.Button(controlRect, "+"))
                             {
@@ -567,7 +488,6 @@ namespace TMPro.EditorUtilities
 
                                 SerializedProperty newSpriteGlyphProperty = m_SpriteGlyphTableProperty.GetArrayElementAtIndex(index);
 
-                                // Copy properties of the selected element
                                 CopyGlyphSerializedProperty(m_SpriteGlyphTableProperty.GetArrayElementAtIndex(elementIndex), ref newSpriteGlyphProperty);
 
                                 newSpriteGlyphProperty.FindPropertyRelative("m_Index").intValue = index;
@@ -575,11 +495,8 @@ namespace TMPro.EditorUtilities
                                 serializedObject.ApplyModifiedProperties();
 
                                 m_IsGlyphSearchDirty = true;
-
-                                //m_SpriteAsset.UpdateLookupTables();
                             }
 
-                            // Delete selected Sprite
                             controlRect.x += controlRect.width;
                             if (m_selectedElement == -1) GUI.enabled = false;
                             if (GUI.Button(controlRect, "-"))
@@ -590,14 +507,12 @@ namespace TMPro.EditorUtilities
 
                                 m_SpriteGlyphTableProperty.DeleteArrayElementAtIndex(elementIndex);
 
-                                // Remove all Sprite Characters referencing this glyph.
                                 for (int j = 0; j < m_SpriteCharacterTableProperty.arraySize; j++)
                                 {
                                     int glyphIndex = m_SpriteCharacterTableProperty.GetArrayElementAtIndex(j).FindPropertyRelative("m_GlyphIndex").intValue;
 
                                     if (glyphIndex == selectedGlyphIndex)
                                     {
-                                        // Remove character
                                         m_SpriteCharacterTableProperty.DeleteArrayElementAtIndex(j);
                                     }
                                 }
@@ -606,8 +521,6 @@ namespace TMPro.EditorUtilities
                                 serializedObject.ApplyModifiedProperties();
 
                                 m_IsGlyphSearchDirty = true;
-
-                                //m_SpriteAsset.UpdateLookupTables();
 
                                 return;
                             }
@@ -624,7 +537,6 @@ namespace TMPro.EditorUtilities
 
                 GUILayout.Space(5f);
 
-                // GLOBAL TOOLS
                 #region Global Tools
                 GUI.enabled = true;
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
@@ -671,7 +583,6 @@ namespace TMPro.EditorUtilities
                 EditorUtility.SetDirty(target);
             }
 
-            // Clear selection if mouse event was not consumed.
             GUI.enabled = true;
             if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
                 m_selectedElement = -1;
@@ -702,34 +613,28 @@ namespace TMPro.EditorUtilities
             Rect pagePos = EditorGUILayout.GetControlRect(false, 20);
             pagePos.width /= 3;
 
-            int shiftMultiplier = Event.current.shift ? 10 : 1; // Page + Shift goes 10 page forward
+            int shiftMultiplier = Event.current.shift ? 10 : 1;
 
-            // Previous Page
             GUI.enabled = currentPage > 0;
 
             if (GUI.Button(pagePos, "Previous Page"))
             {
                 currentPage -= 1 * shiftMultiplier;
-                //m_isNewPage = true;
             }
 
-            // Page Counter
             GUI.enabled = true;
             pagePos.x += pagePos.width;
             int totalPages = (int)(arraySize / (float)itemsPerPage + 0.999f);
             GUI.Label(pagePos, "Page " + (currentPage + 1) + " / " + totalPages, TMP_UIStyleManager.centeredLabel);
 
-            // Next Page
             pagePos.x += pagePos.width;
             GUI.enabled = itemsPerPage * (currentPage + 1) < arraySize;
 
             if (GUI.Button(pagePos, "Next Page"))
             {
                 currentPage += 1 * shiftMultiplier;
-                //m_isNewPage = true;
             }
 
-            // Clamp page range
             currentPage = Mathf.Clamp(currentPage, 0, arraySize / itemsPerPage);
 
             GUI.enabled = true;
@@ -747,7 +652,6 @@ namespace TMPro.EditorUtilities
 
             for (int i = 0; i < arraySize; i++)
             {
-                // Get a reference to the sprite glyph.
                 SerializedProperty spriteGlyphProperty = m_SpriteGlyphTableProperty.GetArrayElementAtIndex(i);
 
                 if (property == "m_Scale")
@@ -764,7 +668,6 @@ namespace TMPro.EditorUtilities
             GUI.changed = false;
         }
 
-        // Check if any of the Style elements were clicked on.
         private bool DoSelectionCheck(Rect selectionArea)
         {
             Event currentEvent = Event.current;
@@ -814,8 +717,6 @@ namespace TMPro.EditorUtilities
             m_selectedElement = newIndex;
             m_IsCharacterSearchDirty = true;
             m_SpriteAsset.m_IsSpriteAssetLookupTablesDirty = true;
-
-            // TODO: Need to handle switching pages if the character or glyph is moved to a different page.
         }
 
         /// <summary>
@@ -848,8 +749,6 @@ namespace TMPro.EditorUtilities
             m_selectedElement = newIndex;
             m_IsGlyphSearchDirty = true;
             m_SpriteAsset.m_IsSpriteAssetLookupTablesDirty = true;
-
-            // TODO: Need to handle switching pages if the character or glyph is moved to a different page.
         }
 
 
@@ -868,12 +767,8 @@ namespace TMPro.EditorUtilities
 
         void CopyGlyphSerializedProperty(SerializedProperty srcGlyph, ref SerializedProperty dstGlyph)
         {
-            // TODO : Should make a generic function which copies each of the properties.
-
-            // Index
             dstGlyph.FindPropertyRelative("m_Index").intValue = srcGlyph.FindPropertyRelative("m_Index").intValue;
 
-            // GlyphMetrics
             SerializedProperty srcGlyphMetrics = srcGlyph.FindPropertyRelative("m_Metrics");
             SerializedProperty dstGlyphMetrics = dstGlyph.FindPropertyRelative("m_Metrics");
 
@@ -883,7 +778,6 @@ namespace TMPro.EditorUtilities
             dstGlyphMetrics.FindPropertyRelative("m_HorizontalBearingY").floatValue = srcGlyphMetrics.FindPropertyRelative("m_HorizontalBearingY").floatValue;
             dstGlyphMetrics.FindPropertyRelative("m_HorizontalAdvance").floatValue = srcGlyphMetrics.FindPropertyRelative("m_HorizontalAdvance").floatValue;
 
-            // GlyphRect
             SerializedProperty srcGlyphRect = srcGlyph.FindPropertyRelative("m_GlyphRect");
             SerializedProperty dstGlyphRect = dstGlyph.FindPropertyRelative("m_GlyphRect");
 
@@ -913,14 +807,12 @@ namespace TMPro.EditorUtilities
             {
                 SerializedProperty sourceSprite = m_SpriteCharacterTableProperty.GetArrayElementAtIndex(i);
 
-                // Check for potential match against array index
                 if (i.ToString().Contains(searchPattern))
                 {
                     searchResults.Add(i);
                     continue;
                 }
 
-                // Check for potential match against decimal id
                 int id = sourceSprite.FindPropertyRelative("m_GlyphIndex").intValue;
                 if (id.ToString().Contains(searchPattern))
                 {
@@ -928,7 +820,6 @@ namespace TMPro.EditorUtilities
                     continue;
                 }
 
-                // Check for potential match against name
                 string name = sourceSprite.FindPropertyRelative("m_Name").stringValue.ToLower(System.Globalization.CultureInfo.InvariantCulture).Trim();
                 if (name.Contains(searchPattern))
                 {
@@ -949,14 +840,12 @@ namespace TMPro.EditorUtilities
             {
                 SerializedProperty sourceSprite = m_SpriteGlyphTableProperty.GetArrayElementAtIndex(i);
 
-                // Check for potential match against array index
                 if (i.ToString().Contains(searchPattern))
                 {
                     searchResults.Add(i);
                     continue;
                 }
 
-                // Check for potential match against decimal id
                 int id = sourceSprite.FindPropertyRelative("m_GlyphIndex").intValue;
                 if (id.ToString().Contains(searchPattern))
                 {
@@ -964,7 +853,6 @@ namespace TMPro.EditorUtilities
                     continue;
                 }
 
-                // Check for potential match against name
                 string name = sourceSprite.FindPropertyRelative("m_Name").stringValue.ToLower(System.Globalization.CultureInfo.InvariantCulture).Trim();
                 if (name.Contains(searchPattern))
                 {

@@ -23,7 +23,6 @@ namespace TMPro
         public int wordCount;
         public int linkCount;
         public int lineCount;
-        public int pageCount;
 
         public int materialCount;
 
@@ -86,7 +85,6 @@ namespace TMPro
             wordCount = 0;
             linkCount = 0;
             lineCount = 0;
-            pageCount = 0;
             spriteCount = 0;
 
             for (int i = 0; i < this.meshInfo.Length; i++)
@@ -106,7 +104,6 @@ namespace TMPro
             wordCount = 0;
             linkCount = 0;
             lineCount = 0;
-            pageCount = 0;
             spriteCount = 0;
 
             this.characterInfo = new TMP_CharacterInfo[4];

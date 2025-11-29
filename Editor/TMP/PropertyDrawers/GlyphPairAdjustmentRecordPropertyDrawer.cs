@@ -35,7 +35,6 @@ namespace TMPro.EditorUtilities
 
             SerializedProperty prop_FontFeatureLookupFlags = property.FindPropertyRelative("m_FeatureLookupFlags");
 
-            // Refresh glyph proxy lookup dictionary if needed
             if (TMP_PropertyDrawerUtilities.s_RefreshGlyphProxyLookup)
                 TMP_PropertyDrawerUtilities.RefreshGlyphProxyLookup(property.serializedObject);
 
@@ -57,7 +56,6 @@ namespace TMPro.EditorUtilities
             GUIStyle style = new GUIStyle(EditorStyles.label);
             style.richText = true;
 
-            // First Glyph
             GUI.enabled = isEditingEnabled;
             if (isSelectable)
             {
@@ -78,9 +76,6 @@ namespace TMPro.EditorUtilities
                 rect.y += 20;
                 EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_XAdvance"), new GUIContent("AX:"));
 
-                //rect.y += 20;
-                //EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_YAdvance"), new GUIContent("AY:"));
-
                 DrawGlyph((uint)prop_FirstGlyphIndex.intValue, new Rect(position.x, position.y + 2, 64, 60), property);
             }
             else
@@ -88,7 +83,6 @@ namespace TMPro.EditorUtilities
                 rect = new Rect(position.x, position.y, width / 2 * 0.8f - padding, 18);
                 EditorGUIUtility.labelWidth = 40f;
 
-                // First Character Lookup
                 GUI.SetNextControlName("FirstCharacterField");
                 EditorGUI.BeginChangeCheck();
                 string firstCharacter = EditorGUI.TextField(rect, s_CharacterTextFieldLabel, m_FirstCharacter);
@@ -97,11 +91,8 @@ namespace TMPro.EditorUtilities
                 {
                     if (ValidateInput(firstCharacter))
                     {
-                        //Debug.Log("1st Unicode value: [" + firstCharacter + "]");
-
                         uint unicode = GetUnicodeCharacter(firstCharacter);
 
-                        // Lookup glyph index
                         TMP_SerializedPropertyHolder propertyHolder = property.serializedObject.targetObject as TMP_SerializedPropertyHolder;
                         TMP_FontAsset fontAsset = propertyHolder.fontAsset;
                         if (fontAsset != null)
@@ -115,7 +106,6 @@ namespace TMPro.EditorUtilities
                 if (EditorGUI.EndChangeCheck())
                     m_FirstCharacter = firstCharacter;
 
-                // First Glyph Index
                 rect.x += width / 2 * 0.8f;
 
                 EditorGUIUtility.labelWidth = 25f;
@@ -138,14 +128,9 @@ namespace TMPro.EditorUtilities
                 rect.x = position.x;
                 rect.y += 20;
                 EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_XAdvance"), new GUIContent("AX"));
-
-                //rect.x += width * 0.5f;
-                //EditorGUI.PropertyField(rect, prop_FirstGlyphAdjustment.FindPropertyRelative("m_YAdvance"), new GUIContent("AY"));
-
             }
 
 
-            // Second Glyph
             GUI.enabled = isEditingEnabled;
             if (isSelectable)
             {
@@ -164,9 +149,6 @@ namespace TMPro.EditorUtilities
                 rect.y += 20;
                 EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_XAdvance"), new GUIContent("AX:"));
 
-                //rect.y += 20;
-                //EditorGUI.PropertyField(rect, prop_SecondGlyphAdjustment.FindPropertyRelative("m_YAdvance"), new GUIContent("AY"));
-
                 DrawGlyph((uint)prop_SecondGlyphIndex.intValue, new Rect(position.width / 2 + 20, position.y + 2, 64, 60), property);
             }
             else
@@ -174,7 +156,6 @@ namespace TMPro.EditorUtilities
                 rect = new Rect(position.width / 2 + 20, position.y, width / 2 * 0.8f - padding, 18);
                 EditorGUIUtility.labelWidth = 40f;
 
-                // Second Character Lookup
                 GUI.SetNextControlName("SecondCharacterField");
                 EditorGUI.BeginChangeCheck();
                 string secondCharacter = EditorGUI.TextField(rect, s_CharacterTextFieldLabel, m_SecondCharacter);
@@ -183,11 +164,8 @@ namespace TMPro.EditorUtilities
                 {
                     if (ValidateInput(secondCharacter))
                     {
-                        //Debug.Log("2nd Unicode value: [" + secondCharacter + "]");
-
                         uint unicode = GetUnicodeCharacter(secondCharacter);
 
-                        // Lookup glyph index
                         TMP_SerializedPropertyHolder propertyHolder = property.serializedObject.targetObject as TMP_SerializedPropertyHolder;
                         TMP_FontAsset fontAsset = propertyHolder.fontAsset;
                         if (fontAsset != null)
@@ -201,7 +179,6 @@ namespace TMPro.EditorUtilities
                 if (EditorGUI.EndChangeCheck())
                     m_SecondCharacter = secondCharacter;
 
-                // Second Glyph Index
                 rect.x += width / 2 * 0.8f;
 
                 EditorGUIUtility.labelWidth = 25f;
@@ -224,12 +201,8 @@ namespace TMPro.EditorUtilities
                 rect.x = position.width / 2 + 20;
                 rect.y += 20;
                 EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_XAdvance"), new GUIContent("AX"));
-
-                //rect.x += width * 0.5f;
-                //EditorGUI.PropertyField(rect, prop_SecondGlyphAdjustment.FindPropertyRelative("m_YAdvance"), new GUIContent("AY"));
             }
 
-            // Font Feature Lookup Flags
             if (isSelectable)
             {
                 EditorGUIUtility.labelWidth = 50f;
@@ -253,7 +226,6 @@ namespace TMPro.EditorUtilities
         {
             int length = string.IsNullOrEmpty(source) ? 0 : source.Length;
 
-            ////Filter out unwanted characters.
             Event evt = Event.current;
 
             char c = evt.character;
@@ -286,7 +258,6 @@ namespace TMPro.EditorUtilities
                         if (source[1] == 'u' || (c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F'))
                             evt.character = '\0';
 
-                        // Validate input
                         if (length == 6 && source[1] == 'u' && source != m_PreviousInput)
                             return true;
                         break;
@@ -320,7 +291,6 @@ namespace TMPro.EditorUtilities
 
         void DrawGlyph(uint glyphIndex, Rect glyphDrawPosition, SerializedProperty property)
         {
-            // Get a reference to the serialized object which can either be a TMP_FontAsset or FontAsset.
             SerializedObject so = property.serializedObject;
             if (so == null)
                 return;
@@ -328,7 +298,6 @@ namespace TMPro.EditorUtilities
             if (m_GlyphLookupDictionary == null)
                 m_GlyphLookupDictionary = TMP_PropertyDrawerUtilities.GetGlyphProxyLookupDictionary(so);
 
-            // Try getting a reference to the glyph for the given glyph index.
             if (!m_GlyphLookupDictionary.TryGetValue(glyphIndex, out GlyphProxy glyph))
                 return;
 
@@ -354,7 +323,6 @@ namespace TMPro.EditorUtilities
             float normalizedHeight = ascentLine - descentLine;
             float scale = glyphDrawPosition.width / normalizedHeight;
 
-            // Compute the normalized texture coordinates
             Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width, (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width, (float)glyphHeight / atlasTexture.height);
 
             if (Event.current.type == EventType.Repaint)
@@ -364,7 +332,6 @@ namespace TMPro.EditorUtilities
                 glyphDrawPosition.width = glyphWidth * scale;
                 glyphDrawPosition.height = glyphHeight * scale;
 
-                // Could switch to using the default material of the font asset which would require passing scale to the shader.
                 Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f), mat);
             }
         }

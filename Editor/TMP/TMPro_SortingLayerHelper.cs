@@ -3,10 +3,8 @@
 
 namespace TMPro
 {
-    // Helpers used by the different sorting layer classes.
     public static class SortingLayerHelper
     {
-        // Gets an array of sorting layer names.
         public static string[] sortingLayerNames
         {
             get

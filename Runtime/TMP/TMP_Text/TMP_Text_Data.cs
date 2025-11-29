@@ -270,8 +270,6 @@ namespace TMPro
         protected int m_lineNumber;
         protected int m_lineVisibleCharacterCount;
         protected int m_lineVisibleSpaceCount;
-        protected int m_pageNumber;
-        protected float m_PageAscender;
         protected float m_maxTextAscender;
         protected float m_maxCapHeight;
         protected float m_ElementAscender;

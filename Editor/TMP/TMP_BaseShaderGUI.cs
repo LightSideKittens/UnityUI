@@ -116,7 +116,6 @@ namespace TMPro.EditorUtilities
 
         static TMP_BaseShaderGUI()
         {
-            // Keep track of how many undo/redo events happened.
             Undo.undoRedoPerformed += () => s_UndoRedoCount += 1;
         }
 
@@ -136,12 +135,8 @@ namespace TMPro.EditorUtilities
             m_IsNewGUI = false;
             ShaderUtilities.GetShaderPropertyIDs();
 
-            // New GUI just got constructed. This happens in response to a selection,
-            // but also after undo/redo events.
             if (s_LastSeenUndoRedoCount != s_UndoRedoCount)
             {
-                // There's been at least one undo/redo since the last time this GUI got constructed.
-                // Maybe the undo/redo was for this material? Assume that is was.
                 TMPro_EventManager.ON_MATERIAL_PROPERTY_CHANGED(true, m_Material);
             }
 

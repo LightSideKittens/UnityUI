@@ -2135,6 +2135,10 @@ namespace TMPro
             m_maxLineAscender = k_LargeNegativeFloat;
             m_maxLineDescender = k_LargePositiveFloat;
             m_lineNumber = 0;
+            float lineMinXForGlyphAdvance = float.PositiveInfinity;
+            float lineMaxXForGlyphAdvance = float.NegativeInfinity;
+            float prevLineWidthForGlyphAdvance = 0f;
+            int lastLineNumberForGlyphAdvance = 0;
             m_startOfLineAscender = 0;
             m_startOfLineDescender = 0;
             m_lineVisibleCharacterCount = 0;
@@ -2147,9 +2151,7 @@ namespace TMPro
             bool kerning = m_ActiveFontFeatures.Contains(OTL_FeatureTag.kern);
             bool markToBase = m_ActiveFontFeatures.Contains(OTL_FeatureTag.mark);
             bool markToMark = m_ActiveFontFeatures.Contains(OTL_FeatureTag.mkmk);
-
-            m_pageNumber = 0;
-            int pageToDisplay = Mathf.Clamp(m_pageToDisplay - 1, 0, m_textInfo.pageInfo.Length - 1);
+            
             m_textInfo.ClearPageInfo();
 
             Vector4 margins = m_margin;
@@ -2168,10 +2170,8 @@ namespace TMPro
             m_maxCapHeight = 0;
             m_maxTextAscender = 0;
             m_ElementDescender = 0;
-            m_PageAscender = 0;
             float maxVisibleDescender = 0;
             bool isMaxVisibleDescenderSet = false;
-            m_isNewPage = false;
 
             bool isFirstWordOfLine = true;
             m_isNonBreakingSpace = false;
@@ -2552,8 +2552,6 @@ namespace TMPro
                 elementDescentLine += glyphAdjustments.yPlacement;
                 #endregion
 
-                float xAdvanceBeforeChar = m_xAdvance;
-
                 #region Handle Right-to-Left
                 if (m_isRightToLeft)
                 {
@@ -2676,6 +2674,50 @@ namespace TMPro
                 m_textInfo.characterInfo[m_characterCount].topRight = top_right;
                 m_textInfo.characterInfo[m_characterCount].bottomRight = bottom_right;
 
+                if (m_lineNumber != lastLineNumberForGlyphAdvance)
+                {
+                    lineMinXForGlyphAdvance = float.PositiveInfinity;
+                    lineMaxXForGlyphAdvance = float.NegativeInfinity;
+                    prevLineWidthForGlyphAdvance = 0f;
+                    lastLineNumberForGlyphAdvance = m_lineNumber;
+                }
+
+                float oldLineWidth = prevLineWidthForGlyphAdvance;
+
+                if (charCode == 10 || charCode == 11 || charCode == 13)
+                {
+                    m_textInfo.characterInfo[m_characterCount].glyphAdvance = 0f;
+                }
+                else
+                {
+                    float charMinX = Mathf.Min(bottom_left.x, top_left.x, top_right.x, bottom_right.x);
+                    float charMaxX = Mathf.Max(bottom_left.x, top_left.x, top_right.x, bottom_right.x);
+
+                    if (float.IsPositiveInfinity(lineMinXForGlyphAdvance))
+                    {
+                        lineMinXForGlyphAdvance = charMinX;
+                        lineMaxXForGlyphAdvance = charMaxX;
+                    }
+                    else
+                    {
+                        if (charMinX < lineMinXForGlyphAdvance)
+                            lineMinXForGlyphAdvance = charMinX;
+                        if (charMaxX > lineMaxXForGlyphAdvance)
+                            lineMaxXForGlyphAdvance = charMaxX;
+                    }
+
+                    float newLineWidth = lineMaxXForGlyphAdvance - lineMinXForGlyphAdvance;
+
+                    float glyphAdvance = newLineWidth - oldLineWidth;
+
+                    if (glyphAdvance < 0f)
+                        glyphAdvance = 0f;
+
+                    m_textInfo.characterInfo[m_characterCount].glyphAdvance = glyphAdvance;
+
+                    prevLineWidthForGlyphAdvance = newLineWidth;
+                }
+                
                 m_textInfo.characterInfo[m_characterCount].origin = m_xAdvance + glyphAdjustments.xPlacement * currentElementScale;
                 m_textInfo.characterInfo[m_characterCount].baseLine = (baselineOffset - m_lineOffset + m_baselineOffset) + glyphAdjustments.yPlacement * currentElementScale;
                 m_textInfo.characterInfo[m_characterCount].aspectRatio = (top_right.x - bottom_left.x) / (top_left.y - bottom_left.y);
@@ -2724,7 +2766,7 @@ namespace TMPro
                     m_ElementDescender = m_textInfo.characterInfo[m_characterCount].descender = m_maxLineDescender - m_lineOffset;
                 }
 
-                if (m_lineNumber == 0 || m_isNewPage)
+                if (m_lineNumber == 0)
                 {
                     if (isFirstCharacterOfLine || isWhiteSpace == false)
                     {
@@ -2732,12 +2774,7 @@ namespace TMPro
                         m_maxCapHeight = Mathf.Max(m_maxCapHeight, m_currentFontAsset.m_FaceInfo.capLine * currentElementScale / smallCapsMultiplier);
                     }
                 }
-
-                if (m_lineOffset == 0)
-                {
-                    if (isFirstCharacterOfLine || isWhiteSpace == false)
-                        m_PageAscender = m_PageAscender > elementAscender ? m_PageAscender : elementAscender;
-                }
+                
                 k_ComputeTextMetricsMarker.End();
                 #endregion
 
@@ -3040,7 +3077,14 @@ namespace TMPro
                                 switch (m_overflowMode)
                                 {
                                     case TextOverflowModes.Overflow:
-
+                                        InsertNewLine(i, baseScale, currentElementScale, currentEmScale, boldSpacingAdjustment, characterSpacingAdjustment, widthOfTextArea, lineGap, ref isMaxVisibleDescenderSet, ref maxVisibleDescender);
+                                        isStartOfNewLine = true;
+                                        isFirstWordOfLine = true;
+                                        k_HandleVerticalLineBreakingMarker.End();
+                                        k_HandleHorizontalLineBreakingMarker.End();
+                                        k_HandleVisibleCharacterMarker.End();
+                                        continue;
+                                    
                                     case TextOverflowModes.Truncate:
                                         i = RestoreWordWrappingState(ref m_SavedLastValidState);
 
@@ -3136,7 +3180,8 @@ namespace TMPro
                             switch (m_overflowMode)
                             {
                                 case TextOverflowModes.Overflow:
-
+                                    break;
+                                
                                 case TextOverflowModes.Truncate:
                                     i = RestoreWordWrappingState(ref m_SavedWordWrapState);
 
@@ -3279,7 +3324,6 @@ namespace TMPro
 
                 #region Store Character Data
                 m_textInfo.characterInfo[m_characterCount].lineNumber = m_lineNumber;
-                m_textInfo.characterInfo[m_characterCount].pageNumber = m_pageNumber;
 
                 if (charCode != 10 && charCode != 11 && charCode != 13 && isInjectedCharacter == false || m_textInfo.lineInfo[m_lineNumber].characterCount == 1)
                     m_textInfo.lineInfo[m_lineNumber].alignment = m_lineJustification;
@@ -3333,16 +3377,6 @@ namespace TMPro
                 m_textInfo.characterInfo[m_characterCount].xAdvance = m_xAdvance;
                 k_ComputeCharacterAdvanceMarker.End();
                 #endregion Tabulation & Stops
-
-                float glyphAdvance = m_xAdvance - xAdvanceBeforeChar;
-                
-                if (glyphAdvance < 0f)
-                    glyphAdvance = -glyphAdvance;
-                
-                if (charCode == 10 || charCode == 11 || charCode == 13)
-                    glyphAdvance = 0f;
-
-                m_textInfo.characterInfo[m_characterCount].glyphAdvance = glyphAdvance;
                 
                 #region Carriage Return
                 if (charCode == 13)
@@ -3360,7 +3394,7 @@ namespace TMPro
                     k_HandleLineTerminationMarker.Begin();
 
                     float baselineAdjustmentDelta = m_maxLineAscender - m_startOfLineAscender;
-                    if (m_lineOffset > 0 && Math.Abs(baselineAdjustmentDelta) > 0.01f && m_IsDrivenLineSpacing == false && !m_isNewPage)
+                    if (m_lineOffset > 0 && Math.Abs(baselineAdjustmentDelta) > 0.01f && m_IsDrivenLineSpacing == false)
                     {
                         AdjustLineOffset(m_firstCharacterOfLine, m_characterCount, baselineAdjustmentDelta);
                         m_ElementDescender -= baselineAdjustmentDelta;
@@ -3374,7 +3408,6 @@ namespace TMPro
                             m_EllipsisInsertionCandidateStack.Push(m_SavedEllipsisState);
                         }
                     }
-                    m_isNewPage = false;
 
                     float lineAscender = m_maxLineAscender - m_lineOffset;
                     float lineDescender = m_maxLineDescender - m_lineOffset;
@@ -3657,7 +3690,6 @@ namespace TMPro
             float underlineEndScale = 0;
             float underlineMaxScale = 0;
             float underlineBaseLine = k_LargePositiveFloat;
-            int lastPage = 0;
 
             float strikethroughPointSize = 0;
             float strikethroughScale = 0;
@@ -4063,18 +4095,13 @@ namespace TMPro
                 bool isUnderline = (m_textInfo.characterInfo[i].style & FontStyles.Underline) == FontStyles.Underline;
                 if (isUnderline)
                 {
-                    bool isUnderlineVisible = true;
-                    int currentPage = m_textInfo.characterInfo[i].pageNumber;
-
-                    if (i > m_maxVisibleCharacters || currentLine > m_maxVisibleLines)
-                        isUnderlineVisible = false;
+                    bool isUnderlineVisible = !(i > m_maxVisibleCharacters || currentLine > m_maxVisibleLines);
 
                     if (!isWhiteSpace && unicode != 0x200B)
                     {
                         underlineMaxScale = Mathf.Max(underlineMaxScale, m_textInfo.characterInfo[i].scale);
                         xScaleMax = Mathf.Max(xScaleMax, Mathf.Abs(xScale));
-                        underlineBaseLine = Mathf.Min(currentPage == lastPage ? underlineBaseLine : k_LargePositiveFloat, m_textInfo.characterInfo[i].baseLine + font.m_FaceInfo.underlineOffset * underlineMaxScale);
-                        lastPage = currentPage;
+                        underlineBaseLine = Mathf.Min(k_LargePositiveFloat, m_textInfo.characterInfo[i].baseLine + font.m_FaceInfo.underlineOffset * underlineMaxScale);
                     }
 
                     if (beginUnderline == false && isUnderlineVisible == true && i <= lineInfo.lastVisibleCharacterIndex && unicode != 10 && unicode != 11 && unicode != 13)
@@ -4256,8 +4283,7 @@ namespace TMPro
                 bool isHighlight = (m_textInfo.characterInfo[i].style & FontStyles.Highlight) == FontStyles.Highlight;
                 if (isHighlight)
                 {
-                    bool isHighlightVisible = true;
-                    int currentPage = m_textInfo.characterInfo[i].pageNumber;
+                    bool isHighlightVisible = true; ;
 
                     if (i > m_maxVisibleCharacters || currentLine > m_maxVisibleLines)
                         isHighlightVisible = false;
@@ -4362,7 +4388,6 @@ namespace TMPro
             m_textInfo.spriteCount = m_spriteCount;
             m_textInfo.lineCount = lineCount;
             m_textInfo.wordCount = wordCount != 0 && m_characterCount > 0 ? wordCount : 1;
-            m_textInfo.pageCount = m_pageNumber + 1;
 
             k_GenerateTextPhaseIIMarker.End();
 

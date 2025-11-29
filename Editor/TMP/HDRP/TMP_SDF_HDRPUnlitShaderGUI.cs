@@ -80,7 +80,6 @@ namespace TMPro.EditorUtilities
         /// </summary>
         public TMP_SDF_HDRPUnlitShaderGUI()
         {
-            // Remove the ShaderGraphUIBlock to avoid having duplicated properties in the UI.
             uiBlocks.RemoveAll(b => b is ShaderGraphUIBlock);
         }
 
@@ -94,10 +93,8 @@ namespace TMPro.EditorUtilities
 
             EndPanel();
 
-            // Outline panels
             DoOutlinePanels();
 
-            // Underlay panel
             s_Underlay = BeginPanel("Underlay", s_Underlay);
             if (s_Underlay)
             {
@@ -106,21 +103,7 @@ namespace TMPro.EditorUtilities
 
             EndPanel();
 
-            // Lighting panel
             DrawLightingPanel();
-
-            /*
-            if (m_Material.HasProperty(ShaderUtilities.ID_GlowColor))
-            {
-                s_Glow = BeginPanel("Glow", s_GlowFeature, s_Glow);
-                if (s_Glow)
-                {
-                    DoGlowPanel();
-                }
-
-                EndPanel();
-            }
-            */
 
             s_DebugExtended = BeginPanel("Debug Settings", s_DebugExtended);
             if (s_DebugExtended)
@@ -132,7 +115,6 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.Space();
             EditorGUILayout.Space();
 
-            // Draw HDRP panels
             uiBlocks.OnGUI(m_Editor, m_Properties);
             #if HDRP_12_OR_NEWER
             ValidateMaterial(m_Material);
@@ -235,7 +217,6 @@ namespace TMPro.EditorUtilities
 
             if (m_Material.HasProperty("_OutlineShininess"))
             {
-                //DoSlider("_OutlineShininess", "Gloss");
             }
 
             EditorGUI.indentLevel -= 1;
@@ -268,7 +249,6 @@ namespace TMPro.EditorUtilities
 
             if (m_Material.HasProperty("_OutlineShininess"))
             {
-                //DoSlider("_OutlineShininess", "Gloss");
             }
 
             EditorGUI.indentLevel -= 1;
@@ -326,24 +306,7 @@ namespace TMPro.EditorUtilities
                 }
                 EndPanel();
 
-                /*
-                s_Bump = BeginPanel("Bump Map", s_Bump);
-                if (s_Bump)
-                {
-                    DoBumpMapPanel();
                 }
-
-                EndPanel();
-
-                s_Env = BeginPanel("Environment Map", s_Env);
-                if (s_Env)
-                {
-                    DoEnvMapPanel();
-                }
-
-                EndPanel();
-                */
-            }
 
             EndPanel();
         }
@@ -505,71 +468,8 @@ namespace TMPro.EditorUtilities
             EditorGUI.indentLevel += 1;
             DoTexture2D("_MainTex", "Font Atlas");
             DoFloat("_GradientScale", "Gradient Scale");
-            //DoFloat("_TextureWidth", "Texture Width");
-            //DoFloat("_TextureHeight", "Texture Height");
             EditorGUILayout.Space();
 
-            /*
-            DoFloat("_ScaleX", "Scale X");
-            DoFloat("_ScaleY", "Scale Y");
-
-            if (m_Material.HasProperty(ShaderUtilities.ID_Sharpness))
-                DoSlider("_Sharpness", "Sharpness");
-
-            DoSlider("_PerspectiveFilter", "Perspective Filter");
-            EditorGUILayout.Space();
-            DoFloat("_VertexOffsetX", "Offset X");
-            DoFloat("_VertexOffsetY", "Offset Y");
-
-            if (m_Material.HasProperty(ShaderUtilities.ID_MaskCoord))
-            {
-                EditorGUILayout.Space();
-                s_MaskFeature.ReadState(m_Material);
-                s_MaskFeature.DoPopup(m_Editor, m_Material);
-                if (s_MaskFeature.Active)
-                {
-                    DoMaskSubgroup();
-                }
-
-                EditorGUILayout.Space();
-                DoVector("_ClipRect", "Clip Rect", s_LbrtVectorLabels);
-            }
-            else if (m_Material.HasProperty("_MaskTex"))
-            {
-                DoMaskTexSubgroup();
-            }
-            else if (m_Material.HasProperty(ShaderUtilities.ID_MaskSoftnessX))
-            {
-                EditorGUILayout.Space();
-                DoFloat("_MaskSoftnessX", "Softness X");
-                DoFloat("_MaskSoftnessY", "Softness Y");
-                DoVector("_ClipRect", "Clip Rect", s_LbrtVectorLabels);
-            }
-
-            if (m_Material.HasProperty(ShaderUtilities.ID_StencilID))
-            {
-                EditorGUILayout.Space();
-                DoFloat("_Stencil", "Stencil ID");
-                DoFloat("_StencilComp", "Stencil Comp");
-            }
-
-            EditorGUILayout.Space();
-
-            EditorGUI.BeginChangeCheck();
-            bool useRatios = EditorGUILayout.Toggle("Use Ratios", !m_Material.IsKeywordEnabled("RATIOS_OFF"));
-            if (EditorGUI.EndChangeCheck())
-            {
-                m_Editor.RegisterPropertyChangeUndo("Use Ratios");
-                if (useRatios)
-                {
-                    m_Material.DisableKeyword("RATIOS_OFF");
-                }
-                else
-                {
-                    m_Material.EnableKeyword("RATIOS_OFF");
-                }
-            }
-            */
             if (m_Material.HasProperty(ShaderUtilities.ShaderTag_CullMode))
             {
                 EditorGUILayout.Space();
@@ -577,13 +477,6 @@ namespace TMPro.EditorUtilities
             }
 
             EditorGUILayout.Space();
-            /*
-            EditorGUI.BeginDisabledGroup(true);
-            DoFloat("_ScaleRatioA", "Scale Ratio A");
-            DoFloat("_ScaleRatioB", "Scale Ratio B");
-            DoFloat("_ScaleRatioC", "Scale Ratio C");
-            EditorGUI.EndDisabledGroup();
-            */
 
             EditorGUI.indentLevel -= 1;
             EditorGUILayout.Space();
@@ -632,11 +525,6 @@ namespace TMPro.EditorUtilities
             DoVector("_ClipRect", "Clip Rect", s_LbrtVectorLabels);
         }
 
-        // protected override void SetupMaterialKeywordsAndPassInternal(Material material)
-        // {
-        //     BaseLitGUI.SetupBaseLitKeywords(material);
-        //     BaseLitGUI.SetupBaseLitMaterialPass(material);
-        // }
-    }
+        }
 }
 #endif

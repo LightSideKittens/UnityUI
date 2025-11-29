@@ -26,7 +26,6 @@ namespace TMPro.EditorUtilities
             SerializedProperty prop_MarkGlyphID = property.FindPropertyRelative("m_CombiningMarkGlyphID");
             SerializedProperty prop_MarkAdjustmentRecord = property.FindPropertyRelative("m_CombiningMarkPositionAdjustment");
 
-            // Refresh glyph proxy lookup dictionary if needed
             if (TMP_PropertyDrawerUtilities.s_RefreshGlyphProxyLookup)
                 TMP_PropertyDrawerUtilities.RefreshGlyphProxyLookup(property.serializedObject);
 
@@ -47,7 +46,6 @@ namespace TMPro.EditorUtilities
 
             GUIStyle style = new GUIStyle(EditorStyles.label) {richText = true};
 
-            // Base Glyph
             GUI.enabled = isEditingEnabled;
             if (isSelectable)
             {
@@ -80,7 +78,6 @@ namespace TMPro.EditorUtilities
                 DrawGlyph((uint)prop_BaseGlyphID.intValue, new Rect(position.x, position.y + 2, 64, 60), property);
             }
 
-            // Mark Glyph
             GUI.enabled = isEditingEnabled;
             if (isSelectable)
             {
@@ -118,7 +115,6 @@ namespace TMPro.EditorUtilities
         {
             int length = string.IsNullOrEmpty(source) ? 0 : source.Length;
 
-            ////Filter out unwanted characters.
             Event evt = Event.current;
 
             char c = evt.character;
@@ -151,7 +147,6 @@ namespace TMPro.EditorUtilities
                         if (source[1] == 'u' || (c < '0' || c > '9') && (c < 'a' || c > 'f') && (c < 'A' || c > 'F'))
                             evt.character = '\0';
 
-                        // Validate input
                         if (length == 6 && source[1] == 'u' && source != m_PreviousInput)
                             return true;
                         break;
@@ -185,7 +180,6 @@ namespace TMPro.EditorUtilities
 
         void DrawGlyph(uint glyphIndex, Rect glyphDrawPosition, SerializedProperty property)
         {
-            // Get a reference to the serialized object which can either be a TMP_FontAsset or FontAsset.
             SerializedObject so = property.serializedObject;
             if (so == null)
                 return;
@@ -193,7 +187,6 @@ namespace TMPro.EditorUtilities
             if (m_GlyphLookupDictionary == null)
                 m_GlyphLookupDictionary = TMP_PropertyDrawerUtilities.GetGlyphProxyLookupDictionary(so);
 
-            // Try getting a reference to the glyph for the given glyph index.
             if (!m_GlyphLookupDictionary.TryGetValue(glyphIndex, out GlyphProxy glyph))
                 return;
 
@@ -219,7 +212,6 @@ namespace TMPro.EditorUtilities
             float normalizedHeight = ascentLine - descentLine;
             float scale = glyphDrawPosition.width / normalizedHeight;
 
-            // Compute the normalized texture coordinates
             Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width, (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width, (float)glyphHeight / atlasTexture.height);
 
             if (Event.current.type == EventType.Repaint)
@@ -229,7 +221,6 @@ namespace TMPro.EditorUtilities
                 glyphDrawPosition.width = glyphWidth * scale;
                 glyphDrawPosition.height = glyphHeight * scale;
 
-                // Could switch to using the default material of the font asset which would require passing scale to the shader.
                 Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f), mat);
             }
         }

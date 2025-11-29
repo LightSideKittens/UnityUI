@@ -60,7 +60,6 @@ namespace TMPro.EditorUtilities
             if (lookupDictionary == null)
                 return;
 
-            // Get reference to serialized property for the glyph table
             SerializedProperty glyphTable = so.FindProperty("m_GlyphTable");
 
             for (int i = 0; i < glyphTable.arraySize; i++)

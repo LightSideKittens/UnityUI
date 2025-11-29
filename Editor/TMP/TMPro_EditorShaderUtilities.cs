@@ -24,7 +24,6 @@ namespace TMPro.EditorUtilities
                 int property_ID = Shader.PropertyToID(source_prop[i].name);
                 if (destination.HasProperty(property_ID))
                 {
-                    //Debug.Log(source_prop[i].name + "  Type:" + source.shader.GetPropertyType(i));
                     switch (source.shader.GetPropertyType(i))
                     {
                         case UnityEngine.Rendering.ShaderPropertyType.Color:

@@ -234,7 +234,6 @@ namespace TMPro
         public float startOfLineAscender;
         public float maxLineAscender;
         public float maxLineDescender;
-        public float pageAscender;
 
         public HorizontalAlignmentOptions horizontalAlignment;
         public float marginLeft;

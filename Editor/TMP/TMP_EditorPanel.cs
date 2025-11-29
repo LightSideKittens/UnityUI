@@ -34,7 +34,6 @@ namespace TMPro.EditorUtilities
         {
             base.OnEnable();
 
-            // Determine if the inspected object is a Preset
             IsPreset = (int)(target as Component).gameObject.hideFlags == 93;
 
             m_IsOrthographicProp = serializedObject.FindProperty("m_isOrthographic");
@@ -54,7 +53,6 @@ namespace TMPro.EditorUtilities
             m_TextSortingLayerIDProp = serializedObject.FindProperty("_SortingLayerID");
             m_TextSortingOrderProp = serializedObject.FindProperty("_SortingOrder");
 
-            // Populate Sorting Layer Names
             k_SortingLayerNames = SortingLayerHelper.sortingLayerNames;
         }
 
@@ -103,7 +101,6 @@ namespace TMPro.EditorUtilities
 
             Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight);
 
-            // Special handling for Presets where the sorting layer, id and order is serialized with the text object instead of on the MeshRenderer.
             SerializedProperty sortingLayerProp = IsPreset ? m_TextSortingLayerProp : m_RendererSortingLayerProp;
             SerializedProperty sortingLayerIDProp = IsPreset ? m_TextSortingLayerIDProp : m_RendererSortingLayerIDProp;
 
@@ -119,14 +116,12 @@ namespace TMPro.EditorUtilities
                 sortingLayerProp.intValue = SortingLayer.GetLayerValueFromName(k_SortingLayerNames[newLayerIndex]);
                 m_HavePropertiesChanged = true;
 
-                // Sync Sorting Layer ID change on potential sub text object.
                 TextMeshPro textComponent = m_TextComponent as TextMeshPro;
                 textComponent.UpdateSubMeshSortingLayerID(sortingLayerIDProp.intValue);
             }
 
             EditorGUI.EndProperty();
 
-            // Sorting Order
             SerializedProperty sortingOrderLayerProp = IsPreset ? m_TextSortingOrderProp : m_RendererSortingOrderProp;
 
             EditorGUI.BeginChangeCheck();
@@ -167,7 +162,6 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.Space();
         }
 
-        // Method to handle multi object selection
         protected override bool IsMixSelectionTypes()
         {
             GameObject[] objects = Selection.gameObjects;
@@ -191,7 +185,6 @@ namespace TMPro.EditorUtilities
             {
                 for (int i = 0; i < targets.Length; i++)
                 {
-                    //Debug.Log("Undo & Redo Performed detected in Editor Panel. Event ID:" + Undo.GetCurrentGroup());
                     TMPro_EventManager.ON_TEXTMESHPRO_PROPERTY_CHANGED(true, targets[i] as TextMeshPro);
                     s_EventId = undoEventId;
                 }

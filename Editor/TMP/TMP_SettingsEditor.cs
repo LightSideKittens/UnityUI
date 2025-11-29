@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditorInternal;
 
-#pragma warning disable 0414 // Disabled a few warnings for not yet implemented features.
+#pragma warning disable 0414
 
 namespace TMPro.EditorUtilities
 {
@@ -54,7 +54,6 @@ namespace TMPro.EditorUtilities
             public static readonly GUIContent defaultSpriteAssetLabel = new GUIContent("Default Sprite Asset", "The Sprite Asset that will be assigned by default when using the <sprite> tag when no Sprite Asset is specified.");
             public static readonly GUIContent missingSpriteCharacterUnicodeLabel = new GUIContent("Missing Sprite Unicode", "The unicode value for the sprite character to be displayed when the requested sprite character is not found in any sprite assets or fallbacks.");
             public static readonly GUIContent enableEmojiSupportLabel = new GUIContent("iOS Emoji Support", "Enables Emoji support for Touch Screen Keyboards on target devices.");
-            //public static readonly GUIContent spriteRelativeScale = new GUIContent("Relative Scaling", "Determines if the sprites will be scaled relative to the primary font asset assigned to the text object or relative to the current font asset.");
             public static readonly GUIContent emojifallbackTextAssetsListLabel = new GUIContent("Fallback Emoji Text Assets", "The Text Assets that will be searched to display characters defined as Emojis in the Unicode.");
 
             public static readonly GUIContent spriteAssetsPathLabel = new GUIContent("Path:        Resources/", "The relative path to a Resources folder where the Sprite Assets are located.\nExample \"Sprite Assets/\"");
@@ -82,7 +81,6 @@ namespace TMPro.EditorUtilities
 
         SerializedProperty m_PropSpriteAsset;
         SerializedProperty m_PropMissingSpriteCharacterUnicode;
-        //SerializedProperty m_PropSpriteRelativeScaling;
         SerializedProperty m_PropEnableEmojiSupport;
         SerializedProperty m_PropSpriteAssetPath;
 
@@ -104,7 +102,6 @@ namespace TMPro.EditorUtilities
         SerializedProperty m_PropMissingGlyphCharacter;
         SerializedProperty m_PropClearDynamicDataOnBuild;
 
-        //SerializedProperty m_DynamicAtlasTextureManager;
         SerializedProperty m_GetFontFeaturesAtRuntime;
 
         SerializedProperty m_PropWarningsDisabled;
@@ -136,7 +133,6 @@ namespace TMPro.EditorUtilities
 
             m_PropSpriteAsset = serializedObject.FindProperty("m_defaultSpriteAsset");
             m_PropMissingSpriteCharacterUnicode = serializedObject.FindProperty("m_MissingCharacterSpriteUnicode");
-            //m_PropSpriteRelativeScaling = serializedObject.FindProperty("m_SpriteRelativeScaling");
             m_PropEnableEmojiSupport = serializedObject.FindProperty("m_enableEmojiSupport");
             m_PropSpriteAssetPath = serializedObject.FindProperty("m_defaultSpriteAssetPath");
 
@@ -146,7 +142,6 @@ namespace TMPro.EditorUtilities
 
             m_PropColorGradientPresetsPath = serializedObject.FindProperty("m_defaultColorGradientPresetsPath");
 
-            // Global Fallback ReorderableList
             m_GlobalFallbackFontAssetList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_fallbackFontAssets"), true, true, true, true);
 
             m_GlobalFallbackFontAssetList.drawHeaderCallback = rect =>
@@ -166,7 +161,6 @@ namespace TMPro.EditorUtilities
                 m_IsFallbackGlyphCacheDirty = true;
             };
 
-            // Emoji Fallback ReorderableList
             m_EmojiFallbackTextAssetList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_EmojiFallbackTextAssets"), true, true, true, true);
 
             m_EmojiFallbackTextAssetList.drawHeaderCallback = rect =>
@@ -199,7 +193,6 @@ namespace TMPro.EditorUtilities
             m_PropClearDynamicDataOnBuild = serializedObject.FindProperty("m_ClearDynamicDataOnBuild");
             m_PropWarningsDisabled = serializedObject.FindProperty("m_warningsDisabled");
 
-            //m_DynamicAtlasTextureManager = serializedObject.FindProperty("m_DynamicAtlasTextureGroup");
             m_GetFontFeaturesAtRuntime = serializedObject.FindProperty("m_GetFontFeaturesAtRuntime");
 
             m_PropLeadingCharacters = serializedObject.FindProperty("m_leadingCharacters");
@@ -216,10 +209,8 @@ namespace TMPro.EditorUtilities
             float labelWidth = EditorGUIUtility.labelWidth;
             float fieldWidth = EditorGUIUtility.fieldWidth;
 
-            // TextMeshPro Font Info Panel
             EditorGUI.indentLevel = 0;
 
-            // FONT ASSET
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label(Styles.defaultFontAssetLabel, EditorStyles.boldLabel);
             EditorGUI.indentLevel = 1;
@@ -234,7 +225,6 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.Space();
             EditorGUILayout.EndVertical();
 
-            // FALLBACK FONT ASSETs
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label(Styles.fallbackFontAssetsLabel, EditorStyles.boldLabel);
             EditorGUI.BeginChangeCheck();
@@ -251,7 +241,6 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.Space();
             EditorGUILayout.EndVertical();
 
-            // MISSING GLYPHS
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label(Styles.dynamicFontSystemSettingsLabel, EditorStyles.boldLabel);
             EditorGUI.indentLevel = 1;
@@ -260,13 +249,11 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.Space();
             EditorGUILayout.PropertyField(m_GetFontFeaturesAtRuntime, Styles.getFontFeaturesAtRuntime);
             EditorGUILayout.PropertyField(m_PropClearDynamicDataOnBuild, Styles.clearDynamicDataOnBuildLabel);
-            //EditorGUILayout.PropertyField(m_DynamicAtlasTextureManager, Styles.dynamicAtlasTextureManager);
             EditorGUI.indentLevel = 0;
 
             EditorGUILayout.Space();
             EditorGUILayout.EndVertical();
 
-            // TEXT OBJECT DEFAULT PROPERTIES
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label(Styles.containerDefaultSettingsLabel, EditorStyles.boldLabel);
             EditorGUI.indentLevel = 1;
@@ -314,7 +301,6 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.Space();
             EditorGUILayout.EndVertical();
 
-            // SPRITE ASSET
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label(Styles.defaultSpriteAssetLabel, EditorStyles.boldLabel);
             EditorGUI.indentLevel = 1;
@@ -325,14 +311,12 @@ namespace TMPro.EditorUtilities
 
             EditorGUILayout.PropertyField(m_PropMissingSpriteCharacterUnicode, Styles.missingSpriteCharacterUnicodeLabel);
             EditorGUILayout.PropertyField(m_PropEnableEmojiSupport, Styles.enableEmojiSupportLabel);
-            //EditorGUILayout.PropertyField(m_PropSpriteRelativeScaling, Styles.spriteRelativeScale);
             EditorGUILayout.PropertyField(m_PropSpriteAssetPath, Styles.spriteAssetsPathLabel);
             EditorGUI.indentLevel = 0;
 
             EditorGUILayout.Space();
             EditorGUILayout.EndVertical();
 
-            // EMOJI FALLBACK TEXT ASSETS
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label(Styles.emojifallbackTextAssetsListLabel, EditorStyles.boldLabel);
             EditorGUI.BeginChangeCheck();
@@ -343,7 +327,6 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.Space();
             EditorGUILayout.EndVertical();
 
-            // STYLE SHEET
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label(Styles.defaultStyleSheetLabel, EditorStyles.boldLabel);
             EditorGUI.indentLevel = 1;
@@ -363,7 +346,6 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.Space();
             EditorGUILayout.EndVertical();
 
-            // COLOR GRADIENT PRESETS
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label(Styles.colorGradientPresetsLabel, EditorStyles.boldLabel);
             EditorGUI.indentLevel = 1;
@@ -373,7 +355,6 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.Space();
             EditorGUILayout.EndVertical();
 
-            // LINE BREAKING RULE
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.Label(Styles.lineBreakingLabel, EditorStyles.boldLabel);
             EditorGUI.indentLevel = 1;
@@ -455,7 +436,6 @@ namespace TMPro.EditorUtilities
 
         public override void OnGUI(string searchContext)
         {
-            // Lazy creation that supports domain reload
             if (m_ResourceImporter == null)
                 m_ResourceImporter = new TMP_PackageResourceImporter(logErrors: false);
 

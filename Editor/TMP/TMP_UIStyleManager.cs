@@ -21,7 +21,6 @@ namespace TMPro.EditorUtilities
         public static GUIStyle alignmentButtonMid;
         public static GUIStyle alignmentButtonRight;
 
-        // Alignment Button Textures
         public static Texture2D alignLeft;
         public static Texture2D alignCenter;
         public static Texture2D alignRight;
@@ -41,7 +40,6 @@ namespace TMPro.EditorUtilities
 
         static TMP_UIStyleManager()
         {
-            // Find to location of the TextMesh Pro Asset Folder (as users may have moved it)
             var tmproAssetFolderPath = TMP_EditorUtility.packageRelativePath;
 
             if (EditorGUIUtility.isProSkin)

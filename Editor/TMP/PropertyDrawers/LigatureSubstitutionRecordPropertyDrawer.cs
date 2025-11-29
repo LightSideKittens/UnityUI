@@ -17,7 +17,6 @@ namespace TMPro.EditorUtilities
             int ComponentGlyphIDCount = prop_ComponentGlyphIDs.arraySize;
             SerializedProperty prop_LigatureGlyphID = property.FindPropertyRelative("m_LigatureGlyphID");
 
-            // Refresh glyph proxy lookup dictionary if needed
             if (TMP_PropertyDrawerUtilities.s_RefreshGlyphProxyLookup)
                 TMP_PropertyDrawerUtilities.RefreshGlyphProxyLookup(property.serializedObject);
 
@@ -34,15 +33,12 @@ namespace TMPro.EditorUtilities
                 return;
             }
 
-            // Spacing between glyphs
             int glyphSpacing = 60;
 
-            // Draw Component Glyphs
             for (int i = 0; i < ComponentGlyphIDCount; i++)
             {
                 Rect componentGlyphPosition = new Rect(50 + (glyphSpacing * i), position.y + 24, 48, 48);
 
-                // Draw glyph
                 uint glyphIndex = (uint)prop_ComponentGlyphIDs.GetArrayElementAtIndex(i).intValue;
                 DrawGlyph(glyphIndex, componentGlyphPosition, property);
 
@@ -54,7 +50,6 @@ namespace TMPro.EditorUtilities
                 }
             }
 
-            // Draw Ligature glyph
             Rect ligatureGlyphPosition = new Rect(50 + (glyphSpacing * ComponentGlyphIDCount + 1), position.y + 3, 95, EditorGUIUtility.singleLineHeight);
             ligatureGlyphPosition.x = Mathf.Max(200, ligatureGlyphPosition.x);
             EditorGUI.LabelField(ligatureGlyphPosition, new GUIContent("Ligature Glyph"));
@@ -71,7 +66,6 @@ namespace TMPro.EditorUtilities
 
         void DrawGlyph(uint glyphIndex, Rect glyphDrawPosition, SerializedProperty property)
         {
-            // Get a reference to the serialized object which can either be a TMP_FontAsset or FontAsset.
             SerializedObject so = property.serializedObject;
             if (so == null)
                 return;
@@ -79,7 +73,6 @@ namespace TMPro.EditorUtilities
             if (m_GlyphLookupDictionary == null)
                 m_GlyphLookupDictionary = TMP_PropertyDrawerUtilities.GetGlyphProxyLookupDictionary(so);
 
-            // Try getting a reference to the glyph for the given glyph index.
             if (!m_GlyphLookupDictionary.TryGetValue(glyphIndex, out GlyphProxy glyph))
                 return;
 
@@ -105,7 +98,6 @@ namespace TMPro.EditorUtilities
             float normalizedHeight = ascentLine - descentLine;
             float scale = glyphDrawPosition.width / normalizedHeight;
 
-            // Compute the normalized texture coordinates
             Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width, (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width, (float)glyphHeight / atlasTexture.height);
 
             if (Event.current.type == EventType.Repaint)
@@ -115,7 +107,6 @@ namespace TMPro.EditorUtilities
                 glyphDrawPosition.width = glyphWidth * scale;
                 glyphDrawPosition.height = glyphHeight * scale;
 
-                // Could switch to using the default material of the font asset which would require passing scale to the shader.
                 Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f), mat);
             }
         }

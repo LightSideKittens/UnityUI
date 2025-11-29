@@ -57,7 +57,7 @@ public static class BiDi
     {
         if (logicalText == null) throw new ArgumentNullException(nameof(logicalText));
 
-        var buffer = StringToCodepoints(logicalText);
+        var buffer = GetCodepointBuffer(logicalText);
         var cps = buffer.cps;
         
         if (cps.Length == 0) return Array.Empty<BidiWrappedLine>();
@@ -100,9 +100,7 @@ public static class BiDi
 
         return result;
     }
-
-    /// Удобный помощник: склеить строки в один текст с '\n' для TMP
-    /// (при этом в TMP нужно отключить word wrapping).
+    
     public static string BuildVisualTextWithNewlines(IReadOnlyList<BidiWrappedLine> lines)
     {
         if (lines == null || lines.Count == 0) return string.Empty;
@@ -124,7 +122,15 @@ public static class BiDi
 
         return sb.ToString();
     }
-    
+
+    public static string DoBiDi(string logical,
+        out int[] logicalToVisualMap,
+        Direction direction = Direction.Auto)
+    {
+        var cps = StringToCodepoints(logical);
+        return DoBiDi(cps, out logicalToVisualMap, direction, true);
+    }
+
     private static Direction DetectDirection(string text, CodepointBuffer buffer)
     {
         if (string.IsNullOrEmpty(text)) return Direction.LeftToRight;
@@ -139,7 +145,7 @@ public static class BiDi
     
     private static string DoBiDi(int[] logical,
         out int[] logicalToVisualMap,
-        Direction direction = Direction.Auto)
+        Direction direction = Direction.Auto, bool reverse = false)
     {
         
         int len = logical.Length;
@@ -161,10 +167,10 @@ public static class BiDi
                 logicalToVisualMap[i] = i;
             }
             
-            return CodepointsToString(logical);
+            return CodepointsToString(logical, reverse);
         }
 
-        return CodepointsToString(visual);
+        return CodepointsToString(visual, reverse);
     }
 
     private static List<(int start, int length)> SplitLogicalLinesByWidth(
@@ -241,13 +247,7 @@ public static class BiDi
 
         return lines;
     }
-
-    /// Возможен ли разрыв строки после данного codepoint (в логическом порядке).
-    /// Здесь реализована "нормальная" word-wrap логика для языков с пробелами:
-    ///   - пробелы и табы;
-    ///   - различные типографские пробелы (кроме NBSP);
-    ///   - мягкий перенос (SOFT HYPHEN);
-    ///   - некоторые дефисы/тире.
+    
     private static bool CanBreakAfterCodepoint(int cp)
     {
         if (cp == 0x0020 || cp == 0x0009) return true;
@@ -283,24 +283,36 @@ public static class BiDi
         return map;
     }
 
-    private static string CodepointsToString(int[] cps)
+    private static string CodepointsToString(int[] cps, bool reverse = false)
     {
         var sb = new StringBuilder(cps.Length);
-        for (int i = 0; i < cps.Length; i++)
+        if (reverse)
         {
-            int cp = cps[i];
-            sb.Append(char.ConvertFromUtf32(cp));
+            for (int i = cps.Length - 1; i >= 0; i--)
+            {
+                int cp = cps[i];
+                sb.Append(char.ConvertFromUtf32(cp));
+            }
         }
+        else
+        {
+            for (int i = 0; i < cps.Length; i++)
+            {
+                int cp = cps[i];
+                sb.Append(char.ConvertFromUtf32(cp));
+            }
+        }
+        
         return sb.ToString();
     }
 
-    public struct CodepointBuffer
+    private struct CodepointBuffer
     {
         public int[] cps;
         public int[] cpIndexByStringIndex;
     }
 
-    public static CodepointBuffer StringToCodepoints(string logicalText)
+    private static CodepointBuffer GetCodepointBuffer(string logicalText)
     {
         var cps = new List<int>(logicalText.Length);
         var cpIndexByStringIndex = new int[logicalText.Length];
@@ -326,6 +338,18 @@ public static class BiDi
             cps           = cps.ToArray(),
             cpIndexByStringIndex = cpIndexByStringIndex
         };
+    }
+    
+    private static int[] StringToCodepoints(string s)
+    {
+        var list = new List<int>(s.Length);
+        for (int i = 0; i < s.Length;)
+        {
+            int cp = char.ConvertToUtf32(s, i);
+            list.Add(cp);
+            i += char.IsSurrogatePair(s, i) ? 2 : 1;
+        }
+        return list.ToArray();
     }
 
     private static float[] MeasureCodepointWidths(TMP_Text text, CodepointBuffer buffer)

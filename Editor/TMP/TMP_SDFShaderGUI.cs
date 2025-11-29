@@ -71,7 +71,6 @@ namespace TMPro.EditorUtilities
 
             EndPanel();
 
-            // Outline panels
             if (isSRPMaterial)
             {
                 DoOutlinePanels();
@@ -98,7 +97,6 @@ namespace TMPro.EditorUtilities
                 }
             }
 
-            // Underlay panel
             if (m_Material.HasProperty(ShaderUtilities.ID_UnderlayColor))
             {
                 if (isSRPMaterial)
@@ -123,7 +121,6 @@ namespace TMPro.EditorUtilities
                 }
             }
 
-            // Lighting panel
             if (m_Material.HasProperty("_SpecularColor"))
             {
                 if (isSRPMaterial)
@@ -370,7 +367,6 @@ namespace TMPro.EditorUtilities
 
             if (m_Material.HasProperty("_OutlineShininess"))
             {
-                //DoSlider("_OutlineShininess", "Gloss");
             }
 
             EditorGUI.indentLevel -= 1;
@@ -403,7 +399,6 @@ namespace TMPro.EditorUtilities
 
             if (m_Material.HasProperty("_OutlineShininess"))
             {
-                //DoSlider("_OutlineShininess", "Gloss");
             }
 
             EditorGUI.indentLevel -= 1;
@@ -414,23 +409,8 @@ namespace TMPro.EditorUtilities
         {
             EditorGUI.indentLevel += 1;
             DoColor("_Outline2Color", "Color");
-            //if (m_Material.HasProperty(ShaderUtilities.ID_OutlineTex))
-            //{
-            //    if (m_Material.HasProperty("_OutlineUVSpeedX"))
-            //    {
-            //        DoTexture2D("_OutlineTex", "Texture", true, s_OutlineUvSpeedNames);
-            //    }
-            //    else
-            //    {
-            //        DoTexture2D("_OutlineTex", "Texture", true);
-            //    }
-            //}
 
             DoSlider("_Outline2Width", "Thickness");
-            //if (m_Material.HasProperty("_OutlineShininess"))
-            //{
-            //    DoSlider("_OutlineShininess", "Gloss");
-            //}
 
             EditorGUI.indentLevel -= 1;
             EditorGUILayout.Space();
@@ -659,71 +639,8 @@ namespace TMPro.EditorUtilities
             EditorGUI.indentLevel += 1;
             DoTexture2D("_MainTex", "Font Atlas");
             DoFloat("_GradientScale", "Gradient Scale");
-            //DoFloat("_TextureWidth", "Texture Width");
-            //DoFloat("_TextureHeight", "Texture Height");
             EditorGUILayout.Space();
 
-            /*
-            DoFloat("_ScaleX", "Scale X");
-            DoFloat("_ScaleY", "Scale Y");
-
-            if (m_Material.HasProperty(ShaderUtilities.ID_Sharpness))
-                DoSlider("_Sharpness", "Sharpness");
-
-            DoSlider("_PerspectiveFilter", "Perspective Filter");
-            EditorGUILayout.Space();
-            DoFloat("_VertexOffsetX", "Offset X");
-            DoFloat("_VertexOffsetY", "Offset Y");
-
-            if (m_Material.HasProperty(ShaderUtilities.ID_MaskCoord))
-            {
-                EditorGUILayout.Space();
-                s_MaskFeature.ReadState(m_Material);
-                s_MaskFeature.DoPopup(m_Editor, m_Material);
-                if (s_MaskFeature.Active)
-                {
-                    DoMaskSubgroup();
-                }
-
-                EditorGUILayout.Space();
-                DoVector("_ClipRect", "Clip Rect", s_LbrtVectorLabels);
-            }
-            else if (m_Material.HasProperty("_MaskTex"))
-            {
-                DoMaskTexSubgroup();
-            }
-            else if (m_Material.HasProperty(ShaderUtilities.ID_MaskSoftnessX))
-            {
-                EditorGUILayout.Space();
-                DoFloat("_MaskSoftnessX", "Softness X");
-                DoFloat("_MaskSoftnessY", "Softness Y");
-                DoVector("_ClipRect", "Clip Rect", s_LbrtVectorLabels);
-            }
-
-            if (m_Material.HasProperty(ShaderUtilities.ID_StencilID))
-            {
-                EditorGUILayout.Space();
-                DoFloat("_Stencil", "Stencil ID");
-                DoFloat("_StencilComp", "Stencil Comp");
-            }
-
-            EditorGUILayout.Space();
-
-            EditorGUI.BeginChangeCheck();
-            bool useRatios = EditorGUILayout.Toggle("Use Ratios", !m_Material.IsKeywordEnabled("RATIOS_OFF"));
-            if (EditorGUI.EndChangeCheck())
-            {
-                m_Editor.RegisterPropertyChangeUndo("Use Ratios");
-                if (useRatios)
-                {
-                    m_Material.DisableKeyword("RATIOS_OFF");
-                }
-                else
-                {
-                    m_Material.EnableKeyword("RATIOS_OFF");
-                }
-            }
-            */
             if (m_Material.HasProperty(ShaderUtilities.ShaderTag_CullMode))
             {
                 EditorGUILayout.Space();
@@ -731,13 +648,6 @@ namespace TMPro.EditorUtilities
             }
 
             EditorGUILayout.Space();
-            /*
-            EditorGUI.BeginDisabledGroup(true);
-            DoFloat("_ScaleRatioA", "Scale Ratio A");
-            DoFloat("_ScaleRatioB", "Scale Ratio B");
-            DoFloat("_ScaleRatioC", "Scale Ratio C");
-            EditorGUI.EndDisabledGroup();
-            */
 
             EditorGUI.indentLevel -= 1;
             EditorGUILayout.Space();

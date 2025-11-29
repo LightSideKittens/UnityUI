@@ -23,10 +23,8 @@ namespace TMPro.EditorUtilities
 
             Rect rect = new Rect(position.x + 70, position.y, position.width, 49);
 
-            // Draw GlyphRect
             EditorGUI.PropertyField(rect, prop_GlyphRect);
 
-            // Draw GlyphMetrics
             rect.y += 45;
             EditorGUI.PropertyField(rect, prop_GlyphMetrics);
 
@@ -49,10 +47,8 @@ namespace TMPro.EditorUtilities
 
         void DrawGlyph(Rect position, SerializedProperty property)
         {
-            // Get a reference to the sprite texture
             Texture tex = property.serializedObject.FindProperty("spriteSheet").objectReferenceValue as Texture;
 
-            // Return if we don't have a texture assigned to the sprite asset.
             if (tex == null)
             {
                 Debug.LogWarning("Please assign a valid Sprite Atlas texture to the [" + property.serializedObject.targetObject.name + "] Sprite Asset.", property.serializedObject.targetObject);
@@ -74,7 +70,6 @@ namespace TMPro.EditorUtilities
                 spriteTexPosition.x += (spriteSize.y - spriteSize.x) / 2;
             }
 
-            // Compute the normalized texture coordinates
             Rect texCoords = new Rect((float)glyphRect.x / tex.width, (float)glyphRect.y / tex.height, (float)glyphRect.width / tex.width, (float)glyphRect.height / tex.height);
             GUI.DrawTextureWithTexCoords(new Rect(spriteTexPosition.x + 5, spriteTexPosition.y + 32f, spriteSize.x, spriteSize.y), tex, texCoords, true);
         }

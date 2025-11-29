@@ -962,20 +962,7 @@ namespace TMPro
         }
         [SerializeField]
         protected bool m_useMaxVisibleDescender = true;
-
-
-        /// <summary>
-        /// Controls which page of text is shown
-        /// </summary>
-        public int pageToDisplay
-        {
-            get { return m_pageToDisplay; }
-            set { if (m_pageToDisplay == value) return; _havePropertiesChanged = true; m_pageToDisplay = value; SetVerticesDirty(); }
-        }
-        [SerializeField]
-        protected int m_pageToDisplay = 1;
-        protected bool m_isNewPage = false;
-
+        
         /// <summary>
         /// The margins of the text object.
         /// </summary>

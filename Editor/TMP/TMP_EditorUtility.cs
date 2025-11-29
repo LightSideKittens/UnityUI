@@ -42,7 +42,6 @@ namespace TMPro.EditorUtilities
         [SerializeField]
         private static string m_PackageFullPath;
 
-        // Static Fields Related to locating the TextMesh Pro Asset
         private static string folderPath = "Not Found";
 
         private static EditorWindow Gameview;
@@ -83,16 +82,13 @@ namespace TMPro.EditorUtilities
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             if (path.Length == 0)
             {
-                // no asset selected, place in asset root
                 path = "Assets/" + name + ".asset";
             }
             else if (Directory.Exists(path))
             {
-                // place in currently selected directory
                 path += "/" + name + ".asset";
             }
             else {
-                // place in current selection's containing directory
                 path = Path.GetDirectoryName(path) + "/" + name + ".asset";
             }
             T asset = ScriptableObject.CreateInstance<T>();
@@ -103,15 +99,12 @@ namespace TMPro.EditorUtilities
         }
 
 
-
-        // Function used to find all materials which reference a font atlas so we can update all their references.
         internal static Material[] FindMaterialReferences(TMP_FontAsset fontAsset)
         {
             List<Material> refs = new List<Material>();
             Material mat = fontAsset.material;
             refs.Add(mat);
 
-            // Get materials matching the search pattern.
             string searchPattern = "t:Material" + " " + fontAsset.name.Split(new char[] { ' ' })[0];
             string[] materialAssetGUIDs = AssetDatabase.FindAssets(searchPattern);
 
@@ -127,8 +120,6 @@ namespace TMPro.EditorUtilities
                 }
                 else
                 {
-                    // TODO: Find a more efficient method to unload resources.
-                    //Resources.UnloadAsset(targetMaterial.GetTexture(ShaderUtilities.ID_MainTex));
                 }
             }
 
@@ -136,12 +127,10 @@ namespace TMPro.EditorUtilities
         }
 
 
-        // Function used to find the Font Asset which matches the given Material Preset and Font Atlas Texture.
         internal static TMP_FontAsset FindMatchingFontAsset(Material mat)
         {
             if (mat.GetTexture(ShaderUtilities.ID_MainTex) == null) return null;
 
-            // Find the dependent assets of this material.
             string[] dependentAssets = AssetDatabase.GetDependencies(AssetDatabase.GetAssetPath(mat), false);
 
             for (int i = 0; i < dependentAssets.Length; i++)
@@ -157,7 +146,6 @@ namespace TMPro.EditorUtilities
 
         private static string GetPackageRelativePath()
         {
-            // Check for potential UPM package
             string packagePath = Path.GetFullPath("Packages/com.unity.ugui");
             if (Directory.Exists(packagePath))
             {
@@ -167,13 +155,11 @@ namespace TMPro.EditorUtilities
             packagePath = Path.GetFullPath("Assets/..");
             if (Directory.Exists(packagePath))
             {
-                // Search default location for development package
                 if (Directory.Exists(packagePath + "/Assets/Packages/com.unity.ugui/Editor Resources"))
                 {
                     return "Assets/Packages/com.unity.ugui";
                 }
 
-                // Search for potential alternative locations in the user project
                 string[] matchingPaths = Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
                 packagePath = ValidateLocation(matchingPaths, packagePath);
                 if (packagePath != null) return packagePath;
@@ -184,7 +170,6 @@ namespace TMPro.EditorUtilities
 
         private static string GetPackageFullPath()
         {
-            // Check for potential UPM package
             string packagePath = Path.GetFullPath("Packages/com.unity.ugui");
             if (Directory.Exists(packagePath))
             {
@@ -194,13 +179,11 @@ namespace TMPro.EditorUtilities
             packagePath = Path.GetFullPath("Assets/..");
             if (Directory.Exists(packagePath))
             {
-                // Search default location for development package
                 if (Directory.Exists(packagePath + "/Assets/Packages/com.unity.ugui/Editor Resources"))
                 {
                     return packagePath + "/Assets/Packages/com.unity.ugui";
                 }
 
-                // Search for potential alternative locations in the user project
                 string[] matchingPaths = Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
                 string path = ValidateLocation(matchingPaths, packagePath);
                 if (path != null) return packagePath + path;
@@ -219,7 +202,6 @@ namespace TMPro.EditorUtilities
         {
             for (int i = 0; i < paths.Length; i++)
             {
-                // Check if any of the matching directories contain a GUISkins directory.
                 if (Directory.Exists(paths[i] + "/Editor Resources"))
                 {
                     folderPath = paths[i].Replace(projectPath, "");
@@ -265,7 +247,6 @@ namespace TMPro.EditorUtilities
 
             }
 
-            // handle the final group
             if (first == last)
                 characterSequence += first;
             else
@@ -308,7 +289,6 @@ namespace TMPro.EditorUtilities
 
             }
 
-            // handle the final group
             if (first == last)
                 characterSequence += first.ToString("X2");
             else
@@ -415,7 +395,6 @@ namespace TMPro.EditorUtilities
             var id = GUIUtility.GetControlID(content, FocusType.Keyboard, position);
             var evt = Event.current;
 
-            // Toggle selected toggle on space or return key
             if (GUIUtility.keyboardControl == id && evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Space || evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter))
             {
                 value = !value;

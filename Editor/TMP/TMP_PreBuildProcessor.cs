@@ -11,7 +11,6 @@ namespace TMPro
 
         public void OnPreprocessBuild(BuildReport report)
         {
-            // Find all font assets in the project
             string searchPattern = "t:TMP_FontAsset";
             string[] fontAssetGUIDs = AssetDatabase.FindAssets(searchPattern);
 

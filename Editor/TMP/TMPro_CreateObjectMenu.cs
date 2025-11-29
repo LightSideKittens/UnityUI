@@ -23,14 +23,12 @@ namespace TMPro.EditorUtilities
         {
             GameObject go = ObjectFactory.CreateGameObject("Text (TMP)");
 
-            // Add support for new prefab mode
             StageUtility.PlaceGameObjectInCurrentStage(go);
 
             TextMeshPro textComponent = ObjectFactory.AddComponent<TextMeshPro>(go);
 
             if (textComponent.m_isWaitingOnResourceLoad == false)
             {
-                // Get reference to potential Presets for <TextMeshPro> component
                 Preset[] presets = Preset.GetDefaultPresetsForObject(textComponent);
 
                 if (presets == null || presets.Length == 0)
@@ -82,12 +80,10 @@ namespace TMPro.EditorUtilities
         {
             GameObject go = TMP_DefaultControls.CreateText(GetStandardResources());
 
-            // Override text color and font size
             TextMeshProUGUI textComponent = go.GetComponent<TextMeshProUGUI>();
 
             if (textComponent.m_isWaitingOnResourceLoad == false)
             {
-                // Get reference to potential Presets for <TextMeshProUGUI> component
                 Preset[] presets = Preset.GetDefaultPresetsForObject(textComponent);
 
                 if (presets == null || presets.Length == 0)
@@ -122,7 +118,6 @@ namespace TMPro.EditorUtilities
         {
             GameObject go = TMP_DefaultControls.CreateButton(GetStandardResources());
 
-            // Override font size
             TMP_Text textComponent = go.GetComponentInChildren<TMP_Text>();
             textComponent.fontSize = 24;
 
@@ -177,31 +172,26 @@ namespace TMPro.EditorUtilities
 
         private static void SetPositionVisibleinSceneView(RectTransform canvasRTransform, RectTransform itemTransform)
         {
-            // Find the best scene view
             SceneView sceneView = SceneView.lastActiveSceneView;
 
             if (sceneView == null && SceneView.sceneViews.Count > 0)
                 sceneView = SceneView.sceneViews[0] as SceneView;
 
-            // Couldn't find a SceneView. Don't set position.
             if (sceneView == null || sceneView.camera == null)
                 return;
 
-            // Create world space Plane from canvas position.
             Camera camera = sceneView.camera;
             Vector3 position = Vector3.zero;
             Vector2 localPlanePosition;
 
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRTransform, new Vector2(camera.pixelWidth / 2, camera.pixelHeight / 2), camera, out localPlanePosition))
             {
-                // Adjust for canvas pivot
                 localPlanePosition.x = localPlanePosition.x + canvasRTransform.sizeDelta.x * canvasRTransform.pivot.x;
                 localPlanePosition.y = localPlanePosition.y + canvasRTransform.sizeDelta.y * canvasRTransform.pivot.y;
 
                 localPlanePosition.x = Mathf.Clamp(localPlanePosition.x, 0, canvasRTransform.sizeDelta.x);
                 localPlanePosition.y = Mathf.Clamp(localPlanePosition.y, 0, canvasRTransform.sizeDelta.y);
 
-                // Adjust for anchoring
                 position.x = localPlanePosition.x - canvasRTransform.sizeDelta.x * itemTransform.anchorMin.x;
                 position.y = localPlanePosition.y - canvasRTransform.sizeDelta.y * itemTransform.anchorMin.y;
 
@@ -232,8 +222,6 @@ namespace TMPro.EditorUtilities
                 parent = GetOrCreateCanvasGameObject();
                 explicitParentChoice = false;
 
-                // If in Prefab Mode, Canvas has to be part of Prefab contents,
-                // otherwise use Prefab root instead.
                 PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
                 if (prefabStage != null && !prefabStage.IsPartOfPrefabContents(parent))
                     parent = prefabStage.prefabContentsRoot;
@@ -241,8 +229,6 @@ namespace TMPro.EditorUtilities
 
             if (parent.GetComponentsInParent<Canvas>(true).Length == 0)
             {
-                // Create canvas under context GameObject,
-                // and make that be the parent which UI element is added under.
                 GameObject canvas = CreateNewUI();
                 Undo.SetTransformParent(canvas.transform, parent.transform, "");
                 parent = canvas;
@@ -251,13 +237,10 @@ namespace TMPro.EditorUtilities
             GameObjectUtility.EnsureUniqueNameForSibling(element);
 
             SetParentAndAlign(element, parent);
-            if (!explicitParentChoice) // not a context click, so center in sceneview
-                SetPositionVisibleinSceneView(parent.GetComponent<RectTransform>(), element.GetComponent<RectTransform>());
+            if (!explicitParentChoice) SetPositionVisibleinSceneView(parent.GetComponent<RectTransform>(), element.GetComponent<RectTransform>());
 
-            // This call ensure any change made to created Objects after they where registered will be part of the Undo.
             Undo.RegisterFullObjectHierarchyUndo(parent == null ? element : parent, "");
 
-            // We have to fix up the undo name since the name of the object was only known after reparenting it.
             Undo.SetCurrentGroupName("Create " + element.name);
 
             Selection.activeGameObject = element;
@@ -299,7 +282,6 @@ namespace TMPro.EditorUtilities
 
         public static GameObject CreateNewUI()
         {
-            // Root for the UI
             var root = new GameObject("Canvas");
             root.layer = LayerMask.NameToLayer(kUILayerName);
             Canvas canvas = root.AddComponent<Canvas>();
@@ -307,7 +289,6 @@ namespace TMPro.EditorUtilities
             root.AddComponent<CanvasScaler>();
             root.AddComponent<GraphicRaycaster>();
 
-            // Works for all stages.
             StageUtility.PlaceGameObjectInCurrentStage(root);
             bool customScene = false;
             PrefabStage prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
@@ -319,10 +300,6 @@ namespace TMPro.EditorUtilities
 
             Undo.RegisterCreatedObjectUndo(root, "Create " + root.name);
 
-            // If there is no event system add one...
-            // No need to place event system in custom scene as these are temporary anyway.
-            // It can be argued for or against placing it in the user scenes,
-            // but let's not modify scene user is not currently looking at.
             if (!customScene)
                 CreateEventSystem(false);
             return root;
@@ -355,24 +332,19 @@ namespace TMPro.EditorUtilities
         }
 
 
-        // Helper function that returns a Canvas GameObject; preferably a parent of the selection, or other existing Canvas.
         public static GameObject GetOrCreateCanvasGameObject()
         {
             GameObject selectedGo = Selection.activeGameObject;
 
-            // Try to find a gameobject that is the selected GO or one if its parents.
             Canvas canvas = (selectedGo != null) ? selectedGo.GetComponentInParent<Canvas>() : null;
             if (IsValidCanvas(canvas))
                 return canvas.gameObject;
 
-            // No canvas in selection or its parents? Then use any valid canvas.
-            // We have to find all loaded Canvases, not just the ones in main scenes.
             Canvas[] canvasArray = StageUtility.GetCurrentStageHandle().FindComponentsOfType<Canvas>();
             for (int i = 0; i < canvasArray.Length; i++)
                 if (IsValidCanvas(canvasArray[i]))
                     return canvasArray[i].gameObject;
 
-            // No canvas in the scene at all? Then create a new one.
             return CreateNewUI();
         }
 
@@ -381,8 +353,6 @@ namespace TMPro.EditorUtilities
             if (canvas == null || !canvas.gameObject.activeInHierarchy)
                 return false;
 
-            // It's important that the non-editable canvas from a prefab scene won't be rejected,
-            // but canvases not visible in the Hierarchy at all do. Don't check for HideAndDontSave.
             if (EditorUtility.IsPersistent(canvas) || (canvas.hideFlags & HideFlags.HideInHierarchy) != 0)
                 return false;
 

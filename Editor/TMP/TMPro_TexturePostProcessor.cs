@@ -13,7 +13,6 @@ namespace TMPro.EditorUtilities
     {
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
-            // Only run post processor after the Editor has been fully loaded.
             if (Time.frameCount == 0)
                 return;
 
@@ -21,7 +20,6 @@ namespace TMPro.EditorUtilities
 
             foreach (var asset in importedAssets)
             {
-                // Return if imported asset path is outside of the project.
                 if (asset.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase) == false)
                     continue;
 
@@ -31,7 +29,6 @@ namespace TMPro.EditorUtilities
                 {
                     TMP_FontAsset fontAsset = AssetDatabase.LoadAssetAtPath(asset, typeof(TMP_FontAsset)) as TMP_FontAsset;
 
-                    // Only refresh font asset definition if font asset was previously initialized.
                     if (fontAsset != null && fontAsset.m_CharacterLookupDictionary != null)
                         TMP_EditorResourceManager.RegisterFontAssetForDefinitionRefresh(fontAsset);
 
@@ -42,7 +39,6 @@ namespace TMPro.EditorUtilities
                     textureImported = true;
             }
 
-            // If textures were imported, issue callback to any potential text objects that might require updating.
             if (textureImported)
                 TMPro_EventManager.ON_SPRITE_ASSET_PROPERTY_CHANGED(true, null);
         }

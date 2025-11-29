@@ -12,12 +12,10 @@ namespace TMPro.EditorUtilities
     public class TMP_InputFieldEditor : SelectableEditor
     {
         private struct m_foldout
-        { // Track Inspector foldout panel states, globally.
+        {
             public static bool textInput = true;
             public static bool fontSettings = true;
             public static bool extraSettings = true;
-            //public static bool shadowSetting = false;
-            //public static bool materialEditor = true;
         }
 
         SerializedProperty m_TextViewport;
@@ -59,8 +57,6 @@ namespace TMPro.EditorUtilities
         SerializedProperty m_GlobalFontAsset;
 
         AnimBool m_CustomColor;
-
-        //TMP_InputValidator m_ValidationScript;
 
         protected override void OnEnable()
         {
@@ -134,18 +130,12 @@ namespace TMPro.EditorUtilities
             if (m_TextComponent != null && m_TextComponent.objectReferenceValue != null)
             {
                 text = m_TextComponent.objectReferenceValue as TextMeshProUGUI;
-                //if (text.supportRichText)
-                //{
-                //    EditorGUILayout.HelpBox("Using Rich Text with input is unsupported.", MessageType.Warning);
-                //}
             }
 
             EditorGUI.BeginDisabledGroup(m_TextComponent == null || m_TextComponent.objectReferenceValue == null);
 
-            // TEXT INPUT BOX
             EditorGUILayout.PropertyField(m_Text);
 
-            // INPUT FIELD SETTINGS
             #region INPUT FIELD SETTINGS
 
             m_foldout.fontSettings = EditorGUILayout.Foldout(m_foldout.fontSettings, "Input Field Settings", true, TMP_UIStyleManager.boldFoldout);
@@ -251,7 +241,6 @@ namespace TMPro.EditorUtilities
             #endregion
 
 
-            // CONTROL SETTINGS
             #region CONTROL SETTINGS
             m_foldout.extraSettings = EditorGUILayout.Foldout(m_foldout.extraSettings, "Control Settings", true, TMP_UIStyleManager.boldFoldout);
 

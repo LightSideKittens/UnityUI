@@ -12,8 +12,6 @@ namespace TMPro.EditorUtilities
     /// </summary>
     public class TMP_EditorCoroutine
     {
-        //private static Dictionary<int, EditorCoroutine> s_ActiveCoroutines;
-
         readonly IEnumerator coroutine;
 
         /// <summary>
@@ -36,13 +34,6 @@ namespace TMPro.EditorUtilities
             TMP_EditorCoroutine coroutine = new TMP_EditorCoroutine(routine);
             coroutine.Start();
 
-            // Add coroutine to tracking list
-            //if (s_ActiveCoroutines == null)
-            //    s_ActiveCoroutines = new Dictionary<int, EditorCoroutine>();
-
-            // Add new instance of editor coroutine to dictionary.
-            //s_ActiveCoroutines.Add(coroutine.GetHashCode(), coroutine);
-
             return coroutine;
         }
 
@@ -50,10 +41,6 @@ namespace TMPro.EditorUtilities
         /// <summary>
         /// Clear delegate list 
         /// </summary>
-        //public static void StopAllEditorCoroutines()
-        //{
-        //    EditorApplication.update = null;
-        //}
 
 
         /// <summary>
@@ -72,8 +59,6 @@ namespace TMPro.EditorUtilities
         {
             if (EditorApplication.update != null)
                 EditorApplication.update -= EditorUpdate;
-
-            //s_ActiveCoroutines.Remove(this.GetHashCode());
         }
  
 
@@ -82,11 +67,9 @@ namespace TMPro.EditorUtilities
         /// </summary>
         void EditorUpdate()
         {
-            // Stop editor coroutine if it does not continue.
             if (coroutine.MoveNext() == false)
                 Stop();
 
-            // Process the different types of EditorCoroutines.
             if (coroutine.Current != null)
             {
 

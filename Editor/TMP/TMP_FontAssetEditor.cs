@@ -28,12 +28,10 @@ namespace TMPro.EditorUtilities
             int oldIndent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
 
-            // NORMAL TYPEFACE
             if (label.text[0] == '4') GUI.enabled = false;
             position.x += position.width; position.width = (width - position.width) / 2;
             EditorGUI.PropertyField(position, prop_regular, GUIContent.none);
 
-            // ITALIC TYPEFACE
             GUI.enabled = true;
             position.x += position.width;
             EditorGUI.PropertyField(position, prop_italic, GUIContent.none);
@@ -217,7 +215,6 @@ namespace TMPro.EditorUtilities
 
         private SerializedProperty fontWeights_prop;
 
-        //private SerializedProperty fallbackFontAssets_prop;
         private ReorderableList m_FallbackFontAssetList;
 
         private SerializedProperty font_normalStyle_prop;
@@ -278,7 +275,6 @@ namespace TMPro.EditorUtilities
 
             m_FallbackFontAssetList = PrepareReorderableList(serializedObject.FindProperty("m_FallbackFontAssetTable"), "Fallback Font Assets");
 
-            // Clean up fallback list in the event if contains null elements.
             CleanFallbackFontAssetTable();
 
             font_normalStyle_prop = serializedObject.FindProperty("normalStyle");
@@ -302,14 +298,11 @@ namespace TMPro.EditorUtilities
             m_fontAsset = target as TMP_FontAsset;
             m_FontFeatureTable = m_fontAsset.fontFeatureTable;
 
-            // Get Font Faces and Styles
             m_FontFaces = GetFontFaces();
 
-            // Upgrade Font Feature Table if necessary
             if (m_fontAsset.m_KerningTable != null && m_fontAsset.m_KerningTable.kerningPairs != null && m_fontAsset.m_KerningTable.kerningPairs.Count > 0)
                 m_fontAsset.ReadFontAssetDefinition();
 
-            // Create serialized object to allow us to use a serialized property of an empty kerning pair.
             m_SerializedPropertyHolder = CreateInstance<TMP_SerializedPropertyHolder>();
             m_SerializedPropertyHolder.fontAsset = m_fontAsset;
             SerializedObject internalSerializedObject = new SerializedObject(m_SerializedPropertyHolder);
@@ -322,10 +315,8 @@ namespace TMPro.EditorUtilities
             m_GlyphSearchList = new List<int>();
             m_KerningTableSearchList = new List<int>();
 
-            // Sort Font Asset Tables
             m_fontAsset.SortAllTables();
 
-            // Clear glyph proxy lookups
             TMP_PropertyDrawerUtilities.ClearGlyphProxyLookups();
         }
 
@@ -355,7 +346,6 @@ namespace TMPro.EditorUtilities
 
         public void OnDisable()
         {
-            // Revert changes if user closes or changes selection without having made a choice.
             if (m_DisplayDestructiveChangeWarning)
             {
                 m_DisplayDestructiveChangeWarning = false;
@@ -369,8 +359,6 @@ namespace TMPro.EditorUtilities
 
         public override void OnInspectorGUI()
         {
-            //Debug.Log("OnInspectorGUI Called.");
-
             Event currentEvent = Event.current;
 
             serializedObject.Update();
@@ -379,7 +367,6 @@ namespace TMPro.EditorUtilities
             float labelWidth = EditorGUIUtility.labelWidth;
             float fieldWidth = EditorGUIUtility.fieldWidth;
 
-            // FACE INFO PANEL
             #region Face info
             GUI.Label(rect, new GUIContent("<b>Face Info</b> - v" + m_fontAsset.version), TMP_UIStyleManager.sectionHeader);
 
@@ -393,9 +380,8 @@ namespace TMPro.EditorUtilities
             }
 
             EditorGUI.indentLevel = 1;
-            GUI.enabled = false; // Lock UI
+            GUI.enabled = false;
 
-            // TODO : Consider creating a property drawer for these.
             EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("m_FamilyName"));
             EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("m_StyleName"));
             EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("m_PointSize"));
@@ -413,19 +399,15 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("m_UnderlineOffset"));
             EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("m_UnderlineThickness"));
             EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("m_StrikethroughOffset"));
-            //EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("strikethroughThickness"));
             EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("m_SuperscriptOffset"));
             EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("m_SuperscriptSize"));
             EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("m_SubscriptOffset"));
             EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("m_SubscriptSize"));
             EditorGUILayout.PropertyField(m_FaceInfo_prop.FindPropertyRelative("m_TabWidth"));
-            // TODO : Add clamping for some of these values.
-            //subSize_prop.floatValue = Mathf.Clamp(subSize_prop.floatValue, 0.25f, 1f);
 
             EditorGUILayout.Space();
             #endregion
 
-            // GENERATION SETTINGS
             #region Generation Settings
             rect = EditorGUILayout.GetControlRect(false, 24);
 
@@ -447,7 +429,6 @@ namespace TMPro.EditorUtilities
                     m_FontFaces = GetFontFaces(0);
                     m_FaceInfoDirty = true;
                     m_DisplayDestructiveChangeWarning = true;
-                    //m_MaterialPresetsRequireUpdate = true;
                 }
 
                 EditorGUI.BeginDisabledGroup(sourceFont == null);
@@ -469,12 +450,10 @@ namespace TMPro.EditorUtilities
 
                         bool isDatabaseRefreshRequired = false;
 
-                        // Static font asset
                         if (m_AtlasPopulationMode_prop.intValue == 0)
                         {
                             m_fontAsset.sourceFontFile = null;
 
-                            //Set atlas textures to non readable.
                             for (int i = 0; i < m_fontAsset.atlasTextures.Length; i++)
                             {
                                 Texture2D tex = m_fontAsset.atlasTextures[i];
@@ -482,10 +461,8 @@ namespace TMPro.EditorUtilities
                                 if (tex != null && tex.isReadable)
                                     FontEngineEditorUtilities.SetAtlasTextureIsReadable(tex, false);
                             }
-
-                            //Debug.Log("Atlas Population mode set to [Static].");
                         }
-                        else // Dynamic font asset
+                        else
                         {
                             if (m_fontAsset.m_SourceFontFile_EditorRef.dynamic == false)
                             {
@@ -498,7 +475,6 @@ namespace TMPro.EditorUtilities
                             {
                                 m_fontAsset.sourceFontFile = m_fontAsset.m_SourceFontFile_EditorRef;
 
-                                // Set atlas textures to non readable.
                                 for (int i = 0; i < m_fontAsset.atlasTextures.Length; i++)
                                 {
                                     Texture2D tex = m_fontAsset.atlasTextures[i];
@@ -506,11 +482,8 @@ namespace TMPro.EditorUtilities
                                     if (tex != null && tex.isReadable == false)
                                         FontEngineEditorUtilities.SetAtlasTextureIsReadable(tex, true);
                                 }
-
-                                //Debug.Log("Atlas Population mode set to [" + (m_AtlasPopulationMode_prop.intValue == 1 ? "Dynamic" : "Dynamic OS") + "].");
                             }
 
-                            // Dynamic OS font asset
                             if (m_AtlasPopulationMode_prop.intValue == 2)
                                 m_fontAsset.sourceFontFile = null;
                         }
@@ -522,17 +495,14 @@ namespace TMPro.EditorUtilities
                         isAssetDirty = true;
                     }
 
-                    // Save state of atlas settings
                     if (m_DisplayDestructiveChangeWarning == false)
                     {
                         SavedGenerationSettings();
-                        //Undo.RegisterCompleteObjectUndo(m_fontAsset, "Font Asset Changes");
                     }
 
                     EditorGUI.BeginDisabledGroup(m_AtlasPopulationMode_prop.intValue == (int)AtlasPopulationMode.Static);
                     {
                         EditorGUI.BeginChangeCheck();
-                        // TODO: Switch shaders depending on GlyphRenderMode.
                         var glyphRenderValues = (GlyphRenderMode[])Enum.GetValues(typeof(GlyphRenderMode));
                         GlyphRenderMode currentValue = glyphRenderValues[m_AtlasRenderMode_prop.enumValueIndex];
                         GlyphRenderModeUI selectedUI = (GlyphRenderModeUI)currentValue;
@@ -551,7 +521,6 @@ namespace TMPro.EditorUtilities
                             m_DisplayDestructiveChangeWarning = true;
                         }
 
-                        // Changes to these properties require updating Material Presets for this font asset.
                         EditorGUI.BeginChangeCheck();
                         EditorGUILayout.PropertyField(m_AtlasPadding_prop, new GUIContent("Padding"));
                         EditorGUILayout.IntPopup(m_AtlasWidth_prop, m_AtlasResolutionLabels, m_AtlasResolutions, new GUIContent("Atlas Width"));
@@ -578,7 +547,6 @@ namespace TMPro.EditorUtilities
                             bool guiEnabledState = GUI.enabled;
                             GUI.enabled = true;
 
-                            // These changes are destructive on the font asset
                             rect = EditorGUILayout.GetControlRect(false, 60);
                             rect.x += 15;
                             rect.width -= 15;
@@ -588,7 +556,6 @@ namespace TMPro.EditorUtilities
                             {
                                 m_DisplayDestructiveChangeWarning = false;
 
-                                // Update face info if sampling point size was changed.
 #if UNITY_2023_3_OR_NEWER
                                 if (m_GenerationSettings.pointSize != m_SamplingPointSize_prop.floatValue || m_FaceInfoDirty)
                                 {
@@ -604,14 +571,12 @@ namespace TMPro.EditorUtilities
 
                                 Material mat = m_fontAsset.material;
 
-                                // Update material
                                 mat.SetFloat(ShaderUtilities.ID_TextureWidth, m_AtlasWidth_prop.intValue);
                                 mat.SetFloat(ShaderUtilities.ID_TextureHeight, m_AtlasHeight_prop.intValue);
 
                                 if (mat.HasProperty(ShaderUtilities.ID_GradientScale))
                                     mat.SetFloat(ShaderUtilities.ID_GradientScale, m_AtlasPadding_prop.intValue + 1);
 
-                                // Update material presets if any of the relevant properties have been changed.
                                 if (m_MaterialPresetsRequireUpdate)
                                 {
                                     m_MaterialPresetsRequireUpdate = false;
@@ -633,11 +598,7 @@ namespace TMPro.EditorUtilities
                                 GUIUtility.keyboardControl = 0;
                                 isAssetDirty = true;
 
-                                // Update Font Asset Creation Settings to reflect new changes.
                                 UpdateFontAssetCreationSettings();
-
-                                // TODO: Clear undo buffers.
-                                //Undo.ClearUndo(m_fontAsset);
                             }
 
                             if (GUI.Button(new Rect(rect.width - 56, rect.y + 36, 80, 18), new GUIContent("Revert")))
@@ -645,9 +606,6 @@ namespace TMPro.EditorUtilities
                                 m_DisplayDestructiveChangeWarning = false;
                                 RestoreGenerationSettings();
                                 GUIUtility.keyboardControl = 0;
-
-                                // TODO: Clear undo buffers.
-                                //Undo.ClearUndo(m_fontAsset);
                             }
 
                             GUI.enabled = guiEnabledState;
@@ -660,7 +618,6 @@ namespace TMPro.EditorUtilities
             }
             #endregion
 
-            // ATLAS & MATERIAL PANEL
             #region Atlas & Material
             rect = EditorGUILayout.GetControlRect(false, 24);
 
@@ -681,9 +638,8 @@ namespace TMPro.EditorUtilities
             }
             #endregion
 
-            string evt_cmd = Event.current.commandName; // Get Current Event CommandName to check for Undo Events
+            string evt_cmd = Event.current.commandName;
 
-            // FONT WEIGHT PANEL
             #region Font Weights
             rect = EditorGUILayout.GetControlRect(false, 24);
 
@@ -731,7 +687,6 @@ namespace TMPro.EditorUtilities
                 {
                     GUI.changed = false;
 
-                    // Modify the material property on matching material presets.
                     for (int i = 0; i < m_materialPresets.Length; i++)
                         m_materialPresets[i].SetFloat("_WeightNormal", font_normalStyle_prop.floatValue);
                 }
@@ -742,7 +697,6 @@ namespace TMPro.EditorUtilities
                 {
                     GUI.changed = false;
 
-                    // Modify the material property on matching material presets.
                     for (int i = 0; i < m_materialPresets.Length; i++)
                         m_materialPresets[i].SetFloat("_WeightBold", font_boldStyle_prop.floatValue);
                 }
@@ -778,7 +732,6 @@ namespace TMPro.EditorUtilities
             EditorGUIUtility.fieldWidth = 0;
             #endregion
 
-            // FALLBACK FONT ASSETS
             #region Fallback Font Asset
             rect = EditorGUILayout.GetControlRect(false, 24);
             EditorGUI.indentLevel = 0;
@@ -801,7 +754,6 @@ namespace TMPro.EditorUtilities
             }
             #endregion
 
-            // CHARACTER TABLE TABLE
             #region Character Table
             EditorGUIUtility.labelWidth = labelWidth;
             EditorGUIUtility.fieldWidth = fieldWidth;
@@ -820,10 +772,8 @@ namespace TMPro.EditorUtilities
                 int arraySize = m_CharacterTable_prop.arraySize;
                 int itemsPerPage = 15;
 
-                // Display Glyph Management Tools
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 {
-                    // Search Bar implementation
                     #region DISPLAY SEARCH BAR
                     EditorGUILayout.BeginHorizontal();
                     {
@@ -836,7 +786,6 @@ namespace TMPro.EditorUtilities
                             {
                                 m_CharacterSearchPattern = searchPattern;
 
-                                // Search Character Table for potential matches
                                 SearchCharacterTable(m_CharacterSearchPattern, ref m_CharacterSearchList);
                             }
                             else
@@ -855,7 +804,6 @@ namespace TMPro.EditorUtilities
                     EditorGUILayout.EndHorizontal();
                     #endregion
 
-                    // Display Page Navigation
                     if (!string.IsNullOrEmpty(m_CharacterSearchPattern))
                         arraySize = m_CharacterSearchList.Count;
 
@@ -863,13 +811,10 @@ namespace TMPro.EditorUtilities
                 }
                 EditorGUILayout.EndVertical();
 
-                // Display Character Table Elements
                 if (arraySize > 0)
                 {
-                    // Display each character entry using the CharacterPropertyDrawer.
                     for (int i = itemsPerPage * m_CurrentCharacterPage; i < arraySize && i < itemsPerPage * (m_CurrentCharacterPage + 1); i++)
                     {
-                        // Define the start of the selection region of the element.
                         Rect elementStartRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
                         int elementIndex = i;
@@ -888,10 +833,8 @@ namespace TMPro.EditorUtilities
 
                         EditorGUILayout.EndVertical();
 
-                        // Define the end of the selection region of the element.
                         Rect elementEndRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
-                        // Check for Item selection
                         Rect selectionArea = new Rect(elementStartRegion.x, elementStartRegion.y, elementEndRegion.width, elementEndRegion.y - elementStartRegion.y);
                         if (DoSelectionCheck(selectionArea))
                         {
@@ -906,31 +849,25 @@ namespace TMPro.EditorUtilities
                             }
                         }
 
-                        // Draw Selection Highlight and Glyph Options
                         if (m_SelectedCharacterRecord == i)
                         {
-                            // Reset other selections
                             ResetSelections(RecordSelectionType.CharacterRecord);
 
                             TMP_EditorUtility.DrawBox(selectionArea, 2f, new Color32(40, 192, 255, 255));
 
-                            // Draw Glyph management options
                             Rect controlRect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * 1f);
                             float optionAreaWidth = controlRect.width * 0.6f;
                             float btnWidth = optionAreaWidth / 3;
 
                             Rect position = new Rect(controlRect.x + controlRect.width * .4f, controlRect.y, btnWidth, controlRect.height);
 
-                            // Copy Selected Glyph to Target Glyph ID
                             GUI.enabled = !string.IsNullOrEmpty(m_dstUnicode);
                             if (GUI.Button(position, new GUIContent("Copy to")))
                             {
                                 GUIUtility.keyboardControl = 0;
 
-                                // Convert Hex Value to Decimal
                                 int dstGlyphID = TMP_TextUtilities.StringHexToInt(m_dstUnicode);
 
-                                //Add new glyph at target Unicode hex id.
                                 if (!AddNewCharacter(elementIndex, dstGlyphID))
                                 {
                                     m_AddCharacterWarning.isEnabled = true;
@@ -943,22 +880,18 @@ namespace TMPro.EditorUtilities
                                 TMPro_EventManager.ON_FONT_PROPERTY_CHANGED(true, m_fontAsset);
                             }
 
-                            // Target Glyph ID
                             GUI.enabled = true;
                             position.x += btnWidth;
 
                             GUI.SetNextControlName("CharacterID_Input");
                             m_dstUnicode = EditorGUI.TextField(position, m_dstUnicode);
 
-                            // Placeholder text
                             EditorGUI.LabelField(position, new GUIContent(m_unicodeHexLabel, "The Unicode (Hex) ID of the duplicated Character"), TMP_UIStyleManager.label);
 
-                            // Only filter the input when the destination glyph ID text field has focus.
                             if (GUI.GetNameOfFocusedControl() == "CharacterID_Input")
                             {
                                 m_unicodeHexLabel = string.Empty;
 
-                                //Filter out unwanted characters.
                                 char chr = Event.current.character;
                                 if ((chr < '0' || chr > '9') && (chr < 'a' || chr > 'f') && (chr < 'A' || chr > 'F'))
                                 {
@@ -968,11 +901,9 @@ namespace TMPro.EditorUtilities
                             else
                             {
                                 m_unicodeHexLabel = k_placeholderUnicodeHex;
-                                //m_dstUnicode = string.Empty;
                             }
 
 
-                            // Remove Glyph
                             position.x += btnWidth;
                             if (GUI.Button(position, "Remove"))
                             {
@@ -1000,7 +931,6 @@ namespace TMPro.EditorUtilities
             }
             #endregion
 
-            // GLYPH TABLE
             #region Glyph Table
             EditorGUIUtility.labelWidth = labelWidth;
             EditorGUIUtility.fieldWidth = fieldWidth;
@@ -1021,10 +951,8 @@ namespace TMPro.EditorUtilities
                 int arraySize = m_GlyphTable_prop.arraySize;
                 int itemsPerPage = 15;
 
-                // Display Glyph Management Tools
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 {
-                    // Search Bar implementation
                     #region DISPLAY SEARCH BAR
                     EditorGUILayout.BeginHorizontal();
                     {
@@ -1037,7 +965,6 @@ namespace TMPro.EditorUtilities
                             {
                                 m_GlyphSearchPattern = searchPattern;
 
-                                // Search Glyph Table for potential matches
                                 SearchGlyphTable(m_GlyphSearchPattern, ref m_GlyphSearchList);
                             }
                             else
@@ -1056,7 +983,6 @@ namespace TMPro.EditorUtilities
                     EditorGUILayout.EndHorizontal();
                     #endregion
 
-                    // Display Page Navigation
                     if (!string.IsNullOrEmpty(m_GlyphSearchPattern))
                         arraySize = m_GlyphSearchList.Count;
 
@@ -1064,14 +990,10 @@ namespace TMPro.EditorUtilities
                 }
                 EditorGUILayout.EndVertical();
 
-                // Display Glyph Table Elements
-
                 if (arraySize > 0)
                 {
-                    // Display each GlyphInfo entry using the GlyphInfo property drawer.
                     for (int i = itemsPerPage * m_CurrentGlyphPage; i < arraySize && i < itemsPerPage * (m_CurrentGlyphPage + 1); i++)
                     {
-                        // Define the start of the selection region of the element.
                         Rect elementStartRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
                         int elementIndex = i;
@@ -1089,10 +1011,8 @@ namespace TMPro.EditorUtilities
 
                         EditorGUILayout.EndVertical();
 
-                        // Define the end of the selection region of the element.
                         Rect elementEndRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
-                        // Check for Item selection
                         Rect selectionArea = new Rect(elementStartRegion.x, elementStartRegion.y, elementEndRegion.width, elementEndRegion.y - elementStartRegion.y);
                         if (DoSelectionCheck(selectionArea))
                         {
@@ -1107,32 +1027,26 @@ namespace TMPro.EditorUtilities
                             }
                         }
 
-                        // Draw Selection Highlight and Glyph Options
                         if (m_SelectedGlyphRecord == i)
                         {
-                            // Reset other selections
                             ResetSelections(RecordSelectionType.GlyphRecord);
 
                             TMP_EditorUtility.DrawBox(selectionArea, 2f, new Color32(40, 192, 255, 255));
 
-                            // Draw Glyph management options
                             Rect controlRect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * 1f);
                             float optionAreaWidth = controlRect.width * 0.6f;
                             float btnWidth = optionAreaWidth / 3;
 
                             Rect position = new Rect(controlRect.x + controlRect.width * .4f, controlRect.y, btnWidth, controlRect.height);
 
-                            // Copy Selected Glyph to Target Glyph ID
                             GUI.enabled = !string.IsNullOrEmpty(m_dstGlyphID);
                             if (GUI.Button(position, new GUIContent("Copy to")))
                             {
                                 GUIUtility.keyboardControl = 0;
                                 int dstGlyphID;
 
-                                // Convert Hex Value to Decimal
                                 int.TryParse(m_dstGlyphID, out dstGlyphID);
 
-                                //Add new glyph at target Unicode hex id.
                                 if (!AddNewGlyph(elementIndex, dstGlyphID))
                                 {
                                     m_AddGlyphWarning.isEnabled = true;
@@ -1145,22 +1059,18 @@ namespace TMPro.EditorUtilities
                                 TMPro_EventManager.ON_FONT_PROPERTY_CHANGED(true, m_fontAsset);
                             }
 
-                            // Target Glyph ID
                             GUI.enabled = true;
                             position.x += btnWidth;
 
                             GUI.SetNextControlName("GlyphID_Input");
                             m_dstGlyphID = EditorGUI.TextField(position, m_dstGlyphID);
 
-                            // Placeholder text
                             EditorGUI.LabelField(position, new GUIContent(m_GlyphIDLabel, "The Glyph ID of the duplicated Glyph"), TMP_UIStyleManager.label);
 
-                            // Only filter the input when the destination glyph ID text field has focus.
                             if (GUI.GetNameOfFocusedControl() == "GlyphID_Input")
                             {
                                 m_GlyphIDLabel = string.Empty;
 
-                                //Filter out unwanted characters.
                                 char chr = Event.current.character;
                                 if ((chr < '0' || chr > '9'))
                                 {
@@ -1170,10 +1080,8 @@ namespace TMPro.EditorUtilities
                             else
                             {
                                 m_GlyphIDLabel = k_placeholderGlyphID;
-                                //m_dstGlyphID = string.Empty;
                             }
 
-                            // Remove Glyph
                             position.x += btnWidth;
                             if (GUI.Button(position, "Remove"))
                             {
@@ -1195,17 +1103,12 @@ namespace TMPro.EditorUtilities
                     }
                 }
 
-                //DisplayAddRemoveButtons(m_GlyphTable_prop, m_SelectedGlyphRecord, glyphRecordCount);
-
                 DisplayPageNavigation(ref m_CurrentGlyphPage, arraySize, itemsPerPage);
 
                 EditorGUILayout.Space();
             }
             #endregion
 
-            // FONT FEATURE TABLES
-
-            // LIGATURE SUBSTITUTION TABLE
             #region LIGATURE
             EditorGUIUtility.labelWidth = labelWidth;
             EditorGUIUtility.fieldWidth = fieldWidth;
@@ -1224,10 +1127,8 @@ namespace TMPro.EditorUtilities
                 int arraySize = m_LigatureSubstitutionRecords_prop.arraySize;
                 int itemsPerPage = 20;
 
-                // Display Mark Adjust Records Management Tools
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 {
-                    // Search Bar implementation
                     #region DISPLAY SEARCH BAR
                     EditorGUILayout.BeginHorizontal();
                     {
@@ -1240,7 +1141,6 @@ namespace TMPro.EditorUtilities
                             {
                                 m_LigatureTableSearchPattern = searchPattern;
 
-                                // Search Glyph Table for potential matches
                                 SearchLigatureTable(m_LigatureTableSearchPattern, ref m_LigatureTableSearchList);
                             }
                             else
@@ -1259,7 +1159,6 @@ namespace TMPro.EditorUtilities
                     EditorGUILayout.EndHorizontal();
                     #endregion
 
-                    // Display Page Navigation
                     if (!string.IsNullOrEmpty(m_LigatureTableSearchPattern))
                         arraySize = m_LigatureTableSearchList.Count;
 
@@ -1269,10 +1168,8 @@ namespace TMPro.EditorUtilities
 
                 if (arraySize > 0)
                 {
-                    // Display each GlyphInfo entry using the GlyphInfo property drawer.
                     for (int i = itemsPerPage * m_CurrentLigaturePage; i < arraySize && i < itemsPerPage * (m_CurrentLigaturePage + 1); i++)
                     {
-                        // Define the start of the selection region of the element.
                         Rect elementStartRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
                         int elementIndex = i;
@@ -1296,10 +1193,8 @@ namespace TMPro.EditorUtilities
 
                         EditorGUILayout.EndVertical();
 
-                        // Define the end of the selection region of the element.
                         Rect elementEndRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
-                        // Check for Item selection
                         Rect selectionArea = new Rect(elementStartRegion.x, elementStartRegion.y, elementEndRegion.width, elementEndRegion.y - elementStartRegion.y);
                         if (DoSelectionCheck(selectionArea))
                         {
@@ -1314,22 +1209,18 @@ namespace TMPro.EditorUtilities
                             }
                         }
 
-                        // Draw Selection Highlight and Kerning Pair Options
                         if (m_SelectedLigatureRecord == i)
                         {
-                            // Reset other selections
                             ResetSelections(RecordSelectionType.LigatureSubstitutionRecord);
 
                             TMP_EditorUtility.DrawBox(selectionArea, 2f, new Color32(40, 192, 255, 255));
 
-                            // Draw Glyph management options
                             Rect controlRect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * 1f);
                             float optionAreaWidth = controlRect.width;
                             float btnWidth = optionAreaWidth / 4;
 
                             Rect position = new Rect(controlRect.x + controlRect.width - btnWidth, controlRect.y, btnWidth, controlRect.height);
 
-                            // Move record up
                             bool guiEnabled = GUI.enabled;
                             if (m_SelectedLigatureRecord == 0) { GUI.enabled = false; }
                             if (GUI.Button(new Rect(controlRect.x, controlRect.y, btnWidth, controlRect.height), "Up"))
@@ -1343,7 +1234,6 @@ namespace TMPro.EditorUtilities
                             }
                             GUI.enabled = guiEnabled;
 
-                            // Move record down
                             if (m_SelectedLigatureRecord == arraySize - 1) { GUI.enabled = false; }
                             if (GUI.Button(new Rect(controlRect.x + btnWidth, controlRect.y, btnWidth, controlRect.height), "Down"))
                             {
@@ -1356,7 +1246,6 @@ namespace TMPro.EditorUtilities
                             }
                             GUI.enabled = guiEnabled;
 
-                            // Remove record
                             GUI.enabled = true;
                             if (GUI.Button(position, "Remove"))
                             {
@@ -1381,7 +1270,6 @@ namespace TMPro.EditorUtilities
             }
             #endregion
 
-            // PAIR ADJUSTMENT TABLE
             #region Pair Adjustment Table
             EditorGUIUtility.labelWidth = labelWidth;
             EditorGUIUtility.fieldWidth = fieldWidth;
@@ -1400,10 +1288,8 @@ namespace TMPro.EditorUtilities
                 int arraySize = m_GlyphPairAdjustmentRecords_prop.arraySize;
                 int itemsPerPage = 20;
 
-                // Display Kerning Pair Management Tools
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 {
-                    // Search Bar implementation
                     #region DISPLAY SEARCH BAR
                     EditorGUILayout.BeginHorizontal();
                     {
@@ -1416,7 +1302,6 @@ namespace TMPro.EditorUtilities
                             {
                                 m_KerningTableSearchPattern = searchPattern;
 
-                                // Search Glyph Table for potential matches
                                 SearchKerningTable(m_KerningTableSearchPattern, ref m_KerningTableSearchList);
                             }
                             else
@@ -1435,7 +1320,6 @@ namespace TMPro.EditorUtilities
                     EditorGUILayout.EndHorizontal();
                     #endregion
 
-                    // Display Page Navigation
                     if (!string.IsNullOrEmpty(m_KerningTableSearchPattern))
                         arraySize = m_KerningTableSearchList.Count;
 
@@ -1445,10 +1329,8 @@ namespace TMPro.EditorUtilities
 
                 if (arraySize > 0)
                 {
-                    // Display each GlyphInfo entry using the GlyphInfo property drawer.
                     for (int i = itemsPerPage * m_CurrentAdjustmentPairPage; i < arraySize && i < itemsPerPage * (m_CurrentAdjustmentPairPage + 1); i++)
                     {
-                        // Define the start of the selection region of the element.
                         Rect elementStartRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
                         int elementIndex = i;
@@ -1471,10 +1353,8 @@ namespace TMPro.EditorUtilities
 
                         EditorGUILayout.EndVertical();
 
-                        // Define the end of the selection region of the element.
                         Rect elementEndRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
-                        // Check for Item selection
                         Rect selectionArea = new Rect(elementStartRegion.x, elementStartRegion.y, elementEndRegion.width, elementEndRegion.y - elementStartRegion.y);
                         if (DoSelectionCheck(selectionArea))
                         {
@@ -1489,22 +1369,18 @@ namespace TMPro.EditorUtilities
                             }
                         }
 
-                        // Draw Selection Highlight and Kerning Pair Options
                         if (m_SelectedAdjustmentRecord == i)
                         {
-                            // Reset other selections
                             ResetSelections(RecordSelectionType.AdjustmentPairRecord);
 
                             TMP_EditorUtility.DrawBox(selectionArea, 2f, new Color32(40, 192, 255, 255));
 
-                            // Draw Glyph management options
                             Rect controlRect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * 1f);
                             float optionAreaWidth = controlRect.width;
                             float btnWidth = optionAreaWidth / 4;
 
                             Rect position = new Rect(controlRect.x + controlRect.width - btnWidth, controlRect.y, btnWidth, controlRect.height);
 
-                            // Remove Kerning pair
                             GUI.enabled = true;
                             if (GUI.Button(position, "Remove"))
                             {
@@ -1525,7 +1401,6 @@ namespace TMPro.EditorUtilities
 
                 GUILayout.Space(5);
 
-                // Add new kerning pair
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 {
                     EditorGUI.BeginChangeCheck();
@@ -1558,7 +1433,6 @@ namespace TMPro.EditorUtilities
                         errorCode = 0;
                     }
 
-                    // Add glyphs and characters
                     TMP_Character character;
 
                     uint firstCharacter = m_SerializedPropertyHolder.firstCharacter;
@@ -1569,7 +1443,6 @@ namespace TMPro.EditorUtilities
                     if (!m_fontAsset.characterLookupTable.ContainsKey(secondCharacter))
                         m_fontAsset.TryAddCharacterInternal(secondCharacter, out character);
 
-                    // Sort Kerning Pairs & Reload Font Asset if new kerning pair was added.
                     if (errorCode != -1)
                     {
                         m_FontFeatureTable.SortGlyphPairAdjustmentRecords();
@@ -1581,9 +1454,6 @@ namespace TMPro.EditorUtilities
                     {
                         timeStamp = System.DateTime.Now.AddSeconds(5);
                     }
-
-                    // Clear Add Kerning Pair Panel
-                    // TODO
                 }
 
                 if (errorCode == -1)
@@ -1600,7 +1470,6 @@ namespace TMPro.EditorUtilities
             }
             #endregion
 
-            // MARK TO BASE Font Feature Table
             #region MARK TO BASE
             EditorGUIUtility.labelWidth = labelWidth;
             EditorGUIUtility.fieldWidth = fieldWidth;
@@ -1619,10 +1488,8 @@ namespace TMPro.EditorUtilities
                 int arraySize = m_MarkToBaseAdjustmentRecords_prop.arraySize;
                 int itemsPerPage = 20;
 
-                // Display Mark Adjust Records Management Tools
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 {
-                    // Search Bar implementation
                     #region DISPLAY SEARCH BAR
                     EditorGUILayout.BeginHorizontal();
                     {
@@ -1635,7 +1502,6 @@ namespace TMPro.EditorUtilities
                             {
                                 m_MarkToBaseTableSearchPattern = searchPattern;
 
-                                // Search Glyph Table for potential matches
                                 SearchMarkToBaseTable(m_MarkToBaseTableSearchPattern, ref m_MarkToBaseTableSearchList);
                             }
                             else
@@ -1654,7 +1520,6 @@ namespace TMPro.EditorUtilities
                     EditorGUILayout.EndHorizontal();
                     #endregion
 
-                    // Display Page Navigation
                     if (!string.IsNullOrEmpty(m_MarkToBaseTableSearchPattern))
                         arraySize = m_MarkToBaseTableSearchList.Count;
 
@@ -1664,10 +1529,8 @@ namespace TMPro.EditorUtilities
 
                 if (arraySize > 0)
                 {
-                    // Display each GlyphInfo entry using the GlyphInfo property drawer.
                     for (int i = itemsPerPage * m_CurrentMarkToBasePage; i < arraySize && i < itemsPerPage * (m_CurrentMarkToBasePage + 1); i++)
                     {
-                        // Define the start of the selection region of the element.
                         Rect elementStartRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
                         int elementIndex = i;
@@ -1691,10 +1554,8 @@ namespace TMPro.EditorUtilities
 
                         EditorGUILayout.EndVertical();
 
-                        // Define the end of the selection region of the element.
                         Rect elementEndRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
-                        // Check for Item selection
                         Rect selectionArea = new Rect(elementStartRegion.x, elementStartRegion.y, elementEndRegion.width, elementEndRegion.y - elementStartRegion.y);
                         if (DoSelectionCheck(selectionArea))
                         {
@@ -1709,22 +1570,18 @@ namespace TMPro.EditorUtilities
                             }
                         }
 
-                        // Draw Selection Highlight and Kerning Pair Options
                         if (m_SelectedMarkToBaseRecord == i)
                         {
-                            // Reset other selections
                             ResetSelections(RecordSelectionType.MarkToBaseRecord);
 
                             TMP_EditorUtility.DrawBox(selectionArea, 2f, new Color32(40, 192, 255, 255));
 
-                            // Draw Glyph management options
                             Rect controlRect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * 1f);
                             float optionAreaWidth = controlRect.width;
                             float btnWidth = optionAreaWidth / 4;
 
                             Rect position = new Rect(controlRect.x + controlRect.width - btnWidth, controlRect.y, btnWidth, controlRect.height);
 
-                            // Remove Mark to Base Record
                             GUI.enabled = true;
                             if (GUI.Button(position, "Remove"))
                             {
@@ -1749,7 +1606,6 @@ namespace TMPro.EditorUtilities
             }
             #endregion
 
-            // MARK TO MARK Font Feature Table
             #region MARK TO MARK
             EditorGUIUtility.labelWidth = labelWidth;
             EditorGUIUtility.fieldWidth = fieldWidth;
@@ -1768,10 +1624,8 @@ namespace TMPro.EditorUtilities
                 int arraySize = m_MarkToMarkAdjustmentRecords_prop.arraySize;
                 int itemsPerPage = 20;
 
-                // Display Kerning Pair Management Tools
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 {
-                    // Search Bar implementation
                     #region DISPLAY SEARCH BAR
                     EditorGUILayout.BeginHorizontal();
                     {
@@ -1784,7 +1638,6 @@ namespace TMPro.EditorUtilities
                             {
                                 m_MarkToMarkTableSearchPattern = searchPattern;
 
-                                // Search Glyph Table for potential matches
                                 SearchMarkToMarkTable(m_MarkToMarkTableSearchPattern, ref m_MarkToMarkTableSearchList);
                             }
                             else
@@ -1803,7 +1656,6 @@ namespace TMPro.EditorUtilities
                     EditorGUILayout.EndHorizontal();
                     #endregion
 
-                    // Display Page Navigation
                     if (!string.IsNullOrEmpty(m_MarkToMarkTableSearchPattern))
                         arraySize = m_MarkToMarkTableSearchList.Count;
 
@@ -1813,10 +1665,8 @@ namespace TMPro.EditorUtilities
 
                 if (arraySize > 0)
                 {
-                    // Display each GlyphInfo entry using the GlyphInfo property drawer.
                     for (int i = itemsPerPage * m_CurrentMarkToMarkPage; i < arraySize && i < itemsPerPage * (m_CurrentMarkToMarkPage + 1); i++)
                     {
-                        // Define the start of the selection region of the element.
                         Rect elementStartRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
                         int elementIndex = i;
@@ -1840,10 +1690,8 @@ namespace TMPro.EditorUtilities
 
                         EditorGUILayout.EndVertical();
 
-                        // Define the end of the selection region of the element.
                         Rect elementEndRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
-                        // Check for Item selection
                         Rect selectionArea = new Rect(elementStartRegion.x, elementStartRegion.y, elementEndRegion.width, elementEndRegion.y - elementStartRegion.y);
                         if (DoSelectionCheck(selectionArea))
                         {
@@ -1858,22 +1706,18 @@ namespace TMPro.EditorUtilities
                             }
                         }
 
-                        // Draw Selection Highlight and Kerning Pair Options
                         if (m_SelectedMarkToMarkRecord == i)
                         {
-                            // Reset other selections
                             ResetSelections(RecordSelectionType.MarkToMarkRecord);
 
                             TMP_EditorUtility.DrawBox(selectionArea, 2f, new Color32(40, 192, 255, 255));
 
-                            // Draw Glyph management options
                             Rect controlRect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * 1f);
                             float optionAreaWidth = controlRect.width;
                             float btnWidth = optionAreaWidth / 4;
 
                             Rect position = new Rect(controlRect.x + controlRect.width - btnWidth, controlRect.y, btnWidth, controlRect.height);
 
-                            // Remove Mark to Base Record
                             GUI.enabled = true;
                             if (GUI.Button(position, "Remove"))
                             {
@@ -1900,7 +1744,6 @@ namespace TMPro.EditorUtilities
 
             if (serializedObject.ApplyModifiedProperties() || evt_cmd == k_UndoRedo || isAssetDirty || m_IsFallbackGlyphCacheDirty)
             {
-                // Delay callback until user has decided to Apply or Revert the changes.
                 if (m_DisplayDestructiveChangeWarning == false)
                 {
                     TMP_ResourceManager.RebuildFontAssetCache();
@@ -1916,7 +1759,6 @@ namespace TMPro.EditorUtilities
             }
 
 
-            // Clear selection if mouse event was not consumed.
             GUI.enabled = true;
             if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
             {
@@ -2025,7 +1867,6 @@ namespace TMPro.EditorUtilities
                     return FontEngineError.Success;
             }
 
-            // Requires Unity 2018.4.35f1
             return FontEngine.LoadFontFace(m_fontAsset.faceInfo.familyName, m_fontAsset.faceInfo.styleName, pointSize);
         }
 
@@ -2149,7 +1990,6 @@ namespace TMPro.EditorUtilities
             Rect rect = EditorGUILayout.GetControlRect(false, 20);
 
             rect.width /= 6;
-            // Add Style
             rect.x = rect.width * 4 + 17;
             if (GUI.Button(rect, "+"))
             {
@@ -2158,10 +1998,8 @@ namespace TMPro.EditorUtilities
                 if (index > recordCount)
                     index = recordCount;
 
-                // Copy selected element
                 property.InsertArrayElementAtIndex(index);
 
-                // Select newly inserted element
                 selectedRecord = index + 1;
 
                 serializedObject.ApplyModifiedProperties();
@@ -2170,7 +2008,6 @@ namespace TMPro.EditorUtilities
 
             }
 
-            // Delete style
             rect.x += rect.width;
             if (selectedRecord == -1 || selectedRecord >= recordCount) GUI.enabled = false;
             if (GUI.Button(rect, "-"))
@@ -2195,29 +2032,25 @@ namespace TMPro.EditorUtilities
             Rect pagePos = EditorGUILayout.GetControlRect(false, 20);
             pagePos.width /= 3;
 
-            int shiftMultiplier = Event.current.shift ? 10 : 1; // Page + Shift goes 10 page forward
+            int shiftMultiplier = Event.current.shift ? 10 : 1;
 
-            // Previous Page
             GUI.enabled = currentPage > 0;
 
             if (GUI.Button(pagePos, "Previous Page"))
                 currentPage -= 1 * shiftMultiplier;
 
 
-            // Page Counter
             GUI.enabled = true;
             pagePos.x += pagePos.width;
             int totalPages = (int)(arraySize / (float)itemsPerPage + 0.999f);
             GUI.Label(pagePos, "Page " + (currentPage + 1) + " / " + totalPages, TMP_UIStyleManager.centeredLabel);
 
-            // Next Page
             pagePos.x += pagePos.width;
             GUI.enabled = itemsPerPage * (currentPage + 1) < arraySize;
 
             if (GUI.Button(pagePos, "Next Page"))
                 currentPage += 1 * shiftMultiplier;
 
-            // Clamp page range
             currentPage = Mathf.Clamp(currentPage, 0, arraySize / itemsPerPage);
 
             GUI.enabled = true;
@@ -2231,24 +2064,19 @@ namespace TMPro.EditorUtilities
         /// <param name="dstGlyphID"></param>
         bool AddNewGlyph(int srcIndex, int dstGlyphID)
         {
-            // Make sure Destination Glyph ID doesn't already contain a Glyph
             if (m_fontAsset.glyphLookupTable.ContainsKey((uint)dstGlyphID))
                 return false;
 
-            // Add new element to glyph list.
             m_GlyphTable_prop.arraySize += 1;
 
-            // Get a reference to the source glyph.
             SerializedProperty sourceGlyph = m_GlyphTable_prop.GetArrayElementAtIndex(srcIndex);
 
             int dstIndex = m_GlyphTable_prop.arraySize - 1;
 
-            // Get a reference to the target / destination glyph.
             SerializedProperty targetGlyph = m_GlyphTable_prop.GetArrayElementAtIndex(dstIndex);
 
             CopyGlyphSerializedProperty(sourceGlyph, ref targetGlyph);
 
-            // Update the ID of the glyph
             targetGlyph.FindPropertyRelative("m_Index").intValue = dstGlyphID;
 
             serializedObject.ApplyModifiedProperties();
@@ -2273,14 +2101,12 @@ namespace TMPro.EditorUtilities
 
             m_GlyphTable_prop.DeleteArrayElementAtIndex(index);
 
-            // Remove all characters referencing this glyph.
             for (int i = 0; i < m_CharacterTable_prop.arraySize; i++)
             {
                 int glyphIndex = m_CharacterTable_prop.GetArrayElementAtIndex(i).FindPropertyRelative("m_GlyphIndex").intValue;
 
                 if (glyphIndex == targetGlyphIndex)
                 {
-                    // Remove character
                     m_CharacterTable_prop.DeleteArrayElementAtIndex(i);
                 }
             }
@@ -2292,24 +2118,19 @@ namespace TMPro.EditorUtilities
 
         bool AddNewCharacter(int srcIndex, int dstGlyphID)
         {
-            // Make sure Destination Glyph ID doesn't already contain a Glyph
             if (m_fontAsset.characterLookupTable.ContainsKey((uint)dstGlyphID))
                 return false;
 
-            // Add new element to glyph list.
             m_CharacterTable_prop.arraySize += 1;
 
-            // Get a reference to the source glyph.
             SerializedProperty sourceCharacter = m_CharacterTable_prop.GetArrayElementAtIndex(srcIndex);
 
             int dstIndex = m_CharacterTable_prop.arraySize - 1;
 
-            // Get a reference to the target / destination glyph.
             SerializedProperty targetCharacter = m_CharacterTable_prop.GetArrayElementAtIndex(dstIndex);
 
             CopyCharacterSerializedProperty(sourceCharacter, ref targetCharacter);
 
-            // Update the ID of the glyph
             targetCharacter.FindPropertyRelative("m_Unicode").intValue = dstGlyphID;
 
             serializedObject.ApplyModifiedProperties();
@@ -2366,7 +2187,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        // Check if any of the Style elements were clicked on.
         private bool DoSelectionCheck(Rect selectionArea)
         {
             Event currentEvent = Event.current;
@@ -2422,7 +2242,6 @@ namespace TMPro.EditorUtilities
 
             uint key = secondGlyphIndex << 16 | firstGlyphIndex;
 
-            // Lookup dictionary entry and update it
             if (m_FontFeatureTable.m_GlyphPairAdjustmentRecordLookup.ContainsKey(key))
                 m_FontFeatureTable.m_GlyphPairAdjustmentRecordLookup[key] = pairAdjustmentRecord;
         }
@@ -2443,9 +2262,7 @@ namespace TMPro.EditorUtilities
 
             pairAdjustmentRecord.secondAdjustmentRecord = new GlyphAdjustmentRecord(secondGlyphIndex, secondValueRecord);
 
-            // TODO : Need to revise how Everything is handled in the event more enum values are added.
             int flagValue = property.FindPropertyRelative("m_FeatureLookupFlags").intValue;
-            //pairAdjustmentRecord.featureLookupFlags = flagValue == -1 ? FontFeatureLookupFlags.IgnoreLigatures | FontFeatureLookupFlags.IgnoreSpacingAdjustments : (FontFeatureLookupFlags) flagValue;
 
             return pairAdjustmentRecord;
         }
@@ -2487,7 +2304,6 @@ namespace TMPro.EditorUtilities
 
             uint key = secondGlyphIndex << 16 | firstGlyphIndex;
 
-            // Lookup dictionary entry and update it
             if (m_FontFeatureTable.m_MarkToBaseAdjustmentRecordLookup.ContainsKey(key))
                 m_FontFeatureTable.m_MarkToBaseAdjustmentRecordLookup[key] = adjustmentRecord;
         }
@@ -2524,7 +2340,6 @@ namespace TMPro.EditorUtilities
 
             uint key = secondGlyphIndex << 16 | firstGlyphIndex;
 
-            // Lookup dictionary entry and update it
             if (m_FontFeatureTable.m_MarkToMarkAdjustmentRecordLookup.ContainsKey(key))
                 m_FontFeatureTable.m_MarkToMarkAdjustmentRecordLookup[key] = adjustmentRecord;
         }
@@ -2559,10 +2374,8 @@ namespace TMPro.EditorUtilities
         /// <param name="dstGlyph"></param>
         void CopyGlyphSerializedProperty(SerializedProperty srcGlyph, ref SerializedProperty dstGlyph)
         {
-            // TODO : Should make a generic function which copies each of the properties.
             dstGlyph.FindPropertyRelative("m_Index").intValue = srcGlyph.FindPropertyRelative("m_Index").intValue;
 
-            // Glyph -> GlyphMetrics
             SerializedProperty srcGlyphMetrics = srcGlyph.FindPropertyRelative("m_Metrics");
             SerializedProperty dstGlyphMetrics = dstGlyph.FindPropertyRelative("m_Metrics");
 
@@ -2572,7 +2385,6 @@ namespace TMPro.EditorUtilities
             dstGlyphMetrics.FindPropertyRelative("m_HorizontalBearingY").floatValue = srcGlyphMetrics.FindPropertyRelative("m_HorizontalBearingY").floatValue;
             dstGlyphMetrics.FindPropertyRelative("m_HorizontalAdvance").floatValue = srcGlyphMetrics.FindPropertyRelative("m_HorizontalAdvance").floatValue;
 
-            // Glyph -> GlyphRect
             SerializedProperty srcGlyphRect = srcGlyph.FindPropertyRelative("m_GlyphRect");
             SerializedProperty dstGlyphRect = dstGlyph.FindPropertyRelative("m_GlyphRect");
 
@@ -2588,7 +2400,6 @@ namespace TMPro.EditorUtilities
 
         void CopyCharacterSerializedProperty(SerializedProperty source, ref SerializedProperty target)
         {
-            // TODO : Should make a generic function which copies each of the properties.
             int unicode = source.FindPropertyRelative("m_Unicode").intValue;
             target.FindPropertyRelative("m_Unicode").intValue = unicode;
 
@@ -2618,19 +2429,8 @@ namespace TMPro.EditorUtilities
 
                 int id = sourceGlyph.FindPropertyRelative("m_Index").intValue;
 
-                // Check for potential match against a character.
-                //if (searchPattern.Length == 1 && id == searchPattern[0])
-                //    searchResults.Add(i);
-
-                // Check for potential match against decimal id
                 if (id.ToString().Contains(searchPattern))
                     searchResults.Add(i);
-
-                //if (id.ToString("x").Contains(searchPattern))
-                //    searchResults.Add(i);
-
-                //if (id.ToString("X").Contains(searchPattern))
-                //    searchResults.Add(i);
             }
         }
 
@@ -2649,17 +2449,12 @@ namespace TMPro.EditorUtilities
 
                 int id = sourceCharacter.FindPropertyRelative("m_Unicode").intValue;
 
-                // Check for potential match against a character.
                 if (searchPattern.Length == 1 && id == searchPattern[0])
                     searchResults.Add(i);
                 else if (id.ToString("x").Contains(searchPattern))
                     searchResults.Add(i);
                 else if (id.ToString("X").Contains(searchPattern))
                     searchResults.Add(i);
-
-                // Check for potential match against decimal id
-                //if (id.ToString().Contains(searchPattern))
-                //    searchResults.Add(i);
             }
         }
 
@@ -2669,7 +2464,6 @@ namespace TMPro.EditorUtilities
 
             searchResults.Clear();
 
-            // Lookup glyph index of potential characters contained in the search pattern.
             uint firstGlyphIndex = 0;
             TMP_Character firstCharacterSearch;
 
@@ -2708,7 +2502,6 @@ namespace TMPro.EditorUtilities
 
             searchResults.Clear();
 
-            // Lookup glyph index of potential characters contained in the search pattern.
             uint firstGlyphIndex = 0;
             TMP_Character firstCharacterSearch;
 
@@ -2750,7 +2543,6 @@ namespace TMPro.EditorUtilities
 
             searchResults.Clear();
 
-            // Lookup glyph index of potential characters contained in the search pattern.
             uint firstGlyphIndex = 0;
             TMP_Character firstCharacterSearch;
 
@@ -2789,7 +2581,6 @@ namespace TMPro.EditorUtilities
 
             searchResults.Clear();
 
-            // Lookup glyph index of potential characters contained in the search pattern.
             uint firstGlyphIndex = 0;
             TMP_Character firstCharacterSearch;
 
@@ -2848,10 +2639,8 @@ namespace TMPro.EditorUtilities
             origin.x = origin.x - (baseGlyph.metrics.horizontalBearingX + baseGlyph.metrics.width / 2) * scale;
             origin.y = origin.y + (baseGlyph.metrics.horizontalBearingY - baseGlyph.metrics.height / 2) * scale;
 
-            // Draw Baseline
             DrawBaseline(origin, rect.width, Color.grey);
 
-            // Draw Origin
             DrawAnchorPoint(origin, Color.yellow);
 
             Rect baseGlyphPosition = new Rect(origin.x + baseGlyph.metrics.horizontalBearingX * scale, origin.y - baseGlyph.metrics.horizontalBearingY * scale , rect.width, rect.height);
@@ -2862,14 +2651,12 @@ namespace TMPro.EditorUtilities
 
             DrawAnchorPoint(baseAnchorPosition, Color.green);
 
-            // Draw Mark
             if (m_fontAsset.glyphLookupTable.ContainsKey(markGlyphIndex))
             {
                 Glyph markGlyph = m_fontAsset.glyphLookupTable[markGlyphIndex];
 
                 Rect markGlyphPosition = new Rect(baseAnchorPosition.x + (markGlyph.metrics.horizontalBearingX - adjustmentRecord.markPositionAdjustment.xPositionAdjustment) * scale, baseAnchorPosition.y + (adjustmentRecord.markPositionAdjustment.yPositionAdjustment - markGlyph.metrics.horizontalBearingY) * scale, markGlyph.metrics.width, markGlyph.metrics.height);
 
-                // Draw Mark Origin
                 DrawGlyph(markGlyph, markGlyphPosition, scale);
             }
         }
@@ -2900,10 +2687,8 @@ namespace TMPro.EditorUtilities
             origin.x = origin.x - (baseGlyph.metrics.horizontalBearingX + baseGlyph.metrics.width / 2) * scale;
             origin.y = origin.y + (baseGlyph.metrics.horizontalBearingY - baseGlyph.metrics.height / 2) * scale;
 
-            // Draw Baseline
             DrawBaseline(origin, rect.width, Color.grey);
 
-            // Draw Origin
             DrawAnchorPoint(origin, Color.yellow);
 
             Rect baseGlyphPosition = new Rect(origin.x + baseGlyph.metrics.horizontalBearingX * scale, origin.y - baseGlyph.metrics.horizontalBearingY * scale , rect.width, rect.height);
@@ -2914,7 +2699,6 @@ namespace TMPro.EditorUtilities
 
             DrawAnchorPoint(baseAnchorPosition, Color.green);
 
-            // Draw Mark Glyph
             if (m_fontAsset.glyphLookupTable.ContainsKey(markGlyphIndex))
             {
                 Glyph markGlyph = m_fontAsset.glyphLookupTable[markGlyphIndex];
@@ -2929,7 +2713,6 @@ namespace TMPro.EditorUtilities
         {
             Handles.color = color;
 
-            // Horizontal line
             Handles.DrawLine(new Vector2(0f, position.y), new Vector2(width, position.y));
         }
 
@@ -2937,16 +2720,13 @@ namespace TMPro.EditorUtilities
         {
             Handles.color = color;
 
-            // Horizontal line
             Handles.DrawLine(new Vector2(position.x - 25, position.y), new Vector2(position.x + 25, position.y));
 
-            // Vertical line
             Handles.DrawLine(new Vector2(position.x, position.y - 25), new Vector2(position.x, position.y + 25));
         }
 
         void DrawGlyph(Glyph glyph, Rect position, float scale)
         {
-            // Get the atlas index of the glyph and lookup its atlas texture
             int atlasIndex = glyph.atlasIndex;
             Texture2D atlasTexture = m_fontAsset.atlasTextures.Length > atlasIndex ? m_fontAsset.atlasTextures[atlasIndex] : null;
 
@@ -2990,20 +2770,15 @@ namespace TMPro.EditorUtilities
             int glyphWidth = glyphRect.width + padding * 2;
             int glyphHeight = glyphRect.height + padding * 2;
 
-            // Compute the normalized texture coordinates
             Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width, (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width, (float)glyphHeight / atlasTexture.height);
 
             if (Event.current.type == EventType.Repaint)
             {
-                // Draw glyph from atlas texture.
                 Rect glyphDrawPosition = new Rect(position.x - padding * scale, position.y - padding * scale, position.width, position.height);
 
-                //glyphDrawPosition.x += (glyphDrawPosition.width - glyphWidth * scale); // / 2;
-                //glyphDrawPosition.y += (glyphDrawPosition.height - glyphHeight * scale); // / 2;
                 glyphDrawPosition.width = glyphWidth * scale;
                 glyphDrawPosition.height = glyphHeight * scale;
 
-                // Could switch to using the default material of the font asset which would require passing scale to the shader.
                 Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(0.8f, 0.8f, 0.8f), mat);
             }
         }

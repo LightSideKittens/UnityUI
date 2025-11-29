@@ -19,10 +19,8 @@ namespace TMPro
             TMP_FontAsset.GetSourceFontRef += TMP_EditorResourceManager.GetSourceFontRef;
             TMP_FontAsset.SetSourceFontGUID += TMP_EditorResourceManager.SetSourceFontGUID;
 
-            // Callback to handle clearing dynamic font asset data when closing the Editor
             EditorApplication.quitting += () =>
             {
-                // Find all font assets in the project
                 string searchPattern = "t:TMP_FontAsset";
                 string[] fontAssetGUIDs = AssetDatabase.FindAssets(searchPattern);
 
@@ -73,7 +71,6 @@ namespace TMPro
         /// </summary>
         private TMP_EditorResourceManager()
         {
-            // Register to the appropriate callback for the given render pipeline.
             if (RenderPipelineManager.currentPipeline == null)
                 Camera.onPostRender += OnCameraPostRender;
             else
@@ -90,7 +87,6 @@ namespace TMPro
 
         void OnCameraPostRender(Camera cam)
         {
-            // Exclude the PreRenderCamera
             if (cam.cameraType != CameraType.SceneView)
                 return;
 
@@ -120,7 +116,6 @@ namespace TMPro
         /// <param name="obj"></param>
         internal static void RegisterResourceForReimport(Object obj)
         {
-            // Return if referenced object is not a persistent asset
             if (!EditorUtility.IsPersistent(obj))
                 return;
 
@@ -144,7 +139,6 @@ namespace TMPro
         /// <param name="obj"></param>
         internal static void RegisterResourceForUpdate(Object obj)
         {
-            // Return if referenced object is not a persistent asset
             if (!EditorUtility.IsPersistent(obj))
                 return;
 
@@ -189,7 +183,6 @@ namespace TMPro
         /// <param name="obj">The object to which this texture sub object will be added.</param>
         internal static void AddTextureToAsset(Texture tex, Object obj)
         {
-            // Return if referenced object is not a persistent asset
             if (!EditorUtility.IsPersistent(obj))
                 return;
 
@@ -222,7 +215,6 @@ namespace TMPro
 
         void DoPostRenderUpdates()
         {
-            // Handle objects that need updating
             int objUpdateCount = m_ObjectUpdateQueue.Count;
 
             for (int i = 0; i < objUpdateCount; i++)
@@ -235,20 +227,15 @@ namespace TMPro
                 Object obj = m_ObjectUpdateQueue[i];
                 if (obj != null)
                 {
-                    //EditorUtility.SetDirty(obj);
                 }
             }
 
             if (objUpdateCount > 0)
             {
-                //Debug.Log("Saving assets");
-                //AssetDatabase.SaveAssets();
-
                 m_ObjectUpdateQueue.Clear();
                 m_ObjectUpdateQueueLookup.Clear();
             }
 
-            // Handle objects that need re-importing
             int objReImportCount = m_ObjectReImportQueue.Count;
 
             for (int i = 0; i < objReImportCount; i++)
@@ -258,7 +245,6 @@ namespace TMPro
                 {
                     string assetPath = AssetDatabase.GetAssetPath(obj);
 
-                    // Exclude Assets not located in the project
                     if (assetPath.StartsWith("Assets/", System.StringComparison.OrdinalIgnoreCase))
                         AssetDatabase.ImportAsset(assetPath);
                 }
@@ -273,7 +259,6 @@ namespace TMPro
 
         void DoPreRenderUpdates()
         {
-            // Handle Font Asset Definition Refresh
             for (int i = 0; i < m_FontAssetDefinitionRefreshQueue.Count; i++)
             {
                 TMP_FontAsset fontAsset = m_FontAssetDefinitionRefreshQueue[i];

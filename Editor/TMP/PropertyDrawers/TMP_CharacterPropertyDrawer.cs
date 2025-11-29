@@ -19,7 +19,6 @@ namespace TMPro.EditorUtilities
             SerializedProperty prop_GlyphIndex = property.FindPropertyRelative("m_GlyphIndex");
             SerializedProperty prop_Scale = property.FindPropertyRelative("m_Scale");
 
-            // Refresh glyph proxy lookup dictionary if needed
             if (TMP_PropertyDrawerUtilities.s_RefreshGlyphProxyLookup)
                 TMP_PropertyDrawerUtilities.RefreshGlyphProxyLookup(property.serializedObject);
 
@@ -31,7 +30,6 @@ namespace TMPro.EditorUtilities
 
             Rect rect = new Rect(position.x + 50, position.y, position.width, 49);
 
-            // Display non-editable fields
             if (GUI.enabled == false)
             {
                 int unicode = prop_Unicode.intValue;
@@ -40,10 +38,9 @@ namespace TMPro.EditorUtilities
                 EditorGUI.LabelField(new Rect(rect.x, rect.y + 18, 120, 18), new GUIContent("Glyph ID: <color=#FFFF80>" + prop_GlyphIndex.intValue + "</color>"), style);
                 EditorGUI.LabelField(new Rect(rect.x, rect.y + 36, 80, 18), new GUIContent("Scale: <color=#FFFF80>" + prop_Scale.floatValue + "</color>"), style);
 
-                // Draw Glyph (if exists)
                 DrawGlyph((uint)prop_GlyphIndex.intValue, new Rect(position.x, position.y, 48, 58), property);
             }
-            else // Display editable fields
+            else
             {
                 EditorGUIUtility.labelWidth = 55f;
                 GUI.SetNextControlName("Unicode Input");
@@ -52,7 +49,6 @@ namespace TMPro.EditorUtilities
 
                 if (GUI.GetNameOfFocusedControl() == "Unicode Input")
                 {
-                    //Filter out unwanted characters.
                     char chr = Event.current.character;
                     if ((chr < '0' || chr > '9') && (chr < 'a' || chr > 'f') && (chr < 'A' || chr > 'F'))
                     {
@@ -62,11 +58,9 @@ namespace TMPro.EditorUtilities
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    // Update Unicode value
                     prop_Unicode.intValue = TMP_TextUtilities.StringHexToInt(unicode);
                 }
 
-                // Cache current glyph index in case it needs to be restored if the new glyph index is invalid.
                 int currentGlyphIndex = prop_GlyphIndex.intValue;
 
                 EditorGUIUtility.labelWidth = 59f;
@@ -74,10 +68,8 @@ namespace TMPro.EditorUtilities
                 EditorGUI.DelayedIntField(new Rect(rect.x, rect.y + 18, 100, 18), prop_GlyphIndex, new GUIContent("Glyph ID:"));
                 if (EditorGUI.EndChangeCheck())
                 {
-                    // Get a reference to the font asset
                     TMP_FontAsset fontAsset = property.serializedObject.targetObject as TMP_FontAsset;
 
-                    // Make sure new glyph index is valid.
                     int elementIndex = fontAsset.glyphTable.FindIndex(item => item.index == prop_GlyphIndex.intValue);
 
                     if (elementIndex == -1)
@@ -88,11 +80,9 @@ namespace TMPro.EditorUtilities
 
                 int glyphIndex = prop_GlyphIndex.intValue;
 
-                // Reset glyph selection if new character has been selected.
                 if (GUI.enabled && m_GlyphSelectedForEditing != glyphIndex)
                     m_GlyphSelectedForEditing = -1;
 
-                // Display button to edit the glyph data.
                 if (GUI.Button(new Rect(rect.x + 120, rect.y + 18, 75, 18), new GUIContent("Edit Glyph")))
                 {
                     if (m_GlyphSelectedForEditing == -1)
@@ -100,19 +90,15 @@ namespace TMPro.EditorUtilities
                     else
                         m_GlyphSelectedForEditing = -1;
 
-                    // Button clicks should not result in potential change.
                     GUI.changed = false;
                 }
 
-                // Show the glyph property drawer if selected
                 if (glyphIndex == m_GlyphSelectedForEditing && GUI.enabled)
                 {
-                    // Get a reference to the font asset
                     TMP_FontAsset fontAsset = property.serializedObject.targetObject as TMP_FontAsset;
 
                     if (fontAsset != null)
                     {
-                        // Get the index of the glyph in the font asset glyph table.
                         int elementIndex = fontAsset.glyphTable.FindIndex(item => item.index == glyphIndex);
 
                         if (elementIndex != -1)
@@ -127,13 +113,11 @@ namespace TMPro.EditorUtilities
                             EditorGUI.DrawRect(new Rect(newRect.x + 52, newRect.y - 20, newRect.width - 52, newRect.height - 5), new Color(0.1f, 0.1f, 0.1f, 0.45f));
                             EditorGUI.DrawRect(new Rect(newRect.x + 53, newRect.y - 19, newRect.width - 54, newRect.height - 7), new Color(0.3f, 0.3f, 0.3f, 0.8f));
 
-                            // Display GlyphRect
                             newRect.x += 55;
                             newRect.y -= 18;
                             newRect.width += 5;
                             EditorGUI.PropertyField(newRect, prop_GlyphRect);
 
-                            // Display GlyphMetrics
                             newRect.y += 45;
                             EditorGUI.PropertyField(newRect, prop_GlyphMetrics);
 
@@ -145,7 +129,6 @@ namespace TMPro.EditorUtilities
                 EditorGUIUtility.labelWidth = 39f;
                 EditorGUI.PropertyField(new Rect(rect.x, rect.y + 36, 80, 18), prop_Scale, new GUIContent("Scale:"));
 
-                // Draw Glyph (if exists)
                 DrawGlyph((uint)prop_GlyphIndex.intValue, new Rect(position.x, position.y, 48, 58), property);
             }
         }
@@ -157,7 +140,6 @@ namespace TMPro.EditorUtilities
 
         void DrawGlyph(uint glyphIndex, Rect glyphDrawPosition, SerializedProperty property)
         {
-            // Get a reference to the serialized object which can either be a TMP_FontAsset or FontAsset.
             SerializedObject so = property.serializedObject;
             if (so == null)
                 return;
@@ -165,7 +147,6 @@ namespace TMPro.EditorUtilities
             if (m_GlyphLookupDictionary == null)
                 m_GlyphLookupDictionary = TMP_PropertyDrawerUtilities.GetGlyphProxyLookupDictionary(so);
 
-            // Try getting a reference to the glyph for the given glyph index.
             if (!m_GlyphLookupDictionary.TryGetValue(glyphIndex, out GlyphProxy glyph))
                 return;
 
@@ -191,7 +172,6 @@ namespace TMPro.EditorUtilities
             float normalizedHeight = ascentLine - descentLine;
             float scale = glyphDrawPosition.width / normalizedHeight;
 
-            // Compute the normalized texture coordinates
             Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width, (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width, (float)glyphHeight / atlasTexture.height);
 
             if (Event.current.type == EventType.Repaint)
@@ -201,7 +181,6 @@ namespace TMPro.EditorUtilities
                 glyphDrawPosition.width = glyphWidth * scale;
                 glyphDrawPosition.height = glyphHeight * scale;
 
-                // Could switch to using the default material of the font asset which would require passing scale to the shader.
                 Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f), mat);
             }
         }

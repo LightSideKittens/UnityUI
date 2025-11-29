@@ -129,14 +129,21 @@ namespace TMPro
             
             input = Normalize();
 
-            var lines = BiDi.WrapAndReorder(input, this);
-            input = BiDi.BuildVisualTextWithNewlines(lines);
+            if (lastWrapMode == TextWrappingModes.NoWrap)
+            {
+                input = BiDi.DoBiDi(input, out _);
+            }
+            else
+            {
+                var lines = BiDi.WrapAndReorder(input, this);
+                input = BiDi.BuildVisualTextWithNewlines(lines);
+            }
 
             preprocessedText = input;
-            m_TextWrappingMode = lastWrapMode;
             m_renderMode = lastRenderMode;
             isAfterRebuildProcessing = true;
             ForceMeshUpdate();
+            m_TextWrappingMode = lastWrapMode;
             isAfterRebuildProcessing = false;
             
             string Normalize()
@@ -1255,7 +1262,7 @@ namespace TMPro
             k_InsertNewLineMarker.Begin();
 
             float baselineAdjustmentDelta = m_maxLineAscender - m_startOfLineAscender;
-            if (m_lineOffset > 0 && Math.Abs(baselineAdjustmentDelta) > 0.01f && m_IsDrivenLineSpacing == false && !m_isNewPage)
+            if (m_lineOffset > 0 && Math.Abs(baselineAdjustmentDelta) > 0.01f && m_IsDrivenLineSpacing == false)
             {
                 AdjustLineOffset(m_firstCharacterOfLine, m_characterCount, baselineAdjustmentDelta);
                 m_ElementDescender -= baselineAdjustmentDelta;
@@ -1344,7 +1351,6 @@ namespace TMPro
             state.total_CharacterCount = count;
             state.visible_CharacterCount = m_lineVisibleCharacterCount;
             state.visibleSpaceCount = m_lineVisibleSpaceCount;
-            state.visible_LinkCount = m_textInfo.linkCount;
 
             state.firstCharacterIndex = m_firstCharacterOfLine;
             state.firstVisibleCharacterIndex = m_firstVisibleCharacterOfLine;
@@ -1362,7 +1368,6 @@ namespace TMPro
             state.startOfLineAscender = m_startOfLineAscender;
             state.maxLineAscender = m_maxLineAscender;
             state.maxLineDescender = m_maxLineDescender;
-            state.pageAscender = m_PageAscender;
 
             state.preferredWidth = m_preferredWidth;
             state.preferredHeight = m_preferredHeight;
@@ -1452,7 +1457,6 @@ namespace TMPro
             m_startOfLineAscender = state.startOfLineAscender;
             m_maxLineAscender = state.maxLineAscender;
             m_maxLineDescender = state.maxLineDescender;
-            m_PageAscender = state.pageAscender;
 
             m_preferredWidth = state.preferredWidth;
             m_preferredHeight = state.preferredHeight;

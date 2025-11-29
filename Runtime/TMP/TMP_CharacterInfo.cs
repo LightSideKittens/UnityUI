@@ -145,8 +145,6 @@ namespace TMPro
         public float pointSize;
 
         public int lineNumber;
-        public int pageNumber;
-
 
         public int vertexIndex;
         public TMP_Vertex vertex_BL;

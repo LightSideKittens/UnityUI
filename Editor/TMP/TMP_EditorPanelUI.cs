@@ -65,7 +65,6 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.PropertyField(m_RaycastTargetProp, k_RaycastTargetLabel);
             if (EditorGUI.EndChangeCheck())
             {
-                // Change needs to propagate to the child sub objects.
                 Graphic[] graphicComponents = m_TextComponent.GetComponentsInChildren<Graphic>();
                 for (int i = 1; i < graphicComponents.Length; i++)
                     graphicComponents[i].raycastTarget = m_RaycastTargetProp.boolValue;
@@ -85,7 +84,6 @@ namespace TMPro.EditorUtilities
             {
                 m_TextComponent.maskable = m_MaskableProp.boolValue;
 
-                // Change needs to propagate to the child sub objects.
                 MaskableGraphic[] maskableGraphics = m_TextComponent.GetComponentsInChildren<MaskableGraphic>();
                 for (int i = 1; i < maskableGraphics.Length; i++)
                     maskableGraphics[i].maskable = m_MaskableProp.boolValue;
@@ -94,7 +92,6 @@ namespace TMPro.EditorUtilities
             }
         }
 
-        // Method to handle multi object selection
         protected override bool IsMixSelectionTypes()
         {
             GameObject[] objects = Selection.gameObjects;
@@ -117,7 +114,6 @@ namespace TMPro.EditorUtilities
             {
                 for (int i = 0; i < targets.Length; i++)
                 {
-                    //Debug.Log("Undo & Redo Performed detected in Editor Panel. Event ID:" + Undo.GetCurrentGroup());
                     TMPro_EventManager.ON_TEXTMESHPRO_UGUI_PROPERTY_CHANGED(true, targets[i] as TextMeshProUGUI);
                     s_EventId = undoEventId;
                 }

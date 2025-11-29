@@ -31,7 +31,6 @@ namespace TMPro.EditorUtilities
             float labelWidth = GUI.skin.label.CalcSize(new GUIContent("ID: " + prop_GlyphIndex.intValue)).x;
             EditorGUI.LabelField(new Rect(position.x + (64 - labelWidth) / 2, position.y + 85, 64f, 18f), new GUIContent("ID: <color=#FFFF80>" + prop_GlyphIndex.intValue + "</color>"), style);
 
-            // We get Rect since a valid position may not be provided by the caller.
             EditorGUI.PropertyField(new Rect(rect.x, rect.y, position.width, 49), prop_GlyphRect);
 
             rect.y += 45;
@@ -60,7 +59,6 @@ namespace TMPro.EditorUtilities
 
         void DrawGlyph(Rect glyphDrawPosition, SerializedProperty property)
         {
-            // Get a reference to the serialized object which can either be a TMP_FontAsset or FontAsset.
             SerializedObject so = property.serializedObject;
             if (so == null)
                 return;
@@ -88,7 +86,6 @@ namespace TMPro.EditorUtilities
             float normalizedHeight = ascentLine - descentLine;
             float scale = glyphDrawPosition.width / normalizedHeight;
 
-            // Compute the normalized texture coordinates
             Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width, (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width, (float)glyphHeight / atlasTexture.height);
 
             if (Event.current.type == EventType.Repaint)
@@ -98,7 +95,6 @@ namespace TMPro.EditorUtilities
                 glyphDrawPosition.width = glyphWidth * scale;
                 glyphDrawPosition.height = glyphHeight * scale;
 
-                // Could switch to using the default material of the font asset which would require passing scale to the shader.
                 Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f), mat);
             }
         }

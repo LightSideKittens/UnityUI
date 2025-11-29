@@ -13,7 +13,6 @@ namespace TMPro
         {
             if (target == BuildTarget.iOS)
             {
-                // Try loading the TMP Settings
                 TMP_Settings settings = Resources.Load<TMP_Settings>("TMP Settings");
 
                 if (settings == null || TMP_Settings.enableEmojiSupport == false)

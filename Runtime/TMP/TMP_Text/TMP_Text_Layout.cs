@@ -847,7 +847,7 @@ namespace TMPro
                         m_maxLineDescender - m_lineOffset;
                 }
 
-                if (m_lineNumber == 0 || m_isNewPage)
+                if (m_lineNumber == 0)
                 {
                     if (isFirstCharacterOfLine || isWhiteSpace == false)
                     {
@@ -856,13 +856,7 @@ namespace TMPro
                             m_currentFontAsset.m_FaceInfo.capLine * currentElementScale / smallCapsMultiplier);
                     }
                 }
-
-                if (m_lineOffset == 0)
-                {
-                    if (!isWhiteSpace || m_characterCount == m_firstCharacterOfLine)
-                        m_PageAscender = m_PageAscender > elementAscender ? m_PageAscender : elementAscender;
-                }
-
+                
                 #endregion
 
                 bool isJustifiedOrFlush =
@@ -967,7 +961,7 @@ namespace TMPro
 
                             float baselineAdjustmentDelta = m_maxLineAscender - m_startOfLineAscender;
                             if (m_lineOffset > 0 && Math.Abs(baselineAdjustmentDelta) > 0.01f &&
-                                m_IsDrivenLineSpacing == false && !m_isNewPage)
+                                m_IsDrivenLineSpacing == false)
                             {
                                 m_ElementDescender -= baselineAdjustmentDelta;
                                 m_lineOffset += baselineAdjustmentDelta;
@@ -1029,7 +1023,7 @@ namespace TMPro
                 #region Adjust Line Spacing
 
                 if (m_lineOffset > 0 && !TMP_Math.Approximately(m_maxLineAscender, m_startOfLineAscender) &&
-                    m_IsDrivenLineSpacing == false && !m_isNewPage)
+                    m_IsDrivenLineSpacing == false)
                 {
                     float offsetDelta = m_maxLineAscender - m_startOfLineAscender;
                     m_ElementDescender -= offsetDelta;
@@ -1094,13 +1088,11 @@ namespace TMPro
                 {
                     float baselineAdjustmentDelta = m_maxLineAscender - m_startOfLineAscender;
                     if (m_lineOffset > 0 && Math.Abs(baselineAdjustmentDelta) > 0.01f &&
-                        m_IsDrivenLineSpacing == false && !m_isNewPage)
+                        m_IsDrivenLineSpacing == false)
                     {
                         m_ElementDescender -= baselineAdjustmentDelta;
                         m_lineOffset += baselineAdjustmentDelta;
                     }
-
-                    m_isNewPage = false;
 
                     float lineDescender = m_maxLineDescender - m_lineOffset;
 
