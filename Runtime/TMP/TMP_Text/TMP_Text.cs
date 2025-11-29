@@ -90,7 +90,7 @@ namespace TMPro
     public enum TMP_TextElementType { Character, Sprite };
     public enum MaskingTypes { MaskOff = 0, MaskHard = 1, MaskSoft = 2 };
 
-    public enum TextOverflowModes { Overflow = 0, Ellipsis = 1, Masking = 2, Truncate = 3, ScrollRect = 4, Page = 5, Linked = 6 };
+    public enum TextOverflowModes { Overflow = 0, Ellipsis = 1, Truncate = 3};
     public enum TextWrappingModes { NoWrap = 0, Normal = 1, PreserveWhitespace = 2, PreserveWhitespaceNoWrap = 3 };
     public enum TextureMappingOptions { Character = 0, Line = 1, Paragraph = 2, MatchAspect = 3 };
 
@@ -110,8 +110,8 @@ namespace TMPro
         
         protected void OnBeforeRebuild()
         {
-            return;
             if(isAfterRebuildProcessing) return;
+            preprocessedText = string.Empty;
             var input = m_text;
             if (string.IsNullOrEmpty(input)) return;
 
@@ -123,7 +123,6 @@ namespace TMPro
 
         protected void OnAfterRebuild()
         {
-            return;
             if(isAfterRebuildProcessing) return;
             var input = m_text;
             if (string.IsNullOrEmpty(input)) return;
@@ -187,7 +186,6 @@ namespace TMPro
         
         string ITextPreprocessor.PreprocessText(string input)
         {
-            return input;
             if (string.IsNullOrEmpty(preprocessedText))
             {
                 return input;
@@ -1718,83 +1716,52 @@ namespace TMPro
         protected virtual void FillCharacterVertexBuffers(int i)
         {
             int materialIndex = m_textInfo.characterInfo[i].materialReferenceIndex;
+            ref var meshInfo = ref m_textInfo.meshInfo[materialIndex];
             int index_X4 = m_textInfo.meshInfo[materialIndex].vertexCount;
 
-            if (index_X4 >= m_textInfo.meshInfo[materialIndex].vertices.Length)
-                m_textInfo.meshInfo[materialIndex].ResizeMeshInfo(Mathf.NextPowerOfTwo((index_X4 + 4) / 4));
-
+            if (index_X4 >= meshInfo.vertices.Length)
+                meshInfo.ResizeMeshInfo(Mathf.NextPowerOfTwo((index_X4 + 4) / 4));
 
             TMP_CharacterInfo[] characterInfoArray = m_textInfo.characterInfo;
             m_textInfo.characterInfo[i].vertexIndex = index_X4;
 
-            m_textInfo.meshInfo[materialIndex].vertices[0 + index_X4] = characterInfoArray[i].vertex_BL.position;
-            m_textInfo.meshInfo[materialIndex].vertices[1 + index_X4] = characterInfoArray[i].vertex_TL.position;
-            m_textInfo.meshInfo[materialIndex].vertices[2 + index_X4] = characterInfoArray[i].vertex_TR.position;
-            m_textInfo.meshInfo[materialIndex].vertices[3 + index_X4] = characterInfoArray[i].vertex_BR.position;
+            var chInfo = characterInfoArray[i];
+            var BL = chInfo.vertex_BL;
+            var TL = chInfo.vertex_TL;
+            var TR = chInfo.vertex_TR;
+            var BR = chInfo.vertex_BR;
+            var i0 = 0 + index_X4;
+            var i1 = 1 + index_X4;
+            var i2 = 2 + index_X4;
+            var i3 = 3 + index_X4;
+
+            var verts = meshInfo.vertices;
+            verts[i0] = BL.position;
+            verts[i1] = TL.position;
+            verts[i2] = TR.position;
+            verts[i3] = BR.position;
 
 
-            m_textInfo.meshInfo[materialIndex].uvs0[0 + index_X4] = characterInfoArray[i].vertex_BL.uv;
-            m_textInfo.meshInfo[materialIndex].uvs0[1 + index_X4] = characterInfoArray[i].vertex_TL.uv;
-            m_textInfo.meshInfo[materialIndex].uvs0[2 + index_X4] = characterInfoArray[i].vertex_TR.uv;
-            m_textInfo.meshInfo[materialIndex].uvs0[3 + index_X4] = characterInfoArray[i].vertex_BR.uv;
+            var uvs0 = meshInfo.uvs0;
+            uvs0[i0] = BL.uv;
+            uvs0[i1] = TL.uv;
+            uvs0[i2] = TR.uv;
+            uvs0[i3] = BR.uv;
 
+            var uvs2 = meshInfo.uvs2;
+            uvs2[i0] = BL.uv2;
+            uvs2[i1] = TL.uv2;
+            uvs2[i2] = TR.uv2;
+            uvs2[i3] = BR.uv2;
 
-            m_textInfo.meshInfo[materialIndex].uvs2[0 + index_X4] = characterInfoArray[i].vertex_BL.uv2;
-            m_textInfo.meshInfo[materialIndex].uvs2[1 + index_X4] = characterInfoArray[i].vertex_TL.uv2;
-            m_textInfo.meshInfo[materialIndex].uvs2[2 + index_X4] = characterInfoArray[i].vertex_TR.uv2;
-            m_textInfo.meshInfo[materialIndex].uvs2[3 + index_X4] = characterInfoArray[i].vertex_BR.uv2;
+            var colors = meshInfo.colors32;
+            colors[i0] = m_ConvertToLinearSpace ? BL.color.GammaToLinear() : BL.color;
+            colors[i1] = m_ConvertToLinearSpace ? TL.color.GammaToLinear() : TL.color;
+            colors[i2] = m_ConvertToLinearSpace ? TR.color.GammaToLinear() : TR.color;
+            colors[i3] = m_ConvertToLinearSpace ? BR.color.GammaToLinear() : BR.color;
 
-
-            m_textInfo.meshInfo[materialIndex].colors32[0 + index_X4] = m_ConvertToLinearSpace ? characterInfoArray[i].vertex_BL.color.GammaToLinear() : characterInfoArray[i].vertex_BL.color;
-            m_textInfo.meshInfo[materialIndex].colors32[1 + index_X4] = m_ConvertToLinearSpace ? characterInfoArray[i].vertex_TL.color.GammaToLinear() : characterInfoArray[i].vertex_TL.color;
-            m_textInfo.meshInfo[materialIndex].colors32[2 + index_X4] = m_ConvertToLinearSpace ? characterInfoArray[i].vertex_TR.color.GammaToLinear() : characterInfoArray[i].vertex_TR.color;
-            m_textInfo.meshInfo[materialIndex].colors32[3 + index_X4] = m_ConvertToLinearSpace ? characterInfoArray[i].vertex_BR.color.GammaToLinear() : characterInfoArray[i].vertex_BR.color;
-
-            m_textInfo.meshInfo[materialIndex].vertexCount = index_X4 + 4;
+            meshInfo.vertexCount = index_X4 + 4;
         }
-
-        /// <summary>
-        /// Fill Vertex Buffers for Sprites
-        /// </summary>
-        /// <param name="i"></param>
-        /// <param name="spriteIndex_X4"></param>
-        protected virtual void FillSpriteVertexBuffers(int i)
-        {
-            int materialIndex = m_textInfo.characterInfo[i].materialReferenceIndex;
-            int index_X4 = m_textInfo.meshInfo[materialIndex].vertexCount;
-
-            if (index_X4 >= m_textInfo.meshInfo[materialIndex].vertices.Length)
-                m_textInfo.meshInfo[materialIndex].ResizeMeshInfo(Mathf.NextPowerOfTwo((index_X4 + 4) / 4));
-
-            TMP_CharacterInfo[] characterInfoArray = m_textInfo.characterInfo;
-            m_textInfo.characterInfo[i].vertexIndex = index_X4;
-
-            m_textInfo.meshInfo[materialIndex].vertices[0 + index_X4] = characterInfoArray[i].vertex_BL.position;
-            m_textInfo.meshInfo[materialIndex].vertices[1 + index_X4] = characterInfoArray[i].vertex_TL.position;
-            m_textInfo.meshInfo[materialIndex].vertices[2 + index_X4] = characterInfoArray[i].vertex_TR.position;
-            m_textInfo.meshInfo[materialIndex].vertices[3 + index_X4] = characterInfoArray[i].vertex_BR.position;
-
-
-            m_textInfo.meshInfo[materialIndex].uvs0[0 + index_X4] = characterInfoArray[i].vertex_BL.uv;
-            m_textInfo.meshInfo[materialIndex].uvs0[1 + index_X4] = characterInfoArray[i].vertex_TL.uv;
-            m_textInfo.meshInfo[materialIndex].uvs0[2 + index_X4] = characterInfoArray[i].vertex_TR.uv;
-            m_textInfo.meshInfo[materialIndex].uvs0[3 + index_X4] = characterInfoArray[i].vertex_BR.uv;
-
-
-            m_textInfo.meshInfo[materialIndex].uvs2[0 + index_X4] = characterInfoArray[i].vertex_BL.uv2;
-            m_textInfo.meshInfo[materialIndex].uvs2[1 + index_X4] = characterInfoArray[i].vertex_TL.uv2;
-            m_textInfo.meshInfo[materialIndex].uvs2[2 + index_X4] = characterInfoArray[i].vertex_TR.uv2;
-            m_textInfo.meshInfo[materialIndex].uvs2[3 + index_X4] = characterInfoArray[i].vertex_BR.uv2;
-
-
-            m_textInfo.meshInfo[materialIndex].colors32[0 + index_X4] = m_ConvertToLinearSpace ? characterInfoArray[i].vertex_BL.color.GammaToLinear() : characterInfoArray[i].vertex_BL.color;
-            m_textInfo.meshInfo[materialIndex].colors32[1 + index_X4] = m_ConvertToLinearSpace ? characterInfoArray[i].vertex_TL.color.GammaToLinear() : characterInfoArray[i].vertex_TL.color;
-            m_textInfo.meshInfo[materialIndex].colors32[2 + index_X4] = m_ConvertToLinearSpace ? characterInfoArray[i].vertex_TR.color.GammaToLinear() : characterInfoArray[i].vertex_TR.color;
-            m_textInfo.meshInfo[materialIndex].colors32[3 + index_X4] = m_ConvertToLinearSpace ? characterInfoArray[i].vertex_BR.color.GammaToLinear() : characterInfoArray[i].vertex_BR.color;
-
-            m_textInfo.meshInfo[materialIndex].vertexCount = index_X4 + 4;
-        }
-
 
         /// <summary>
         /// Method to add the underline geometry.
@@ -2256,38 +2223,6 @@ namespace TMPro
         /// Function to clear the geometry of the Primary and Sub Text objects.
         /// </summary>
         public virtual void ClearMesh(bool uploadGeometry) { }
-        internal bool IsSelfOrLinkedAncestor(TMP_Text targetTextComponent)
-        {
-            if (targetTextComponent == null)
-                return true;
-
-            if (parentLinkedComponent != null)
-            {
-                if (parentLinkedComponent.IsSelfOrLinkedAncestor(targetTextComponent))
-                    return true;
-            }
-
-            if (GetInstanceID() == targetTextComponent.GetInstanceID())
-                return true;
-
-            return false;
-        }
-
-        internal void ReleaseLinkedTextComponent(TMP_Text targetTextComponent)
-        {
-            if (targetTextComponent == null)
-                return;
-
-            TMP_Text childLinkedComponent = targetTextComponent.linkedTextComponent;
-
-            if (childLinkedComponent != null)
-                ReleaseLinkedTextComponent(childLinkedComponent);
-
-            targetTextComponent.text = string.Empty;
-            targetTextComponent.firstVisibleCharacter = 0;
-            targetTextComponent.linkedTextComponent = null;
-            targetTextComponent.parentLinkedComponent = null;
-        }
 
         protected void DoMissingGlyphCallback(int unicode, int stringIndex, TMP_FontAsset fontAsset)
         {
@@ -3166,15 +3101,6 @@ namespace TMPro
                         return false;
                     case MarkupTag.SLASH_VERTICAL_OFFSET:
                         m_baselineOffset = 0;
-                        return true;
-                    case MarkupTag.PAGE:
-                        if (m_overflowMode == TextOverflowModes.Page)
-                        {
-                            m_xAdvance = 0 + tag_LineIndent + tag_Indent;
-                            m_lineOffset = 0;
-                            m_pageNumber += 1;
-                            m_isNewPage = true;
-                        }
                         return true;
                     case MarkupTag.NO_BREAK:
                         m_isNonBreakingSpace = true;

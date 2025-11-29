@@ -40,7 +40,7 @@ namespace TMPro
         {
             characterInfo = new TMP_CharacterInfo[8];
             wordInfo = new TMP_WordInfo[16];
-            linkInfo = new TMP_LinkInfo[0];
+            linkInfo = Array.Empty<TMP_LinkInfo>();
             lineInfo = new TMP_LineInfo[2];
             pageInfo = new TMP_PageInfo[4];
 
@@ -51,7 +51,7 @@ namespace TMPro
         {
             characterInfo = new TMP_CharacterInfo[characterCount];
             wordInfo = new TMP_WordInfo[16];
-            linkInfo = new TMP_LinkInfo[0];
+            linkInfo = Array.Empty<TMP_LinkInfo>();
             lineInfo = new TMP_LineInfo[2];
             pageInfo = new TMP_PageInfo[4];
 
@@ -65,7 +65,7 @@ namespace TMPro
             characterInfo = new TMP_CharacterInfo[8];
 
             wordInfo = new TMP_WordInfo[4];
-            linkInfo = new TMP_LinkInfo[0];
+            linkInfo = Array.Empty<TMP_LinkInfo>();
 
             lineInfo = new TMP_LineInfo[2];
             pageInfo = new TMP_PageInfo[4];
@@ -113,7 +113,7 @@ namespace TMPro
             this.wordInfo = new TMP_WordInfo[1];
             this.lineInfo = new TMP_LineInfo[1];
             this.pageInfo = new TMP_PageInfo[1];
-            this.linkInfo = new TMP_LinkInfo[0];
+            this.linkInfo = Array.Empty<TMP_LinkInfo>();
 
             materialCount = 0;
 

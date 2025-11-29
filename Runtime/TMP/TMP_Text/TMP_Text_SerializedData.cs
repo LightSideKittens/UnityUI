@@ -681,44 +681,6 @@ namespace TMPro
 
 
         /// <summary>
-        /// The linked text component used for flowing the text from one text component to another.
-        /// </summary>
-        public TMP_Text linkedTextComponent
-        {
-            get { return m_linkedTextComponent; }
-
-            set
-            {
-                if (value == null)
-                {
-                    ReleaseLinkedTextComponent(m_linkedTextComponent);
-
-                    m_linkedTextComponent = value;
-                }
-                else if (IsSelfOrLinkedAncestor(value))
-                {
-                    return;
-                }
-                else
-                {
-                    ReleaseLinkedTextComponent(m_linkedTextComponent);
-
-                    m_linkedTextComponent = value;
-                    m_linkedTextComponent.parentLinkedComponent = this;
-                }
-
-                _havePropertiesChanged = true;
-                SetVerticesDirty();
-                SetLayoutDirty();
-            }
-        }
-        [SerializeField]
-        protected TMP_Text m_linkedTextComponent;
-        [SerializeField]
-        internal TMP_Text parentLinkedComponent;
-
-
-        /// <summary>
         /// Property indicating whether the text is Truncated or using Ellipsis.
         /// </summary>
         public bool isTextTruncated { get { return m_isTextTruncated; } }

@@ -479,7 +479,6 @@ namespace TMPro
         private static ProfilerMarker k_ComputeCharacterAdvanceMarker = new ProfilerMarker("TMP Compute Character Advance");
         private static ProfilerMarker k_HandleCarriageReturnMarker = new ProfilerMarker("TMP Handle Carriage Return");
         private static ProfilerMarker k_HandleLineTerminationMarker = new ProfilerMarker("TMP Handle Line Termination");
-        private static ProfilerMarker k_SavePageInfoMarker = new ProfilerMarker("TMP Save Page Info");
         private static ProfilerMarker k_SaveTextExtentMarker = new ProfilerMarker("TMP Save Text Extent");
         private static ProfilerMarker k_SaveProcessingStatesMarker = new ProfilerMarker("TMP Save Processing States");
         private static ProfilerMarker k_GenerateTextPhaseIIMarker = new ProfilerMarker("TMP GenerateText - Phase II");
@@ -1259,9 +1258,6 @@ namespace TMPro
             #endregion
 
             bool ligature = m_ActiveFontFeatures.Contains(OTL_FeatureTag.liga);
-
-            if (m_overflowMode == TextOverflowModes.Linked && m_linkedTextComponent != null && !m_isCalculatingPreferredValues)
-                m_linkedTextComponent.text = string.Empty;
 
             for (int i = 0; i < textProcessingArray.Length && textProcessingArray[i].unicode != 0; i++)
             {
@@ -2203,7 +2199,6 @@ namespace TMPro
 
                 m_textInfo.characterInfo[m_characterCount].character = (char)charCode;
                 m_textInfo.characterInfo[m_characterCount].pointSize = m_currentFontSize;
-                m_textInfo.characterInfo[m_characterCount].color = m_htmlColor;
                 m_textInfo.characterInfo[m_characterCount].underlineColor = m_underlineColor;
                 m_textInfo.characterInfo[m_characterCount].strikethroughColor = m_strikethroughColor;
                 m_textInfo.characterInfo[m_characterCount].highlightState = m_HighlightState;
@@ -2600,8 +2595,6 @@ namespace TMPro
                         switch (m_overflowMode)
                         {
                             case TextOverflowModes.Overflow:
-                            case TextOverflowModes.ScrollRect:
-                            case TextOverflowModes.Masking:
                                 break;
 
                             case TextOverflowModes.Truncate:
@@ -2635,65 +2628,6 @@ namespace TMPro
                                 characterToSubstitute.unicode = 0x2026;
 
                                 restoreCount += 1;
-                                k_HandleVerticalLineBreakingMarker.End();
-                                k_HandleVisibleCharacterMarker.End();
-                                continue;
-
-                            case TextOverflowModes.Linked:
-                                i = RestoreWordWrappingState(ref m_SavedLastValidState);
-
-                                if (m_linkedTextComponent != null)
-                                {
-                                    m_linkedTextComponent.text = text;
-                                    m_linkedTextComponent.firstVisibleCharacter = m_characterCount;
-                                    m_linkedTextComponent.ForceMeshUpdate();
-
-                                    m_isTextTruncated = true;
-                                }
-
-                                characterToSubstitute.index = testedCharacterCount;
-                                characterToSubstitute.unicode = 0x03;
-                                k_HandleVerticalLineBreakingMarker.End();
-                                k_HandleVisibleCharacterMarker.End();
-                                continue;
-
-                            case TextOverflowModes.Page:
-                                if (i < 0 || testedCharacterCount == 0)
-                                {
-                                    i = -1;
-                                    m_characterCount = 0;
-                                    characterToSubstitute.index = 0;
-                                    characterToSubstitute.unicode = 0x03;
-                                    k_HandleVerticalLineBreakingMarker.End();
-                                    k_HandleVisibleCharacterMarker.End();
-                                    continue;
-                                }
-                                else if (m_maxLineAscender - m_maxLineDescender > marginHeight + 0.0001f)
-                                {
-                                    i = RestoreWordWrappingState(ref m_SavedLineState);
-
-                                    characterToSubstitute.index = testedCharacterCount;
-                                    characterToSubstitute.unicode = 0x03;
-                                    k_HandleVerticalLineBreakingMarker.End();
-                                    k_HandleVisibleCharacterMarker.End();
-                                    continue;
-                                }
-
-                                i = RestoreWordWrappingState(ref m_SavedLineState);
-
-                                m_isNewPage = true;
-                                m_firstCharacterOfLine = m_characterCount;
-                                m_maxLineAscender = k_LargeNegativeFloat;
-                                m_maxLineDescender = k_LargePositiveFloat;
-                                m_startOfLineAscender = 0;
-
-                                m_xAdvance = 0 + tag_Indent;
-                                m_lineOffset = 0;
-                                m_maxTextAscender = 0;
-                                m_PageAscender = 0;
-                                m_lineNumber += 1;
-                                m_pageNumber += 1;
-
                                 k_HandleVerticalLineBreakingMarker.End();
                                 k_HandleVisibleCharacterMarker.End();
                                 continue;
@@ -2885,15 +2819,6 @@ namespace TMPro
                                 switch (m_overflowMode)
                                 {
                                     case TextOverflowModes.Overflow:
-                                    case TextOverflowModes.ScrollRect:
-                                    case TextOverflowModes.Masking:
-                                        InsertNewLine(i, baseScale, currentElementScale, currentEmScale, boldSpacingAdjustment, characterSpacingAdjustment, widthOfTextArea, lineGap, ref isMaxVisibleDescenderSet, ref maxVisibleDescender);
-                                        isStartOfNewLine = true;
-                                        isFirstWordOfLine = true;
-                                        k_HandleVerticalLineBreakingMarker.End();
-                                        k_HandleHorizontalLineBreakingMarker.End();
-                                        k_HandleVisibleCharacterMarker.End();
-                                        continue;
 
                                     case TextOverflowModes.Truncate:
                                         i = RestoreWordWrappingState(ref m_SavedLastValidState);
@@ -2928,41 +2853,6 @@ namespace TMPro
                                         characterToSubstitute.unicode = 0x2026;
 
                                         restoreCount += 1;
-                                        k_HandleVerticalLineBreakingMarker.End();
-                                        k_HandleHorizontalLineBreakingMarker.End();
-                                        k_HandleVisibleCharacterMarker.End();
-                                        continue;
-
-                                    case TextOverflowModes.Linked:
-                                        if (m_linkedTextComponent != null)
-                                        {
-                                            m_linkedTextComponent.text = text;
-                                            m_linkedTextComponent.firstVisibleCharacter = m_characterCount;
-                                            m_linkedTextComponent.ForceMeshUpdate();
-
-                                            m_isTextTruncated = true;
-                                        }
-
-                                        characterToSubstitute.index = m_characterCount;
-                                        characterToSubstitute.unicode = 0x03;
-                                        k_HandleVerticalLineBreakingMarker.End();
-                                        k_HandleHorizontalLineBreakingMarker.End();
-                                        k_HandleVisibleCharacterMarker.End();
-                                        continue;
-
-                                    case TextOverflowModes.Page:
-                                        m_isNewPage = true;
-
-                                        InsertNewLine(i, baseScale, currentElementScale, currentEmScale, boldSpacingAdjustment, characterSpacingAdjustment, widthOfTextArea, lineGap, ref isMaxVisibleDescenderSet, ref maxVisibleDescender);
-
-                                        m_startOfLineAscender = 0;
-                                        m_lineOffset = 0;
-                                        m_maxTextAscender = 0;
-                                        m_PageAscender = 0;
-                                        m_pageNumber += 1;
-
-                                        isStartOfNewLine = true;
-                                        isFirstWordOfLine = true;
                                         k_HandleVerticalLineBreakingMarker.End();
                                         k_HandleHorizontalLineBreakingMarker.End();
                                         k_HandleVisibleCharacterMarker.End();
@@ -3025,9 +2915,6 @@ namespace TMPro
                             switch (m_overflowMode)
                             {
                                 case TextOverflowModes.Overflow:
-                                case TextOverflowModes.ScrollRect:
-                                case TextOverflowModes.Masking:
-                                    break;
 
                                 case TextOverflowModes.Truncate:
                                     i = RestoreWordWrappingState(ref m_SavedWordWrapState);
@@ -3060,24 +2947,6 @@ namespace TMPro
                                     characterToSubstitute.unicode = 0x2026;
 
                                     restoreCount += 1;
-                                    k_HandleHorizontalLineBreakingMarker.End();
-                                    k_HandleVisibleCharacterMarker.End();
-                                    continue;
-
-                                case TextOverflowModes.Linked:
-                                    i = RestoreWordWrappingState(ref m_SavedWordWrapState);
-
-                                    if (m_linkedTextComponent != null)
-                                    {
-                                        m_linkedTextComponent.text = text;
-                                        m_linkedTextComponent.firstVisibleCharacter = m_characterCount;
-                                        m_linkedTextComponent.ForceMeshUpdate();
-
-                                        m_isTextTruncated = true;
-                                    }
-
-                                    characterToSubstitute.index = m_characterCount;
-                                    characterToSubstitute.unicode = 0x03;
                                     k_HandleHorizontalLineBreakingMarker.End();
                                     k_HandleVisibleCharacterMarker.End();
                                     continue;
@@ -3142,37 +3011,6 @@ namespace TMPro
                 else
                 {
                     k_HandleWhiteSpacesMarker.Begin();
-
-                    #region Check Vertical Bounds
-                    if (m_overflowMode == TextOverflowModes.Linked && (charCode == 10 || charCode == 11))
-                    {
-                        float textHeight = m_maxTextAscender - (m_maxLineDescender - m_lineOffset) + (m_lineOffset > 0 && m_IsDrivenLineSpacing == false ? m_maxLineAscender - m_startOfLineAscender : 0);
-
-                        int testedCharacterCount = m_characterCount;
-
-                        if (textHeight > marginHeight + 0.0001f)
-                        {
-                            if (m_firstOverflowCharacterIndex == -1)
-                                m_firstOverflowCharacterIndex = m_characterCount;
-
-                            i = RestoreWordWrappingState(ref m_SavedLastValidState);
-
-                            if (m_linkedTextComponent != null)
-                            {
-                                m_linkedTextComponent.text = text;
-                                m_linkedTextComponent.firstVisibleCharacter = m_characterCount;
-                                m_linkedTextComponent.ForceMeshUpdate();
-
-                                m_isTextTruncated = true;
-                            }
-
-                            characterToSubstitute.index = testedCharacterCount;
-                            characterToSubstitute.unicode = 0x03;
-                            k_HandleWhiteSpacesMarker.End();
-                            continue;
-                        }
-                    }
-                    #endregion
 
                     if ((charCode == 10 || charCode == 11 || charCode == 0xA0 || charCode == 0x2007 || charCode == 0x2028 || charCode == 0x2029 || char.IsSeparator((char)charCode)) && charCode != 0xAD && charCode != 0x200B && charCode != 0x2060)
                     {
@@ -3283,30 +3121,6 @@ namespace TMPro
                     k_HandleCarriageReturnMarker.End();
                 }
                 #endregion Carriage Return
-
-
-                #region Save PageInfo
-                k_SavePageInfoMarker.Begin();
-                if (m_overflowMode == TextOverflowModes.Page && charCode != 10 && charCode != 11 && charCode != 13 && charCode != 0x2028 && charCode != 0x2029)
-                {
-                    if (m_pageNumber + 1 > m_textInfo.pageInfo.Length)
-                        TMP_TextInfo.Resize(ref m_textInfo.pageInfo, m_pageNumber + 1, true);
-
-                    m_textInfo.pageInfo[m_pageNumber].ascender = m_PageAscender;
-                    m_textInfo.pageInfo[m_pageNumber].descender = m_ElementDescender < m_textInfo.pageInfo[m_pageNumber].descender
-                        ? m_ElementDescender
-                        : m_textInfo.pageInfo[m_pageNumber].descender;
-
-                    if (m_isNewPage)
-                    {
-                        m_isNewPage = false;
-                        m_textInfo.pageInfo[m_pageNumber].firstCharacterIndex = m_characterCount;
-                    }
-
-                    m_textInfo.pageInfo[m_pageNumber].lastCharacterIndex = m_characterCount;
-                }
-                k_SavePageInfoMarker.End();
-                #endregion Save PageInfo
 
 
                 #region Check for Line Feed and Last Character
@@ -3437,7 +3251,7 @@ namespace TMPro
 
 
                 #region Save Word Wrapping State
-                if ((m_TextWrappingMode != TextWrappingModes.NoWrap && m_TextWrappingMode != TextWrappingModes.PreserveWhitespaceNoWrap) || m_overflowMode == TextOverflowModes.Truncate || m_overflowMode == TextOverflowModes.Ellipsis || m_overflowMode == TextOverflowModes.Linked)
+                if ((m_TextWrappingMode != TextWrappingModes.NoWrap && m_TextWrappingMode != TextWrappingModes.PreserveWhitespaceNoWrap) || m_overflowMode == TextOverflowModes.Truncate || m_overflowMode == TextOverflowModes.Ellipsis)
                 {
                     k_SaveProcessingStatesMarker.Begin();
 
@@ -3561,24 +3375,15 @@ namespace TMPro
             switch (m_VerticalAlignment)
             {
                 case VerticalAlignmentOptions.Top:
-                    if (m_overflowMode != TextOverflowModes.Page)
-                        anchorOffset = corners[1] + new Vector3(0 + margins.x, 0 - m_maxTextAscender - margins.y, 0);
-                    else
-                        anchorOffset = corners[1] + new Vector3(0 + margins.x, 0 - m_textInfo.pageInfo[pageToDisplay].ascender - margins.y, 0);
+                    anchorOffset = corners[1] + new Vector3(0 + margins.x, 0 - m_maxTextAscender - margins.y, 0);
                     break;
 
                 case VerticalAlignmentOptions.Middle:
-                    if (m_overflowMode != TextOverflowModes.Page)
-                        anchorOffset = (corners[0] + corners[1]) / 2 + new Vector3(0 + margins.x, 0 - (m_maxTextAscender + margins.y + maxVisibleDescender - margins.w) / 2, 0);
-                    else
-                        anchorOffset = (corners[0] + corners[1]) / 2 + new Vector3(0 + margins.x, 0 - (m_textInfo.pageInfo[pageToDisplay].ascender + margins.y + m_textInfo.pageInfo[pageToDisplay].descender - margins.w) / 2, 0);
+                    anchorOffset = (corners[0] + corners[1]) / 2 + new Vector3(0 + margins.x, 0 - (m_maxTextAscender + margins.y + maxVisibleDescender - margins.w) / 2, 0);
                     break;
 
                 case VerticalAlignmentOptions.Bottom:
-                    if (m_overflowMode != TextOverflowModes.Page)
-                        anchorOffset = corners[0] + new Vector3(0 + margins.x, 0 - maxVisibleDescender + margins.w, 0);
-                    else
-                        anchorOffset = corners[0] + new Vector3(0 + margins.x, 0 - m_textInfo.pageInfo[pageToDisplay].descender + margins.w, 0);
+                    anchorOffset = corners[0] + new Vector3(0 + margins.x, 0 - maxVisibleDescender + margins.w, 0);
                     break;
 
                 case VerticalAlignmentOptions.Baseline:
@@ -3863,14 +3668,7 @@ namespace TMPro
                     }
 
                     #region Handle maxVisibleCharacters / maxVisibleLines / Page Mode
-                    if (i < m_maxVisibleCharacters && wordCount < m_maxVisibleWords && currentLine < m_maxVisibleLines && m_overflowMode != TextOverflowModes.Page)
-                    {
-                        characterInfos[i].vertex_BL.position += offset;
-                        characterInfos[i].vertex_TL.position += offset;
-                        characterInfos[i].vertex_TR.position += offset;
-                        characterInfos[i].vertex_BR.position += offset;
-                    }
-                    else if (i < m_maxVisibleCharacters && wordCount < m_maxVisibleWords && currentLine < m_maxVisibleLines && m_overflowMode == TextOverflowModes.Page && characterInfos[i].pageNumber == pageToDisplay)
+                    if (i < m_maxVisibleCharacters && wordCount < m_maxVisibleWords && currentLine < m_maxVisibleLines)
                     {
                         characterInfos[i].vertex_BL.position += offset;
                         characterInfos[i].vertex_TL.position += offset;
@@ -3898,7 +3696,7 @@ namespace TMPro
                     }
                     else if (elementType == TMP_TextElementType.Sprite)
                     {
-                        FillSpriteVertexBuffers(i);
+                        FillCharacterVertexBuffers(i);
                     }
                 }
                 #endregion
@@ -4015,9 +3813,8 @@ namespace TMPro
                 {
                     bool isUnderlineVisible = true;
                     int currentPage = m_textInfo.characterInfo[i].pageNumber;
-                    m_textInfo.characterInfo[i].underlineVertexIndex = last_vert_index;
 
-                    if (i > m_maxVisibleCharacters || currentLine > m_maxVisibleLines || (m_overflowMode == TextOverflowModes.Page && currentPage + 1 != m_pageToDisplay))
+                    if (i > m_maxVisibleCharacters || currentLine > m_maxVisibleLines)
                         isUnderlineVisible = false;
 
                     if (!isWhiteSpace && unicode != 0x200B)
@@ -4124,11 +3921,7 @@ namespace TMPro
 
                 if (isStrikethrough)
                 {
-                    bool isStrikeThroughVisible = true;
-                    m_textInfo.characterInfo[i].strikethroughVertexIndex = last_vert_index;
-
-                    if (i > m_maxVisibleCharacters || currentLine > m_maxVisibleLines || (m_overflowMode == TextOverflowModes.Page && m_textInfo.characterInfo[i].pageNumber + 1 != m_pageToDisplay))
-                        isStrikeThroughVisible = false;
+                    bool isStrikeThroughVisible = !(i > m_maxVisibleCharacters || currentLine > m_maxVisibleLines);
 
                     if (beginStrikethrough == false && isStrikeThroughVisible && i <= lineInfo.lastVisibleCharacterIndex && unicode != 10 && unicode != 11 && unicode != 13)
                     {
@@ -4214,7 +4007,7 @@ namespace TMPro
                     bool isHighlightVisible = true;
                     int currentPage = m_textInfo.characterInfo[i].pageNumber;
 
-                    if (i > m_maxVisibleCharacters || currentLine > m_maxVisibleLines || (m_overflowMode == TextOverflowModes.Page && currentPage + 1 != m_pageToDisplay))
+                    if (i > m_maxVisibleCharacters || currentLine > m_maxVisibleLines)
                         isHighlightVisible = false;
 
                     if (beginHighlight == false && isHighlightVisible == true && i <= lineInfo.lastVisibleCharacterIndex && unicode != 10 && unicode != 11 && unicode != 13)

@@ -686,8 +686,6 @@ namespace TMPro
                     TMP_CharacterInfo currentCharInfo = text.textInfo.characterInfo[characterIndex];
                     int currentLine = currentCharInfo.lineNumber;
 
-                    if (text.overflowMode == TextOverflowModes.Page && currentCharInfo.pageNumber + 1 != text.pageToDisplay) continue;
-
                     if (isBeginRegion == false)
                     {
                         isBeginRegion = true;
@@ -783,8 +781,6 @@ namespace TMPro
                     int characterIndex = linkInfo.linkTextfirstCharacterIndex + j;
                     TMP_CharacterInfo currentCharInfo = text.textInfo.characterInfo[characterIndex];
                     int currentLine = currentCharInfo.lineNumber;
-
-                    if (text.overflowMode == TextOverflowModes.Page && currentCharInfo.pageNumber + 1 != text.pageToDisplay) continue;
 
                     if (isBeginRegion == false)
                     {

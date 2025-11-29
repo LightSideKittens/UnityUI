@@ -1,42 +1,14 @@
-using System;
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using UnityEngine.TextCore.LowLevel;
-using Object = UnityEngine.Object;
 
 
 namespace TMPro.EditorUtilities
 {
     public abstract class TMP_BaseEditorPanel : Editor
     {
-        static readonly Regex LongPattern = new Regex(@"\\U([0-9a-fA-F]{8})", RegexOptions.Compiled);
-        static readonly Regex ShortPattern = new Regex(@"\\u([0-9a-fA-F]{4})", RegexOptions.Compiled);
-
-        public static string DecodeAndNormalize(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return value;
-
-            value = LongPattern.Replace(value, match =>
-            {
-                int code = Convert.ToInt32(match.Groups[1].Value, 16);
-                return char.ConvertFromUtf32(code);
-            });
-
-            value = ShortPattern.Replace(value, match =>
-            {
-                int code = Convert.ToInt32(match.Groups[1].Value, 16);
-                return ((char)code).ToString();
-            });
-
-            value = value.Normalize(NormalizationForm.FormC);
-            return value;
-        }
-        
         //Labels and Tooltips
         static readonly GUIContent k_RtlToggleLabel = new GUIContent("Enable RTL Editor", "Reverses text direction and allows right to left editing.");
         //static readonly GUIContent k_MainSettingsLabel = new GUIContent("Main Settings");
@@ -173,9 +145,6 @@ namespace TMPro.EditorUtilities
         protected SerializedProperty m_TextWrappingModeProp;
         protected SerializedProperty m_WordWrappingRatiosProp;
         protected SerializedProperty m_TextOverflowModeProp;
-        protected SerializedProperty m_PageToDisplayProp;
-        protected SerializedProperty m_LinkedTextComponentProp;
-        protected SerializedProperty m_ParentLinkedTextComponentProp;
 
         protected SerializedProperty m_FontFeaturesActiveProp;
 
@@ -204,7 +173,6 @@ namespace TMPro.EditorUtilities
         protected bool m_HavePropertiesChanged;
 
         protected TMP_Text m_TextComponent;
-        protected TMP_Text m_PreviousLinkedTextComponent;
         protected RectTransform m_RectTransform;
 
         protected Material m_TargetMaterial;
@@ -256,9 +224,6 @@ namespace TMPro.EditorUtilities
             m_TextWrappingModeProp = serializedObject.FindProperty("m_TextWrappingMode");
             m_WordWrappingRatiosProp = serializedObject.FindProperty("m_wordWrappingRatios");
             m_TextOverflowModeProp = serializedObject.FindProperty("m_overflowMode");
-            m_PageToDisplayProp = serializedObject.FindProperty("m_pageToDisplay");
-            m_LinkedTextComponentProp = serializedObject.FindProperty("m_linkedTextComponent");
-            m_ParentLinkedTextComponentProp = serializedObject.FindProperty("parentLinkedComponent");
 
             m_FontFeaturesActiveProp = serializedObject.FindProperty("m_ActiveFontFeatures");
 
@@ -286,9 +251,6 @@ namespace TMPro.EditorUtilities
 
             m_TextComponent = (TMP_Text)target;
             m_RectTransform = m_TextComponent.rectTransform;
-
-            // Restore Previous Linked Text Component
-            m_PreviousLinkedTextComponent = m_TextComponent.linkedTextComponent;
 
             // Create new Material Editor if one does not exists
             m_TargetMaterial = m_TextComponent.fontSharedMaterial;
@@ -481,86 +443,75 @@ namespace TMPro.EditorUtilities
 
             EditorGUI.indentLevel = 0;
 
-            // If the text component is linked, disable the text input box.
-            if (m_ParentLinkedTextComponentProp.objectReferenceValue != null)
+            // Display RTL Toggle
+            float labelWidth = EditorGUIUtility.labelWidth;
+            EditorGUIUtility.labelWidth = 110f;
+
+            m_IsRightToLeftProp.boolValue = EditorGUI.Toggle(new Rect(rect.width - 120, rect.y + 3, 130, 20),
+                k_RtlToggleLabel, m_IsRightToLeftProp.boolValue);
+
+            EditorGUIUtility.labelWidth = labelWidth;
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUILayout.PropertyField(m_TextProp, GUIContent.none);
+
+            // Need to also compare string content due to issue related to scroll bar drag handle
+            if (EditorGUI.EndChangeCheck() && m_TextProp.stringValue != m_TextComponent.text)
             {
-                EditorGUILayout.HelpBox("The Text Input Box is disabled due to this text component being linked to another.", MessageType.Info);
+                m_HavePropertiesChanged = true;
             }
-            else
+
+            if (m_IsRightToLeftProp.boolValue)
             {
-                // Display RTL Toggle
-                float labelWidth = EditorGUIUtility.labelWidth;
-                EditorGUIUtility.labelWidth = 110f;
+                // Copy source text to RTL string
+                m_RtlText = string.Empty;
+                string sourceText = m_TextProp.stringValue;
 
-                m_IsRightToLeftProp.boolValue = EditorGUI.Toggle(new Rect(rect.width - 120, rect.y + 3, 130, 20), k_RtlToggleLabel, m_IsRightToLeftProp.boolValue);
+                // Reverse Text displayed in Text Input Box
+                for (int i = 0; i < sourceText.Length; i++)
+                    m_RtlText += sourceText[sourceText.Length - i - 1];
 
-                EditorGUIUtility.labelWidth = labelWidth;
+                GUILayout.Label("RTL Text Input");
 
                 EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(m_TextProp, GUIContent.none);
-                //m_TextProp.stringValue = DecodeUnicodeEscapes(m_TextProp.stringValue);
+                m_RtlText = EditorGUILayout.TextArea(m_RtlText, TMP_UIStyleManager.wrappingTextArea,
+                    GUILayout.Height(EditorGUI.GetPropertyHeight(m_TextProp) - EditorGUIUtility.singleLineHeight),
+                    GUILayout.ExpandWidth(true));
 
-                // Need to also compare string content due to issue related to scroll bar drag handle
-                if (EditorGUI.EndChangeCheck() && m_TextProp.stringValue != m_TextComponent.text)
+                if (EditorGUI.EndChangeCheck())
                 {
+                    // Convert RTL input
+                    sourceText = string.Empty;
+
+                    // Reverse Text displayed in Text Input Box
+                    for (int i = 0; i < m_RtlText.Length; i++)
+                        sourceText += m_RtlText[m_RtlText.Length - i - 1];
+
+                    m_TextProp.stringValue = sourceText;
+                }
+            }
+
+            // TEXT STYLE
+            if (m_StyleNames != null)
+            {
+                rect = EditorGUILayout.GetControlRect(false, 17);
+
+                EditorGUI.BeginProperty(rect, k_StyleLabel, m_TextStyleHashCodeProp);
+
+                m_TextStyleIndexLookup.TryGetValue(m_TextStyleHashCodeProp.intValue, out m_StyleSelectionIndex);
+
+                EditorGUI.BeginChangeCheck();
+                m_StyleSelectionIndex = EditorGUI.Popup(rect, k_StyleLabel, m_StyleSelectionIndex, m_StyleNames);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    m_TextStyleHashCodeProp.intValue = m_Styles[m_StyleSelectionIndex].hashCode;
+                    m_TextComponent.m_TextStyle = m_Styles[m_StyleSelectionIndex];
                     m_HavePropertiesChanged = true;
                 }
 
-                if (m_IsRightToLeftProp.boolValue)
-                {
-                    // Copy source text to RTL string
-                    m_RtlText = string.Empty;
-                    string sourceText = m_TextProp.stringValue;
-
-                    // Reverse Text displayed in Text Input Box
-                    for (int i = 0; i < sourceText.Length; i++)
-                        m_RtlText += sourceText[sourceText.Length - i - 1];
-
-                    GUILayout.Label("RTL Text Input");
-
-                    EditorGUI.BeginChangeCheck();
-                    m_RtlText = EditorGUILayout.TextArea(m_RtlText, TMP_UIStyleManager.wrappingTextArea, GUILayout.Height(EditorGUI.GetPropertyHeight(m_TextProp) - EditorGUIUtility.singleLineHeight), GUILayout.ExpandWidth(true));
-
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        // Convert RTL input
-                        sourceText = string.Empty;
-
-                        // Reverse Text displayed in Text Input Box
-                        for (int i = 0; i < m_RtlText.Length; i++)
-                            sourceText += m_RtlText[m_RtlText.Length - i - 1];
-
-                        m_TextProp.stringValue = sourceText;
-                    }
-                }
-
-                if (m_TextComponent.textPreprocessor != null)
-                {
-                    GUILayout.Label("Preprocessed Text (Text Preprocessor)");
-                    EditorGUILayout.TextArea(m_TextComponent.PreprocessedText, TMP_UIStyleManager.wrappingTextArea, GUILayout.Height(EditorGUI.GetPropertyHeight(m_TextProp) - EditorGUIUtility.singleLineHeight), GUILayout.ExpandWidth(true));
-                }
-
-                // TEXT STYLE
-                if (m_StyleNames != null)
-                {
-                    rect = EditorGUILayout.GetControlRect(false, 17);
-
-                    EditorGUI.BeginProperty(rect, k_StyleLabel, m_TextStyleHashCodeProp);
-
-                    m_TextStyleIndexLookup.TryGetValue(m_TextStyleHashCodeProp.intValue, out m_StyleSelectionIndex);
-
-                    EditorGUI.BeginChangeCheck();
-                    m_StyleSelectionIndex = EditorGUI.Popup(rect, k_StyleLabel, m_StyleSelectionIndex, m_StyleNames);
-                    if (EditorGUI.EndChangeCheck())
-                    {
-                        m_TextStyleHashCodeProp.intValue = m_Styles[m_StyleSelectionIndex].hashCode;
-                        m_TextComponent.m_TextStyle = m_Styles[m_StyleSelectionIndex];
-                        m_HavePropertiesChanged = true;
-                    }
-
-                    EditorGUI.EndProperty();
-                }
+                EditorGUI.EndProperty();
             }
+
         }
 
         protected void DrawMainSettings()
@@ -1083,70 +1034,7 @@ namespace TMPro.EditorUtilities
             // TEXT OVERFLOW
             EditorGUI.BeginChangeCheck();
 
-            if ((TextOverflowModes)m_TextOverflowModeProp.enumValueIndex == TextOverflowModes.Linked)
-            {
-                EditorGUILayout.BeginHorizontal();
-
-                float fieldWidth = EditorGUIUtility.fieldWidth;
-                EditorGUIUtility.fieldWidth = 65;
-                EditorGUILayout.PropertyField(m_TextOverflowModeProp, k_OverflowLabel);
-                EditorGUIUtility.fieldWidth = fieldWidth;
-
-                EditorGUILayout.PropertyField(m_LinkedTextComponentProp, GUIContent.none);
-
-                EditorGUILayout.EndHorizontal();
-
-                if (GUI.changed)
-                {
-                    TMP_Text linkedComponent = m_LinkedTextComponentProp.objectReferenceValue as TMP_Text;
-
-                    if (linkedComponent == null)
-                    {
-                        m_LinkedTextComponentProp.objectReferenceValue = null;
-
-                        if (m_PreviousLinkedTextComponent != null)
-                            m_TextComponent.ReleaseLinkedTextComponent(m_PreviousLinkedTextComponent);
-                    }
-                    else if (m_TextComponent.IsSelfOrLinkedAncestor(linkedComponent))
-                    {
-                        m_LinkedTextComponentProp.objectReferenceValue = m_PreviousLinkedTextComponent;
-                    }
-                    else
-                    {
-                        if (m_PreviousLinkedTextComponent != null)
-                            m_TextComponent.ReleaseLinkedTextComponent(m_PreviousLinkedTextComponent);
-
-                        m_LinkedTextComponentProp.objectReferenceValue = linkedComponent;
-                        linkedComponent.parentLinkedComponent = m_TextComponent;
-                        m_PreviousLinkedTextComponent = linkedComponent;
-                    }
-                }
-            }
-            else if ((TextOverflowModes)m_TextOverflowModeProp.enumValueIndex == TextOverflowModes.Page)
-            {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.PropertyField(m_TextOverflowModeProp, k_OverflowLabel);
-                EditorGUILayout.PropertyField(m_PageToDisplayProp, GUIContent.none);
-                EditorGUILayout.EndHorizontal();
-
-                if (m_PreviousLinkedTextComponent)
-                {
-                    m_TextComponent.ReleaseLinkedTextComponent(m_PreviousLinkedTextComponent);
-
-                    m_TextComponent.linkedTextComponent = null;
-                }
-            }
-            else
-            {
-                EditorGUILayout.PropertyField(m_TextOverflowModeProp, k_OverflowLabel);
-
-                if (m_PreviousLinkedTextComponent)
-                {
-                    m_TextComponent.ReleaseLinkedTextComponent(m_PreviousLinkedTextComponent);
-
-                    m_TextComponent.linkedTextComponent = null;
-                }
-            }
+            EditorGUILayout.PropertyField(m_TextOverflowModeProp, k_OverflowLabel);
 
             if (EditorGUI.EndChangeCheck())
             {

@@ -43,38 +43,41 @@ public static class BiDi
         [Out] int[] visual,
         [Out] int[] logicalToVisual);
     
+    
+    [DllImport(DLL_NAME, CallingConvention = CallingConvention.Cdecl)]
+    private static extern int fribidi_unity_detect_base_direction(
+        [In] int[] logicalUtf32,
+        int length);
+    
     /// Главный метод: логический текст → набор визуальных строк после переноса и BiDi.
     public static IReadOnlyList<BidiWrappedLine> WrapAndReorder(
         string logicalText,
         TMP_Text text,
         Direction direction = Direction.Auto)
     {
-        if (logicalText == null)
-            throw new ArgumentNullException(nameof(logicalText));
+        if (logicalText == null) throw new ArgumentNullException(nameof(logicalText));
 
-        // 1. Нормализуем переводы строк и конвертируем string → массив Unicode codepoint'ов.
         var buffer = StringToCodepoints(logicalText);
         var cps = buffer.cps;
         
-        if (cps.Length == 0)
-            return Array.Empty<BidiWrappedLine>();
+        if (cps.Length == 0) return Array.Empty<BidiWrappedLine>();
 
-        // 2. Ширина каждого codepoint’а – сюда ты подставишь TMP-логику.
         float[] widths = MeasureCodepointWidths(text, buffer);
 
-        if (widths.Length != cps.Length)
-            throw new InvalidOperationException("MeasureCodepointWidths must return width for each codepoint.");
+        if (widths.Length != cps.Length) throw new InvalidOperationException("MeasureCodepointWidths must return width for each codepoint.");
 
-        // 3. Разбиваем логический текст на строки по ширине (без BiDi).
         var maxWidth = text.rectTransform.rect.width;
         var lineRanges = SplitLogicalLinesByWidth(cps, widths, maxWidth);
 
-        // 4. Для каждой логической строки делаем BiDi и собираем результат.
         var result = new List<BidiWrappedLine>(lineRanges.Count);
 
+        if (direction == Direction.Auto)
+        {
+            direction = DetectDirection(logicalText, buffer);
+        }
+        
         foreach (var (start, length) in lineRanges)
         {
-            // Логическая подстрока в виде codepoint’ов.
             var logicalSlice = new int[length];
             Array.Copy(cps, start, logicalSlice, 0, length);
             
@@ -84,7 +87,6 @@ public static class BiDi
 
             if (localMap == null || localMap.Length != length)
             {
-                // На всякий случай не даём карте "поехать".
                 localMap = BuildIdentityMap(length);
             }
 
@@ -123,6 +125,18 @@ public static class BiDi
         return sb.ToString();
     }
     
+    private static Direction DetectDirection(string text, CodepointBuffer buffer)
+    {
+        if (string.IsNullOrEmpty(text)) return Direction.LeftToRight;
+
+        var cps = buffer.cps;
+        int rtlFlag = fribidi_unity_detect_base_direction(cps, cps.Length);
+        
+        return rtlFlag == 1
+            ? Direction.RightToLeft
+            : Direction.LeftToRight;
+    }
+    
     private static string DoBiDi(int[] logical,
         out int[] logicalToVisualMap,
         Direction direction = Direction.Auto)
@@ -153,10 +167,6 @@ public static class BiDi
         return CodepointsToString(visual);
     }
 
-    // --------------------------------------------------------------------
-    //  ЛОГИЧЕСКОЕ РАЗБИТИЕ НА СТРОКИ ПО ШИРИНЕ (без BiDi)
-    // --------------------------------------------------------------------
-
     private static List<(int start, int length)> SplitLogicalLinesByWidth(
         int[] cps,
         float[] widths,
@@ -177,7 +187,6 @@ public static class BiDi
             {
                 int cp = cps[i];
 
-                // Жёсткий перенос строки: U+000A (LF)
                 if (cp == 0x000A)
                 {
                     if (i > lineStart)
@@ -186,9 +195,8 @@ public static class BiDi
                         lines.Add((lineStart, len));
                     }
 
-                    // Пропускаем сам \n
                     lineStart = i + 1;
-                    goto NextLine; // переходим к следующей строке
+                    goto NextLine;
                 }
 
                 currentWidth += widths[i];
@@ -202,7 +210,6 @@ public static class BiDi
                 {
                     if (lastBreakIndex >= lineStart)
                     {
-                        // Переносим по последнему допустимому разрыву.
                         int lineEnd = lastBreakIndex;
                         int len = lineEnd - lineStart + 1;
                         lines.Add((lineStart, len));
@@ -210,7 +217,6 @@ public static class BiDi
                     }
                     else
                     {
-                        // "Длинное слово": форсированный перенос.
                         int lineEnd = i;
                         int len = lineEnd - lineStart + 1;
                         lines.Add((lineStart, len));
@@ -221,7 +227,6 @@ public static class BiDi
                 }
             }
 
-            // Дошли до конца абзаца: остаток – последняя строка.
             if (lineStart < n)
             {
                 int len = n - lineStart;
@@ -245,35 +250,25 @@ public static class BiDi
     ///   - некоторые дефисы/тире.
     private static bool CanBreakAfterCodepoint(int cp)
     {
-        // Явные пробелы / whitespace
-        if (cp == 0x0020 || cp == 0x0009) // space, tab
-            return true;
+        if (cp == 0x0020 || cp == 0x0009) return true;
 
-        // Разные типографские пробелы (но НЕ NBSP U+00A0 и узкий NBSP U+202F)
-        if (cp >= 0x2000 && cp <= 0x2006) // EN QUAD..SIX-PER-EM SPACE
-            return true;
-        if (cp == 0x2008 || cp == 0x2009 || cp == 0x200A) // PUNCTUATION / THIN / HAIR SPACE
-            return true;
-        if (cp == 0x3000) // IDEOGRAPHIC SPACE
-            return true;
+        if (cp >= 0x2000 && cp <= 0x2006) return true;
+        if (cp == 0x2008 || cp == 0x2009 || cp == 0x200A) return true;
+        if (cp == 0x3000) return true;
 
-        // Zero width space – явная точка переноса.
         if (cp == 0x200B)
             return true;
 
-        // Мягкий перенос: символ отображается как точка разрыва.
-        if (cp == 0x00AD) // SOFT HYPHEN
-            return true;
+        if (cp == 0x00AD) return true;
 
-        // Некоторые дефисы/тире, после которых перенос обычно допустим.
         switch (cp)
         {
-            case 0x002D: // HYPHEN-MINUS
-            case 0x2010: // HYPHEN
-            case 0x2012: // FIGURE DASH
-            case 0x2013: // EN DASH
-            case 0x2014: // EM DASH
-            case 0x058A: // ARMENIAN HYPHEN
+            case 0x002D:
+            case 0x2010:
+            case 0x2012:
+            case 0x2013:
+            case 0x2014:
+            case 0x058A:
                 return true;
         }
 
@@ -288,21 +283,6 @@ public static class BiDi
         return map;
     }
 
-    // --------------------------------------------------------------------
-    //  КОНВЕРТАЦИЯ string ↔ массив Unicode codepoint'ов (UTF-32)
-    // --------------------------------------------------------------------
-    
-    /*private static string CodepointsToString(int[] codepoints)
-{
-    var sb = new StringBuilder(codepoints.Length);
-    for (var i = codepoints.Length - 1; i >= 0; i--)
-    {
-        sb.Append(char.ConvertFromUtf32(codepoints[i]));
-
-    }
-    return sb.ToString();
-}*/
-    
     private static string CodepointsToString(int[] cps)
     {
         var sb = new StringBuilder(cps.Length);
@@ -363,24 +343,21 @@ public static class BiDi
 
             int stringIndex = ch.index;
             if (stringIndex < 0 || stringIndex >= cpIndexByStrIndex.Length)
+            {
                 continue;
+            }
 
             int cpIndex = cpIndexByStrIndex[stringIndex];
             if (cpIndex < 0 || cpIndex >= widths.Length)
             {
-                // Этот глиф не соответствует началу codepoint'а (например, часть тега) – пропускаем.
                 continue;
             }
-
-            // Advance-ширина символа: сколько "пера" ушло вперёд после этого глифа.
-            float width = ch.xAdvance - ch.origin;
-
-            // На случай, если один codepoint даёт несколько глифов (лигатуры и т.п.),
-            // аккумулируем сумму.
+            
+            float width = ch.glyphAdvance;
+            
             widths[cpIndex] += width;
         }
-
-        // Для перевода строки (U+000A) ширина нам не нужна — она обрабатывается отдельно.
+        
         for (int i = 0; i < cps.Length; i++)
         {
             if (cps[i] == 0x000A)
