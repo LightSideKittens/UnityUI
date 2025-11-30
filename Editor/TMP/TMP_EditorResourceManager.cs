@@ -43,14 +43,14 @@ namespace TMPro
     {
         private static TMP_EditorResourceManager s_Instance;
 
-        private readonly List<Object> m_ObjectUpdateQueue = new List<Object>();
-        private HashSet<int> m_ObjectUpdateQueueLookup = new HashSet<int>();
+        private readonly List<Object> m_ObjectUpdateQueue = new();
+        private HashSet<int> m_ObjectUpdateQueueLookup = new();
 
-        private readonly List<Object> m_ObjectReImportQueue = new List<Object>();
-        private HashSet<int> m_ObjectReImportQueueLookup = new HashSet<int>();
+        private readonly List<Object> m_ObjectReImportQueue = new();
+        private HashSet<int> m_ObjectReImportQueueLookup = new();
 
-        private readonly List<TMP_FontAsset> m_FontAssetDefinitionRefreshQueue = new List<TMP_FontAsset>();
-        private HashSet<int> m_FontAssetDefinitionRefreshQueueLookup = new HashSet<int>();
+        private readonly List<TMP_FontAsset> m_FontAssetDefinitionRefreshQueue = new();
+        private HashSet<int> m_FontAssetDefinitionRefreshQueueLookup = new();
 
         /// <summary>
         /// Get a singleton instance of the manager.

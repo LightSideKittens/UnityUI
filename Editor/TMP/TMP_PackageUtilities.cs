@@ -103,7 +103,7 @@ namespace TMPro
 
         private static AssetConversionData m_ConversionData;
 
-        private static readonly List<AssetModificationRecord> m_ModifiedAssetList = new List<AssetModificationRecord>();
+        private static readonly List<AssetModificationRecord> m_ModifiedAssetList = new();
 
         void OnEnable()
         {
@@ -550,7 +550,7 @@ namespace TMPro
             window.Focus();
         }
 
-        private static HashSet<Type> m_IgnoreAssetTypes = new HashSet<Type>()
+        private static HashSet<Type> m_IgnoreAssetTypes = new()
         {
             typeof(AnimatorOverrideController),
             typeof(AudioClip),
@@ -619,7 +619,7 @@ namespace TMPro
 
         private static AssetConversionData m_ConversionData;
 
-        private static List<AssetModificationRecord> m_ModifiedAssetList = new List<AssetModificationRecord>();
+        private static List<AssetModificationRecord> m_ModifiedAssetList = new();
 
 
         void OnEnable()

@@ -252,8 +252,6 @@ namespace TMPro
         public override void Rebuild(CanvasUpdate update)
         {
             if (this == null) return;
-
-            base.Rebuild(update);
             
             if (update == CanvasUpdate.PreRender)
             {
@@ -1641,6 +1639,7 @@ namespace TMPro
 
             if (_havePropertiesChanged || m_isLayoutDirty)
             {
+                OnBeforeRebuild();
                 if (isMaskUpdateRequired)
                 {
                     UpdateMask();
@@ -1677,6 +1676,7 @@ namespace TMPro
                     GenerateTextMesh();
                     m_AutoSizeIterationCount += 1;
                 }
+                OnAfterRebuild();
             }
         }
 
@@ -1812,8 +1812,6 @@ namespace TMPro
             bool kerning = m_ActiveFontFeatures.Contains(OTL_FeatureTag.kern);
             bool markToBase = m_ActiveFontFeatures.Contains(OTL_FeatureTag.mark);
             bool markToMark = m_ActiveFontFeatures.Contains(OTL_FeatureTag.mkmk);
-            
-            m_textInfo.ClearPageInfo();
 
             Vector4 margins = m_margin;
             float marginWidth = m_marginWidth > 0 ? m_marginWidth : 0;

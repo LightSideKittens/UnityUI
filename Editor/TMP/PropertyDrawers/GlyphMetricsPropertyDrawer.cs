@@ -10,12 +10,12 @@ namespace TMPro.EditorUtilities
     [CustomPropertyDrawer(typeof(GlyphMetrics))]
     internal class GlyphMetricsPropertyDrawer : PropertyDrawer
     {
-        private static readonly GUIContent k_GlyphMetricLabel = new GUIContent("Glyph Metrics", "The layout metrics of the glyph.");
-        private static readonly GUIContent k_WidthPropertyLabel = new GUIContent("W:", "The width of the glyph.");
-        private static readonly GUIContent k_HeightPropertyLabel = new GUIContent("H:", "The height of the glyph.");
-        private static readonly GUIContent k_BearingXPropertyLabel = new GUIContent("BX:", "The horizontal bearing X of the glyph.");
-        private static readonly GUIContent k_BearingYPropertyLabel = new GUIContent("BY:", "The horizontal bearing Y of the glyph.");
-        private static readonly GUIContent k_HorizontalAdvancePropertyLabel = new GUIContent("AD:", "The horizontal advance of the glyph.");
+        private static readonly GUIContent k_GlyphMetricLabel = new("Glyph Metrics", "The layout metrics of the glyph.");
+        private static readonly GUIContent k_WidthPropertyLabel = new("W:", "The width of the glyph.");
+        private static readonly GUIContent k_HeightPropertyLabel = new("H:", "The height of the glyph.");
+        private static readonly GUIContent k_BearingXPropertyLabel = new("BX:", "The horizontal bearing X of the glyph.");
+        private static readonly GUIContent k_BearingYPropertyLabel = new("BY:", "The horizontal bearing Y of the glyph.");
+        private static readonly GUIContent k_HorizontalAdvancePropertyLabel = new("AD:", "The horizontal advance of the glyph.");
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {

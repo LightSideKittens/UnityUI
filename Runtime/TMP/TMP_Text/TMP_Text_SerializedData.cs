@@ -530,9 +530,10 @@ namespace TMPro
         [FormerlySerializedAs("m_lineJustification")]
         protected TextAlignmentOptions m_textAlignment = TextAlignmentOptions.Converted;
 
+        [SerializeField] protected bool autoHorizontalAlignment = true;
+
         protected HorizontalAlignmentOptions m_lineJustification;
         protected TMP_TextProcessingStack<HorizontalAlignmentOptions> m_lineJustificationStack = new(new HorizontalAlignmentOptions[16]);
-        protected Vector3[] m_textContainerLocalCorners = new Vector3[4];
 
         /// <summary>
         /// Use the extents of the text geometry for alignment instead of font metrics.
@@ -628,9 +629,7 @@ namespace TMPro
         
         [SerializeField] [FormerlySerializedAs("m_enableWordWrapping")]
         protected TextWrappingModes m_TextWrappingMode;
-        protected bool m_isCharacterWrappingEnabled = false;
         protected bool m_isNonBreakingSpace = false;
-        protected bool m_isIgnoringAlignment;
 
         /// <summary>
         /// Controls the blending between using character and word spacing to fill-in the space for justified text.

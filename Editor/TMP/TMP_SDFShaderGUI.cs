@@ -465,8 +465,8 @@ namespace TMPro.EditorUtilities
 
         static GUIContent[] s_BevelTypeLabels =
         {
-            new GUIContent("Outer Bevel"),
-            new GUIContent("Inner Bevel")
+            new("Outer Bevel"),
+            new("Inner Bevel")
         };
 
         void DoBevelPanel()

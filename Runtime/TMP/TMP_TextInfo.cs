@@ -30,7 +30,6 @@ namespace TMPro
         public TMP_WordInfo[] wordInfo;
         public TMP_LinkInfo[] linkInfo;
         public TMP_LineInfo[] lineInfo;
-        public TMP_PageInfo[] pageInfo;
         public TMP_MeshInfo[] meshInfo;
 
         private TMP_MeshInfo[] m_CachedMeshInfo;
@@ -41,7 +40,6 @@ namespace TMPro
             wordInfo = new TMP_WordInfo[16];
             linkInfo = Array.Empty<TMP_LinkInfo>();
             lineInfo = new TMP_LineInfo[2];
-            pageInfo = new TMP_PageInfo[4];
 
             meshInfo = new TMP_MeshInfo[1];
         }
@@ -52,7 +50,6 @@ namespace TMPro
             wordInfo = new TMP_WordInfo[16];
             linkInfo = Array.Empty<TMP_LinkInfo>();
             lineInfo = new TMP_LineInfo[2];
-            pageInfo = new TMP_PageInfo[4];
 
             meshInfo = new TMP_MeshInfo[1];
         }
@@ -67,7 +64,6 @@ namespace TMPro
             linkInfo = Array.Empty<TMP_LinkInfo>();
 
             lineInfo = new TMP_LineInfo[2];
-            pageInfo = new TMP_PageInfo[4];
 
             meshInfo = new TMP_MeshInfo[1];
             meshInfo[0].mesh = textComponent.mesh;
@@ -109,7 +105,6 @@ namespace TMPro
             characterInfo = new TMP_CharacterInfo[4];
             wordInfo = new TMP_WordInfo[1];
             lineInfo = new TMP_LineInfo[1];
-            pageInfo = new TMP_PageInfo[1];
             linkInfo = Array.Empty<TMP_LinkInfo>();
 
             materialCount = 0;
@@ -195,24 +190,6 @@ namespace TMPro
                 lineInfo[i].width = 0;
             }
         }
-
-        internal void ClearPageInfo()
-        {
-            if (pageInfo == null)
-                pageInfo = new TMP_PageInfo[2];
-
-            int length = pageInfo.Length;
-
-            for (int i = 0; i < length; i++)
-            {
-                pageInfo[i].firstCharacterIndex = 0;
-                pageInfo[i].lastCharacterIndex = 0;
-                pageInfo[i].ascender = -32767;
-                pageInfo[i].baseLine = 0;
-                pageInfo[i].descender = 32767;
-            }
-        }
-
 
         /// <summary>
         /// Function to copy the MeshInfo Arrays and their primary vertex data content.

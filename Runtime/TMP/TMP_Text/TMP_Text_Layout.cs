@@ -54,236 +54,114 @@ namespace TMPro
         protected bool m_isCalculatingPreferredValues;
         
         /// <summary>
-        /// Function to Calculate the Preferred Width and Height of the text object.
-        /// </summary>
-        /// <returns></returns>
-        public Vector2 GetPreferredValues()
-        {
-            m_isPreferredWidthDirty = true;
-            float preferredWidth = GetPreferredWidth();
-
-            m_isPreferredHeightDirty = true;
-            float preferredHeight = GetPreferredHeight();
-
-            m_isPreferredWidthDirty = true;
-            m_isPreferredHeightDirty = true;
-
-            return new(preferredWidth, preferredHeight);
-        }
-
-        /// <summary>
-        /// Function to Calculate the Preferred Width and Height of the text object given the provided width and height.
-        /// </summary>
-        /// <returns></returns>
-        public Vector2 GetPreferredValues(float width, float height)
-        {
-            m_isCalculatingPreferredValues = true;
-            ParseInputText();
-
-            Vector2 margin = new(width, height);
-
-            float preferredWidth = GetPreferredWidth(margin);
-
-            float preferredHeight = GetPreferredHeight(margin);
-
-            return new(preferredWidth, preferredHeight);
-        }
-
-        /// <summary>
         /// Method to calculate the preferred width of a text object.
         /// </summary>
-        /// <returns></returns>
         protected float GetPreferredWidth()
         {
-            if (TMP_Settings.instance == null) return 0;
-
-            if (!m_isPreferredWidthDirty)
-                return m_preferredWidth;
-
-            float fontSize = m_enableAutoSizing ? m_fontSizeMax : m_fontSize;
-
-            m_minFontSize = m_fontSizeMin;
-            m_maxFontSize = m_fontSizeMax;
-            m_charWidthAdjDelta = 0;
-
-            Vector2 margin = k_LargePositiveVector2;
-
-            m_isCalculatingPreferredValues = true;
-            ParseInputText();
-
-            m_AutoSizeIterationCount = 0;
-            TextWrappingModes wrapMode =
-                m_TextWrappingMode == TextWrappingModes.Normal || m_TextWrappingMode == TextWrappingModes.NoWrap
-                    ? TextWrappingModes.NoWrap
-                    : TextWrappingModes.PreserveWhitespaceNoWrap;
-            float preferredWidth = CalculatePreferredValues(ref fontSize, margin, false, wrapMode).x;
-
-            m_isPreferredWidthDirty = false;
-
-            return preferredWidth;
-        }
-
-        private float GetPreferredWidth(Vector2 margin)
-        {
-            float fontSize = m_enableAutoSizing ? m_fontSizeMax : m_fontSize;
-
-            m_minFontSize = m_fontSizeMin;
-            m_maxFontSize = m_fontSizeMax;
-            m_charWidthAdjDelta = 0;
-
-            m_AutoSizeIterationCount = 0;
-            TextWrappingModes wrapMode =
-                m_TextWrappingMode == TextWrappingModes.Normal || m_TextWrappingMode == TextWrappingModes.NoWrap
-                    ? TextWrappingModes.NoWrap
-                    : TextWrappingModes.PreserveWhitespaceNoWrap;
-            float preferredWidth = CalculatePreferredValues(ref fontSize, margin, false, wrapMode).x;
-
-            return preferredWidth;
-        }
-
-        private float GetPreferredWidth(Vector2 margin, TextWrappingModes wrapMode)
-        {
-            float fontSize = m_enableAutoSizing ? m_fontSizeMax : m_fontSize;
-
-            m_minFontSize = m_fontSizeMin;
-            m_maxFontSize = m_fontSizeMax;
-            m_charWidthAdjDelta = 0;
-
-            m_AutoSizeIterationCount = 0;
-            float preferredWidth = CalculatePreferredValues(ref fontSize, margin, false, wrapMode).x;
-
-            return preferredWidth;
+            CalculatePreferredValues();
+            return m_preferredWidth;
         }
 
         /// <summary>
         /// Method to calculate the preferred height of a text object.
         /// </summary>
-        /// <returns></returns>
         protected float GetPreferredHeight()
         {
-            if (TMP_Settings.instance == null) return 0;
+            CalculatePreferredValues();
+            return m_preferredHeight;
+        }
 
-            if (!m_isPreferredHeightDirty)
-                return m_preferredHeight;
+        /// <summary>
+        /// Единый расчёт preferred-ширины и высоты.
+        /// Вызывается из preferredWidth / preferredHeight и кеширует оба значения.
+        /// </summary>
+        protected Vector2 CalculatePreferredValues()
+        {
+            if (TMP_Settings.instance == null)
+            {
+                m_preferredWidth = 0;
+                m_preferredHeight = 0;
+                m_isPreferredWidthDirty = false;
+                m_isPreferredHeightDirty = false;
+                return Vector2.zero;
+            }
 
-            float fontSize = m_enableAutoSizing ? m_fontSizeMax : m_fontSize;
-
-            m_minFontSize = m_fontSizeMin;
-            m_maxFontSize = m_fontSizeMax;
-            m_charWidthAdjDelta = 0;
-
-            Vector2 margin = new(m_marginWidth != 0 ? m_marginWidth : k_LargePositiveFloat,
-                k_LargePositiveFloat);
+            if (!m_isPreferredWidthDirty && !m_isPreferredHeightDirty)
+                return new Vector2(m_preferredWidth, m_preferredHeight);
 
             m_isCalculatingPreferredValues = true;
             ParseInputText();
 
-            m_IsAutoSizePointSizeSet = false;
-            m_AutoSizeIterationCount = 0;
-
-            float preferredHeight = 0;
-
-            while (m_IsAutoSizePointSizeSet == false)
+            if (m_isPreferredWidthDirty)
             {
-                preferredHeight = CalculatePreferredValues(ref fontSize, margin, m_enableAutoSizing, m_TextWrappingMode)
-                    .y;
-                m_AutoSizeIterationCount += 1;
+                float fontSizeW = m_enableAutoSizing ? m_fontSizeMax : m_fontSize;
+
+                m_minFontSize = m_fontSizeMin;
+                m_maxFontSize = m_fontSizeMax;
+                m_charWidthAdjDelta = 0;
+                m_AutoSizeIterationCount = 0;
+
+                Vector2 marginW = k_LargePositiveVector2;
+                TextWrappingModes wrapModeW =
+                    (m_TextWrappingMode == TextWrappingModes.Normal ||
+                     m_TextWrappingMode == TextWrappingModes.NoWrap)
+                        ? TextWrappingModes.NoWrap
+                        : TextWrappingModes.PreserveWhitespaceNoWrap;
+
+                Vector2 prefW = CalculatePreferredValues(
+                    ref fontSizeW,
+                    marginW,
+                    isTextAutoSizingEnabled: false,
+                    textWrapMode: wrapModeW);
+
+                m_preferredWidth = prefW.x;
+                m_isPreferredWidthDirty = false;
             }
 
-            m_isPreferredHeightDirty = false;
-
-            return preferredHeight;
-        }
-
-        /// <summary>
-        /// Method to calculate the preferred height of a text object.
-        /// </summary>
-        /// <param name="margin"></param>
-        /// <returns></returns>
-        private float GetPreferredHeight(Vector2 margin)
-        {
-            float fontSize = m_enableAutoSizing ? m_fontSizeMax : m_fontSize;
-
-            m_minFontSize = m_fontSizeMin;
-            m_maxFontSize = m_fontSizeMax;
-            m_charWidthAdjDelta = 0;
-
-            m_IsAutoSizePointSizeSet = false;
-            m_AutoSizeIterationCount = 0;
-
-            float preferredHeight = 0;
-
-            while (m_IsAutoSizePointSizeSet == false)
+            if (m_isPreferredHeightDirty)
             {
-                preferredHeight = CalculatePreferredValues(ref fontSize, margin, m_enableAutoSizing, m_TextWrappingMode)
-                    .y;
-                m_AutoSizeIterationCount += 1;
+                float fontSizeH = m_enableAutoSizing ? m_fontSizeMax : m_fontSize;
+
+                m_minFontSize = m_fontSizeMin;
+                m_maxFontSize = m_fontSizeMax;
+                m_charWidthAdjDelta = 0;
+
+                Vector2 marginH = new(
+                    m_marginWidth != 0 ? m_marginWidth : k_LargePositiveFloat,
+                    k_LargePositiveFloat);
+
+                m_IsAutoSizePointSizeSet = false;
+                m_AutoSizeIterationCount = 0;
+
+                float preferredHeight = 0;
+
+                while (!m_IsAutoSizePointSizeSet)
+                {
+                    Vector2 prefH = CalculatePreferredValues(
+                        ref fontSizeH,
+                        marginH,
+                        isTextAutoSizingEnabled: m_enableAutoSizing,
+                        textWrapMode: m_TextWrappingMode);
+
+                    preferredHeight = prefH.y;
+                    m_AutoSizeIterationCount += 1;
+                }
+
+                m_preferredHeight = preferredHeight;
+                m_isPreferredHeightDirty = false;
             }
 
-            return preferredHeight;
+            m_isCalculatingPreferredValues = false;
+
+            return new Vector2(m_preferredWidth, m_preferredHeight);
         }
 
-        /// <summary>
-        /// Method returning the rendered width and height of the text object.
-        /// </summary>
-        /// <returns></returns>
-        public Vector2 GetRenderedValues()
-        {
-            return GetTextBounds().size;
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="onlyVisibleCharacters">Should returned value only factor in visible characters and exclude those greater than maxVisibleCharacters for instance.</param>
-        /// <returns></returns>
-        public Vector2 GetRenderedValues(bool onlyVisibleCharacters)
-        {
-            return GetTextBounds(onlyVisibleCharacters).size;
-        }
-
-        /// <summary>
-        /// Method returning the rendered width of the text object.
-        /// </summary>
-        /// <returns></returns>
-        private float GetRenderedWidth()
-        {
-            return GetRenderedValues().x;
-        }
-
-        /// <summary>
-        /// Method returning the rendered width of the text object.
-        /// </summary>
-        /// <returns></returns>
-        protected float GetRenderedWidth(bool onlyVisibleCharacters)
-        {
-            return GetRenderedValues(onlyVisibleCharacters).x;
-        }
-
-        /// <summary>
-        /// Method returning the rendered height of the text object.
-        /// </summary>
-        /// <returns></returns>
-        private float GetRenderedHeight()
-        {
-            return GetRenderedValues().y;
-        }
-
-        /// <summary>
-        /// Method returning the rendered height of the text object.
-        /// </summary>
-        /// <returns></returns>
-        protected float GetRenderedHeight(bool onlyVisibleCharacters)
-        {
-            return GetRenderedValues(onlyVisibleCharacters).y;
-        }
 
         /// <summary>
         /// Method to calculate the preferred width and height of the text object.
         /// </summary>
         /// <returns></returns>
-        protected virtual Vector2 CalculatePreferredValues(ref float fontSize, Vector2 marginSize,
-            bool isTextAutoSizingEnabled, TextWrappingModes textWrapMode)
+        protected virtual Vector2 CalculatePreferredValues(ref float fontSize, Vector2 marginSize, bool isTextAutoSizingEnabled, TextWrappingModes textWrapMode)
         {
             if (m_fontAsset == null || m_fontAsset.characterLookupTable == null)
             {
@@ -450,7 +328,6 @@ namespace TMPro
                             break;
                         case 0x2026:
                             m_internalCharacterInfo[m_characterCount].textElement = m_Ellipsis.character;
-                            ;
                             m_internalCharacterInfo[m_characterCount].elementType = TMP_TextElementType.Character;
                             m_internalCharacterInfo[m_characterCount].fontAsset = m_Ellipsis.fontAsset;
                             m_internalCharacterInfo[m_characterCount].material = m_Ellipsis.material;
@@ -1265,6 +1142,15 @@ namespace TMPro
             return new(m_RenderedWidth, m_RenderedHeight);
         }
 
+        /// <summary>
+        /// Method returning the rendered width and height of the text object.
+        /// </summary>
+        /// <returns></returns>
+        public Vector2 GetRenderedValues()
+        {
+            return GetTextBounds().size;
+        }
+        
         /// <summary>
         /// Method returning the compound bounds of the text object and child sub objects.
         /// </summary>

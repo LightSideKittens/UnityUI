@@ -66,14 +66,7 @@ namespace TMPro
         /// <summary>
         /// Compute the rendered width of the text object.
         /// </summary>
-        public virtual float renderedWidth { get { return GetRenderedWidth(); } }
-
-
-        /// <summary>
-        /// Compute the rendered height of the text object.
-        /// </summary>
-        public virtual float renderedHeight { get { return GetRenderedHeight(); } }
-
+        public virtual Vector2 renderedSize => GetRenderedValues();
 
         /// <summary>
         ///

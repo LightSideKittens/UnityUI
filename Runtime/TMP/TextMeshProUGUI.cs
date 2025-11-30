@@ -1896,8 +1896,6 @@ namespace TMPro
             bool kerning = m_ActiveFontFeatures.Contains(OTL_FeatureTag.kern);
             bool markToBase = m_ActiveFontFeatures.Contains(OTL_FeatureTag.mark);
             bool markToMark = m_ActiveFontFeatures.Contains(OTL_FeatureTag.mkmk);
-            
-            m_textInfo.ClearPageInfo();
 
             Vector4 margins = m_margin;
             float marginWidth = m_marginWidth > 0 ? m_marginWidth : 0;

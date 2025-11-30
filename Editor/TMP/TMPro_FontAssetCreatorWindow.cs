@@ -144,20 +144,20 @@ namespace TMPro.EditorUtilities
         Texture2D m_GlyphRectPreviewTexture;
         Texture2D m_SavedFontAtlas;
 
-        List<Glyph> m_FontGlyphTable = new List<Glyph>();
-        List<TMP_Character> m_FontCharacterTable = new List<TMP_Character>();
+        List<Glyph> m_FontGlyphTable = new();
+        List<TMP_Character> m_FontCharacterTable = new();
 
-        Dictionary<uint, uint> m_CharacterLookupMap = new Dictionary<uint, uint>();
-        Dictionary<uint, List<uint>> m_GlyphLookupMap = new Dictionary<uint, List<uint>>();
+        Dictionary<uint, uint> m_CharacterLookupMap = new();
+        Dictionary<uint, List<uint>> m_GlyphLookupMap = new();
 
-        List<Glyph> m_GlyphsToPack = new List<Glyph>();
-        List<Glyph> m_GlyphsPacked = new List<Glyph>();
-        List<GlyphRect> m_FreeGlyphRects = new List<GlyphRect>();
-        List<GlyphRect> m_UsedGlyphRects = new List<GlyphRect>();
-        List<Glyph> m_GlyphsToRender = new List<Glyph>();
-        List<uint> m_AvailableGlyphsToAdd = new List<uint>();
-        List<uint> m_MissingCharacters = new List<uint>();
-        List<uint> m_ExcludedCharacters = new List<uint>();
+        List<Glyph> m_GlyphsToPack = new();
+        List<Glyph> m_GlyphsPacked = new();
+        List<GlyphRect> m_FreeGlyphRects = new();
+        List<GlyphRect> m_UsedGlyphRects = new();
+        List<Glyph> m_GlyphsToRender = new();
+        List<uint> m_AvailableGlyphsToAdd = new();
+        List<uint> m_MissingCharacters = new();
+        List<uint> m_ExcludedCharacters = new();
 
         private FaceInfo m_FaceInfo;
 

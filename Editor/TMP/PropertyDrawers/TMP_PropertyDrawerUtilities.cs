@@ -18,7 +18,7 @@ namespace TMPro.EditorUtilities
     internal static class TMP_PropertyDrawerUtilities
     {
         internal static bool s_RefreshGlyphProxyLookup;
-        private static Dictionary<SerializedObject, Dictionary<uint, GlyphProxy>> s_GlyphProxyLookups = new Dictionary<SerializedObject, Dictionary<uint, GlyphProxy>>();
+        private static Dictionary<SerializedObject, Dictionary<uint, GlyphProxy>> s_GlyphProxyLookups = new();
 
         internal static void ClearGlyphProxyLookups()
         {

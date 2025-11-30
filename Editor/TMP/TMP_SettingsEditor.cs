@@ -12,60 +12,60 @@ namespace TMPro.EditorUtilities
     {
         internal class Styles
         {
-            public static readonly GUIContent defaultFontAssetLabel = new GUIContent("Default Font Asset", "The Font Asset that will be assigned by default to newly created text objects when no Font Asset is specified.");
-            public static readonly GUIContent defaultFontAssetPathLabel = new GUIContent("Path:        Resources/", "The relative path to a Resources folder where the Font Assets and Material Presets are located.\nExample \"Fonts & Materials/\"");
+            public static readonly GUIContent defaultFontAssetLabel = new("Default Font Asset", "The Font Asset that will be assigned by default to newly created text objects when no Font Asset is specified.");
+            public static readonly GUIContent defaultFontAssetPathLabel = new("Path:        Resources/", "The relative path to a Resources folder where the Font Assets and Material Presets are located.\nExample \"Fonts & Materials/\"");
 
-            public static readonly GUIContent fallbackFontAssetsLabel = new GUIContent("Fallback Font Assets", "The Font Assets that will be searched to locate and replace missing characters from a given Font Asset.");
-            public static readonly GUIContent fallbackFontAssetsListLabel = new GUIContent("Font Asset List", "The Font Assets that will be searched to locate and replace missing characters from a given Font Asset.");
+            public static readonly GUIContent fallbackFontAssetsLabel = new("Fallback Font Assets", "The Font Assets that will be searched to locate and replace missing characters from a given Font Asset.");
+            public static readonly GUIContent fallbackFontAssetsListLabel = new("Font Asset List", "The Font Assets that will be searched to locate and replace missing characters from a given Font Asset.");
 
-            public static readonly GUIContent fallbackMaterialSettingsLabel = new GUIContent("Fallback Material Settings");
-            public static readonly GUIContent matchMaterialPresetLabel = new GUIContent("Match Material Presets");
-            public static readonly GUIContent hideSubTextObjectsPresetLabel = new GUIContent("Hide Sub Text Objects", "Determines if sub text objects will be hidden in the scene hierarchy. Property change will only take effect after entering or existing play mode.");
+            public static readonly GUIContent fallbackMaterialSettingsLabel = new("Fallback Material Settings");
+            public static readonly GUIContent matchMaterialPresetLabel = new("Match Material Presets");
+            public static readonly GUIContent hideSubTextObjectsPresetLabel = new("Hide Sub Text Objects", "Determines if sub text objects will be hidden in the scene hierarchy. Property change will only take effect after entering or existing play mode.");
 
-            public static readonly GUIContent containerDefaultSettingsLabel = new GUIContent("Text Container Default Settings");
+            public static readonly GUIContent containerDefaultSettingsLabel = new("Text Container Default Settings");
 
-            public static readonly GUIContent textMeshProLabel = new GUIContent("TextMeshPro");
-            public static readonly GUIContent textMeshProUiLabel = new GUIContent("TextMeshPro UI");
-            public static readonly GUIContent enableRaycastTarget = new GUIContent("Enable Raycast Target");
-            public static readonly GUIContent autoSizeContainerLabel = new GUIContent("Auto Size Text Container", "Set the size of the text container to match the text.");
-            public static readonly GUIContent isTextObjectScaleStaticLabel = new GUIContent("Is Object Scale Static", "Disables calling InternalUpdate() when enabled. This can improve performance when text object scale is static.");
+            public static readonly GUIContent textMeshProLabel = new("TextMeshPro");
+            public static readonly GUIContent textMeshProUiLabel = new("TextMeshPro UI");
+            public static readonly GUIContent enableRaycastTarget = new("Enable Raycast Target");
+            public static readonly GUIContent autoSizeContainerLabel = new("Auto Size Text Container", "Set the size of the text container to match the text.");
+            public static readonly GUIContent isTextObjectScaleStaticLabel = new("Is Object Scale Static", "Disables calling InternalUpdate() when enabled. This can improve performance when text object scale is static.");
 
-            public static readonly GUIContent textComponentDefaultSettingsLabel = new GUIContent("Text Component Default Settings");
-            public static readonly GUIContent defaultFontSize = new GUIContent("Default Font Size");
-            public static readonly GUIContent autoSizeRatioLabel = new GUIContent("Text Auto Size Ratios");
-            public static readonly GUIContent minLabel = new GUIContent("Min");
-            public static readonly GUIContent maxLabel = new GUIContent("Max");
+            public static readonly GUIContent textComponentDefaultSettingsLabel = new("Text Component Default Settings");
+            public static readonly GUIContent defaultFontSize = new("Default Font Size");
+            public static readonly GUIContent autoSizeRatioLabel = new("Text Auto Size Ratios");
+            public static readonly GUIContent minLabel = new("Min");
+            public static readonly GUIContent maxLabel = new("Max");
 
-            public static readonly GUIContent textWrappingModeLabel = new GUIContent("Text Wrapping Mode");
-            public static readonly GUIContent kerningLabel = new GUIContent("Kerning");
-            public static readonly GUIContent fontFeaturesLabel = new GUIContent("Font Features", "Font features that should be set by default on the text component.");
-            public static readonly GUIContent extraPaddingLabel = new GUIContent("Extra Padding");
-            public static readonly GUIContent tintAllSpritesLabel = new GUIContent("Tint All Sprites");
-            public static readonly GUIContent parseEscapeCharactersLabel = new GUIContent("Parse Escape Sequence");
+            public static readonly GUIContent textWrappingModeLabel = new("Text Wrapping Mode");
+            public static readonly GUIContent kerningLabel = new("Kerning");
+            public static readonly GUIContent fontFeaturesLabel = new("Font Features", "Font features that should be set by default on the text component.");
+            public static readonly GUIContent extraPaddingLabel = new("Extra Padding");
+            public static readonly GUIContent tintAllSpritesLabel = new("Tint All Sprites");
+            public static readonly GUIContent parseEscapeCharactersLabel = new("Parse Escape Sequence");
 
-            public static readonly GUIContent dynamicFontSystemSettingsLabel = new GUIContent("Dynamic Font System Settings");
-            public static readonly GUIContent getFontFeaturesAtRuntime = new GUIContent("Get Font Features at Runtime", "Determines if OpenType font features should be retrieved from source font files as new characters and glyphs are added to font assets.");
-            public static readonly GUIContent dynamicAtlasTextureGroup = new GUIContent("Dynamic Atlas Texture Group");
+            public static readonly GUIContent dynamicFontSystemSettingsLabel = new("Dynamic Font System Settings");
+            public static readonly GUIContent getFontFeaturesAtRuntime = new("Get Font Features at Runtime", "Determines if OpenType font features should be retrieved from source font files as new characters and glyphs are added to font assets.");
+            public static readonly GUIContent dynamicAtlasTextureGroup = new("Dynamic Atlas Texture Group");
 
-            public static readonly GUIContent missingGlyphLabel = new GUIContent("Missing Character Unicode", "The character to be displayed when the requested character is not found in any font asset or fallbacks.");
-            public static readonly GUIContent clearDynamicDataOnBuildLabel = new GUIContent("Clear Dynamic Data On Build", "Determines if the \"Clear Dynamic Data on Build\" property will be set to true or false on newly created dynamic font assets.");
-            public static readonly GUIContent disableWarningsLabel = new GUIContent("Disable warnings", "Disable warning messages in the Console.");
+            public static readonly GUIContent missingGlyphLabel = new("Missing Character Unicode", "The character to be displayed when the requested character is not found in any font asset or fallbacks.");
+            public static readonly GUIContent clearDynamicDataOnBuildLabel = new("Clear Dynamic Data On Build", "Determines if the \"Clear Dynamic Data on Build\" property will be set to true or false on newly created dynamic font assets.");
+            public static readonly GUIContent disableWarningsLabel = new("Disable warnings", "Disable warning messages in the Console.");
 
-            public static readonly GUIContent defaultSpriteAssetLabel = new GUIContent("Default Sprite Asset", "The Sprite Asset that will be assigned by default when using the <sprite> tag when no Sprite Asset is specified.");
-            public static readonly GUIContent missingSpriteCharacterUnicodeLabel = new GUIContent("Missing Sprite Unicode", "The unicode value for the sprite character to be displayed when the requested sprite character is not found in any sprite assets or fallbacks.");
-            public static readonly GUIContent enableEmojiSupportLabel = new GUIContent("iOS Emoji Support", "Enables Emoji support for Touch Screen Keyboards on target devices.");
-            public static readonly GUIContent emojifallbackTextAssetsListLabel = new GUIContent("Fallback Emoji Text Assets", "The Text Assets that will be searched to display characters defined as Emojis in the Unicode.");
+            public static readonly GUIContent defaultSpriteAssetLabel = new("Default Sprite Asset", "The Sprite Asset that will be assigned by default when using the <sprite> tag when no Sprite Asset is specified.");
+            public static readonly GUIContent missingSpriteCharacterUnicodeLabel = new("Missing Sprite Unicode", "The unicode value for the sprite character to be displayed when the requested sprite character is not found in any sprite assets or fallbacks.");
+            public static readonly GUIContent enableEmojiSupportLabel = new("iOS Emoji Support", "Enables Emoji support for Touch Screen Keyboards on target devices.");
+            public static readonly GUIContent emojifallbackTextAssetsListLabel = new("Fallback Emoji Text Assets", "The Text Assets that will be searched to display characters defined as Emojis in the Unicode.");
 
-            public static readonly GUIContent spriteAssetsPathLabel = new GUIContent("Path:        Resources/", "The relative path to a Resources folder where the Sprite Assets are located.\nExample \"Sprite Assets/\"");
+            public static readonly GUIContent spriteAssetsPathLabel = new("Path:        Resources/", "The relative path to a Resources folder where the Sprite Assets are located.\nExample \"Sprite Assets/\"");
 
-            public static readonly GUIContent defaultStyleSheetLabel = new GUIContent("Default Style Sheet", "The Style Sheet that will be used for all text objects in this project.");
-            public static readonly GUIContent styleSheetResourcePathLabel = new GUIContent("Path:        Resources/", "The relative path to a Resources folder where the Style Sheets are located.\nExample \"Style Sheets/\"");
+            public static readonly GUIContent defaultStyleSheetLabel = new("Default Style Sheet", "The Style Sheet that will be used for all text objects in this project.");
+            public static readonly GUIContent styleSheetResourcePathLabel = new("Path:        Resources/", "The relative path to a Resources folder where the Style Sheets are located.\nExample \"Style Sheets/\"");
 
-            public static readonly GUIContent colorGradientPresetsLabel = new GUIContent("Color Gradient Presets", "The relative path to a Resources folder where the Color Gradient Presets are located.\nExample \"Color Gradient Presets/\"");
-            public static readonly GUIContent colorGradientsPathLabel = new GUIContent("Path:        Resources/", "The relative path to a Resources folder where the Color Gradient Presets are located.\nExample \"Color Gradient Presets/\"");
+            public static readonly GUIContent colorGradientPresetsLabel = new("Color Gradient Presets", "The relative path to a Resources folder where the Color Gradient Presets are located.\nExample \"Color Gradient Presets/\"");
+            public static readonly GUIContent colorGradientsPathLabel = new("Path:        Resources/", "The relative path to a Resources folder where the Color Gradient Presets are located.\nExample \"Color Gradient Presets/\"");
 
-            public static readonly GUIContent lineBreakingLabel = new GUIContent("Line Breaking for Asian languages", "The text assets that contain the Leading and Following characters which define the rules for line breaking with Asian languages.");
-            public static readonly GUIContent koreanSpecificRules = new GUIContent("Korean Language Options");
+            public static readonly GUIContent lineBreakingLabel = new("Line Breaking for Asian languages", "The text assets that contain the Leading and Following characters which define the rules for line breaking with Asian languages.");
+            public static readonly GUIContent koreanSpecificRules = new("Korean Language Options");
         }
 
         SerializedProperty m_PropFontAsset;
@@ -113,7 +113,7 @@ namespace TMPro.EditorUtilities
         private const string k_UndoRedo = "UndoRedoPerformed";
         private bool m_IsFallbackGlyphCacheDirty;
 
-        private static readonly string[] k_FontFeatures = new string[] { "kern", "liga", "mark", "mkmk" };
+        private static readonly string[] k_FontFeatures = { "kern", "liga", "mark", "mkmk" };
 
         public void OnEnable()
         {

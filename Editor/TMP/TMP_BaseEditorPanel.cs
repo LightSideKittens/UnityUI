@@ -9,74 +9,68 @@ namespace TMPro.EditorUtilities
 {
     public abstract class TMP_BaseEditorPanel : Editor
     {
-        static readonly GUIContent k_RtlToggleLabel = new GUIContent("Enable RTL Editor", "Reverses text direction and allows right to left editing.");
-        static readonly GUIContent k_FontAssetLabel = new GUIContent("Font Asset", "The Font Asset containing the glyphs that can be rendered for this text.");
-        static readonly GUIContent k_MaterialPresetLabel = new GUIContent("Material Preset", "The material used for rendering. Only materials created from the Font Asset can be used.");
-        static readonly GUIContent k_StyleLabel = new GUIContent("Text Style", "The style from a style sheet to be applied to the text.");
-        static readonly GUIContent k_AutoSizeLabel = new GUIContent("Auto Size", "Auto sizes the text to fit the available space.");
-        static readonly GUIContent k_FontSizeLabel = new GUIContent("Font Size", "The size the text will be rendered at in points.");
-        static readonly GUIContent k_AutoSizeOptionsLabel = new GUIContent("Auto Size Options");
-        static readonly GUIContent k_MinLabel = new GUIContent("Min", "The minimum font size.");
-        static readonly GUIContent k_MaxLabel = new GUIContent("Max", "The maximum font size.");
-        static readonly GUIContent k_WdLabel = new GUIContent("WD%", "Compresses character width up to this value before reducing font size.");
-        static readonly GUIContent k_LineLabel = new GUIContent("Line", "Negative value only. Compresses line height down to this value before reducing font size.");
-        static readonly GUIContent k_FontStyleLabel = new GUIContent("Font Style", "Styles to apply to the text such as Bold or Italic.");
+        static readonly GUIContent k_RtlToggleLabel = new("Enable RTL Editor", "Reverses text direction and allows right to left editing.");
+        static readonly GUIContent k_FontAssetLabel = new("Font Asset", "The Font Asset containing the glyphs that can be rendered for this text.");
+        static readonly GUIContent k_MaterialPresetLabel = new("Material Preset", "The material used for rendering. Only materials created from the Font Asset can be used.");
+        static readonly GUIContent k_StyleLabel = new("Text Style", "The style from a style sheet to be applied to the text.");
+        static readonly GUIContent k_AutoSizeLabel = new("Auto Size", "Auto sizes the text to fit the available space.");
+        static readonly GUIContent k_FontSizeLabel = new("Font Size", "The size the text will be rendered at in points.");
+        static readonly GUIContent k_AutoSizeOptionsLabel = new("Auto Size Options");
+        static readonly GUIContent k_MinLabel = new("Min", "The minimum font size.");
+        static readonly GUIContent k_MaxLabel = new("Max", "The maximum font size.");
+        static readonly GUIContent k_WdLabel = new("WD%", "Compresses character width up to this value before reducing font size.");
+        static readonly GUIContent k_LineLabel = new("Line", "Negative value only. Compresses line height down to this value before reducing font size.");
+        static readonly GUIContent k_FontStyleLabel = new("Font Style", "Styles to apply to the text such as Bold or Italic.");
 
-        static readonly GUIContent k_BoldLabel = new GUIContent("B", "Bold");
-        static readonly GUIContent k_ItalicLabel = new GUIContent("I", "Italic");
-        static readonly GUIContent k_UnderlineLabel = new GUIContent("U", "Underline");
-        static readonly GUIContent k_StrikethroughLabel = new GUIContent("S", "Strikethrough");
-        static readonly GUIContent k_LowercaseLabel = new GUIContent("ab", "Lowercase");
-        static readonly GUIContent k_UppercaseLabel = new GUIContent("AB", "Uppercase");
-        static readonly GUIContent k_SmallcapsLabel = new GUIContent("SC", "Smallcaps");
+        static readonly GUIContent k_BoldLabel = new("B", "Bold");
+        static readonly GUIContent k_ItalicLabel = new("I", "Italic");
+        static readonly GUIContent k_UnderlineLabel = new("U", "Underline");
+        static readonly GUIContent k_StrikethroughLabel = new("S", "Strikethrough");
+        static readonly GUIContent k_LowercaseLabel = new("ab", "Lowercase");
+        static readonly GUIContent k_UppercaseLabel = new("AB", "Uppercase");
+        static readonly GUIContent k_SmallcapsLabel = new("SC", "Smallcaps");
 
-        static readonly GUIContent k_ColorModeLabel = new GUIContent("Color Mode", "The type of gradient to use.");
-        static readonly GUIContent k_BaseColorLabel = new GUIContent("Vertex Color", "The base color of the text vertices.");
-        static readonly GUIContent k_ColorPresetLabel = new GUIContent("Color Preset", "A Color Preset which override the local color settings.");
-        static readonly GUIContent k_ColorGradientLabel = new GUIContent("Color Gradient", "The gradient color applied over the Vertex Color. Can be locally set or driven by a Gradient Asset.");
-        static readonly GUIContent k_CorenerColorsLabel = new GUIContent("Colors", "The color composition of the gradient.");
-        static readonly GUIContent k_OverrideTagsLabel = new GUIContent("Override Tags", "Whether the color settings override the <color> tag.");
+        static readonly GUIContent k_ColorModeLabel = new("Color Mode", "The type of gradient to use.");
+        static readonly GUIContent k_BaseColorLabel = new("Vertex Color", "The base color of the text vertices.");
+        static readonly GUIContent k_ColorPresetLabel = new("Color Preset", "A Color Preset which override the local color settings.");
+        static readonly GUIContent k_ColorGradientLabel = new("Color Gradient", "The gradient color applied over the Vertex Color. Can be locally set or driven by a Gradient Asset.");
+        static readonly GUIContent k_CorenerColorsLabel = new("Colors", "The color composition of the gradient.");
+        static readonly GUIContent k_OverrideTagsLabel = new("Override Tags", "Whether the color settings override the <color> tag.");
 
-        static readonly GUIContent k_SpacingOptionsLabel = new GUIContent("Spacing Options (em)", "Spacing adjustments between different elements of the text. Values are in font units where a value of 1 equals 1/100em.");
-        static readonly GUIContent k_CharacterSpacingLabel = new GUIContent("Character");
-        static readonly GUIContent k_WordSpacingLabel = new GUIContent("Word");
-        static readonly GUIContent k_LineSpacingLabel = new GUIContent("Line");
-        static readonly GUIContent k_ParagraphSpacingLabel = new GUIContent("Paragraph");
+        static readonly GUIContent k_SpacingOptionsLabel = new("Spacing Options (em)", "Spacing adjustments between different elements of the text. Values are in font units where a value of 1 equals 1/100em.");
+        static readonly GUIContent k_CharacterSpacingLabel = new("Character");
+        static readonly GUIContent k_WordSpacingLabel = new("Word");
+        static readonly GUIContent k_LineSpacingLabel = new("Line");
+        static readonly GUIContent k_ParagraphSpacingLabel = new("Paragraph");
 
-        static readonly GUIContent k_AlignmentLabel = new GUIContent("Alignment", "Horizontal and vertical alignment of the text within its container.");
-        static readonly GUIContent k_WrapMixLabel = new GUIContent("Wrap Mix (W <-> C)", "How much to favor words versus characters when distributing the text.");
+        static readonly GUIContent k_AlignmentLabel = new("Alignment", "Horizontal and vertical alignment of the text within its container.");
+        static readonly GUIContent k_WrapMixLabel = new("Wrap Mix (W <-> C)", "How much to favor words versus characters when distributing the text.");
 
-        static readonly GUIContent k_WrappingLabel = new GUIContent("Wrapping", "Wraps text to the next line when reaching the edge of the container.");
-        static readonly GUIContent[] k_WrappingOptions = { new GUIContent("Disabled"), new GUIContent("Enabled") };
-        static readonly GUIContent k_OverflowLabel = new GUIContent("Overflow", "How to display text which goes past the edge of the container.");
+        static readonly GUIContent k_WrappingLabel = new("Wrapping", "Wraps text to the next line when reaching the edge of the container.");
+        static readonly GUIContent[] k_WrappingOptions = { new("Disabled"), new("Enabled") };
+        static readonly GUIContent k_OverflowLabel = new("Overflow", "How to display text which goes past the edge of the container.");
 
-        static readonly GUIContent k_MarginsLabel = new GUIContent("Margins", "The space between the text and the edge of its container.");
-        static readonly GUIContent k_GeometrySortingLabel = new GUIContent("Geometry Sorting", "The order in which text geometry is sorted. Used to adjust the way overlapping characters are displayed.");
-        static readonly GUIContent k_IsTextObjectScaleStatic = new GUIContent("Is Scale Static", "Controls whether a text object will be excluded from the InteralUpdate callback to handle scale changes of the text object or its parent(s).");
-        static readonly GUIContent k_RichTextLabel = new GUIContent("Rich Text", "Enables the use of rich text tags such as <color> and <font>.");
-        static readonly GUIContent k_EscapeCharactersLabel = new GUIContent("Parse Escape Characters", "Whether to display strings such as \"\\n\" as is or replace them by the character they represent.");
-        static readonly GUIContent k_VisibleDescenderLabel = new GUIContent("Visible Descender", "Compute descender values from visible characters only. Used to adjust layout behavior when hiding and revealing characters dynamically.");
-        static readonly GUIContent k_EmojiFallbackSupportLabel = new GUIContent("Emoji Fallback Support", "When text contains Emojis, try using and displaying those from the potential Text Assets assigned in the TMP Settings Emoji Fallback Text Assets.");
-        static readonly GUIContent k_SpriteAssetLabel = new GUIContent("Sprite Asset", "The Sprite Asset used when NOT specifically referencing one using <sprite=\"Sprite Asset Name\">.");
-        static readonly GUIContent k_StyleSheetAssetLabel = new GUIContent("Style Sheet Asset", "The Style Sheet Asset used by this text object.");
+        static readonly GUIContent k_MarginsLabel = new("Margins", "The space between the text and the edge of its container.");
+        static readonly GUIContent k_GeometrySortingLabel = new("Geometry Sorting", "The order in which text geometry is sorted. Used to adjust the way overlapping characters are displayed.");
+        static readonly GUIContent k_IsTextObjectScaleStatic = new("Is Scale Static", "Controls whether a text object will be excluded from the InteralUpdate callback to handle scale changes of the text object or its parent(s).");
+        static readonly GUIContent k_RichTextLabel = new("Rich Text", "Enables the use of rich text tags such as <color> and <font>.");
+        static readonly GUIContent k_EscapeCharactersLabel = new("Parse Escape Characters", "Whether to display strings such as \"\\n\" as is or replace them by the character they represent.");
+        static readonly GUIContent k_VisibleDescenderLabel = new("Visible Descender", "Compute descender values from visible characters only. Used to adjust layout behavior when hiding and revealing characters dynamically.");
+        static readonly GUIContent k_EmojiFallbackSupportLabel = new("Emoji Fallback Support", "When text contains Emojis, try using and displaying those from the potential Text Assets assigned in the TMP Settings Emoji Fallback Text Assets.");
+        static readonly GUIContent k_SpriteAssetLabel = new("Sprite Asset", "The Sprite Asset used when NOT specifically referencing one using <sprite=\"Sprite Asset Name\">.");
+        static readonly GUIContent k_StyleSheetAssetLabel = new("Style Sheet Asset", "The Style Sheet Asset used by this text object.");
 
-        static readonly GUIContent k_HorizontalMappingLabel = new GUIContent("Horizontal Mapping", "Horizontal UV mapping when using a shader with a texture face option.");
-        static readonly GUIContent k_VerticalMappingLabel = new GUIContent("Vertical Mapping", "Vertical UV mapping when using a shader with a texture face option.");
-        static readonly GUIContent k_LineOffsetLabel = new GUIContent("Line Offset", "Adds an horizontal offset to each successive line. Used for slanted texturing.");
+        static readonly GUIContent k_HorizontalMappingLabel = new("Horizontal Mapping", "Horizontal UV mapping when using a shader with a texture face option.");
+        static readonly GUIContent k_VerticalMappingLabel = new("Vertical Mapping", "Vertical UV mapping when using a shader with a texture face option.");
+        static readonly GUIContent k_LineOffsetLabel = new("Line Offset", "Adds an horizontal offset to each successive line. Used for slanted texturing.");
 
-        static readonly GUIContent k_FontFeaturesLabel = new GUIContent("Font Features", "Font features available for the primary font asset assigned to the text component.");
-        static readonly GUIContent k_PaddingLabel = new GUIContent("Extra Padding", "Adds some padding between the characters and the edge of the text mesh. Can reduce graphical errors when displaying small text.");
+        static readonly GUIContent k_FontFeaturesLabel = new("Font Features", "Font features available for the primary font asset assigned to the text component.");
+        static readonly GUIContent k_PaddingLabel = new("Extra Padding", "Adds some padding between the characters and the edge of the text mesh. Can reduce graphical errors when displaying small text.");
+        
+        protected static string[] k_UiStateLabel = { "<i>(Click to collapse)</i> ", "<i>(Click to expand)</i> " };
 
-        static readonly GUIContent k_LeftLabel = new GUIContent("Left");
-        static readonly GUIContent k_TopLabel = new GUIContent("Top");
-        static readonly GUIContent k_RightLabel = new GUIContent("Right");
-        static readonly GUIContent k_BottomLabel = new GUIContent("Bottom");
-
-        protected static readonly GUIContent k_ExtraSettingsLabel = new GUIContent("Extra Settings");
-        protected static string[] k_UiStateLabel = new string[] { "<i>(Click to collapse)</i> ", "<i>(Click to expand)</i> " };
-
-        static Dictionary<int, TMP_Style> k_AvailableStyles = new Dictionary<int, TMP_Style>();
-        protected Dictionary<int, int> m_TextStyleIndexLookup = new Dictionary<int, int>();
+        static Dictionary<int, TMP_Style> k_AvailableStyles = new();
+        protected Dictionary<int, int> m_TextStyleIndexLookup = new();
 
         protected struct Foldout
         {
@@ -85,9 +79,6 @@ namespace TMPro.EditorUtilities
         }
 
         protected static int s_EventId;
-
-        public int selAlignGridA;
-        public int selAlignGridB;
 
         protected SerializedProperty m_TextProp;
 
@@ -99,11 +90,10 @@ namespace TMPro.EditorUtilities
         protected SerializedProperty m_FontSharedMaterialProp;
         protected Material[] m_MaterialPresets;
         protected GUIContent[] m_MaterialPresetNames;
-        protected Dictionary<int, int> m_MaterialPresetIndexLookup = new Dictionary<int, int>();
+        protected Dictionary<int, int> m_MaterialPresetIndexLookup = new();
         protected int m_MaterialPresetSelectionIndex;
-        protected bool m_IsPresetListDirty;
 
-        protected List<TMP_Style> m_Styles = new List<TMP_Style>();
+        protected List<TMP_Style> m_Styles = new();
         protected GUIContent[] m_StyleNames;
         protected int m_StyleSelectionIndex;
 
@@ -130,9 +120,8 @@ namespace TMPro.EditorUtilities
         protected SerializedProperty m_LineSpacingProp;
         protected SerializedProperty m_ParagraphSpacingProp;
 
-        protected SerializedProperty m_TextAlignmentProp;
-
         protected SerializedProperty m_HorizontalAlignmentProp;
+        protected SerializedProperty autoHorizontalAlignment;
         protected SerializedProperty m_VerticalAlignmentProp;
 
         protected SerializedProperty m_HorizontalMappingProp;
@@ -175,7 +164,7 @@ namespace TMPro.EditorUtilities
         protected Vector3[] m_RectCorners = new Vector3[4];
         protected Vector3[] m_HandlePoints = new Vector3[4];
 
-        private static readonly string[] k_FontFeatures = new string[] { "kern", "liga", "mark", "mkmk" };
+        private static readonly string[] k_FontFeatures = { "kern", "liga", "mark", "mkmk" };
 
         protected virtual void OnEnable()
         {
@@ -206,9 +195,9 @@ namespace TMPro.EditorUtilities
             m_WordSpacingProp = serializedObject.FindProperty("m_wordSpacing");
             m_LineSpacingProp = serializedObject.FindProperty("m_lineSpacing");
             m_ParagraphSpacingProp = serializedObject.FindProperty("m_paragraphSpacing");
-
-            m_TextAlignmentProp = serializedObject.FindProperty("m_textAlignment");
+            
             m_HorizontalAlignmentProp = serializedObject.FindProperty("m_HorizontalAlignment");
+            autoHorizontalAlignment = serializedObject.FindProperty("autoHorizontalAlignment");
             m_VerticalAlignmentProp = serializedObject.FindProperty("m_VerticalAlignment");
 
             m_HorizontalMappingProp = serializedObject.FindProperty("m_horizontalMapping");
@@ -951,6 +940,8 @@ namespace TMPro.EditorUtilities
             EditorGUI.EndProperty();
             EditorGUI.EndProperty();
 
+            EditorGUILayout.PropertyField(autoHorizontalAlignment);
+            
             EditorGUILayout.Space();
         }
 
@@ -1180,8 +1171,6 @@ namespace TMPro.EditorUtilities
 
                 m_MaterialPresetIndexLookup.Add(m_MaterialPresets[i].GetInstanceID(), i);
             }
-
-            m_IsPresetListDirty = false;
 
             return m_MaterialPresetNames;
         }

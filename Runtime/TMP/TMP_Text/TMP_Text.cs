@@ -104,22 +104,18 @@ namespace TMPro
     public abstract partial class TMP_Text : MaskableGraphic, ITextPreprocessor
     {
         private string preprocessedText = string.Empty;
-        private TextWrappingModes lastWrapMode;
         private TextRenderFlags lastRenderMode;
         private bool isAfterRebuildProcessing;
         
         protected void OnBeforeRebuild()
         {
-            return;
             if(isAfterRebuildProcessing) return;
             var input = m_text;
             if (string.IsNullOrEmpty(input)) return;
             
             input = Normalize();
             preprocessedText = input;
-            lastWrapMode = m_TextWrappingMode;
             lastRenderMode = m_renderMode;
-            m_TextWrappingMode = TextWrappingModes.NoWrap;
             m_renderMode = TextRenderFlags.DontRender;
                         
             string Normalize()
@@ -169,32 +165,21 @@ namespace TMPro
 
         protected void OnAfterRebuild()
         {
-            return;
             if(isAfterRebuildProcessing) return;
-            var input = m_text;
+            var input = preprocessedText;
             if (string.IsNullOrEmpty(input)) return;
             
-            if (/*lastWrapMode == TextWrappingModes.NoWrap*/ false)
-            {
-                input = BiDi.DoBiDi(input, out _);
-            }
-            else
-            {
-                var lines = BiDi.WrapAndReorder(input, this);
-                input = BiDi.BuildVisualTextWithNewlines(lines);
-            }
-
+            input = BiDi.Do(this, out _);
+            
             preprocessedText = input;
             m_renderMode = lastRenderMode;
             isAfterRebuildProcessing = true;
             ForceMeshUpdate();
-            m_TextWrappingMode = lastWrapMode;
             isAfterRebuildProcessing = false;
         }
         
         string ITextPreprocessor.PreprocessText(string input)
         {
-            return input;
             if (string.IsNullOrEmpty(preprocessedText))
             {
                 return input;
@@ -473,7 +458,6 @@ namespace TMPro
             
             k_ParseTextMarker.End();
         }
-        
 
         /// <summary>
         /// Method used to determine the number of visible characters and required buffer allocations.
@@ -2998,9 +2982,6 @@ namespace TMPro
                                 return true;
                         }
                         return false;
-                    case MarkupTag.SLASH_POSITION:
-                        m_isIgnoringAlignment = false;
-                        return true;
                     case MarkupTag.VERTICAL_OFFSET:
                         value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
 

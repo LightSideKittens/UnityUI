@@ -10,11 +10,11 @@ namespace TMPro.EditorUtilities
     [CustomPropertyDrawer(typeof(GlyphRect))]
     public class GlyphRectPropertyDrawer : PropertyDrawer
     {
-        private static readonly GUIContent k_GlyphRectLabel = new GUIContent("Glyph Rect", "A rectangle (rect) that represents the position of the glyph in the atlas texture.");
-        private static readonly GUIContent k_XPropertyLabel = new GUIContent("X:", "The X coordinate of the glyph in the atlas texture.");
-        private static readonly GUIContent k_YPropertyLabel = new GUIContent("Y:", "The Y coordinate of the glyph in the atlas texture.");
-        private static readonly GUIContent k_WidthPropertyLabel = new GUIContent("W:", "The width of the glyph in the atlas texture.");
-        private static readonly GUIContent k_HeightPropertyLabel = new GUIContent("H:", "The height of the glyph in the atlas texture.");
+        private static readonly GUIContent k_GlyphRectLabel = new("Glyph Rect", "A rectangle (rect) that represents the position of the glyph in the atlas texture.");
+        private static readonly GUIContent k_XPropertyLabel = new("X:", "The X coordinate of the glyph in the atlas texture.");
+        private static readonly GUIContent k_YPropertyLabel = new("Y:", "The Y coordinate of the glyph in the atlas texture.");
+        private static readonly GUIContent k_WidthPropertyLabel = new("W:", "The width of the glyph in the atlas texture.");
+        private static readonly GUIContent k_HeightPropertyLabel = new("H:", "The height of the glyph in the atlas texture.");
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {

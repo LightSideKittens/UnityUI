@@ -80,7 +80,7 @@ namespace TMPro.EditorUtilities
             }
         }
 
-        static GUIContent s_TempLabel = new GUIContent();
+        static GUIContent s_TempLabel = new();
 
         protected static bool s_DebugExtended;
 
@@ -93,25 +93,25 @@ namespace TMPro.EditorUtilities
 
         protected static GUIContent[] s_XywhVectorLabels =
         {
-            new GUIContent("X"),
-            new GUIContent("Y"),
-            new GUIContent("W", "Width"),
-            new GUIContent("H", "Height")
+            new("X"),
+            new("Y"),
+            new("W", "Width"),
+            new("H", "Height")
         };
 
         protected static GUIContent[] s_LbrtVectorLabels =
         {
-            new GUIContent("L", "Left"),
-            new GUIContent("B", "Bottom"),
-            new GUIContent("R", "Right"),
-            new GUIContent("T", "Top")
+            new("L", "Left"),
+            new("B", "Bottom"),
+            new("R", "Right"),
+            new("T", "Top")
         };
 
         protected static GUIContent[] s_CullingTypeLabels =
         {
-            new GUIContent("Off"),
-            new GUIContent("Front"),
-            new GUIContent("Back")
+            new("Off"),
+            new("Front"),
+            new("Back")
         };
 
         static TMP_BaseShaderGUI()
@@ -173,7 +173,7 @@ namespace TMPro.EditorUtilities
         /// <summary>Override this method to create the specific shader GUI.</summary>
         protected abstract void DoGUI();
 
-        static string[] s_PanelStateLabel = new string[] { "\t- <i>Click to collapse</i> -", "\t- <i>Click to expand</i>  -" };
+        static string[] s_PanelStateLabel = { "\t- <i>Click to collapse</i> -", "\t- <i>Click to expand</i>  -" };
 
         protected bool BeginPanel(string panel, bool expanded)
         {

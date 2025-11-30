@@ -13,22 +13,6 @@ public static class BiDi
         RightToLeft = 2
     }
     
-    /// Одна визуальная строка после переноса и BiDi.
-    public sealed class BidiWrappedLine
-    {
-        /// Готовый визуальный текст этой строки (то, что можно отдавать в TMP).
-        public string visualText;
-
-        /// Карта logical→visual внутри ЭТОЙ логической строки.
-        /// Индексы – по Unicode codepoint'ам.
-        public int[] logicalToVisualMap;
-
-        /// Начальный индекс (по codepoint'ам) этой строки в исходном абзаце.
-        public int logicalStartCodepointIndex;
-
-        public int LogicalLength => logicalToVisualMap?.Length ?? 0;
-    }
-    
 #if UNITY_IOS && !UNITY_EDITOR
     private const string DLL_NAME = "__Internal";
 #else
@@ -49,36 +33,40 @@ public static class BiDi
         [In] int[] logicalUtf32,
         int length);
     
-    public static IReadOnlyList<BidiWrappedLine> WrapAndReorder(
+    [DllImport(DLL_NAME,
+        EntryPoint = "fribidi_unity_has_rtl",
+        CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int fribidi_unity_has_rtl(
+        [In] int[] logicalUtf32,
+        int length);
+    
+    private static string WrapAndReorder(
         string logicalText,
+        int[] cps,
         TMP_Text text,
+        out int[] logicalToVisualMap,
         Direction direction = Direction.Auto)
     {
-        if (logicalText == null) throw new ArgumentNullException(nameof(logicalText));
-
-        var buffer = GetCodepointBuffer(logicalText);
-        var cps = buffer.cps;
-        
-        if (cps.Length == 0) return Array.Empty<BidiWrappedLine>();
-
-        float[] widths = MeasureCodepointWidths(text, buffer);
-
-        if (widths.Length != cps.Length) throw new InvalidOperationException("MeasureCodepointWidths must return width for each codepoint.");
-
-        var maxWidth = text.rectTransform.rect.width;
-        var lineRanges = SplitLogicalLinesByWidth(cps, widths, maxWidth);
-
-        var result = new List<BidiWrappedLine>(lineRanges.Count);
+        var info = text.textInfo;
+        var lines = info.lineInfo;
 
         if (direction == Direction.Auto)
         {
-            direction = DetectDirection(logicalText, buffer);
+            direction = DetectDirection(cps);
         }
+
+        var sb = new StringBuilder();
+        var logicalToVisualMapList = new List<int>();
         
-        foreach (var (start, length) in lineRanges)
+        for (int i = 0; i < info.lineCount; i++)
         {
-            var logicalSlice = new int[length];
-            Array.Copy(cps, start, logicalSlice, 0, length);
+            var line = lines[i];
+            int start = line.firstCharacterIndex;
+            var length = line.characterCount;
+            int end = start + length;
+            var part = logicalText[start..end];
+            
+            var logicalSlice = StringToCodepoints(part);
             
             string visualLineText = DoBiDi(
                 logicalSlice,
@@ -89,52 +77,64 @@ public static class BiDi
                 localMap = BuildIdentityMap(length);
             }
 
-            result.Add(new()
-            {
-                visualText = visualLineText,
-                logicalToVisualMap = localMap,
-                logicalStartCodepointIndex = start
-            });
-        }
-
-        return result;
-    }
-    
-    public static string BuildVisualTextWithNewlines(IReadOnlyList<BidiWrappedLine> lines)
-    {
-        if (lines == null || lines.Count == 0) return string.Empty;
-
-        var sb = new StringBuilder();
-        for (int i = 0; i < lines.Count; i++)
-        {
             if (i > 0)
             {
                 sb.Append('\n');
             }
-
-            var str = lines[i].visualText;
-            for (int j = str.Length - 1; j >= 0; j--)
-            { 
-                sb.Append(str[j]);
+            
+            for (int j = visualLineText.Length - 1; j >= 0; j--)
+            {
+                logicalToVisualMapList.Add(localMap[j]);
+                sb.Append(visualLineText[j]);
             }
         }
 
+        logicalToVisualMap = logicalToVisualMapList.ToArray();
         return sb.ToString();
     }
-
-    public static string DoBiDi(string logical,
+    
+    public static string Do(TMP_Text text,
         out int[] logicalToVisualMap,
         Direction direction = Direction.Auto)
     {
-        var cps = StringToCodepoints(logical);
-        return DoBiDi(cps, out logicalToVisualMap, direction, true);
+        var info = text.textInfo;
+        var characters = info.characterInfo;
+        var sb = new StringBuilder(info.characterCount);
+        
+        for (int i = 0; i < info.characterCount; i++)
+        {
+            var ch = characters[i];
+            sb.Append(ch.character);
+        }
+        
+        var logicalText = sb.ToString();
+        var cps = StringToCodepoints(logicalText);
+        
+        if (ContainsRtl(cps))
+        {
+            if (text.textWrappingMode == TextWrappingModes.NoWrap)
+            { 
+                return DoBiDi(cps, out logicalToVisualMap, direction, true);
+            }
+            
+            return WrapAndReorder(logicalText, cps, text, out logicalToVisualMap, direction);
+        }
+        
+        logicalToVisualMap = null;
+        return logicalText;
     }
 
-    private static Direction DetectDirection(string text, CodepointBuffer buffer)
+    private static bool ContainsRtl(int[] codepoints)
     {
-        if (string.IsNullOrEmpty(text)) return Direction.LeftToRight;
+        if (codepoints == null || codepoints.Length == 0)
+            return false;
 
-        var cps = buffer.cps;
+        int result = fribidi_unity_has_rtl(codepoints, codepoints.Length);
+        return result != 0;
+    }
+    
+    private static Direction DetectDirection(int[] cps)
+    {
         int rtlFlag = fribidi_unity_detect_base_direction(cps, cps.Length);
         
         return rtlFlag == 1
@@ -144,9 +144,9 @@ public static class BiDi
     
     private static string DoBiDi(int[] logical,
         out int[] logicalToVisualMap,
-        Direction direction = Direction.Auto, bool reverse = false)
+        Direction direction = Direction.Auto,
+        bool reverse = false)
     {
-        
         int len = logical.Length;
 
         int[] visual = new int[len];
@@ -170,108 +170,6 @@ public static class BiDi
         }
 
         return CodepointsToString(visual, reverse);
-    }
-
-    private static List<(int start, int length)> SplitLogicalLinesByWidth(
-        int[] cps,
-        float[] widths,
-        float maxWidth)
-    {
-        int n = cps.Length;
-        var lines = new List<(int start, int length)>();
-
-        int lineStart = 0;
-
-        while (lineStart < n)
-        {
-            float currentWidth = 0f;
-            int lastBreakIndex = -1;
-
-            int i;
-            for (i = lineStart; i < n; i++)
-            {
-                int cp = cps[i];
-
-                if (cp == 0x000A)
-                {
-                    if (i > lineStart)
-                    {
-                        int len = i - lineStart;
-                        lines.Add((lineStart, len));
-                    }
-
-                    lineStart = i + 1;
-                    goto NextLine;
-                }
-
-                currentWidth += widths[i];
-
-                if (CanBreakAfterCodepoint(cp))
-                {
-                    lastBreakIndex = i;
-                }
-
-                if (currentWidth > maxWidth)
-                {
-                    if (lastBreakIndex >= lineStart)
-                    {
-                        int lineEnd = lastBreakIndex;
-                        int len = lineEnd - lineStart + 1;
-                        lines.Add((lineStart, len));
-                        lineStart = lineEnd + 1;
-                    }
-                    else
-                    {
-                        int lineEnd = i;
-                        int len = lineEnd - lineStart + 1;
-                        lines.Add((lineStart, len));
-                        lineStart = lineEnd + 1;
-                    }
-
-                    goto NextLine;
-                }
-            }
-
-            if (lineStart < n)
-            {
-                int len = n - lineStart;
-                lines.Add((lineStart, len));
-            }
-
-            break;
-
-        NextLine:
-            ;
-        }
-
-        return lines;
-    }
-    
-    private static bool CanBreakAfterCodepoint(int cp)
-    {
-        if (cp == 0x0020 || cp == 0x0009) return true;
-
-        if (cp >= 0x2000 && cp <= 0x2006) return true;
-        if (cp == 0x2008 || cp == 0x2009 || cp == 0x200A) return true;
-        if (cp == 0x3000) return true;
-
-        if (cp == 0x200B)
-            return true;
-
-        if (cp == 0x00AD) return true;
-
-        switch (cp)
-        {
-            case 0x002D:
-            case 0x2010:
-            case 0x2012:
-            case 0x2013:
-            case 0x2014:
-            case 0x058A:
-                return true;
-        }
-
-        return false;
     }
 
     private static int[] BuildIdentityMap(int length)
@@ -304,40 +202,6 @@ public static class BiDi
         
         return sb.ToString();
     }
-
-    private struct CodepointBuffer
-    {
-        public int[] cps;
-        public int[] cpIndexByStringIndex;
-    }
-
-    private static CodepointBuffer GetCodepointBuffer(string logicalText)
-    {
-        var cps = new List<int>(logicalText.Length);
-        var cpIndexByStringIndex = new int[logicalText.Length];
-        for (int i = 0; i < cpIndexByStringIndex.Length; i++)
-            cpIndexByStringIndex[i] = -1;
-
-        int cpIndex = 0;
-
-        for (int stringIndex = 0; stringIndex < logicalText.Length;)
-        {
-            int cp = char.ConvertToUtf32(logicalText, stringIndex);
-
-            cps.Add(cp);
-            cpIndexByStringIndex[stringIndex] = cpIndex;
-
-            int delta = char.IsSurrogatePair(logicalText, stringIndex) ? 2 : 1;
-            stringIndex += delta;
-            cpIndex++;
-        }
-
-        return new()
-        {
-            cps           = cps.ToArray(),
-            cpIndexByStringIndex = cpIndexByStringIndex
-        };
-    }
     
     private static int[] StringToCodepoints(string s)
     {
@@ -350,45 +214,5 @@ public static class BiDi
         }
         return list.ToArray();
     }
-
-    private static float[] MeasureCodepointWidths(TMP_Text text, CodepointBuffer buffer)
-    {
-        var cps               = buffer.cps;
-        var cpIndexByStrIndex = buffer.cpIndexByStringIndex;
-        var widths            = new float[cps.Length];
-
-        var info = text.textInfo;
-        int glyphCount = info.characterCount;
-
-        for (int glyphIndex = 0; glyphIndex < glyphCount; glyphIndex++)
-        {
-            TMP_CharacterInfo ch = info.characterInfo[glyphIndex];
-
-            int stringIndex = ch.index;
-            if (stringIndex < 0 || stringIndex >= cpIndexByStrIndex.Length)
-            {
-                continue;
-            }
-
-            int cpIndex = cpIndexByStrIndex[stringIndex];
-            if (cpIndex < 0 || cpIndex >= widths.Length)
-            {
-                continue;
-            }
-            
-            float width = ch.glyphAdvance;
-            
-            widths[cpIndex] += width;
-        }
-        
-        for (int i = 0; i < cps.Length; i++)
-        {
-            if (cps[i] == 0x000A)
-                widths[i] = 0f;
-        }
-
-        return widths;
-    }
-
 }
 

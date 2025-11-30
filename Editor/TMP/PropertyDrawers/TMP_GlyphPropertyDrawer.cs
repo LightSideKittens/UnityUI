@@ -10,9 +10,9 @@ namespace TMPro.EditorUtilities
     [CustomPropertyDrawer(typeof(Glyph))]
     public class TMP_GlyphPropertyDrawer : PropertyDrawer
     {
-        private static readonly GUIContent k_ScaleLabel = new GUIContent("Scale:", "The scale of this glyph.");
-        private static readonly GUIContent k_AtlasIndexLabel = new GUIContent("Atlas Index:", "The index of the atlas texture that contains this glyph.");
-        private static readonly GUIContent k_ClassTypeLabel = new GUIContent("Class Type:", "The class definition type of this glyph.");
+        private static readonly GUIContent k_ScaleLabel = new("Scale:", "The scale of this glyph.");
+        private static readonly GUIContent k_AtlasIndexLabel = new("Atlas Index:", "The index of the atlas texture that contains this glyph.");
+        private static readonly GUIContent k_ClassTypeLabel = new("Class Type:", "The class definition type of this glyph.");
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {

@@ -131,9 +131,9 @@ namespace TMPro.EditorUtilities
 
 
 
-        private static string[] s_UiStateLabel = new string[] { "<i>(Click to collapse)</i> ", "<i>(Click to expand)</i> " };
-        public static readonly GUIContent getFontFeaturesLabel = new GUIContent("Get Font Features", "Determines if OpenType font features should be retrieved from the source font file as new characters and glyphs are added to the font asset.");
-        private GUIContent[] m_AtlasResolutionLabels = { new GUIContent("8"), new GUIContent("16"), new GUIContent("32"), new GUIContent("64"), new GUIContent("128"), new GUIContent("256"), new GUIContent("512"), new GUIContent("1024"), new GUIContent("2048"), new GUIContent("4096"), new GUIContent("8192") };
+        private static string[] s_UiStateLabel = { "<i>(Click to collapse)</i> ", "<i>(Click to expand)</i> " };
+        public static readonly GUIContent getFontFeaturesLabel = new("Get Font Features", "Determines if OpenType font features should be retrieved from the source font file as new characters and glyphs are added to the font asset.");
+        private GUIContent[] m_AtlasResolutionLabels = { new("8"), new("16"), new("32"), new("64"), new("128"), new("256"), new("512"), new("1024"), new("2048"), new("4096"), new("8192") };
         private int[] m_AtlasResolutions = { 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192 };
 
         private struct Warning

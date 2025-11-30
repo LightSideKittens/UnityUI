@@ -199,7 +199,7 @@ namespace TMPro
             fontAsset.atlasTextures[0] = texture;
             AssetDatabase.AddObjectToAsset(texture, fontAsset);
 
-            fontAsset.freeGlyphRects = new List<GlyphRect>() { new GlyphRect(0, 0, atlasWidth - packingModifier, atlasHeight - packingModifier) };
+            fontAsset.freeGlyphRects = new List<GlyphRect>() { new(0, 0, atlasWidth - packingModifier, atlasHeight - packingModifier) };
             fontAsset.usedGlyphRects = new List<GlyphRect>();
 
             mat.SetTexture(ShaderUtilities.ID_MainTex, texture);

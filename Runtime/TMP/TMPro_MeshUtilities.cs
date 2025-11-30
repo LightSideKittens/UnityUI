@@ -6,21 +6,6 @@ using System;
 namespace TMPro
 {
     /// <summary>
-    /// Flags to control what vertex data is pushed to the mesh and renderer.
-    /// </summary>
-    public enum TMP_VertexDataUpdateFlags
-    {
-        None = 0x0,
-        Vertices = 0x1,
-        Uv0 = 0x2,
-        Uv2 = 0x4,
-        Uv4 = 0x8,
-        Colors32 = 0x10,
-        All = 0xFF
-    };
-
-
-    /// <summary>
     /// TMP custom data type to represent 32 bit characters.
     /// </summary>
     [Serializable]
@@ -53,16 +38,6 @@ namespace TMPro
             bottomLeft = color2;
             bottomRight = color3;
         }
-    }
-
-
-    public struct TMP_PageInfo
-    {
-        public int firstCharacterIndex;
-        public int lastCharacterIndex;
-        public float ascender;
-        public float baseLine;
-        public float descender;
     }
 
 
@@ -161,15 +136,6 @@ namespace TMPro
             return word;
         }
     }
-
-
-    public struct TMP_SpriteInfo
-    {
-        public int spriteIndex;
-        public int characterIndex;
-        public int vertexIndex;
-    }
-
 
     public struct Extents
     {

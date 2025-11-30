@@ -8,8 +8,8 @@ namespace TMPro.EditorUtilities
     [CustomEditor(typeof(TextMeshProUGUI), true), CanEditMultipleObjects]
     public class TMP_EditorPanelUI : TMP_BaseEditorPanel
     {
-        static readonly GUIContent k_RaycastTargetLabel = new GUIContent("Raycast Target", "Whether the text blocks raycasts from the Graphic Raycaster.");
-        static readonly GUIContent k_MaskableLabel = new GUIContent("Maskable", "Determines if the text object will be affected by UI Mask.");
+        static readonly GUIContent k_RaycastTargetLabel = new("Raycast Target", "Whether the text blocks raycasts from the Graphic Raycaster.");
+        static readonly GUIContent k_MaskableLabel = new("Maskable", "Determines if the text object will be affected by UI Mask.");
 
         SerializedProperty m_RaycastTargetProp;
         private SerializedProperty m_MaskableProp;

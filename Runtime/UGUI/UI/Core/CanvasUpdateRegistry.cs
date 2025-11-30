@@ -56,7 +56,7 @@ namespace UnityEngine.UI
 
             for (int i = 0; i <= (int)CanvasUpdate.PostLayout; i++)
             {
-                UnityEngine.Profiling.Profiler.BeginSample(m_CanvasUpdateProfilerStrings[i]);
+                Profiling.Profiler.BeginSample(m_CanvasUpdateProfilerStrings[i]);
 
                 for (int j = 0; j < m_LayoutRebuildQueue.Count; j++)
                 {
@@ -70,21 +70,21 @@ namespace UnityEngine.UI
                         Debug.LogException(e, rebuild.transform);
                     }
                 }
-                UnityEngine.Profiling.Profiler.EndSample();
+                Profiling.Profiler.EndSample();
             }
 
             m_LayoutRebuildQueue.Clear();
             m_PerformingLayoutUpdate = false;
             UISystemProfilerApi.EndSample(UISystemProfilerApi.SampleType.Layout);
             UISystemProfilerApi.BeginSample(UISystemProfilerApi.SampleType.Render);
-            UnityEngine.Profiling.Profiler.BeginSample(m_CullingUpdateProfilerString);
+            Profiling.Profiler.BeginSample(m_CullingUpdateProfilerString);
             ClipperRegistry.instance.Cull();
-            UnityEngine.Profiling.Profiler.EndSample();
+            Profiling.Profiler.EndSample();
 
             m_PerformingGraphicUpdate = true;
             RemoveDestroyed(m_GraphicRebuildQueue);
             
-            UnityEngine.Profiling.Profiler.BeginSample(m_CanvasUpdateProfilerStrings[3]);
+            Profiling.Profiler.BeginSample(m_CanvasUpdateProfilerStrings[3]);
             for (var k = 0; k < m_GraphicRebuildQueue.Count; k++)
             {
                 try
@@ -97,7 +97,7 @@ namespace UnityEngine.UI
                     Debug.LogException(e, m_GraphicRebuildQueue[k].transform);
                 }
             }
-            UnityEngine.Profiling.Profiler.EndSample();
+            Profiling.Profiler.EndSample();
 
             m_GraphicRebuildQueue.Clear();
             m_PerformingGraphicUpdate = false;

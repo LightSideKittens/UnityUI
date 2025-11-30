@@ -27,7 +27,7 @@ namespace TMPro
 
         TMP_SpriteAsset m_SpriteAsset;
 
-        static readonly GUIContent k_ConvertSpriteNameToUnicodeLabel = new GUIContent("Use filenames as Unicodes", "Should sprite filenames be converted and assigned as Unicode code points for each sprite? This conversion assumes the sprite filenames represent valid Unicode code points.");
+        static readonly GUIContent k_ConvertSpriteNameToUnicodeLabel = new("Use filenames as Unicodes", "Should sprite filenames be converted and assigned as Unicode code points for each sprite? This conversion assumes the sprite filenames represent valid Unicode code points.");
         static bool k_SpriteNameIsUnicodeValue;
 
         /// <summary>

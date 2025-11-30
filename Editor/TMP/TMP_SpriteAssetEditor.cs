@@ -20,7 +20,7 @@ namespace TMPro.EditorUtilities
             public static bool spriteGlyphTablePanel;
         }
 
-        private static string[] s_UiStateLabel = new string[] { "<i>(Click to collapse)</i> ", "<i>(Click to expand)</i> " };
+        private static string[] s_UiStateLabel = { "<i>(Click to collapse)</i> ", "<i>(Click to expand)</i> " };
 
         int m_moveToIndex;
         int m_selectedElement = -1;

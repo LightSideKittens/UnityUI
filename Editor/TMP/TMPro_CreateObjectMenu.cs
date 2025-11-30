@@ -42,15 +42,7 @@ namespace TMPro.EditorUtilities
                     textComponent.renderer.sortingOrder = textComponent._SortingOrder;
                 }
 
-                if (TMP_Settings.autoSizeTextContainer)
-                {
-                    Vector2 size = textComponent.GetPreferredValues(TMP_Math.FLOAT_MAX, TMP_Math.FLOAT_MAX);
-                    textComponent.rectTransform.sizeDelta = size;
-                }
-                else
-                {
-                    textComponent.rectTransform.sizeDelta = TMP_Settings.defaultTextMeshProTextContainerSize;
-                }
+                textComponent.rectTransform.sizeDelta = TMP_Settings.defaultTextMeshProTextContainerSize;
             }
             else
             {
@@ -93,15 +85,7 @@ namespace TMPro.EditorUtilities
                     textComponent.text = "New Text";
                 }
 
-                if (TMP_Settings.autoSizeTextContainer)
-                {
-                    Vector2 size = textComponent.GetPreferredValues(TMP_Math.FLOAT_MAX, TMP_Math.FLOAT_MAX);
-                    textComponent.rectTransform.sizeDelta = size;
-                }
-                else
-                {
-                    textComponent.rectTransform.sizeDelta = TMP_Settings.defaultTextMeshProUITextContainerSize;
-                }
+                textComponent.rectTransform.sizeDelta = TMP_Settings.defaultTextMeshProUITextContainerSize;
             }
             else
             {
