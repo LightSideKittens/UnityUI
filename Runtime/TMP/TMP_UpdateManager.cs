@@ -11,23 +11,23 @@ namespace TMPro
     {
         private static TMP_UpdateManager s_Instance;
 
-        private readonly HashSet<int> m_LayoutQueueLookup = new HashSet<int>();
-        private readonly List<TMP_Text> m_LayoutRebuildQueue = new List<TMP_Text>();
+        private readonly HashSet<int> m_LayoutQueueLookup = new();
+        private readonly List<TMP_Text> m_LayoutRebuildQueue = new();
 
-        private readonly HashSet<int> m_GraphicQueueLookup = new HashSet<int>();
-        private readonly List<TMP_Text> m_GraphicRebuildQueue = new List<TMP_Text>();
+        private readonly HashSet<int> m_GraphicQueueLookup = new();
+        private readonly List<TMP_Text> m_GraphicRebuildQueue = new();
 
-        private readonly HashSet<int> m_InternalUpdateLookup = new HashSet<int>();
-        private readonly List<TMP_Text> m_InternalUpdateQueue = new List<TMP_Text>();
+        private readonly HashSet<int> m_InternalUpdateLookup = new();
+        private readonly List<TMP_Text> m_InternalUpdateQueue = new();
 
-        private readonly HashSet<int> m_CullingUpdateLookup = new HashSet<int>();
-        private readonly List<TMP_Text> m_CullingUpdateQueue = new List<TMP_Text>();
+        private readonly HashSet<int> m_CullingUpdateLookup = new();
+        private readonly List<TMP_Text> m_CullingUpdateQueue = new();
 
-        private static ProfilerMarker k_RegisterTextObjectForUpdateMarker = new ProfilerMarker("TMP.RegisterTextObjectForUpdate");
-        private static ProfilerMarker k_RegisterTextElementForGraphicRebuildMarker = new ProfilerMarker("TMP.RegisterTextElementForGraphicRebuild");
-        private static ProfilerMarker k_RegisterTextElementForCullingUpdateMarker = new ProfilerMarker("TMP.RegisterTextElementForCullingUpdate");
-        private static ProfilerMarker k_UnregisterTextObjectForUpdateMarker = new ProfilerMarker("TMP.UnregisterTextObjectForUpdate");
-        private static ProfilerMarker k_UnregisterTextElementForGraphicRebuildMarker = new ProfilerMarker("TMP.UnregisterTextElementForGraphicRebuild");
+        private static ProfilerMarker k_RegisterTextObjectForUpdateMarker = new("TMP.RegisterTextObjectForUpdate");
+        private static ProfilerMarker k_RegisterTextElementForGraphicRebuildMarker = new("TMP.RegisterTextElementForGraphicRebuild");
+        private static ProfilerMarker k_RegisterTextElementForCullingUpdateMarker = new("TMP.RegisterTextElementForCullingUpdate");
+        private static ProfilerMarker k_UnregisterTextObjectForUpdateMarker = new("TMP.UnregisterTextObjectForUpdate");
+        private static ProfilerMarker k_UnregisterTextElementForGraphicRebuildMarker = new("TMP.UnregisterTextElementForGraphicRebuild");
 
         /// <summary>
         /// Get a singleton instance of the registry
@@ -37,7 +37,7 @@ namespace TMPro
             get
             {
                 if (s_Instance == null)
-                    s_Instance = new TMP_UpdateManager();
+                    s_Instance = new();
 
                 return s_Instance;
             }

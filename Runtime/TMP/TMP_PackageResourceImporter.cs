@@ -223,7 +223,7 @@ namespace TMPro
             if (m_ImporterWindow == null)
             {
                 m_ImporterWindow = GetWindow<TMP_PackageResourceImporterWindow>();
-                m_ImporterWindow.titleContent = new GUIContent("TMP Importer");
+                m_ImporterWindow.titleContent = new("TMP Importer");
                 m_ImporterWindow.Focus();
             }
         }
@@ -233,7 +233,7 @@ namespace TMPro
             SetEditorWindowSize();
 
             if (m_ResourceImporter == null)
-                m_ResourceImporter = new TMP_PackageResourceImporter();
+                m_ResourceImporter = new();
 
             if (m_ResourceImporter.m_IsImportingExamples)
                 m_ResourceImporter.RegisterResourceImportCallback();
@@ -261,7 +261,7 @@ namespace TMPro
         {
             EditorWindow editorWindow = this;
 
-            Vector2 windowSize = new Vector2(640, 210);
+            Vector2 windowSize = new(640, 210);
             editorWindow.minSize = windowSize;
             editorWindow.maxSize = windowSize;
         }
@@ -352,7 +352,7 @@ namespace TMPro
             SetEditorWindowSize();
 
             if (m_ResourceImporter == null)
-                m_ResourceImporter = new TMP_ShaderPackageImporter();
+                m_ResourceImporter = new();
         }
 
         private void OnDestroy()
@@ -391,7 +391,7 @@ namespace TMPro
         {
             EditorWindow editorWindow = this;
 
-            Vector2 windowSize = new Vector2(640, 117);
+            Vector2 windowSize = new(640, 117);
             editorWindow.minSize = windowSize;
             editorWindow.maxSize = windowSize;
         }

@@ -7,7 +7,7 @@ namespace TMPro
 {
     public class TMP_FontAssetUtilities
     {
-        private static readonly TMP_FontAssetUtilities s_Instance = new TMP_FontAssetUtilities();
+        private static readonly TMP_FontAssetUtilities s_Instance = new();
 
         /// <summary>
         /// Default constructor
@@ -49,7 +49,7 @@ namespace TMPro
             if (includeFallbacks)
             {
                 if (k_SearchedAssets == null)
-                    k_SearchedAssets = new HashSet<int>();
+                    k_SearchedAssets = new();
                 else
                     k_SearchedAssets.Clear();
             }
@@ -227,7 +227,7 @@ namespace TMPro
             if (includeFallbacks)
             {
                 if (k_SearchedAssets == null)
-                    k_SearchedAssets = new HashSet<int>();
+                    k_SearchedAssets = new();
                 else
                     k_SearchedAssets.Clear();
             }
@@ -259,7 +259,7 @@ namespace TMPro
             if (includeFallbacks)
             {
                 if (k_SearchedAssets == null)
-                    k_SearchedAssets = new HashSet<int>();
+                    k_SearchedAssets = new();
                 else
                     k_SearchedAssets.Clear();
             }
@@ -313,7 +313,7 @@ namespace TMPro
             if (includeFallbacks)
             {
                 if (k_SearchedAssets == null)
-                    k_SearchedAssets = new HashSet<int>();
+                    k_SearchedAssets = new();
                 else
                     k_SearchedAssets.Clear();
 

@@ -84,17 +84,17 @@ namespace TMPro
 
         public TMP_FontFeatureTable()
         {
-            m_LigatureSubstitutionRecords = new List<LigatureSubstitutionRecord>();
-            m_LigatureSubstitutionRecordLookup = new Dictionary<uint, List<LigatureSubstitutionRecord>>();
+            m_LigatureSubstitutionRecords = new();
+            m_LigatureSubstitutionRecordLookup = new();
 
-            m_GlyphPairAdjustmentRecords = new List<GlyphPairAdjustmentRecord>();
-            m_GlyphPairAdjustmentRecordLookup = new Dictionary<uint, GlyphPairAdjustmentRecord>();
+            m_GlyphPairAdjustmentRecords = new();
+            m_GlyphPairAdjustmentRecordLookup = new();
 
-            m_MarkToBaseAdjustmentRecords = new List<MarkToBaseAdjustmentRecord>();
-            m_MarkToBaseAdjustmentRecordLookup = new Dictionary<uint, MarkToBaseAdjustmentRecord>();
+            m_MarkToBaseAdjustmentRecords = new();
+            m_MarkToBaseAdjustmentRecordLookup = new();
 
-            m_MarkToMarkAdjustmentRecords = new List<MarkToMarkAdjustmentRecord>();
-            m_MarkToMarkAdjustmentRecordLookup = new Dictionary<uint, MarkToMarkAdjustmentRecord>();
+            m_MarkToMarkAdjustmentRecords = new();
+            m_MarkToMarkAdjustmentRecordLookup = new();
         }
 
         /// <summary>

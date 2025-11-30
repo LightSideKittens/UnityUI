@@ -13,7 +13,7 @@ namespace TMPro
             get
             {
                 if (k_NormalStyle == null)
-                    k_NormalStyle = new TMP_Style("Normal", string.Empty, string.Empty);
+                    k_NormalStyle = new("Normal", string.Empty, string.Empty);
 
                 return k_NormalStyle;
             }

@@ -105,7 +105,6 @@ namespace TMPro
         NAME = 2875623,
         INDEX = 84268030,
         TINT = 2960519,
-        ANIM = 2283339,
         MATERIAL = 825491659,
         HREF = 2535353,
         ANGLE = 75347905,

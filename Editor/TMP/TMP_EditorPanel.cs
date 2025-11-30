@@ -81,9 +81,7 @@ namespace TMPro.EditorUtilities
                 DrawRichText();
 
                 DrawParsing();
-
-                DrawEmojiFallbackSupport();
-
+                
                 DrawSpriteAsset();
 
                 DrawStyleSheet();

@@ -41,15 +41,15 @@ namespace TMPro
                 this.nameHashCode = nameHashCode != 0 ? nameHashCode : familyNameHashCode;
                 this.familyNameHashCode = familyNameHashCode;
                 this.styleNameHashCode = styleNameHashCode;
-                this.familyNameAndStyleHashCode = (long) styleNameHashCode << 32 | (uint) familyNameHashCode;
+                familyNameAndStyleHashCode = (long) styleNameHashCode << 32 | (uint) familyNameHashCode;
                 this.fontAsset = fontAsset;
             }
         }
 
-        private static readonly Dictionary<int, FontAssetRef> s_FontAssetReferences = new Dictionary<int, FontAssetRef>();
-        private static readonly Dictionary<int, TMP_FontAsset> s_FontAssetNameReferenceLookup = new Dictionary<int, TMP_FontAsset>();
-        private static readonly Dictionary<long, TMP_FontAsset> s_FontAssetFamilyNameAndStyleReferenceLookup = new Dictionary<long, TMP_FontAsset>();
-        private static readonly List<int> s_FontAssetRemovalList = new List<int>(16);
+        private static readonly Dictionary<int, FontAssetRef> s_FontAssetReferences = new();
+        private static readonly Dictionary<int, TMP_FontAsset> s_FontAssetNameReferenceLookup = new();
+        private static readonly Dictionary<long, TMP_FontAsset> s_FontAssetFamilyNameAndStyleReferenceLookup = new();
+        private static readonly List<int> s_FontAssetRemovalList = new(16);
 
         private static readonly int k_RegularStyleHashCode = TMP_TextUtilities.GetHashCode("Regular");
 
@@ -63,7 +63,7 @@ namespace TMPro
 
             if (!s_FontAssetReferences.ContainsKey(instanceID))
             {
-                FontAssetRef fontAssetRef = new FontAssetRef(fontAsset.hashCode, fontAsset.familyNameHashCode, fontAsset.styleNameHashCode, fontAsset);
+                FontAssetRef fontAssetRef = new(fontAsset.hashCode, fontAsset.familyNameHashCode, fontAsset.styleNameHashCode, fontAsset);
                 s_FontAssetReferences.Add(instanceID, fontAssetRef);
 
                 if (!s_FontAssetNameReferenceLookup.ContainsKey(fontAssetRef.nameHashCode))

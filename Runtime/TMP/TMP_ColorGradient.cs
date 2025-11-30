@@ -59,10 +59,10 @@ namespace TMPro
         public TMP_ColorGradient(Color color0, Color color1, Color color2, Color color3)
         {
             colorMode = k_DefaultColorMode;
-            this.topLeft = color0;
-            this.topRight = color1;
-            this.bottomLeft = color2;
-            this.bottomRight = color3;
+            topLeft = color0;
+            topRight = color1;
+            bottomLeft = color2;
+            bottomRight = color3;
         }
     }
 }

@@ -7,7 +7,6 @@ namespace TMPro
 {
     public abstract partial class TMP_Text
     {
-        
         /// <summary>
         /// Returns the bounds of the mesh of the text object in world space.
         /// </summary>
@@ -15,7 +14,7 @@ namespace TMPro
         {
             get
             {
-                if (m_mesh == null) return new Bounds();
+                if (m_mesh == null) return new();
 
                 return GetCompoundBounds();
             }
@@ -28,7 +27,7 @@ namespace TMPro
         {
             get
             {
-                if (m_textInfo == null) return new Bounds();
+                if (m_textInfo == null) return new();
 
                 return GetTextBounds();
             }
@@ -63,108 +62,7 @@ namespace TMPro
         /// Event delegate to allow modifying the text geometry before it is uploaded to the mesh and rendered.
         /// </summary>
         public virtual event Action<TMP_TextInfo> OnPreRenderText = delegate { };
-
-        /// <summary>
-        /// Component used to control wrapping of text following some arbitrary shape.
-        /// </summary>
-
-
-        /// <summary>
-        /// Component used to control and animate sprites in the text object.
-        /// </summary>
-        protected TMP_SpriteAnimator spriteAnimator
-        {
-            get
-            {
-                if (m_spriteAnimator == null)
-                {
-                    m_spriteAnimator = GetComponent<TMP_SpriteAnimator>();
-                    if (m_spriteAnimator == null) m_spriteAnimator = gameObject.AddComponent<TMP_SpriteAnimator>();
-                }
-
-                return m_spriteAnimator;
-            }
-
-        }
-        protected TMP_SpriteAnimator m_spriteAnimator;
-
-
-        /// <summary>
-        ///
-        /// </summary>
-
-        /// <summary>
-        ///
-        /// </summary>
-        public float flexibleHeight { get { return m_flexibleHeight; } }
-        protected float m_flexibleHeight = -1f;
-
-        /// <summary>
-        ///
-        /// </summary>
-        public float flexibleWidth { get { return m_flexibleWidth; } }
-        protected float m_flexibleWidth = -1f;
-
-        /// <summary>
-        ///
-        /// </summary>
-        public float minWidth { get { return m_minWidth; } }
-        protected float m_minWidth;
-
-        /// <summary>
-        ///
-        /// </summary>
-        public float minHeight { get { return m_minHeight; } }
-        protected float m_minHeight;
-
-        /// <summary>
-        ///
-        /// </summary>
-        public float maxWidth { get { return m_maxWidth; } }
-        protected float m_maxWidth;
-
-        /// <summary>
-        ///
-        /// </summary>
-        public float maxHeight { get { return m_maxHeight; } }
-        protected float m_maxHeight;
-
-        /// <summary>
-        ///
-        /// </summary>
-        protected LayoutElement layoutElement
-        {
-            get
-            {
-                if (m_LayoutElement == null)
-                {
-                    m_LayoutElement = GetComponent<LayoutElement>();
-                }
-
-                return m_LayoutElement;
-            }
-        }
-        protected LayoutElement m_LayoutElement;
-
-        /// <summary>
-        /// Computed preferred width of the text object.
-        /// </summary>
-        public virtual float preferredWidth { get { m_preferredWidth = GetPreferredWidth(); return m_preferredWidth; } }
-        protected float m_preferredWidth;
-        protected float m_RenderedWidth;
-        protected bool m_isPreferredWidthDirty;
-
-        /// <summary>
-        /// Computed preferred height of the text object.
-        /// </summary>
-        public virtual float preferredHeight { get { m_preferredHeight = GetPreferredHeight(); return m_preferredHeight; } }
-        protected float m_preferredHeight;
-        protected float m_RenderedHeight;
-        protected bool m_isPreferredHeightDirty;
-
-        protected bool m_isCalculatingPreferredValues;
-
-
+        
         /// <summary>
         /// Compute the rendered width of the text object.
         /// </summary>

@@ -55,7 +55,7 @@ namespace TMPro
                 chars[i] = (char)unicodes[i];
             }
 
-            return new string(chars);
+            return new(chars);
         }
 
         internal static string UintToString(this List<uint> unicodes)
@@ -67,7 +67,7 @@ namespace TMPro
                 chars[i] = (char)unicodes[i];
             }
 
-            return new string(chars);
+            return new(chars);
         }
 
         public static string IntToString(this int[] unicodes, int start, int length)
@@ -86,7 +86,7 @@ namespace TMPro
                 chars[writeIndex++] = (char)unicodes[i];
             }
 
-            return new string(chars);
+            return new(chars);
         }
 
 
@@ -132,7 +132,7 @@ namespace TMPro
             byte b = (byte)((c1.b / 255f) * (c2.b / 255f) * 255);
             byte a = (byte)((c1.a / 255f) * (c2.a / 255f) * 255);
 
-            return new Color32(r, g, b, a);
+            return new(r, g, b, a);
         }
 
 
@@ -143,7 +143,7 @@ namespace TMPro
             byte b = (byte)((c1.b / 255f) * (c2.b / 255f) * 255);
             byte a = (byte)((c1.a / 255f) * (c2.a / 255f) * 255);
 
-            return new Color32(r, g, b, a);
+            return new(r, g, b, a);
         }
 
         public static Color32 Tint(this Color32 c1, float tint)
@@ -153,12 +153,12 @@ namespace TMPro
             byte b = (byte)(Mathf.Clamp(c1.b / 255f * tint * 255, 0, 255));
             byte a = (byte)(Mathf.Clamp(c1.a / 255f * tint * 255, 0, 255));
 
-            return new Color32(r, g, b, a);
+            return new(r, g, b, a);
         }
 
         internal static Color32 GammaToLinear(this Color32 c)
         {
-            return new Color32(GammaToLinear(c.r), GammaToLinear(c.g), GammaToLinear(c.b), c.a);
+            return new(GammaToLinear(c.r), GammaToLinear(c.g), GammaToLinear(c.b), c.a);
         }
 
         private static byte GammaToLinear(byte value)
@@ -181,7 +181,7 @@ namespace TMPro
         {
             float a = c1.a < c2.a ? c1.a : c2.a;
 
-            return new Color(c1.r, c1.g, c1.b, a);
+            return new(c1.r, c1.g, c1.b, a);
         }
 
 
@@ -231,8 +231,8 @@ namespace TMPro
         public const float FLOAT_UNSET = -32767;
         public const int INT_UNSET = -32767;
 
-        public static Vector2 MAX_16BIT = new Vector2(FLOAT_MAX, FLOAT_MAX);
-        public static Vector2 MIN_16BIT = new Vector2(FLOAT_MIN, FLOAT_MIN);
+        public static Vector2 MAX_16BIT = new(FLOAT_MAX, FLOAT_MAX);
+        public static Vector2 MIN_16BIT = new(FLOAT_MIN, FLOAT_MIN);
 
         public static bool Approximately(float a, float b)
         {

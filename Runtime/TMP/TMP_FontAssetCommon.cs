@@ -57,7 +57,7 @@ namespace TMPro
         /// <returns></returns>
         public static TMP_Glyph Clone(TMP_Glyph source)
         {
-            TMP_Glyph copy = new TMP_Glyph();
+            TMP_Glyph copy = new();
 
             copy.id = source.id;
             copy.x = source.x;
@@ -98,25 +98,25 @@ namespace TMPro
 
         internal FontAssetCreationSettings(string sourceFontFileGUID, int pointSize, int pointSizeSamplingMode, int padding, int packingMode, int atlasWidth, int atlasHeight, int characterSelectionMode, string characterSet, int renderMode)
         {
-            this.sourceFontFileName = string.Empty;
+            sourceFontFileName = string.Empty;
             this.sourceFontFileGUID = sourceFontFileGUID;
-            this.faceIndex = 0;
+            faceIndex = 0;
             this.pointSize = pointSize;
             this.pointSizeSamplingMode = pointSizeSamplingMode;
             this.padding = padding;
-            this.paddingMode = 2;
+            paddingMode = 2;
             this.packingMode = packingMode;
             this.atlasWidth = atlasWidth;
             this.atlasHeight = atlasHeight;
-            this.characterSequence = characterSet;
-            this.characterSetSelectionMode = characterSelectionMode;
+            characterSequence = characterSet;
+            characterSetSelectionMode = characterSelectionMode;
             this.renderMode = renderMode;
 
-            this.referencedFontAssetGUID = string.Empty;
-            this.referencedTextAssetGUID = string.Empty;
-            this.fontStyle = 0;
-            this.fontStyleModifier = 0;
-            this.includeFontFeatures = false;
+            referencedFontAssetGUID = string.Empty;
+            referencedTextAssetGUID = string.Empty;
+            fontStyle = 0;
+            fontStyleModifier = 0;
+            includeFontFeatures = false;
         }
     }
 
@@ -156,12 +156,12 @@ namespace TMPro
         public float xAdvance;
         public float yAdvance;
 
-        internal GlyphValueRecord_Legacy(UnityEngine.TextCore.LowLevel.GlyphValueRecord valueRecord)
+        internal GlyphValueRecord_Legacy(GlyphValueRecord valueRecord)
         {
-            this.xPlacement = valueRecord.xPlacement;
-            this.yPlacement = valueRecord.yPlacement;
-            this.xAdvance = valueRecord.xAdvance;
-            this.yAdvance = valueRecord.yAdvance;
+            xPlacement = valueRecord.xPlacement;
+            yPlacement = valueRecord.yPlacement;
+            xAdvance = valueRecord.xAdvance;
+            yAdvance = valueRecord.yAdvance;
         }
 
         public static GlyphValueRecord_Legacy operator +(GlyphValueRecord_Legacy a, GlyphValueRecord_Legacy b)
@@ -226,7 +226,7 @@ namespace TMPro
         [FormerlySerializedAs("XadvanceOffset")]
         public float xOffset;
 
-        internal static KerningPair empty = new KerningPair(0, new GlyphValueRecord_Legacy(), 0, new GlyphValueRecord_Legacy());
+        internal static KerningPair empty = new(0, new(), 0, new());
 
         /// <summary>
         /// Determines if the Character Spacing property of the text object will affect the kerning pair.
@@ -237,15 +237,15 @@ namespace TMPro
             get { return m_IgnoreSpacingAdjustments; }
         }
         [SerializeField]
-        private bool m_IgnoreSpacingAdjustments = false;
+        private bool m_IgnoreSpacingAdjustments;
 
         public KerningPair()
         {
             m_FirstGlyph = 0;
-            m_FirstGlyphAdjustments = new GlyphValueRecord_Legacy();
+            m_FirstGlyphAdjustments = new();
 
             m_SecondGlyph = 0;
-            m_SecondGlyphAdjustments = new GlyphValueRecord_Legacy();
+            m_SecondGlyphAdjustments = new();
         }
 
         public KerningPair(uint left, uint right, float offset)
@@ -277,7 +277,7 @@ namespace TMPro
 
         public KerningTable()
         {
-            kerningPairs = new List<KerningPair>();
+            kerningPairs = new();
         }
 
 
@@ -285,7 +285,7 @@ namespace TMPro
         {
             if (kerningPairs.Count == 0)
             {
-                kerningPairs.Add(new KerningPair(0, 0, 0));
+                kerningPairs.Add(new(0, 0, 0));
             }
             else
             {
@@ -293,7 +293,7 @@ namespace TMPro
                 uint right = kerningPairs.Last().secondGlyph;
                 float xoffset = kerningPairs.Last().xOffset;
 
-                kerningPairs.Add(new KerningPair(left, right, xoffset));
+                kerningPairs.Add(new(left, right, xoffset));
             }
         }
 
@@ -311,7 +311,7 @@ namespace TMPro
 
             if (index == -1)
             {
-                kerningPairs.Add(new KerningPair(first, second, offset));
+                kerningPairs.Add(new(first, second, offset));
                 return 0;
             }
 
@@ -332,7 +332,7 @@ namespace TMPro
 
             if (index == -1)
             {
-                kerningPairs.Add(new KerningPair(first, firstAdjustments, second, secondAdjustments));
+                kerningPairs.Add(new(first, firstAdjustments, second, secondAdjustments));
                 return 0;
             }
 
@@ -376,7 +376,7 @@ namespace TMPro
         public static TMP_FontAsset SearchForCharacter(TMP_FontAsset font, uint unicode, out TMP_Character character)
         {
             if (k_searchedFontAssets == null)
-                k_searchedFontAssets = new List<int>();
+                k_searchedFontAssets = new();
 
             k_searchedFontAssets.Clear();
 

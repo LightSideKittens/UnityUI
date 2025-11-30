@@ -4,7 +4,7 @@ using UnityEngine;
 namespace TMPro
 {
     /// <summary>
-    /// A basic element of text representing a pictograph, image, sprite or emoji.
+    /// A basic element of text representing a pictograph, image, sprite.
     /// </summary>
     [Serializable]
     public class TMP_SpriteCharacter : TMP_TextElement
@@ -39,9 +39,9 @@ namespace TMPro
             m_ElementType = TextElementType.Sprite;
 
             this.unicode = unicode;
-            this.glyphIndex = glyph.index;
+            glyphIndex = glyph.index;
             this.glyph = glyph;
-            this.scale = 1.0f;
+            scale = 1.0f;
         }
 
         /// <summary>
@@ -55,10 +55,10 @@ namespace TMPro
             m_ElementType = TextElementType.Sprite;
 
             this.unicode = unicode;
-            this.textAsset = spriteAsset;
+            textAsset = spriteAsset;
             this.glyph = glyph;
-            this.glyphIndex = glyph.index;
-            this.scale = 1.0f;
+            glyphIndex = glyph.index;
+            scale = 1.0f;
         }
 
         /// <summary>
@@ -71,10 +71,10 @@ namespace TMPro
             m_ElementType = TextElementType.Sprite;
 
             this.unicode = unicode;
-            this.textAsset = null;
-            this.glyph = null;
+            textAsset = null;
+            glyph = null;
             this.glyphIndex = glyphIndex;
-            this.scale = 1.0f;
+            scale = 1.0f;
         }
     }
 }

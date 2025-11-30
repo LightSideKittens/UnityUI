@@ -9,11 +9,11 @@ namespace TMPro
 
     public static class TMP_MaterialManager
     {
-        private static List<MaskingMaterial> m_materialList = new List<MaskingMaterial>();
+        private static List<MaskingMaterial> m_materialList = new();
 
-        private static Dictionary<long, FallbackMaterial> m_fallbackMaterials = new Dictionary<long, FallbackMaterial>();
-        private static Dictionary<int, long> m_fallbackMaterialLookup = new Dictionary<int, long>();
-        private static List<FallbackMaterial> m_fallbackCleanupList = new List<FallbackMaterial>();
+        private static Dictionary<long, FallbackMaterial> m_fallbackMaterials = new();
+        private static Dictionary<int, long> m_fallbackMaterialLookup = new();
+        private static List<FallbackMaterial> m_fallbackCleanupList = new();
 
         private static bool isFallbackListDirty;
 
@@ -63,7 +63,7 @@ namespace TMPro
 
             Material stencilMaterial;
 
-            stencilMaterial = new Material(baseMaterial);
+            stencilMaterial = new(baseMaterial);
             stencilMaterial.hideFlags = HideFlags.HideAndDontSave;
 
             #if UNITY_EDITOR
@@ -76,7 +76,7 @@ namespace TMPro
             stencilMaterial.SetFloat(ShaderUtilities.ID_StencilID, stencilID);
             stencilMaterial.SetFloat(ShaderUtilities.ID_StencilComp, 4);
 
-            MaskingMaterial temp = new MaskingMaterial();
+            MaskingMaterial temp = new();
             temp.baseMaterial = baseMaterial;
             temp.stencilMaterial = stencilMaterial;
             temp.stencilID = stencilID;
@@ -161,7 +161,7 @@ namespace TMPro
 
             if (index == -1)
             {
-                MaskingMaterial temp = new MaskingMaterial();
+                MaskingMaterial temp = new();
                 temp.baseMaterial = baseMaterial;
                 temp.stencilMaterial = stencilMaterial;
                 temp.stencilID = stencilID;
@@ -336,7 +336,7 @@ namespace TMPro
                 return fallback.fallbackMaterial;
             }
 
-            Material fallbackMaterial = new Material(sourceMaterial);
+            Material fallbackMaterial = new(sourceMaterial);
             fallbackMaterial.SetTexture(ShaderUtilities.ID_MainTex, tex);
 
             fallbackMaterial.hideFlags = HideFlags.HideAndDontSave;
@@ -345,7 +345,7 @@ namespace TMPro
                 fallbackMaterial.name += " + " + tex.name;
             #endif
 
-            fallback = new FallbackMaterial();
+            fallback = new();
             fallback.fallbackID = key;
             fallback.sourceMaterial = fontAsset.material;
             fallback.sourceMaterialCRC = sourceMaterial.ComputeCRC();
@@ -391,7 +391,7 @@ namespace TMPro
             Material fallbackMaterial;
             if (sourceMaterial.HasProperty(ShaderUtilities.ID_GradientScale) && targetMaterial.HasProperty(ShaderUtilities.ID_GradientScale))
             {
-                fallbackMaterial = new Material(sourceMaterial);
+                fallbackMaterial = new(sourceMaterial);
                 fallbackMaterial.hideFlags = HideFlags.HideAndDontSave;
 
                 #if UNITY_EDITOR
@@ -407,7 +407,7 @@ namespace TMPro
             }
             else
             {
-                fallbackMaterial = new Material(targetMaterial);
+                fallbackMaterial = new(targetMaterial);
                 fallbackMaterial.hideFlags = HideFlags.HideAndDontSave;
 
                 #if UNITY_EDITOR
@@ -415,7 +415,7 @@ namespace TMPro
                 #endif
             }
 
-            fallback = new FallbackMaterial();
+            fallback = new();
             fallback.fallbackID = key;
             fallback.sourceMaterial = sourceMaterial;
             fallback.sourceMaterialCRC = sourceMaterial.ComputeCRC();

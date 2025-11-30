@@ -14,11 +14,11 @@ namespace TMPro
     {
         private static TMP_UpdateRegistry s_Instance;
 
-        private readonly List<ICanvasElement> m_LayoutRebuildQueue = new List<ICanvasElement>();
-        private HashSet<int> m_LayoutQueueLookup = new HashSet<int>();
+        private readonly List<ICanvasElement> m_LayoutRebuildQueue = new();
+        private HashSet<int> m_LayoutQueueLookup = new();
 
-        private readonly List<ICanvasElement> m_GraphicRebuildQueue = new List<ICanvasElement>();
-        private HashSet<int> m_GraphicQueueLookup = new HashSet<int>();
+        private readonly List<ICanvasElement> m_GraphicRebuildQueue = new();
+        private HashSet<int> m_GraphicQueueLookup = new();
 
         /// <summary>
         /// Get a singleton instance of the registry
@@ -27,9 +27,9 @@ namespace TMPro
         {
             get
             {
-                if (TMP_UpdateRegistry.s_Instance == null)
-                    TMP_UpdateRegistry.s_Instance = new TMP_UpdateRegistry();
-                return TMP_UpdateRegistry.s_Instance;
+                if (s_Instance == null)
+                    s_Instance = new();
+                return s_Instance;
             }
         }
 
@@ -49,7 +49,7 @@ namespace TMPro
         /// <param name="element"></param>
         public static void RegisterCanvasElementForLayoutRebuild(ICanvasElement element)
         {
-            TMP_UpdateRegistry.instance.InternalRegisterCanvasElementForLayoutRebuild(element);
+            instance.InternalRegisterCanvasElementForLayoutRebuild(element);
         }
 
         private bool InternalRegisterCanvasElementForLayoutRebuild(ICanvasElement element)
@@ -72,7 +72,7 @@ namespace TMPro
         /// <param name="element"></param>
         public static void RegisterCanvasElementForGraphicRebuild(ICanvasElement element)
         {
-            TMP_UpdateRegistry.instance.InternalRegisterCanvasElementForGraphicRebuild(element);
+            instance.InternalRegisterCanvasElementForGraphicRebuild(element);
         }
 
         private bool InternalRegisterCanvasElementForGraphicRebuild(ICanvasElement element)
@@ -96,7 +96,7 @@ namespace TMPro
         {
             for (int index = 0; index < m_LayoutRebuildQueue.Count; index++)
             {
-                ICanvasElement element = TMP_UpdateRegistry.instance.m_LayoutRebuildQueue[index];
+                ICanvasElement element = instance.m_LayoutRebuildQueue[index];
 
                 element.Rebuild(CanvasUpdate.Prelayout);
             }
@@ -110,7 +110,7 @@ namespace TMPro
 
             for (int index = 0; index < m_GraphicRebuildQueue.Count; index++)
             {
-                ICanvasElement element = TMP_UpdateRegistry.instance.m_GraphicRebuildQueue[index];
+                ICanvasElement element = instance.m_GraphicRebuildQueue[index];
 
                 element.Rebuild(CanvasUpdate.PreRender);
             }
@@ -138,8 +138,8 @@ namespace TMPro
         /// <param name="element"></param>
         public static void UnRegisterCanvasElementForRebuild(ICanvasElement element)
         {
-            TMP_UpdateRegistry.instance.InternalUnRegisterCanvasElementForLayoutRebuild(element);
-            TMP_UpdateRegistry.instance.InternalUnRegisterCanvasElementForGraphicRebuild(element);
+            instance.InternalUnRegisterCanvasElementForLayoutRebuild(element);
+            instance.InternalUnRegisterCanvasElementForGraphicRebuild(element);
         }
 
 
@@ -147,7 +147,7 @@ namespace TMPro
         {
             int id = (element as Object).GetInstanceID();
 
-            TMP_UpdateRegistry.instance.m_LayoutRebuildQueue.Remove(element);
+            instance.m_LayoutRebuildQueue.Remove(element);
             m_GraphicQueueLookup.Remove(id);
         }
 
@@ -156,7 +156,7 @@ namespace TMPro
         {
             int id = (element as Object).GetInstanceID();
 
-            TMP_UpdateRegistry.instance.m_GraphicRebuildQueue.Remove(element);
+            instance.m_GraphicRebuildQueue.Remove(element);
             m_LayoutQueueLookup.Remove(id);
         }
     }

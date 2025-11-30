@@ -31,7 +31,7 @@ namespace TMPro
             internal set { m_SpriteCharacterTable = value; }
         }
         [SerializeField]
-        private List<TMP_SpriteCharacter> m_SpriteCharacterTable = new List<TMP_SpriteCharacter>();
+        private List<TMP_SpriteCharacter> m_SpriteCharacterTable = new();
 
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace TMPro
         }
         [FormerlySerializedAs("m_SpriteGlyphTable")]
         [SerializeField]
-        private List<TMP_SpriteGlyph> m_GlyphTable = new List<TMP_SpriteGlyph>();
+        private List<TMP_SpriteGlyph> m_GlyphTable = new();
 
         internal Dictionary<uint, TMP_SpriteGlyph> m_SpriteGlyphLookup;
 
@@ -69,12 +69,12 @@ namespace TMPro
         [SerializeField]
         public List<TMP_SpriteAsset> fallbackSpriteAssets;
 
-        internal bool m_IsSpriteAssetLookupTablesDirty = false;
+        internal bool m_IsSpriteAssetLookupTablesDirty;
 
 
         private void Awake()
         {
-            if (this.material != null && string.IsNullOrEmpty(m_Version))
+            if (material != null && string.IsNullOrEmpty(m_Version))
                 UpgradeSpriteAsset();
         }
 
@@ -88,7 +88,7 @@ namespace TMPro
             ShaderUtilities.GetShaderPropertyIDs();
 
             Shader shader = Shader.Find("TextMeshPro/Sprite");
-            Material tempMaterial = new Material(shader);
+            Material tempMaterial = new(shader);
             tempMaterial.SetTexture(ShaderUtilities.ID_MainTex, spriteSheet);
 
             #if UNITY_EDITOR
@@ -106,16 +106,16 @@ namespace TMPro
         /// </summary>
         public void UpdateLookupTables()
         {
-            if (this.material != null && string.IsNullOrEmpty(m_Version))
+            if (material != null && string.IsNullOrEmpty(m_Version))
                 UpgradeSpriteAsset();
 
             if (m_GlyphIndexLookup == null)
-                m_GlyphIndexLookup = new Dictionary<uint, int>();
+                m_GlyphIndexLookup = new();
             else
                 m_GlyphIndexLookup.Clear();
 
             if (m_SpriteGlyphLookup == null)
-                m_SpriteGlyphLookup = new Dictionary<uint, TMP_SpriteGlyph>();
+                m_SpriteGlyphLookup = new();
             else
                 m_SpriteGlyphLookup.Clear();
 
@@ -132,13 +132,13 @@ namespace TMPro
             }
 
             if (m_NameLookup == null)
-                m_NameLookup = new Dictionary<int, int>();
+                m_NameLookup = new();
             else
                 m_NameLookup.Clear();
 
 
             if (m_SpriteCharacterLookup == null)
-                m_SpriteCharacterLookup = new Dictionary<uint, TMP_SpriteCharacter>();
+                m_SpriteCharacterLookup = new();
             else
                 m_SpriteCharacterLookup.Clear();
 
@@ -248,7 +248,7 @@ namespace TMPro
                 return spriteAsset;
 
             if (k_searchedSpriteAssets == null)
-                k_searchedSpriteAssets = new HashSet<int>();
+                k_searchedSpriteAssets = new();
             else
                 k_searchedSpriteAssets.Clear();
 
@@ -337,7 +337,7 @@ namespace TMPro
                 return spriteAsset;
 
             if (k_searchedSpriteAssets == null)
-                k_searchedSpriteAssets = new HashSet<int>();
+                k_searchedSpriteAssets = new();
             else
                 k_searchedSpriteAssets.Clear();
 
@@ -482,7 +482,7 @@ namespace TMPro
         {
             m_Version = "1.1.0";
 
-            Debug.Log("Upgrading sprite asset [" + this.name + "] to version " + m_Version + ".", this);
+            Debug.Log("Upgrading sprite asset [" + name + "] to version " + m_Version + ".", this);
 
             m_SpriteCharacterTable.Clear();
             m_GlyphTable.Clear();
@@ -491,18 +491,18 @@ namespace TMPro
             {
                 TMP_Sprite oldSprite = spriteInfoList[i];
 
-                TMP_SpriteGlyph spriteGlyph = new TMP_SpriteGlyph();
+                TMP_SpriteGlyph spriteGlyph = new();
                 spriteGlyph.index = (uint)i;
                 spriteGlyph.sprite = oldSprite.sprite;
-                spriteGlyph.metrics = new GlyphMetrics(oldSprite.width, oldSprite.height, oldSprite.xOffset, oldSprite.yOffset, oldSprite.xAdvance);
-                spriteGlyph.glyphRect = new GlyphRect((int)oldSprite.x, (int)oldSprite.y, (int)oldSprite.width, (int)oldSprite.height);
+                spriteGlyph.metrics = new(oldSprite.width, oldSprite.height, oldSprite.xOffset, oldSprite.yOffset, oldSprite.xAdvance);
+                spriteGlyph.glyphRect = new((int)oldSprite.x, (int)oldSprite.y, (int)oldSprite.width, (int)oldSprite.height);
 
                 spriteGlyph.scale = 1.0f;
                 spriteGlyph.atlasIndex = 0;
 
                 m_GlyphTable.Add(spriteGlyph);
 
-                TMP_SpriteCharacter spriteCharacter = new TMP_SpriteCharacter();
+                TMP_SpriteCharacter spriteCharacter = new();
                 spriteCharacter.glyph = spriteGlyph;
                 spriteCharacter.unicode = oldSprite.unicode == 0x0 ? 0xFFFE : (uint)oldSprite.unicode;
                 spriteCharacter.name = oldSprite.name;

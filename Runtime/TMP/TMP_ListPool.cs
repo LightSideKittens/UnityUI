@@ -5,7 +5,7 @@ namespace TMPro
 {
     internal static class TMP_ListPool<T>
     {
-        private static readonly TMP_ObjectPool<List<T>> s_ListPool = new TMP_ObjectPool<List<T>>(null, l => l.Clear());
+        private static readonly TMP_ObjectPool<List<T>> s_ListPool = new(null, l => l.Clear());
 
         public static List<T> Get()
         {

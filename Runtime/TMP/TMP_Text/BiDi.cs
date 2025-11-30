@@ -49,7 +49,6 @@ public static class BiDi
         [In] int[] logicalUtf32,
         int length);
     
-    /// Главный метод: логический текст → набор визуальных строк после переноса и BiDi.
     public static IReadOnlyList<BidiWrappedLine> WrapAndReorder(
         string logicalText,
         TMP_Text text,
@@ -90,7 +89,7 @@ public static class BiDi
                 localMap = BuildIdentityMap(length);
             }
 
-            result.Add(new BidiWrappedLine
+            result.Add(new()
             {
                 visualText = visualLineText,
                 logicalToVisualMap = localMap,
@@ -333,7 +332,7 @@ public static class BiDi
             cpIndex++;
         }
 
-        return new CodepointBuffer
+        return new()
         {
             cps           = cps.ToArray(),
             cpIndexByStringIndex = cpIndexByStringIndex

@@ -124,7 +124,7 @@ namespace TMPro
 
             public OptionDataList()
             {
-                options = new List<OptionData>();
+                options = new();
             }
         }
 
@@ -134,9 +134,9 @@ namespace TMPro
         /// </summary>
         public class DropdownEvent : UnityEvent<int> { }
 
-        private static readonly OptionData k_NothingOption = new OptionData { text = "Nothing" };
-        private static readonly OptionData k_EverythingOption = new OptionData { text = "Everything" };
-        private static readonly OptionData k_MixedOption = new OptionData { text = "Mixed..." };
+        private static readonly OptionData k_NothingOption = new() { text = "Nothing" };
+        private static readonly OptionData k_EverythingOption = new() { text = "Everything" };
+        private static readonly OptionData k_MixedOption = new() { text = "Mixed..." };
 
         [SerializeField]
         private RectTransform m_Template;
@@ -197,7 +197,7 @@ namespace TMPro
         private bool m_MultiSelect;
 
         [Space] [SerializeField]
-        private OptionDataList m_Options = new OptionDataList();
+        private OptionDataList m_Options = new();
 
         /// <summary>
         /// The list of possible options. A text string and an image can be specified for each option.
@@ -297,7 +297,7 @@ namespace TMPro
         }
 
         [Space] [SerializeField]
-        private DropdownEvent m_OnValueChanged = new DropdownEvent();
+        private DropdownEvent m_OnValueChanged = new();
 
         /// <summary>
         /// A UnityEvent that is invoked when a user has clicked one of the options in the dropdown list.
@@ -352,12 +352,12 @@ namespace TMPro
 
         private GameObject m_Dropdown;
         private GameObject m_Blocker;
-        private List<DropdownItem> m_Items = new List<DropdownItem>();
+        private List<DropdownItem> m_Items = new();
         private TweenRunner<FloatTween> m_AlphaTweenRunner;
-        private bool validTemplate = false;
-        private Coroutine m_Coroutine = null;
+        private bool validTemplate;
+        private Coroutine m_Coroutine;
 
-        private static OptionData s_NoOptionData = new OptionData();
+        private static OptionData s_NoOptionData = new();
 
         /// <summary>
         /// The Value is the index number of the current selection in the Dropdown. 0 is the first option in the Dropdown, 1 is the second, and so on.
@@ -464,7 +464,7 @@ namespace TMPro
 
         protected override void Start()
         {
-            m_AlphaTweenRunner = new TweenRunner<FloatTween>();
+            m_AlphaTweenRunner = new();
             m_AlphaTweenRunner.Init(this);
             base.Start();
 
@@ -597,7 +597,7 @@ namespace TMPro
         public void AddOptions(List<string> options)
         {
             for (int i = 0; i < options.Count; i++)
-                this.options.Add(new OptionData(options[i]));
+                this.options.Add(new(options[i]));
 
             RefreshShownValue();
         }
@@ -612,7 +612,7 @@ namespace TMPro
         public void AddOptions(List<Sprite> options)
         {
             for (int i = 0; i < options.Count; i++)
-                this.options.Add(new OptionData(options[i]));
+                this.options.Add(new(options[i]));
 
             RefreshShownValue();
         }
@@ -901,7 +901,7 @@ namespace TMPro
 
             float extraSpace = dropdownRectTransform.rect.height - contentRectTransform.rect.height;
             if (extraSpace > 0)
-                dropdownRectTransform.sizeDelta = new Vector2(dropdownRectTransform.sizeDelta.x, dropdownRectTransform.sizeDelta.y - extraSpace);
+                dropdownRectTransform.sizeDelta = new(dropdownRectTransform.sizeDelta.x, dropdownRectTransform.sizeDelta.y - extraSpace);
 
             Vector3[] corners = new Vector3[4];
             dropdownRectTransform.GetWorldCorners(corners);
@@ -928,10 +928,10 @@ namespace TMPro
             for (int i = 0; i < m_Items.Count; i++)
             {
                 RectTransform itemRect = m_Items[i].rectTransform;
-                itemRect.anchorMin = new Vector2(itemRect.anchorMin.x, 0);
-                itemRect.anchorMax = new Vector2(itemRect.anchorMax.x, 0);
-                itemRect.anchoredPosition = new Vector2(itemRect.anchoredPosition.x, offsetMin.y + itemSize.y * (m_Items.Count - 1 - i) + itemSize.y * itemRect.pivot.y);
-                itemRect.sizeDelta = new Vector2(itemRect.sizeDelta.x, itemSize.y);
+                itemRect.anchorMin = new(itemRect.anchorMin.x, 0);
+                itemRect.anchorMax = new(itemRect.anchorMax.x, 0);
+                itemRect.anchoredPosition = new(itemRect.anchoredPosition.x, offsetMin.y + itemSize.y * (m_Items.Count - 1 - i) + itemSize.y * itemRect.pivot.y);
+                itemRect.sizeDelta = new(itemRect.sizeDelta.x, itemSize.y);
             }
 
             AlphaFadeList(m_AlphaFadeSpeed, 0f, 1f);
@@ -975,7 +975,7 @@ namespace TMPro
         /// <returns>The created blocker object</returns>
         protected virtual GameObject CreateBlocker(Canvas rootCanvas)
         {
-            GameObject blocker = new GameObject("Blocker");
+            GameObject blocker = new("Blocker");
 
             blocker.layer = rootCanvas.gameObject.layer;
 
@@ -1131,7 +1131,7 @@ namespace TMPro
             if (end.Equals(start))
                 return;
 
-            FloatTween tween = new FloatTween { duration = duration, startValue = start, targetValue = end };
+            FloatTween tween = new() { duration = duration, startValue = start, targetValue = end };
             tween.AddOnChangedCallback(SetAlpha);
             tween.ignoreTimeScale = true;
             m_AlphaTweenRunner.StartTween(tween);

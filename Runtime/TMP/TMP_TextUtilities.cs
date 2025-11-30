@@ -44,7 +44,7 @@ namespace TMPro
         /// <returns></returns>
         public static int GetCursorIndexFromPosition(TMP_Text textComponent, Vector3 position, Camera camera)
         {
-            int index = TMP_TextUtilities.FindNearestCharacter(textComponent, position, camera, false);
+            int index = FindNearestCharacter(textComponent, position, camera, false);
 
             RectTransform rectTransform = textComponent.rectTransform;
 
@@ -145,8 +145,8 @@ namespace TMPro
             {
                 TMP_LineInfo lineInfo = text.textInfo.lineInfo[i];
 
-                float ascender = rectTransform.TransformPoint(new Vector3(0, lineInfo.ascender, 0)).y;
-                float descender = rectTransform.TransformPoint(new Vector3(0, lineInfo.descender, 0)).y;
+                float ascender = rectTransform.TransformPoint(new(0, lineInfo.ascender, 0)).y;
+                float descender = rectTransform.TransformPoint(new(0, lineInfo.descender, 0)).y;
 
                 if (ascender > position.y && descender < position.y)
                 {
@@ -197,9 +197,9 @@ namespace TMPro
                     continue;
 
                 Vector3 bl = rectTransform.TransformPoint(cInfo.bottomLeft);
-                Vector3 tl = rectTransform.TransformPoint(new Vector3(cInfo.bottomLeft.x, cInfo.topRight.y, 0));
+                Vector3 tl = rectTransform.TransformPoint(new(cInfo.bottomLeft.x, cInfo.topRight.y, 0));
                 Vector3 tr = rectTransform.TransformPoint(cInfo.topRight);
-                Vector3 br = rectTransform.TransformPoint(new Vector3(cInfo.topRight.x, cInfo.bottomLeft.y, 0));
+                Vector3 br = rectTransform.TransformPoint(new(cInfo.topRight.x, cInfo.bottomLeft.y, 0));
 
                 if (PointIntersectRectangle(position, bl, tl, tr, br))
                 {
@@ -269,9 +269,9 @@ namespace TMPro
                 if (visibleOnly && !cInfo.isVisible) continue;
 
                 Vector3 bl = rectTransform.TransformPoint(cInfo.bottomLeft);
-                Vector3 tl = rectTransform.TransformPoint(new Vector3(cInfo.bottomLeft.x, cInfo.topRight.y, 0));
+                Vector3 tl = rectTransform.TransformPoint(new(cInfo.bottomLeft.x, cInfo.topRight.y, 0));
                 Vector3 tr = rectTransform.TransformPoint(cInfo.topRight);
-                Vector3 br = rectTransform.TransformPoint(new Vector3(cInfo.topRight.x, cInfo.bottomLeft.y, 0));
+                Vector3 br = rectTransform.TransformPoint(new(cInfo.topRight.x, cInfo.bottomLeft.y, 0));
 
                 if (PointIntersectRectangle(position, bl, tl, tr, br))
                     return i;
@@ -314,9 +314,9 @@ namespace TMPro
                 if (visibleOnly && !cInfo.isVisible) continue;
 
                 Vector3 bl = rectTransform.TransformPoint(cInfo.bottomLeft);
-                Vector3 tl = rectTransform.TransformPoint(new Vector3(cInfo.bottomLeft.x, cInfo.topRight.y, 0));
+                Vector3 tl = rectTransform.TransformPoint(new(cInfo.bottomLeft.x, cInfo.topRight.y, 0));
                 Vector3 tr = rectTransform.TransformPoint(cInfo.topRight);
-                Vector3 br = rectTransform.TransformPoint(new Vector3(cInfo.topRight.x, cInfo.bottomLeft.y, 0));
+                Vector3 br = rectTransform.TransformPoint(new(cInfo.topRight.x, cInfo.bottomLeft.y, 0));
 
                 if (PointIntersectRectangle(position, bl, tl, tr, br))
                     return i;
@@ -403,20 +403,20 @@ namespace TMPro
                     {
                         isBeginRegion = true;
 
-                        bl = new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0);
-                        tl = new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0);
+                        bl = new(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0);
+                        tl = new(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0);
 
                         if (wInfo.characterCount == 1)
                         {
                             isBeginRegion = false;
 
-                            br = new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0);
-                            tr = new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0);
+                            br = new(currentCharInfo.topRight.x, currentCharInfo.descender, 0);
+                            tr = new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0);
 
-                            bl = rectTransform.TransformPoint(new Vector3(bl.x, minDescender, 0));
-                            tl = rectTransform.TransformPoint(new Vector3(tl.x, maxAscender, 0));
-                            tr = rectTransform.TransformPoint(new Vector3(tr.x, maxAscender, 0));
-                            br = rectTransform.TransformPoint(new Vector3(br.x, minDescender, 0));
+                            bl = rectTransform.TransformPoint(new(bl.x, minDescender, 0));
+                            tl = rectTransform.TransformPoint(new(tl.x, maxAscender, 0));
+                            tr = rectTransform.TransformPoint(new(tr.x, maxAscender, 0));
+                            br = rectTransform.TransformPoint(new(br.x, minDescender, 0));
 
                             if (PointIntersectRectangle(position, bl, tl, tr, br))
                                 return i;
@@ -427,13 +427,13 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0);
-                        tr = new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0);
+                        br = new(currentCharInfo.topRight.x, currentCharInfo.descender, 0);
+                        tr = new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0);
 
-                        bl = rectTransform.TransformPoint(new Vector3(bl.x, minDescender, 0));
-                        tl = rectTransform.TransformPoint(new Vector3(tl.x, maxAscender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(tr.x, maxAscender, 0));
-                        br = rectTransform.TransformPoint(new Vector3(br.x, minDescender, 0));
+                        bl = rectTransform.TransformPoint(new(bl.x, minDescender, 0));
+                        tl = rectTransform.TransformPoint(new(tl.x, maxAscender, 0));
+                        tr = rectTransform.TransformPoint(new(tr.x, maxAscender, 0));
+                        br = rectTransform.TransformPoint(new(br.x, minDescender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
                             return i;
@@ -442,13 +442,13 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0);
-                        tr = new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0);
+                        br = new(currentCharInfo.topRight.x, currentCharInfo.descender, 0);
+                        tr = new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0);
 
-                        bl = rectTransform.TransformPoint(new Vector3(bl.x, minDescender, 0));
-                        tl = rectTransform.TransformPoint(new Vector3(tl.x, maxAscender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(tr.x, maxAscender, 0));
-                        br = rectTransform.TransformPoint(new Vector3(br.x, minDescender, 0));
+                        bl = rectTransform.TransformPoint(new(bl.x, minDescender, 0));
+                        tl = rectTransform.TransformPoint(new(tl.x, maxAscender, 0));
+                        tr = rectTransform.TransformPoint(new(tr.x, maxAscender, 0));
+                        br = rectTransform.TransformPoint(new(br.x, minDescender, 0));
 
                         maxAscender = -Mathf.Infinity;
                         minDescender = Mathf.Infinity;
@@ -520,15 +520,15 @@ namespace TMPro
                     {
                         isBeginRegion = true;
 
-                        bl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
-                        tl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
+                        bl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
+                        tl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
 
                         if (wInfo.characterCount == 1)
                         {
                             isBeginRegion = false;
 
-                            br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                            tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                            br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                            tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                             if (PointIntersectRectangle(position, bl, tl, tr, br))
                                 return i;
@@ -554,8 +554,8 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
                             return i;
@@ -579,8 +579,8 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
                             return i;
@@ -643,8 +643,8 @@ namespace TMPro
             {
                 TMP_LineInfo lineInfo = text.textInfo.lineInfo[i];
 
-                float ascender = rectTransform.TransformPoint(new Vector3(0, lineInfo.ascender, 0)).y;
-                float descender = rectTransform.TransformPoint(new Vector3(0, lineInfo.descender, 0)).y;
+                float ascender = rectTransform.TransformPoint(new(0, lineInfo.ascender, 0)).y;
+                float descender = rectTransform.TransformPoint(new(0, lineInfo.descender, 0)).y;
 
                 if (ascender > position.y && descender < position.y)
                 {
@@ -690,15 +690,15 @@ namespace TMPro
                     {
                         isBeginRegion = true;
 
-                        bl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
-                        tl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
+                        bl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
+                        tl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
 
                         if (linkInfo.linkTextLength == 1)
                         {
                             isBeginRegion = false;
 
-                            br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                            tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                            br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                            tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                             if (PointIntersectRectangle(position, bl, tl, tr, br))
                                 return i;
@@ -709,8 +709,8 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
                             return i;
@@ -719,8 +719,8 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
                             return i;
@@ -786,15 +786,15 @@ namespace TMPro
                     {
                         isBeginRegion = true;
 
-                        bl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
-                        tl = rectTransform.TransformPoint(new Vector3(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
+                        bl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
+                        tl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
 
                         if (linkInfo.linkTextLength == 1)
                         {
                             isBeginRegion = false;
 
-                            br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                            tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                            br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                            tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                             if (PointIntersectRectangle(position, bl, tl, tr, br))
                                 return i;
@@ -821,8 +821,8 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
                             return i;
@@ -847,8 +847,8 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                        tr = rectTransform.TransformPoint(new Vector3(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
                             return i;

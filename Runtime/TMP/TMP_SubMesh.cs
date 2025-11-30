@@ -175,7 +175,7 @@ namespace TMPro
             {
                 if (m_mesh == null)
                 {
-                    m_mesh = new Mesh();
+                    m_mesh = new();
                     m_mesh.hideFlags = HideFlags.HideAndDontSave;
                 }
 
@@ -212,7 +212,7 @@ namespace TMPro
 
         public static TMP_SubMesh AddSubTextObject(TextMeshPro textComponent, MaterialReference materialReference)
         {
-            GameObject go = new GameObject();
+            GameObject go = new();
             go.hideFlags = TMP_Settings.hideSubTextObjects ? HideFlags.HideAndDontSave : HideFlags.DontSave;
             go.transform.SetParent(textComponent.transform, false);
             go.transform.localPosition = Vector3.zero;
@@ -258,7 +258,7 @@ namespace TMPro
             meshFilter.sharedMesh = mesh;
 
             if (m_sharedMaterial != null)
-                m_sharedMaterial.SetVector(ShaderUtilities.ID_ClipRect, new Vector4(-32767, -32767, 32767, 32767));
+                m_sharedMaterial.SetVector(ShaderUtilities.ID_ClipRect, new(-32767, -32767, 32767, 32767));
         }
 
 
@@ -356,7 +356,7 @@ namespace TMPro
         }
 
 
-        private void ON_SPRITE_ASSET_PROPERTY_CHANGED(bool isChanged, UnityEngine.Object obj)
+        private void ON_SPRITE_ASSET_PROPERTY_CHANGED(bool isChanged, Object obj)
         {
             if (m_TextComponent != null)
             {
@@ -390,7 +390,7 @@ namespace TMPro
 
         public void DestroySelf()
         {
-            Destroy(this.gameObject, 1f);
+            Destroy(gameObject, 1f);
         }
 
         private Material GetMaterial(Material mat)
@@ -419,7 +419,7 @@ namespace TMPro
         /// <returns></returns>
         private Material CreateMaterialInstance(Material source)
         {
-            Material mat = new Material(source);
+            Material mat = new(source);
             mat.shaderKeywords = source.shaderKeywords;
             mat.name += " (Instance)";
 

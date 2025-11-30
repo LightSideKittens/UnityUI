@@ -18,7 +18,7 @@ namespace TMPro
         }
 
         [SerializeField]
-        private List<TMP_Style> m_StyleList = new List<TMP_Style>(1);
+        private List<TMP_Style> m_StyleList = new(1);
         private Dictionary<int, TMP_Style> m_StyleLookupDictionary;
 
         private void Reset()
@@ -77,7 +77,7 @@ namespace TMPro
         private void LoadStyleDictionaryInternal()
         {
             if (m_StyleLookupDictionary == null)
-                m_StyleLookupDictionary = new Dictionary<int, TMP_Style>();
+                m_StyleLookupDictionary = new();
             else
                 m_StyleLookupDictionary.Clear();
 
@@ -92,7 +92,7 @@ namespace TMPro
             int normalStyleHashCode = TMP_TextParsingUtilities.GetHashCode("Normal");
             if (!m_StyleLookupDictionary.ContainsKey(normalStyleHashCode))
             {
-                TMP_Style style = new TMP_Style("Normal", string.Empty, string.Empty);
+                TMP_Style style = new("Normal", string.Empty, string.Empty);
                 m_StyleList.Add(style);
                 m_StyleLookupDictionary.Add(normalStyleHashCode, style);
             }

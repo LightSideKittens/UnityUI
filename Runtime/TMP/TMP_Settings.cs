@@ -12,7 +12,7 @@ namespace TMPro
     /// <summary>
     /// Scaling options for the sprites
     /// </summary>
-    [System.Serializable][ExcludeFromPresetAttribute]
+    [Serializable][ExcludeFromPresetAttribute]
     [HelpURL("https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/TextMeshPro/Settings.html")]
     public class TMP_Settings : ScriptableObject
     {
@@ -58,7 +58,7 @@ namespace TMPro
             get { return instance.m_ActiveFontFeatures; }
         }
         [SerializeField]
-        private List<OTL_FeatureTag> m_ActiveFontFeatures = new List<OTL_FeatureTag> { 0 };
+        private List<OTL_FeatureTag> m_ActiveFontFeatures = new() { 0 };
 
         /// <summary>
         /// Controls if Extra Padding is enabled on newly created text objects by default.
@@ -286,17 +286,6 @@ namespace TMPro
         private string m_defaultSpriteAssetPath;
 
         /// <summary>
-        /// Determines if Emoji support is enabled in the Input Field TouchScreenKeyboard.
-        /// </summary>
-        public static bool enableEmojiSupport
-        {
-            get { return instance.m_enableEmojiSupport; }
-            set { instance.m_enableEmojiSupport = value; }
-        }
-        [SerializeField]
-        private bool m_enableEmojiSupport;
-
-        /// <summary>
         /// The unicode value of the sprite that will be used when the requested sprite is missing from the sprite asset and potential fallbacks.
         /// </summary>
         public static uint missingCharacterSpriteUnicode
@@ -306,17 +295,6 @@ namespace TMPro
         }
         [SerializeField]
         private uint m_MissingCharacterSpriteUnicode;
-
-        /// <summary>
-        /// list of Fallback Text Assets (Font Assets and Sprite Assets) used to lookup characters defined in the Unicode as Emojis.
-        /// </summary>
-        public static List<TMP_Asset> emojiFallbackTextAssets
-        {
-            get => instance.m_EmojiFallbackTextAssets;
-            set => instance.m_EmojiFallbackTextAssets = value;
-        }
-        [SerializeField]
-        private List<TMP_Asset> m_EmojiFallbackTextAssets;
 
         /// <summary>
         /// Determines if sprites will be scaled relative to the primary font asset assigned to the text object or relative to the current font asset.
@@ -468,9 +446,9 @@ namespace TMPro
         /// <returns></returns>
         public static TMP_Settings GetSettings()
         {
-            if (TMP_Settings.instance == null) return null;
+            if (instance == null) return null;
 
-            return TMP_Settings.instance;
+            return instance;
         }
 
 
@@ -480,9 +458,9 @@ namespace TMPro
         /// <returns></returns>
         public static TMP_FontAsset GetFontAsset()
         {
-            if (TMP_Settings.instance == null) return null;
+            if (instance == null) return null;
 
-            return TMP_Settings.instance.m_defaultFontAsset;
+            return instance.m_defaultFontAsset;
         }
 
 
@@ -492,9 +470,9 @@ namespace TMPro
         /// <returns></returns>
         public static TMP_SpriteAsset GetSpriteAsset()
         {
-            if (TMP_Settings.instance == null) return null;
+            if (instance == null) return null;
 
-            return TMP_Settings.instance.m_defaultSpriteAsset;
+            return instance.m_defaultSpriteAsset;
         }
 
 
@@ -504,9 +482,9 @@ namespace TMPro
         /// <returns></returns>
         public static TMP_StyleSheet GetStyleSheet()
         {
-            if (TMP_Settings.instance == null) return null;
+            if (instance == null) return null;
 
-            return TMP_Settings.instance.m_defaultStyleSheet;
+            return instance.m_defaultStyleSheet;
         }
 
 
@@ -515,7 +493,7 @@ namespace TMPro
             if (instance == null) return;
 
             if (s_Instance.m_linebreakingRules == null)
-                s_Instance.m_linebreakingRules = new LineBreakingTable();
+                s_Instance.m_linebreakingRules = new();
 
             s_Instance.m_linebreakingRules.leadingCharacters = GetCharacters(s_Instance.m_leadingCharacters);
             s_Instance.m_linebreakingRules.followingCharacters = GetCharacters(s_Instance.m_followingCharacters);
@@ -529,7 +507,7 @@ namespace TMPro
         /// <returns></returns>
         private static HashSet<uint> GetCharacters(TextAsset file)
         {
-            HashSet<uint> dict = new HashSet<uint>();
+            HashSet<uint> dict = new();
             string text = file.text;
 
             for (int i = 0; i < text.Length; i++)

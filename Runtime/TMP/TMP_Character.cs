@@ -15,7 +15,7 @@ namespace TMPro
         public TMP_Character()
         {
             m_ElementType = TextElementType.Character;
-            this.scale = 1.0f;
+            scale = 1.0f;
         }
 
         /// <summary>
@@ -28,10 +28,10 @@ namespace TMPro
             m_ElementType = TextElementType.Character;
 
             this.unicode = unicode;
-            this.textAsset = null;
+            textAsset = null;
             this.glyph = glyph;
-            this.glyphIndex = glyph.index;
-            this.scale = 1.0f;
+            glyphIndex = glyph.index;
+            scale = 1.0f;
         }
 
         /// <summary>
@@ -45,10 +45,10 @@ namespace TMPro
             m_ElementType = TextElementType.Character;
 
             this.unicode = unicode;
-            this.textAsset = fontAsset;
+            textAsset = fontAsset;
             this.glyph = glyph;
-            this.glyphIndex = glyph.index;
-            this.scale = 1.0f;
+            glyphIndex = glyph.index;
+            scale = 1.0f;
         }
 
         /// <summary>
@@ -61,10 +61,10 @@ namespace TMPro
             m_ElementType = TextElementType.Character;
 
             this.unicode = unicode;
-            this.textAsset = null;
-            this.glyph = null;
+            textAsset = null;
+            glyph = null;
             this.glyphIndex = glyphIndex;
-            this.scale = 1.0f;
+            scale = 1.0f;
         }
     }
 }

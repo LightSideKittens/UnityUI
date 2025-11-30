@@ -15,10 +15,10 @@ namespace TMPro
     /// </summary>
     public struct TMP_MeshInfo
     {
-        private static readonly Color32 s_DefaultColor = new Color32(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
-        private static readonly Vector3 s_DefaultNormal = new Vector3(0.0f, 0.0f, -1f);
-        private static readonly Vector4 s_DefaultTangent = new Vector4(-1f, 0.0f, 0.0f, 1f);
-        private static readonly Bounds s_DefaultBounds = new Bounds();
+        private static readonly Color32 s_DefaultColor = new(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
+        private static readonly Vector3 s_DefaultNormal = new(0.0f, 0.0f, -1f);
+        private static readonly Vector4 s_DefaultTangent = new(-1f, 0.0f, 0.0f, 1f);
+        private static readonly Bounds s_DefaultBounds = new();
 
         public Mesh mesh;
         public int vertexCount;
@@ -54,7 +54,7 @@ namespace TMPro
         public TMP_MeshInfo(Mesh mesh, int size)
         {
             if (mesh == null)
-                mesh = new Mesh();
+                mesh = new();
             else
                 mesh.Clear();
 
@@ -65,17 +65,17 @@ namespace TMPro
             int sizeX4 = size * 4;
             int sizeX6 = size * 6;
 
-            this.vertexCount = 0;
+            vertexCount = 0;
 
-            this.vertices = new Vector3[sizeX4];
-            this.uvs0 = new Vector4[sizeX4];
-            this.uvs2 = new Vector2[sizeX4];
-            this.colors32 = new Color32[sizeX4];
+            vertices = new Vector3[sizeX4];
+            uvs0 = new Vector4[sizeX4];
+            uvs2 = new Vector2[sizeX4];
+            colors32 = new Color32[sizeX4];
 
-            this.normals = new Vector3[sizeX4];
-            this.tangents = new Vector4[sizeX4];
+            normals = new Vector3[sizeX4];
+            tangents = new Vector4[sizeX4];
 
-            this.triangles = new int[sizeX6];
+            triangles = new int[sizeX6];
 
             int index_X6 = 0;
             int index_X4 = 0;
@@ -83,31 +83,31 @@ namespace TMPro
             {
                 for (int i = 0; i < 4; i++)
                 {
-                    this.vertices[index_X4 + i] = Vector3.zero;
-                    this.uvs0[index_X4 + i] = Vector2.zero;
-                    this.uvs2[index_X4 + i] = Vector2.zero;
-                    this.colors32[index_X4 + i] = s_DefaultColor;
-                    this.normals[index_X4 + i] = s_DefaultNormal;
-                    this.tangents[index_X4 + i] = s_DefaultTangent;
+                    vertices[index_X4 + i] = Vector3.zero;
+                    uvs0[index_X4 + i] = Vector2.zero;
+                    uvs2[index_X4 + i] = Vector2.zero;
+                    colors32[index_X4 + i] = s_DefaultColor;
+                    normals[index_X4 + i] = s_DefaultNormal;
+                    tangents[index_X4 + i] = s_DefaultTangent;
                 }
 
-                this.triangles[index_X6 + 0] = index_X4 + 0;
-                this.triangles[index_X6 + 1] = index_X4 + 1;
-                this.triangles[index_X6 + 2] = index_X4 + 2;
-                this.triangles[index_X6 + 3] = index_X4 + 2;
-                this.triangles[index_X6 + 4] = index_X4 + 3;
-                this.triangles[index_X6 + 5] = index_X4 + 0;
+                triangles[index_X6 + 0] = index_X4 + 0;
+                triangles[index_X6 + 1] = index_X4 + 1;
+                triangles[index_X6 + 2] = index_X4 + 2;
+                triangles[index_X6 + 3] = index_X4 + 2;
+                triangles[index_X6 + 4] = index_X4 + 3;
+                triangles[index_X6 + 5] = index_X4 + 0;
 
                 index_X4 += 4;
                 index_X6 += 6;
             }
 
-            this.mesh.vertices = this.vertices;
-            this.mesh.normals = this.normals;
-            this.mesh.tangents = this.tangents;
-            this.mesh.triangles = this.triangles;
+            this.mesh.vertices = vertices;
+            this.mesh.normals = normals;
+            this.mesh.tangents = tangents;
+            this.mesh.triangles = triangles;
             this.mesh.bounds = s_DefaultBounds;
-            this.material = null;
+            material = null;
         }
 
 
@@ -120,7 +120,7 @@ namespace TMPro
         public TMP_MeshInfo(Mesh mesh, int size, bool isVolumetric)
         {
             if (mesh == null)
-                mesh = new Mesh();
+                mesh = new();
             else
                 mesh.Clear();
 
@@ -134,17 +134,17 @@ namespace TMPro
             int size_x_s0 = size * s0;
             int size_x_s1 = size * s1;
 
-            this.vertexCount = 0;
+            vertexCount = 0;
 
-            this.vertices = new Vector3[size_x_s0];
-            this.uvs0 = new Vector4[size_x_s0];
-            this.uvs2 = new Vector2[size_x_s0];
-            this.colors32 = new Color32[size_x_s0];
+            vertices = new Vector3[size_x_s0];
+            uvs0 = new Vector4[size_x_s0];
+            uvs2 = new Vector2[size_x_s0];
+            colors32 = new Color32[size_x_s0];
 
-            this.normals = new Vector3[size_x_s0];
-            this.tangents = new Vector4[size_x_s0];
+            normals = new Vector3[size_x_s0];
+            tangents = new Vector4[size_x_s0];
 
-            this.triangles = new int[size_x_s1];
+            triangles = new int[size_x_s1];
 
             int index_x_s0 = 0;
             int index_x_s1 = 0;
@@ -152,69 +152,69 @@ namespace TMPro
             {
                 for (int i = 0; i < s0; i++)
                 {
-                    this.vertices[index_x_s0 + i] = Vector3.zero;
-                    this.uvs0[index_x_s0 + i] = Vector2.zero;
-                    this.uvs2[index_x_s0 + i] = Vector2.zero;
-                    this.colors32[index_x_s0 + i] = s_DefaultColor;
-                    this.normals[index_x_s0 + i] = s_DefaultNormal;
-                    this.tangents[index_x_s0 + i] = s_DefaultTangent;
+                    vertices[index_x_s0 + i] = Vector3.zero;
+                    uvs0[index_x_s0 + i] = Vector2.zero;
+                    uvs2[index_x_s0 + i] = Vector2.zero;
+                    colors32[index_x_s0 + i] = s_DefaultColor;
+                    normals[index_x_s0 + i] = s_DefaultNormal;
+                    tangents[index_x_s0 + i] = s_DefaultTangent;
                 }
 
-                this.triangles[index_x_s1 + 0] = index_x_s0 + 0;
-                this.triangles[index_x_s1 + 1] = index_x_s0 + 1;
-                this.triangles[index_x_s1 + 2] = index_x_s0 + 2;
-                this.triangles[index_x_s1 + 3] = index_x_s0 + 2;
-                this.triangles[index_x_s1 + 4] = index_x_s0 + 3;
-                this.triangles[index_x_s1 + 5] = index_x_s0 + 0;
+                triangles[index_x_s1 + 0] = index_x_s0 + 0;
+                triangles[index_x_s1 + 1] = index_x_s0 + 1;
+                triangles[index_x_s1 + 2] = index_x_s0 + 2;
+                triangles[index_x_s1 + 3] = index_x_s0 + 2;
+                triangles[index_x_s1 + 4] = index_x_s0 + 3;
+                triangles[index_x_s1 + 5] = index_x_s0 + 0;
 
                 if (isVolumetric)
                 {
-                    this.triangles[index_x_s1 + 6] = index_x_s0 + 4;
-                    this.triangles[index_x_s1 + 7] = index_x_s0 + 5;
-                    this.triangles[index_x_s1 + 8] = index_x_s0 + 1;
-                    this.triangles[index_x_s1 + 9] = index_x_s0 + 1;
-                    this.triangles[index_x_s1 + 10] = index_x_s0 + 0;
-                    this.triangles[index_x_s1 + 11] = index_x_s0 + 4;
+                    triangles[index_x_s1 + 6] = index_x_s0 + 4;
+                    triangles[index_x_s1 + 7] = index_x_s0 + 5;
+                    triangles[index_x_s1 + 8] = index_x_s0 + 1;
+                    triangles[index_x_s1 + 9] = index_x_s0 + 1;
+                    triangles[index_x_s1 + 10] = index_x_s0 + 0;
+                    triangles[index_x_s1 + 11] = index_x_s0 + 4;
 
-                    this.triangles[index_x_s1 + 12] = index_x_s0 + 3;
-                    this.triangles[index_x_s1 + 13] = index_x_s0 + 2;
-                    this.triangles[index_x_s1 + 14] = index_x_s0 + 6;
-                    this.triangles[index_x_s1 + 15] = index_x_s0 + 6;
-                    this.triangles[index_x_s1 + 16] = index_x_s0 + 7;
-                    this.triangles[index_x_s1 + 17] = index_x_s0 + 3;
+                    triangles[index_x_s1 + 12] = index_x_s0 + 3;
+                    triangles[index_x_s1 + 13] = index_x_s0 + 2;
+                    triangles[index_x_s1 + 14] = index_x_s0 + 6;
+                    triangles[index_x_s1 + 15] = index_x_s0 + 6;
+                    triangles[index_x_s1 + 16] = index_x_s0 + 7;
+                    triangles[index_x_s1 + 17] = index_x_s0 + 3;
 
-                    this.triangles[index_x_s1 + 18] = index_x_s0 + 1;
-                    this.triangles[index_x_s1 + 19] = index_x_s0 + 5;
-                    this.triangles[index_x_s1 + 20] = index_x_s0 + 6;
-                    this.triangles[index_x_s1 + 21] = index_x_s0 + 6;
-                    this.triangles[index_x_s1 + 22] = index_x_s0 + 2;
-                    this.triangles[index_x_s1 + 23] = index_x_s0 + 1;
+                    triangles[index_x_s1 + 18] = index_x_s0 + 1;
+                    triangles[index_x_s1 + 19] = index_x_s0 + 5;
+                    triangles[index_x_s1 + 20] = index_x_s0 + 6;
+                    triangles[index_x_s1 + 21] = index_x_s0 + 6;
+                    triangles[index_x_s1 + 22] = index_x_s0 + 2;
+                    triangles[index_x_s1 + 23] = index_x_s0 + 1;
 
-                    this.triangles[index_x_s1 + 24] = index_x_s0 + 4;
-                    this.triangles[index_x_s1 + 25] = index_x_s0 + 0;
-                    this.triangles[index_x_s1 + 26] = index_x_s0 + 3;
-                    this.triangles[index_x_s1 + 27] = index_x_s0 + 3;
-                    this.triangles[index_x_s1 + 28] = index_x_s0 + 7;
-                    this.triangles[index_x_s1 + 29] = index_x_s0 + 4;
+                    triangles[index_x_s1 + 24] = index_x_s0 + 4;
+                    triangles[index_x_s1 + 25] = index_x_s0 + 0;
+                    triangles[index_x_s1 + 26] = index_x_s0 + 3;
+                    triangles[index_x_s1 + 27] = index_x_s0 + 3;
+                    triangles[index_x_s1 + 28] = index_x_s0 + 7;
+                    triangles[index_x_s1 + 29] = index_x_s0 + 4;
 
-                    this.triangles[index_x_s1 + 30] = index_x_s0 + 7;
-                    this.triangles[index_x_s1 + 31] = index_x_s0 + 6;
-                    this.triangles[index_x_s1 + 32] = index_x_s0 + 5;
-                    this.triangles[index_x_s1 + 33] = index_x_s0 + 5;
-                    this.triangles[index_x_s1 + 34] = index_x_s0 + 4;
-                    this.triangles[index_x_s1 + 35] = index_x_s0 + 7;
+                    triangles[index_x_s1 + 30] = index_x_s0 + 7;
+                    triangles[index_x_s1 + 31] = index_x_s0 + 6;
+                    triangles[index_x_s1 + 32] = index_x_s0 + 5;
+                    triangles[index_x_s1 + 33] = index_x_s0 + 5;
+                    triangles[index_x_s1 + 34] = index_x_s0 + 4;
+                    triangles[index_x_s1 + 35] = index_x_s0 + 7;
                 }
 
                 index_x_s0 += s0;
                 index_x_s1 += s1;
             }
 
-            this.mesh.vertices = this.vertices;
-            this.mesh.normals = this.normals;
-            this.mesh.tangents = this.tangents;
-            this.mesh.triangles = this.triangles;
+            this.mesh.vertices = vertices;
+            this.mesh.normals = normals;
+            this.mesh.tangents = tangents;
+            this.mesh.triangles = triangles;
             this.mesh.bounds = s_DefaultBounds;
-            this.material = null;
+            material = null;
         }
 
 
@@ -230,26 +230,26 @@ namespace TMPro
             int size_X4 = size * 4;
             int size_X6 = size * 6;
 
-            int previousSize = this.vertices.Length / 4;
+            int previousSize = vertices.Length / 4;
 
-            Array.Resize(ref this.vertices, size_X4);
-            Array.Resize(ref this.normals, size_X4);
-            Array.Resize(ref this.tangents, size_X4);
+            Array.Resize(ref vertices, size_X4);
+            Array.Resize(ref normals, size_X4);
+            Array.Resize(ref tangents, size_X4);
 
-            Array.Resize(ref this.uvs0, size_X4);
-            Array.Resize(ref this.uvs2, size_X4);
+            Array.Resize(ref uvs0, size_X4);
+            Array.Resize(ref uvs2, size_X4);
 
-            Array.Resize(ref this.colors32, size_X4);
+            Array.Resize(ref colors32, size_X4);
 
-            Array.Resize(ref this.triangles, size_X6);
+            Array.Resize(ref triangles, size_X6);
 
 
             if (size <= previousSize)
             {
-                this.mesh.triangles = this.triangles;
-                this.mesh.vertices = this.vertices;
-                this.mesh.normals = this.normals;
-                this.mesh.tangents = this.tangents;
+                mesh.triangles = triangles;
+                mesh.vertices = vertices;
+                mesh.normals = normals;
+                mesh.tangents = tangents;
 
                 return;
             }
@@ -259,28 +259,28 @@ namespace TMPro
                 int index_X4 = i * 4;
                 int index_X6 = i * 6;
 
-                this.normals[0 + index_X4] = s_DefaultNormal;
-                this.normals[1 + index_X4] = s_DefaultNormal;
-                this.normals[2 + index_X4] = s_DefaultNormal;
-                this.normals[3 + index_X4] = s_DefaultNormal;
+                normals[0 + index_X4] = s_DefaultNormal;
+                normals[1 + index_X4] = s_DefaultNormal;
+                normals[2 + index_X4] = s_DefaultNormal;
+                normals[3 + index_X4] = s_DefaultNormal;
 
-                this.tangents[0 + index_X4] = s_DefaultTangent;
-                this.tangents[1 + index_X4] = s_DefaultTangent;
-                this.tangents[2 + index_X4] = s_DefaultTangent;
-                this.tangents[3 + index_X4] = s_DefaultTangent;
+                tangents[0 + index_X4] = s_DefaultTangent;
+                tangents[1 + index_X4] = s_DefaultTangent;
+                tangents[2 + index_X4] = s_DefaultTangent;
+                tangents[3 + index_X4] = s_DefaultTangent;
 
-                this.triangles[0 + index_X6] = 0 + index_X4;
-                this.triangles[1 + index_X6] = 1 + index_X4;
-                this.triangles[2 + index_X6] = 2 + index_X4;
-                this.triangles[3 + index_X6] = 2 + index_X4;
-                this.triangles[4 + index_X6] = 3 + index_X4;
-                this.triangles[5 + index_X6] = 0 + index_X4;
+                triangles[0 + index_X6] = 0 + index_X4;
+                triangles[1 + index_X6] = 1 + index_X4;
+                triangles[2 + index_X6] = 2 + index_X4;
+                triangles[3 + index_X6] = 2 + index_X4;
+                triangles[4 + index_X6] = 3 + index_X4;
+                triangles[5 + index_X6] = 0 + index_X4;
             }
 
-            this.mesh.vertices = this.vertices;
-            this.mesh.normals = this.normals;
-            this.mesh.tangents = this.tangents;
-            this.mesh.triangles = this.triangles;
+            mesh.vertices = vertices;
+            mesh.normals = normals;
+            mesh.tangents = tangents;
+            mesh.triangles = triangles;
         }
 
 
@@ -299,26 +299,26 @@ namespace TMPro
             int size_X4 = size * s0;
             int size_X6 = size * s1;
 
-            int previousSize = this.vertices.Length / s0;
+            int previousSize = vertices.Length / s0;
 
-            Array.Resize(ref this.vertices, size_X4);
-            Array.Resize(ref this.normals, size_X4);
-            Array.Resize(ref this.tangents, size_X4);
+            Array.Resize(ref vertices, size_X4);
+            Array.Resize(ref normals, size_X4);
+            Array.Resize(ref tangents, size_X4);
 
-            Array.Resize(ref this.uvs0, size_X4);
-            Array.Resize(ref this.uvs2, size_X4);
+            Array.Resize(ref uvs0, size_X4);
+            Array.Resize(ref uvs2, size_X4);
 
-            Array.Resize(ref this.colors32, size_X4);
+            Array.Resize(ref colors32, size_X4);
 
-            Array.Resize(ref this.triangles, size_X6);
+            Array.Resize(ref triangles, size_X6);
 
 
             if (size <= previousSize)
             {
-                this.mesh.triangles = this.triangles;
-                this.mesh.vertices = this.vertices;
-                this.mesh.normals = this.normals;
-                this.mesh.tangents = this.tangents;
+                mesh.triangles = triangles;
+                mesh.vertices = vertices;
+                mesh.normals = normals;
+                mesh.tangents = tangents;
 
                 return;
             }
@@ -328,79 +328,79 @@ namespace TMPro
                 int index_X4 = i * s0;
                 int index_X6 = i * s1;
 
-                this.normals[0 + index_X4] = s_DefaultNormal;
-                this.normals[1 + index_X4] = s_DefaultNormal;
-                this.normals[2 + index_X4] = s_DefaultNormal;
-                this.normals[3 + index_X4] = s_DefaultNormal;
+                normals[0 + index_X4] = s_DefaultNormal;
+                normals[1 + index_X4] = s_DefaultNormal;
+                normals[2 + index_X4] = s_DefaultNormal;
+                normals[3 + index_X4] = s_DefaultNormal;
 
-                this.tangents[0 + index_X4] = s_DefaultTangent;
-                this.tangents[1 + index_X4] = s_DefaultTangent;
-                this.tangents[2 + index_X4] = s_DefaultTangent;
-                this.tangents[3 + index_X4] = s_DefaultTangent;
+                tangents[0 + index_X4] = s_DefaultTangent;
+                tangents[1 + index_X4] = s_DefaultTangent;
+                tangents[2 + index_X4] = s_DefaultTangent;
+                tangents[3 + index_X4] = s_DefaultTangent;
 
                 if (isVolumetric)
                 {
-                    this.normals[4 + index_X4] = s_DefaultNormal;
-                    this.normals[5 + index_X4] = s_DefaultNormal;
-                    this.normals[6 + index_X4] = s_DefaultNormal;
-                    this.normals[7 + index_X4] = s_DefaultNormal;
+                    normals[4 + index_X4] = s_DefaultNormal;
+                    normals[5 + index_X4] = s_DefaultNormal;
+                    normals[6 + index_X4] = s_DefaultNormal;
+                    normals[7 + index_X4] = s_DefaultNormal;
 
-                    this.tangents[4 + index_X4] = s_DefaultTangent;
-                    this.tangents[5 + index_X4] = s_DefaultTangent;
-                    this.tangents[6 + index_X4] = s_DefaultTangent;
-                    this.tangents[7 + index_X4] = s_DefaultTangent;
+                    tangents[4 + index_X4] = s_DefaultTangent;
+                    tangents[5 + index_X4] = s_DefaultTangent;
+                    tangents[6 + index_X4] = s_DefaultTangent;
+                    tangents[7 + index_X4] = s_DefaultTangent;
                 }
 
-                this.triangles[0 + index_X6] = 0 + index_X4;
-                this.triangles[1 + index_X6] = 1 + index_X4;
-                this.triangles[2 + index_X6] = 2 + index_X4;
-                this.triangles[3 + index_X6] = 2 + index_X4;
-                this.triangles[4 + index_X6] = 3 + index_X4;
-                this.triangles[5 + index_X6] = 0 + index_X4;
+                triangles[0 + index_X6] = 0 + index_X4;
+                triangles[1 + index_X6] = 1 + index_X4;
+                triangles[2 + index_X6] = 2 + index_X4;
+                triangles[3 + index_X6] = 2 + index_X4;
+                triangles[4 + index_X6] = 3 + index_X4;
+                triangles[5 + index_X6] = 0 + index_X4;
 
                 if (isVolumetric)
                 {
-                    this.triangles[index_X6 + 6] = index_X4 + 4;
-                    this.triangles[index_X6 + 7] = index_X4 + 5;
-                    this.triangles[index_X6 + 8] = index_X4 + 1;
-                    this.triangles[index_X6 + 9] = index_X4 + 1;
-                    this.triangles[index_X6 + 10] = index_X4 + 0;
-                    this.triangles[index_X6 + 11] = index_X4 + 4;
+                    triangles[index_X6 + 6] = index_X4 + 4;
+                    triangles[index_X6 + 7] = index_X4 + 5;
+                    triangles[index_X6 + 8] = index_X4 + 1;
+                    triangles[index_X6 + 9] = index_X4 + 1;
+                    triangles[index_X6 + 10] = index_X4 + 0;
+                    triangles[index_X6 + 11] = index_X4 + 4;
 
-                    this.triangles[index_X6 + 12] = index_X4 + 3;
-                    this.triangles[index_X6 + 13] = index_X4 + 2;
-                    this.triangles[index_X6 + 14] = index_X4 + 6;
-                    this.triangles[index_X6 + 15] = index_X4 + 6;
-                    this.triangles[index_X6 + 16] = index_X4 + 7;
-                    this.triangles[index_X6 + 17] = index_X4 + 3;
+                    triangles[index_X6 + 12] = index_X4 + 3;
+                    triangles[index_X6 + 13] = index_X4 + 2;
+                    triangles[index_X6 + 14] = index_X4 + 6;
+                    triangles[index_X6 + 15] = index_X4 + 6;
+                    triangles[index_X6 + 16] = index_X4 + 7;
+                    triangles[index_X6 + 17] = index_X4 + 3;
 
-                    this.triangles[index_X6 + 18] = index_X4 + 1;
-                    this.triangles[index_X6 + 19] = index_X4 + 5;
-                    this.triangles[index_X6 + 20] = index_X4 + 6;
-                    this.triangles[index_X6 + 21] = index_X4 + 6;
-                    this.triangles[index_X6 + 22] = index_X4 + 2;
-                    this.triangles[index_X6 + 23] = index_X4 + 1;
+                    triangles[index_X6 + 18] = index_X4 + 1;
+                    triangles[index_X6 + 19] = index_X4 + 5;
+                    triangles[index_X6 + 20] = index_X4 + 6;
+                    triangles[index_X6 + 21] = index_X4 + 6;
+                    triangles[index_X6 + 22] = index_X4 + 2;
+                    triangles[index_X6 + 23] = index_X4 + 1;
 
-                    this.triangles[index_X6 + 24] = index_X4 + 4;
-                    this.triangles[index_X6 + 25] = index_X4 + 0;
-                    this.triangles[index_X6 + 26] = index_X4 + 3;
-                    this.triangles[index_X6 + 27] = index_X4 + 3;
-                    this.triangles[index_X6 + 28] = index_X4 + 7;
-                    this.triangles[index_X6 + 29] = index_X4 + 4;
+                    triangles[index_X6 + 24] = index_X4 + 4;
+                    triangles[index_X6 + 25] = index_X4 + 0;
+                    triangles[index_X6 + 26] = index_X4 + 3;
+                    triangles[index_X6 + 27] = index_X4 + 3;
+                    triangles[index_X6 + 28] = index_X4 + 7;
+                    triangles[index_X6 + 29] = index_X4 + 4;
 
-                    this.triangles[index_X6 + 30] = index_X4 + 7;
-                    this.triangles[index_X6 + 31] = index_X4 + 6;
-                    this.triangles[index_X6 + 32] = index_X4 + 5;
-                    this.triangles[index_X6 + 33] = index_X4 + 5;
-                    this.triangles[index_X6 + 34] = index_X4 + 4;
-                    this.triangles[index_X6 + 35] = index_X4 + 7;
+                    triangles[index_X6 + 30] = index_X4 + 7;
+                    triangles[index_X6 + 31] = index_X4 + 6;
+                    triangles[index_X6 + 32] = index_X4 + 5;
+                    triangles[index_X6 + 33] = index_X4 + 5;
+                    triangles[index_X6 + 34] = index_X4 + 4;
+                    triangles[index_X6 + 35] = index_X4 + 7;
                 }
             }
 
-            this.mesh.vertices = this.vertices;
-            this.mesh.normals = this.normals;
-            this.mesh.tangents = this.tangents;
-            this.mesh.triangles = this.triangles;
+            mesh.vertices = vertices;
+            mesh.normals = normals;
+            mesh.tangents = tangents;
+            mesh.triangles = triangles;
         }
 
 
@@ -409,13 +409,13 @@ namespace TMPro
         /// </summary>
         public void Clear()
         {
-            if (this.vertices == null) return;
+            if (vertices == null) return;
 
-            Array.Clear(this.vertices, 0, this.vertices.Length);
-            this.vertexCount = 0;
+            Array.Clear(vertices, 0, vertices.Length);
+            vertexCount = 0;
 
-            if (this.mesh != null)
-                this.mesh.vertices = this.vertices;
+            if (mesh != null)
+                mesh.vertices = vertices;
         }
 
 
@@ -424,16 +424,16 @@ namespace TMPro
         /// </summary>
         public void Clear(bool uploadChanges)
         {
-            if (this.vertices == null) return;
+            if (vertices == null) return;
 
-            Array.Clear(this.vertices, 0, this.vertices.Length);
-            this.vertexCount = 0;
+            Array.Clear(vertices, 0, vertices.Length);
+            vertexCount = 0;
 
-            if (uploadChanges && this.mesh != null)
-                this.mesh.vertices = this.vertices;
+            if (uploadChanges && mesh != null)
+                mesh.vertices = vertices;
 
-            if (this.mesh != null)
-                this.mesh.bounds = s_DefaultBounds;
+            if (mesh != null)
+                mesh.bounds = s_DefaultBounds;
         }
 
 
@@ -455,10 +455,10 @@ namespace TMPro
         /// <param name="startIndex"></param>
         public void ClearUnusedVertices(int startIndex)
         {
-            int length = this.vertices.Length - startIndex;
+            int length = vertices.Length - startIndex;
 
             if (length > 0)
-                Array.Clear(this.vertices, startIndex, length);
+                Array.Clear(vertices, startIndex, length);
         }
 
 
@@ -468,13 +468,13 @@ namespace TMPro
         /// <param name="startIndex"></param>
         public void ClearUnusedVertices(int startIndex, bool updateMesh)
         {
-            int length = this.vertices.Length - startIndex;
+            int length = vertices.Length - startIndex;
 
             if (length > 0)
-                Array.Clear(this.vertices, startIndex, length);
+                Array.Clear(vertices, startIndex, length);
 
             if (updateMesh && mesh != null)
-                this.mesh.vertices = this.vertices;
+                mesh.vertices = vertices;
         }
 
 

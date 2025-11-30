@@ -183,8 +183,8 @@ namespace TMPro
             m_StartIndex = startIndex;
             m_Length = length;
 
-            m_CharacterElement = new CharacterElement();
-            m_MarkupElement = new MarkupElement();
+            m_CharacterElement = new();
+            m_MarkupElement = new();
         }
 
         public TextProcessingElement(TMP_TextElement textElement, int startIndex, int length)
@@ -193,8 +193,8 @@ namespace TMPro
             m_StartIndex = startIndex;
             m_Length = length;
 
-            m_CharacterElement = new CharacterElement(textElement);
-            m_MarkupElement = new MarkupElement();
+            m_CharacterElement = new(textElement);
+            m_MarkupElement = new();
         }
 
         public TextProcessingElement(CharacterElement characterElement, int startIndex, int length)
@@ -204,7 +204,7 @@ namespace TMPro
             m_Length = length;
 
             m_CharacterElement = characterElement;
-            m_MarkupElement = new MarkupElement();
+            m_MarkupElement = new();
         }
 
         public TextProcessingElement(MarkupElement markupElement)
@@ -213,11 +213,11 @@ namespace TMPro
             m_StartIndex = markupElement.ValueStartIndex;
             m_Length = markupElement.ValueLength;
 
-            m_CharacterElement = new CharacterElement();
+            m_CharacterElement = new();
             m_MarkupElement = markupElement;
         }
 
-        public static TextProcessingElement Undefined => new TextProcessingElement() { ElementType = TextProcessingElementType.Undefined };
+        public static TextProcessingElement Undefined => new() { ElementType = TextProcessingElementType.Undefined };
 
 
         private string DebuggerDisplay()

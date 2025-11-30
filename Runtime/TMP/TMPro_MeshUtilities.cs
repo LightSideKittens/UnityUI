@@ -33,10 +33,10 @@ namespace TMPro
 
         public VertexGradient (Color color)
         {
-            this.topLeft = color;
-            this.topRight = color;
-            this.bottomLeft = color;
-            this.bottomRight = color;
+            topLeft = color;
+            topRight = color;
+            bottomLeft = color;
+            bottomRight = color;
         }
 
         /// <summary>
@@ -48,10 +48,10 @@ namespace TMPro
         /// <param name="color3">Bottom right color.</param>
         public VertexGradient(Color color0, Color color1, Color color2, Color color3)
         {
-            this.topLeft = color0;
-            this.topRight = color1;
-            this.bottomLeft = color2;
-            this.bottomRight = color3;
+            topLeft = color0;
+            topRight = color1;
+            bottomLeft = color2;
+            bottomRight = color3;
         }
     }
 
@@ -128,7 +128,7 @@ namespace TMPro
             if (textComponent == null)
                 return string.Empty;
 
-            return new string(linkID, 0, linkIdLength);
+            return new(linkID, 0, linkIdLength);
         }
     }
 
@@ -173,8 +173,8 @@ namespace TMPro
 
     public struct Extents
     {
-        internal static Extents zero = new Extents(Vector2.zero, Vector2.zero);
-        internal static Extents uninitialized = new Extents(new Vector2(32767, 32767), new Vector2(-32767, -32767));
+        internal static Extents zero = new(Vector2.zero, Vector2.zero);
+        internal static Extents uninitialized = new(new(32767, 32767), new(-32767, -32767));
 
         public Vector2 min;
         public Vector2 max;

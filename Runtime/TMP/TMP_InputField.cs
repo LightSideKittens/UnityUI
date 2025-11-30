@@ -96,10 +96,10 @@ namespace TMPro
         static private readonly char[] kSeparators = { ' ', '.', ',', '\t', '\r', '\n' };
 
     #if UNITY_ANDROID
-        static private bool s_IsQuestDeviceEvaluated = false;
+        static private bool s_IsQuestDeviceEvaluated;
     #endif
 
-        static private bool s_IsQuestDevice = false;
+        static private bool s_IsQuestDevice;
 
         #region Exposed properties
         /// <summary>
@@ -129,7 +129,7 @@ namespace TMPro
         [SerializeField]
         protected TMP_ScrollbarEventHandler m_VerticalScrollbarEventHandler;
 
-        private bool m_IsDrivenByLayoutComponents = false;
+        private bool m_IsDrivenByLayoutComponents;
         [SerializeField]
         private LayoutGroup m_LayoutGroup;
 
@@ -174,13 +174,13 @@ namespace TMPro
         /// Should hide mobile input field part of the virtual keyboard.
         /// </summary>
         [SerializeField]
-        private bool m_HideMobileInput = false;
+        private bool m_HideMobileInput;
 
         /// <summary>
         /// Should hide soft / virtual keyboard.
         /// </summary>
         [SerializeField]
-        private bool m_HideSoftKeyboard = false;
+        private bool m_HideSoftKeyboard;
 
         /// <summary>
         /// What kind of validation to use with the input field's data.
@@ -204,55 +204,55 @@ namespace TMPro
         /// Maximum number of characters allowed before input no longer works.
         /// </summary>
         [SerializeField]
-        private int m_CharacterLimit = 0;
+        private int m_CharacterLimit;
 
         /// <summary>
         /// Event delegates triggered when the input field submits its data.
         /// </summary>
         [SerializeField]
-        private SubmitEvent m_OnEndEdit = new SubmitEvent();
+        private SubmitEvent m_OnEndEdit = new();
 
         /// <summary>
         /// Event delegates triggered when the input field submits its data.
         /// </summary>
         [SerializeField]
-        private SubmitEvent m_OnSubmit = new SubmitEvent();
+        private SubmitEvent m_OnSubmit = new();
 
         /// <summary>
         /// Event delegates triggered when the input field is focused.
         /// </summary>
         [SerializeField]
-        private SelectionEvent m_OnSelect = new SelectionEvent();
+        private SelectionEvent m_OnSelect = new();
 
         /// <summary>
         /// Event delegates triggered when the input field focus is lost.
         /// </summary>
         [SerializeField]
-        private SelectionEvent m_OnDeselect = new SelectionEvent();
+        private SelectionEvent m_OnDeselect = new();
 
         /// <summary>
         /// Event delegates triggered when the text is selected / highlighted.
         /// </summary>
         [SerializeField]
-        private TextSelectionEvent m_OnTextSelection = new TextSelectionEvent();
+        private TextSelectionEvent m_OnTextSelection = new();
 
         /// <summary>
         /// Event delegates triggered when text is no longer select / highlighted.
         /// </summary>
         [SerializeField]
-        private TextSelectionEvent m_OnEndTextSelection = new TextSelectionEvent();
+        private TextSelectionEvent m_OnEndTextSelection = new();
 
         /// <summary>
         /// Event delegates triggered when the input field changes its data.
         /// </summary>
         [SerializeField]
-        private OnChangeEvent m_OnValueChanged = new OnChangeEvent();
+        private OnChangeEvent m_OnValueChanged = new();
 
         /// <summary>
         /// Event delegates triggered when the status of the TouchScreenKeyboard changes.
         /// </summary>
         [SerializeField]
-        private TouchScreenKeyboardEvent m_OnTouchScreenKeyboardStatusChanged = new TouchScreenKeyboardEvent();
+        private TouchScreenKeyboardEvent m_OnTouchScreenKeyboardStatusChanged = new();
 
         /// <summary>
         /// Custom validation callback.
@@ -261,13 +261,13 @@ namespace TMPro
         private OnValidateInput m_OnValidateInput;
 
         [SerializeField]
-        private Color m_CaretColor = new Color(50f / 255f, 50f / 255f, 50f / 255f, 1f);
+        private Color m_CaretColor = new(50f / 255f, 50f / 255f, 50f / 255f, 1f);
 
         [SerializeField]
-        private bool m_CustomCaretColor = false;
+        private bool m_CustomCaretColor;
 
         [SerializeField]
-        private Color m_SelectionColor = new Color(168f / 255f, 206f / 255f, 255f / 255f, 192f / 255f);
+        private Color m_SelectionColor = new(168f / 255f, 206f / 255f, 255f / 255f, 192f / 255f);
 
         /// <summary>
         /// Input field's value.
@@ -286,51 +286,51 @@ namespace TMPro
         private int m_CaretWidth = 1;
 
         [SerializeField]
-        private bool m_ReadOnly = false;
+        private bool m_ReadOnly;
 
         [SerializeField]
         private bool m_RichText = true;
 
         #endregion
 
-        protected int m_StringPosition = 0;
-        protected int m_StringSelectPosition = 0;
-        protected int m_CaretPosition = 0;
-        protected int m_CaretSelectPosition = 0;
+        protected int m_StringPosition;
+        protected int m_StringSelectPosition;
+        protected int m_CaretPosition;
+        protected int m_CaretSelectPosition;
 
-        private RectTransform caretRectTrans = null;
-        protected UIVertex[] m_CursorVerts = null;
+        private RectTransform caretRectTrans;
+        protected UIVertex[] m_CursorVerts;
         private CanvasRenderer m_CachedInputRenderer;
         private Vector2 m_LastPosition;
 
         [NonSerialized]
         protected Mesh m_Mesh;
-        private bool m_AllowInput = false;
-        private bool m_ShouldActivateNextUpdate = false;
-        private bool m_UpdateDrag = false;
-        private bool m_DragPositionOutOfBounds = false;
+        private bool m_AllowInput;
+        private bool m_ShouldActivateNextUpdate;
+        private bool m_UpdateDrag;
+        private bool m_DragPositionOutOfBounds;
         private const float kHScrollSpeed = 0.05f;
         private const float kVScrollSpeed = 0.10f;
         protected bool m_CaretVisible;
-        private Coroutine m_BlinkCoroutine = null;
-        private float m_BlinkStartTime = 0.0f;
-        private Coroutine m_DragCoroutine = null;
+        private Coroutine m_BlinkCoroutine;
+        private float m_BlinkStartTime;
+        private Coroutine m_DragCoroutine;
         private string m_OriginalText = "";
-        private bool m_WasCanceled = false;
-        private bool m_HasDoneFocusTransition = false;
+        private bool m_WasCanceled;
+        private bool m_HasDoneFocusTransition;
         private WaitForSecondsRealtime m_WaitForSecondsRealtime;
-        private bool m_PreventCallback = false;
+        private bool m_PreventCallback;
 
-        private bool m_TouchKeyboardAllowsInPlaceEditing = false;
+        private bool m_TouchKeyboardAllowsInPlaceEditing;
 
-        private bool m_IsTextComponentUpdateRequired = false;
+        private bool m_IsTextComponentUpdateRequired;
 
-        private bool m_HasTextBeenRemoved = false;
+        private bool m_HasTextBeenRemoved;
         private float m_PointerDownClickStartTime;
         private float m_KeyDownStartTime;
         private float m_DoubleClickDelay = 0.5f;
 
-        private bool m_IsApplePlatform = false;
+        private bool m_IsApplePlatform;
 
         private const string kEmailSpecialCharacters = "!#$%&'*+-/=?^_`{|}~";
         private const string kOculusQuestDeviceModel = "Oculus Quest";
@@ -349,9 +349,9 @@ namespace TMPro
         {
             get { return inputSystem != null ? inputSystem.compositionString : Input.compositionString; }
         }
-        private bool m_IsCompositionActive = false;
-        private bool m_ShouldUpdateIMEWindowPosition = false;
-        private int m_PreviousIMEInsertionLine = 0;
+        private bool m_IsCompositionActive;
+        private bool m_ShouldUpdateIMEWindowPosition;
+        private int m_PreviousIMEInsertionLine;
 
         private int compositionLength
         {
@@ -376,7 +376,7 @@ namespace TMPro
             get
             {
                 if (m_Mesh == null)
-                    m_Mesh = new Mesh();
+                    m_Mesh = new();
                 return m_Mesh;
             }
         }
@@ -596,7 +596,7 @@ namespace TMPro
 
         private void SetText(string value, bool sendCallback = true)
         {
-            if (this.text == value)
+            if (text == value)
                 return;
 
             if (value == null)
@@ -782,8 +782,8 @@ namespace TMPro
         }
         [SerializeField]
         protected bool m_ResetOnDeActivation = true;
-        private bool m_SelectionStillActive = false;
-        private bool m_ReleaseSelection = false;
+        private bool m_SelectionStillActive;
+        private bool m_ReleaseSelection;
         private KeyCode m_LastKeyCode;
 
         private GameObject m_PreviouslySelectedObject;
@@ -820,7 +820,7 @@ namespace TMPro
             set { m_isRichTextEditingAllowed = value; }
         }
         [SerializeField]
-        protected bool m_isRichTextEditingAllowed = false;
+        protected bool m_isRichTextEditingAllowed;
 
 
         public ContentType contentType { get { return m_ContentType; } set { if (SetPropertyUtility.SetStruct(ref m_ContentType, value)) EnforceContentType(); } }
@@ -854,7 +854,7 @@ namespace TMPro
             }
         }
         [SerializeField]
-        protected int m_LineLimit = 0;
+        protected int m_LineLimit;
 
         /// <summary>
         /// The type of input expected. See InputField.InputType.
@@ -898,7 +898,7 @@ namespace TMPro
             set {  if (SetPropertyUtility.SetClass(ref m_InputValidator, value)) SetToCustom(CharacterValidation.CustomValidator); }
         }
         [SerializeField]
-        protected TMP_InputValidator m_InputValidator = null;
+        protected TMP_InputValidator m_InputValidator;
 
         public bool readOnly { get { return m_ReadOnly; } set { m_ReadOnly = value; } }
 
@@ -954,7 +954,7 @@ namespace TMPro
         private bool m_IsCaretPositionDirty;
         private bool m_forceRectTransformAdjustment;
 
-        private bool m_IsKeyboardBeingClosedInHoloLens = false;
+        private bool m_IsKeyboardBeingClosedInHoloLens;
 
         /// <summary>
         /// Get: Returns the focus position as thats the position that moves around even during selection.
@@ -1116,7 +1116,7 @@ namespace TMPro
             {
                 if (m_CachedInputRenderer == null && m_TextComponent != null)
                 {
-                    GameObject go = new GameObject("Caret", typeof(TMP_SelectionCaret));
+                    GameObject go = new("Caret", typeof(TMP_SelectionCaret));
 
                     go.hideFlags = HideFlags.DontSave;
                     go.transform.SetParent(m_TextComponent.transform.parent);
@@ -1482,7 +1482,7 @@ namespace TMPro
             {
                 var selectionStart = Mathf.Min(stringSelectPositionInternal, stringPositionInternal);
                 var selectionLength = Mathf.Abs(stringSelectPositionInternal - stringPositionInternal);
-                m_SoftKeyboard.selection = new RangeInt(selectionStart, selectionLength);
+                m_SoftKeyboard.selection = new(selectionStart, selectionLength);
             }
         }
 
@@ -1549,7 +1549,7 @@ namespace TMPro
                     return;
                 }
 
-                if (selectedObject != null && selectedObject != this.gameObject)
+                if (selectedObject != null && selectedObject != gameObject)
                 {
                     if (selectedObject == m_PreviouslySelectedObject)
                         return;
@@ -1717,7 +1717,7 @@ namespace TMPro
             {
                 var selectionStart = Mathf.Min(stringSelectPositionInternal, stringPositionInternal);
                 var selectionLength = Mathf.Abs(stringSelectPositionInternal - stringPositionInternal);
-                m_SoftKeyboard.selection = new RangeInt(selectionStart, selectionLength);
+                m_SoftKeyboard.selection = new(selectionStart, selectionLength);
             }
             else if (m_HideMobileInput && Application.platform == RuntimePlatform.Android ||
                      m_SoftKeyboard.canSetSelection && (Application.platform == RuntimePlatform.IPhonePlayer || Application.platform == RuntimePlatform.tvOS))
@@ -1831,7 +1831,7 @@ namespace TMPro
                 float delay = multiLine ? kVScrollSpeed : kHScrollSpeed;
 
                 if (m_WaitForSecondsRealtime == null)
-                    m_WaitForSecondsRealtime = new WaitForSecondsRealtime(delay);
+                    m_WaitForSecondsRealtime = new(delay);
                 else
                     m_WaitForSecondsRealtime.waitTime = delay;
 
@@ -2180,7 +2180,7 @@ namespace TMPro
         /// <summary>
         /// Handle the specified event.
         /// </summary>
-        private Event m_ProcessingEvent = new Event();
+        private Event m_ProcessingEvent = new();
 
         public void ProcessEvent(Event e)
         {
@@ -3248,7 +3248,7 @@ namespace TMPro
 
                 string processed;
                 if (inputType == InputType.Password)
-                    processed = new string(asteriskChar, fullText.Length);
+                    processed = new(asteriskChar, fullText.Length);
                 else
                     processed = fullText;
 
@@ -3365,7 +3365,7 @@ namespace TMPro
                     break;
             }
 
-            m_TextComponent.rectTransform.anchoredPosition = new Vector2(m_TextComponent.rectTransform.anchoredPosition.x, (textHeight - m_TextViewport.rect.height) * (relativePosition - verticalAlignmentOffset));
+            m_TextComponent.rectTransform.anchoredPosition = new(m_TextComponent.rectTransform.anchoredPosition.x, (textHeight - m_TextViewport.rect.height) * (relativePosition - verticalAlignmentOffset));
 
             AssignPositioningIfNeeded();
         }
@@ -3576,9 +3576,9 @@ namespace TMPro
                 height = currentCharacter.ascender - currentCharacter.descender;
 
                 if (m_TextComponent.verticalAlignment == VerticalAlignmentOptions.Geometry)
-                    startPosition = new Vector2(currentCharacter.origin, 0 - height / 2);
+                    startPosition = new(currentCharacter.origin, 0 - height / 2);
                 else
-                    startPosition = new Vector2(currentCharacter.origin, currentCharacter.descender);
+                    startPosition = new(currentCharacter.origin, currentCharacter.descender);
             }
             else
             {
@@ -3586,9 +3586,9 @@ namespace TMPro
                 height = currentCharacter.ascender - currentCharacter.descender;
 
                 if (m_TextComponent.verticalAlignment == VerticalAlignmentOptions.Geometry)
-                    startPosition = new Vector2(currentCharacter.xAdvance, 0 - height / 2);
+                    startPosition = new(currentCharacter.xAdvance, 0 - height / 2);
                 else
-                    startPosition = new Vector2(currentCharacter.xAdvance, currentCharacter.descender);
+                    startPosition = new(currentCharacter.xAdvance, currentCharacter.descender);
 
             }
 
@@ -3603,7 +3603,7 @@ namespace TMPro
                 if (selectionStart > softKeyboardStringLength)
                     selectionStart = softKeyboardStringLength;
 
-                m_SoftKeyboard.selection = new RangeInt(selectionStart, 0);
+                m_SoftKeyboard.selection = new(selectionStart, 0);
             }
 
             if (isFocused && startPosition != m_LastPosition || m_forceRectTransformAdjustment || m_HasTextBeenRemoved)
@@ -3619,10 +3619,10 @@ namespace TMPro
             float width = m_CaretWidth * fontAsset.faceInfo.lineHeight * baseScale * 0.05f;
             width = Mathf.Max(width, 1.0f);
 
-            m_CursorVerts[0].position = new Vector3(startPosition.x, bottom, 0.0f);
-            m_CursorVerts[1].position = new Vector3(startPosition.x, top, 0.0f);
-            m_CursorVerts[2].position = new Vector3(startPosition.x + width, top, 0.0f);
-            m_CursorVerts[3].position = new Vector3(startPosition.x + width, bottom, 0.0f);
+            m_CursorVerts[0].position = new(startPosition.x, bottom, 0.0f);
+            m_CursorVerts[1].position = new(startPosition.x, top, 0.0f);
+            m_CursorVerts[2].position = new(startPosition.x + width, top, 0.0f);
+            m_CursorVerts[3].position = new(startPosition.x + width, bottom, 0.0f);
 
             m_CursorVerts[0].color = caretColor;
             m_CursorVerts[1].color = caretColor;
@@ -3685,19 +3685,19 @@ namespace TMPro
             {
                 int stringPosition = m_CaretPosition < m_CaretSelectPosition ? textInfo.characterInfo[m_CaretPosition].index : textInfo.characterInfo[m_CaretSelectPosition].index;
                 int length = m_CaretPosition < m_CaretSelectPosition ? stringSelectPositionInternal - stringPosition : stringPositionInternal - stringPosition;
-                m_SoftKeyboard.selection = new RangeInt(stringPosition, length);
+                m_SoftKeyboard.selection = new(stringPosition, length);
             }
 
             Vector2 caretPosition;
             float height = 0;
             if (m_CaretSelectPosition < textInfo.characterCount)
             {
-                caretPosition = new Vector2(textInfo.characterInfo[m_CaretSelectPosition].origin, textInfo.characterInfo[m_CaretSelectPosition].descender);
+                caretPosition = new(textInfo.characterInfo[m_CaretSelectPosition].origin, textInfo.characterInfo[m_CaretSelectPosition].descender);
                 height = textInfo.characterInfo[m_CaretSelectPosition].ascender - textInfo.characterInfo[m_CaretSelectPosition].descender;
             }
             else
             {
-                caretPosition = new Vector2(textInfo.characterInfo[m_CaretSelectPosition - 1].xAdvance, textInfo.characterInfo[m_CaretSelectPosition - 1].descender);
+                caretPosition = new(textInfo.characterInfo[m_CaretSelectPosition - 1].xAdvance, textInfo.characterInfo[m_CaretSelectPosition - 1].descender);
                 height = textInfo.characterInfo[m_CaretSelectPosition - 1].ascender - textInfo.characterInfo[m_CaretSelectPosition - 1].descender;
             }
 
@@ -3734,20 +3734,20 @@ namespace TMPro
                     if (currentChar > 0 && endCharInfo.character == '\n' && textInfo.characterInfo[currentChar - 1].character == '\r')
                         endCharInfo = textInfo.characterInfo[currentChar - 1];
 
-                    Vector2 startPosition = new Vector2(startCharInfo.origin, textInfo.lineInfo[currentLineIndex].ascender);
-                    Vector2 endPosition = new Vector2(endCharInfo.xAdvance, textInfo.lineInfo[currentLineIndex].descender);
+                    Vector2 startPosition = new(startCharInfo.origin, textInfo.lineInfo[currentLineIndex].ascender);
+                    Vector2 endPosition = new(endCharInfo.xAdvance, textInfo.lineInfo[currentLineIndex].descender);
 
                     var startIndex = vbo.currentVertCount;
-                    vert.position = new Vector3(startPosition.x, endPosition.y, 0.0f);
+                    vert.position = new(startPosition.x, endPosition.y, 0.0f);
                     vbo.AddVert(vert);
 
-                    vert.position = new Vector3(endPosition.x, endPosition.y, 0.0f);
+                    vert.position = new(endPosition.x, endPosition.y, 0.0f);
                     vbo.AddVert(vert);
 
-                    vert.position = new Vector3(endPosition.x, startPosition.y, 0.0f);
+                    vert.position = new(endPosition.x, startPosition.y, 0.0f);
                     vbo.AddVert(vert);
 
-                    vert.position = new Vector3(startPosition.x, startPosition.y, 0.0f);
+                    vert.position = new(startPosition.x, startPosition.y, 0.0f);
                     vbo.AddVert(vert);
 
                     vbo.AddTriangle(startIndex, startIndex + 1, startIndex + 2);
@@ -3780,8 +3780,8 @@ namespace TMPro
             Vector3 textViewportLocalPosition = m_TextViewport.localPosition;
             Rect textViewportRect = m_TextViewport.rect;
 
-            Vector2 caretPosition = new Vector2(startPosition.x + textComponentLocalPosition.x + textViewportLocalPosition.x + localPosition.x, startPosition.y + textComponentLocalPosition.y + textViewportLocalPosition.y + localPosition.y);
-            Rect viewportWSRect = new Rect(localPosition.x + textViewportLocalPosition.x + textViewportRect.x, localPosition.y + textViewportLocalPosition.y + textViewportRect.y, textViewportRect.width, textViewportRect.height);
+            Vector2 caretPosition = new(startPosition.x + textComponentLocalPosition.x + textViewportLocalPosition.x + localPosition.x, startPosition.y + textComponentLocalPosition.y + textViewportLocalPosition.y + localPosition.y);
+            Rect viewportWSRect = new(localPosition.x + textViewportLocalPosition.x + textViewportRect.x, localPosition.y + textViewportLocalPosition.y + textViewportRect.y, textViewportRect.width, textViewportRect.height);
 
             float rightOffset = viewportWSRect.xMax - (caretPosition.x + m_TextComponent.margin.z + m_CaretWidth);
             if (rightOffset < 0f)
@@ -4008,7 +4008,7 @@ namespace TMPro
                     if (m_SoftKeyboard != null && m_SoftKeyboard.canSetSelection)
                     {
                         int length = stringPositionInternal < stringSelectPositionInternal ? stringSelectPositionInternal - stringPositionInternal : stringPositionInternal - stringSelectPositionInternal;
-                        m_SoftKeyboard.selection = new RangeInt(stringPositionInternal < stringSelectPositionInternal ? stringPositionInternal : stringSelectPositionInternal, length);
+                        m_SoftKeyboard.selection = new(stringPositionInternal < stringSelectPositionInternal ? stringPositionInternal : stringSelectPositionInternal, length);
                     }
                 }
             }

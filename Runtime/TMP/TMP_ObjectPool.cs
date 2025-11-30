@@ -8,7 +8,7 @@ namespace TMPro
 
     internal class TMP_ObjectPool<T> where T : new()
     {
-        private readonly Stack<T> m_Stack = new Stack<T>();
+        private readonly Stack<T> m_Stack = new();
         private readonly UnityAction<T> m_ActionOnGet;
         private readonly UnityAction<T> m_ActionOnRelease;
 
@@ -27,7 +27,7 @@ namespace TMPro
             T element;
             if (m_Stack.Count == 0)
             {
-                element = new T();
+                element = new();
                 countAll++;
             }
             else

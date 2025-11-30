@@ -12,8 +12,8 @@ namespace TMPro
     [Serializable]
     public class TMP_TextInfo
     {
-        internal static Vector2 k_InfinityVectorPositive = new Vector2(32767, 32767);
-        internal static Vector2 k_InfinityVectorNegative = new Vector2(-32767, -32767);
+        internal static Vector2 k_InfinityVectorPositive = new(32767, 32767);
+        internal static Vector2 k_InfinityVectorNegative = new(-32767, -32767);
 
         public TMP_Text textComponent;
 
@@ -87,9 +87,9 @@ namespace TMPro
             lineCount = 0;
             spriteCount = 0;
 
-            for (int i = 0; i < this.meshInfo.Length; i++)
+            for (int i = 0; i < meshInfo.Length; i++)
             {
-                this.meshInfo[i].vertexCount = 0;
+                meshInfo[i].vertexCount = 0;
             }
         }
 
@@ -106,15 +106,15 @@ namespace TMPro
             lineCount = 0;
             spriteCount = 0;
 
-            this.characterInfo = new TMP_CharacterInfo[4];
-            this.wordInfo = new TMP_WordInfo[1];
-            this.lineInfo = new TMP_LineInfo[1];
-            this.pageInfo = new TMP_PageInfo[1];
-            this.linkInfo = Array.Empty<TMP_LinkInfo>();
+            characterInfo = new TMP_CharacterInfo[4];
+            wordInfo = new TMP_WordInfo[1];
+            lineInfo = new TMP_LineInfo[1];
+            pageInfo = new TMP_PageInfo[1];
+            linkInfo = Array.Empty<TMP_LinkInfo>();
 
             materialCount = 0;
 
-            this.meshInfo = new TMP_MeshInfo[1];
+            meshInfo = new TMP_MeshInfo[1];
         }
 
 
@@ -123,8 +123,8 @@ namespace TMPro
         /// </summary>
         public void ClearMeshInfo(bool updateMesh)
         {
-            for (int i = 0; i < this.meshInfo.Length; i++)
-                this.meshInfo[i].Clear(updateMesh);
+            for (int i = 0; i < meshInfo.Length; i++)
+                meshInfo[i].Clear(updateMesh);
         }
 
 
@@ -133,8 +133,8 @@ namespace TMPro
         /// </summary>
         public void ClearAllMeshInfo()
         {
-            for (int i = 0; i < this.meshInfo.Length; i++)
-                this.meshInfo[i].Clear(true);
+            for (int i = 0; i < meshInfo.Length; i++)
+                meshInfo[i].Clear(true);
         }
 
 
@@ -143,8 +143,8 @@ namespace TMPro
         /// </summary>
         public void ResetVertexLayout(bool isVolumetric)
         {
-            for (int i = 0; i < this.meshInfo.Length; i++)
-                this.meshInfo[i].ResizeMeshInfo(0, isVolumetric);
+            for (int i = 0; i < meshInfo.Length; i++)
+                meshInfo[i].ResizeMeshInfo(0, isVolumetric);
         }
 
 
@@ -167,49 +167,49 @@ namespace TMPro
         /// </summary>
         internal void ClearLineInfo()
         {
-            if (this.lineInfo == null)
-                this.lineInfo = new TMP_LineInfo[1];
+            if (lineInfo == null)
+                lineInfo = new TMP_LineInfo[1];
 
-            int length = this.lineInfo.Length;
+            int length = lineInfo.Length;
 
             for (int i = 0; i < length; i++)
             {
-                this.lineInfo[i].characterCount = 0;
-                this.lineInfo[i].spaceCount = 0;
-                this.lineInfo[i].wordCount = 0;
-                this.lineInfo[i].controlCharacterCount = 0;
+                lineInfo[i].characterCount = 0;
+                lineInfo[i].spaceCount = 0;
+                lineInfo[i].wordCount = 0;
+                lineInfo[i].controlCharacterCount = 0;
 
-                this.lineInfo[i].visibleCharacterCount = 0;
-                this.lineInfo[i].visibleSpaceCount = 0;
+                lineInfo[i].visibleCharacterCount = 0;
+                lineInfo[i].visibleSpaceCount = 0;
 
-                this.lineInfo[i].ascender = k_InfinityVectorNegative.x;
-                this.lineInfo[i].baseline = 0;
-                this.lineInfo[i].descender = k_InfinityVectorPositive.x;
-                this.lineInfo[i].maxAdvance = 0;
+                lineInfo[i].ascender = k_InfinityVectorNegative.x;
+                lineInfo[i].baseline = 0;
+                lineInfo[i].descender = k_InfinityVectorPositive.x;
+                lineInfo[i].maxAdvance = 0;
 
-                this.lineInfo[i].marginLeft = 0;
-                this.lineInfo[i].marginRight = 0;
+                lineInfo[i].marginLeft = 0;
+                lineInfo[i].marginRight = 0;
 
-                this.lineInfo[i].lineExtents.min = k_InfinityVectorPositive;
-                this.lineInfo[i].lineExtents.max = k_InfinityVectorNegative;
-                this.lineInfo[i].width = 0;
+                lineInfo[i].lineExtents.min = k_InfinityVectorPositive;
+                lineInfo[i].lineExtents.max = k_InfinityVectorNegative;
+                lineInfo[i].width = 0;
             }
         }
 
         internal void ClearPageInfo()
         {
-            if (this.pageInfo == null)
-                this.pageInfo = new TMP_PageInfo[2];
+            if (pageInfo == null)
+                pageInfo = new TMP_PageInfo[2];
 
-            int length = this.pageInfo.Length;
+            int length = pageInfo.Length;
 
             for (int i = 0; i < length; i++)
             {
-                this.pageInfo[i].firstCharacterIndex = 0;
-                this.pageInfo[i].lastCharacterIndex = 0;
-                this.pageInfo[i].ascender = -32767;
-                this.pageInfo[i].baseLine = 0;
-                this.pageInfo[i].descender = 32767;
+                pageInfo[i].firstCharacterIndex = 0;
+                pageInfo[i].lastCharacterIndex = 0;
+                pageInfo[i].ascender = -32767;
+                pageInfo[i].baseLine = 0;
+                pageInfo[i].descender = 32767;
             }
         }
 

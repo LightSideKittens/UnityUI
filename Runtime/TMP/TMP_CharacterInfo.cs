@@ -14,7 +14,7 @@ namespace TMPro
 
         public static TMP_Vertex zero { get { return k_Zero; } }
 
-        private static readonly TMP_Vertex k_Zero = new TMP_Vertex();
+        private static readonly TMP_Vertex k_Zero = new();
     }
 
     /// <summary>
@@ -44,7 +44,7 @@ namespace TMPro
         private float m_Top;
         private float m_Bottom;
 
-        private static readonly TMP_Offset k_ZeroOffset = new TMP_Offset(0F, 0F, 0F, 0F);
+        private static readonly TMP_Offset k_ZeroOffset = new(0F, 0F, 0F, 0F);
 
         /// <summary>
         ///
@@ -89,7 +89,7 @@ namespace TMPro
 
         public static TMP_Offset operator *(TMP_Offset a, float b)
         {
-            return new TMP_Offset(a.m_Left * b, a.m_Right * b, a.m_Top * b, a.m_Bottom * b);
+            return new(a.m_Left * b, a.m_Right * b, a.m_Top * b, a.m_Bottom * b);
         }
     }
 

@@ -7,7 +7,7 @@ namespace TMPro
 {
     internal class TMP_DynamicFontAssetUtilities
     {
-        private static TMP_DynamicFontAssetUtilities s_Instance = new TMP_DynamicFontAssetUtilities();
+        private static TMP_DynamicFontAssetUtilities s_Instance = new();
 
         private Dictionary<ulong, FontReference> s_SystemFontLookup;
         private string[] s_SystemFontPaths;
@@ -52,7 +52,7 @@ namespace TMPro
                         if (isSeparator)
                         {
                             readingFlag = 1;
-                            this.familyName = new string(conversionArray, 0, writingIndex);
+                            familyName = new(conversionArray, 0, writingIndex);
                             i += 2;
                             writingIndex = 0;
                             continue;
@@ -69,7 +69,7 @@ namespace TMPro
                         conversionArray[writingIndex++] = c;
 
                         if (i + 1 == length)
-                            this.styleName = new string(conversionArray, 0, writingIndex);
+                            styleName = new(conversionArray, 0, writingIndex);
                     }
                 }
 
@@ -81,7 +81,7 @@ namespace TMPro
         private void InitializeSystemFontReferenceCache()
         {
             if (s_SystemFontLookup == null)
-                s_SystemFontLookup = new Dictionary<ulong, FontReference>();
+                s_SystemFontLookup = new();
             else
                 s_SystemFontLookup.Clear();
 
@@ -101,7 +101,7 @@ namespace TMPro
 
                 for (int j = 0; j < fontFaces.Length; j++)
                 {
-                    FontReference fontRef = new FontReference(s_SystemFontPaths[i], fontFaces[j], j);
+                    FontReference fontRef = new(s_SystemFontPaths[i], fontFaces[j], j);
 
                     if (s_SystemFontLookup.ContainsKey(fontRef.hashCode))
                     {
@@ -146,7 +146,7 @@ namespace TMPro
             if (s_SystemFontLookup == null)
                 InitializeSystemFontReferenceCache();
 
-            fontRef = new FontReference();
+            fontRef = new();
 
             uint familyNameHashCode = TMP_TextUtilities.GetHashCodeCaseInSensitive(familyName);
             uint styleNameHashCode = string.IsNullOrEmpty(styleName) ? s_RegularStyleNameHashCode : TMP_TextUtilities.GetHashCodeCaseInSensitive(styleName);

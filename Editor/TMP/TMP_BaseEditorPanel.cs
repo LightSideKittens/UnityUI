@@ -156,8 +156,6 @@ namespace TMPro.EditorUtilities
         protected SerializedProperty m_GeometrySortingOrderProp;
         protected SerializedProperty m_IsTextObjectScaleStaticProp;
 
-        protected SerializedProperty m_EmojiFallbackSupportProp;
-
         protected SerializedProperty m_SpriteAssetProp;
 
         protected SerializedProperty m_StyleSheetAssetProp;
@@ -231,8 +229,6 @@ namespace TMPro.EditorUtilities
 
             m_GeometrySortingOrderProp = serializedObject.FindProperty("m_geometrySortingOrder");
             m_IsTextObjectScaleStaticProp = serializedObject.FindProperty("m_IsTextObjectScaleStatic");
-
-            m_EmojiFallbackSupportProp = serializedObject.FindProperty("m_EmojiFallbackSupport");
 
             m_SpriteAssetProp = serializedObject.FindProperty("m_spriteAsset");
 
@@ -1056,15 +1052,6 @@ namespace TMPro.EditorUtilities
                 m_HavePropertiesChanged = true;
 
             EditorGUILayout.Space();
-        }
-
-        protected void DrawEmojiFallbackSupport()
-        {
-            EditorGUI.BeginChangeCheck();
-
-            EditorGUILayout.PropertyField(m_EmojiFallbackSupportProp, k_EmojiFallbackSupportLabel);
-            if (EditorGUI.EndChangeCheck())
-                m_HavePropertiesChanged = true;
         }
 
         protected void DrawSpriteAsset()

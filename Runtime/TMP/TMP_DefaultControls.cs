@@ -26,12 +26,12 @@ namespace TMPro
         private const float kWidth = 160f;
         private const float kThickHeight = 30f;
         private const float kThinHeight = 20f;
-        private static Vector2 s_TextElementSize = new Vector2(100f, 100f);
-        private static Vector2 s_ThickElementSize = new Vector2(kWidth, kThickHeight);
-        private static Vector2 s_ThinElementSize = new Vector2(kWidth, kThinHeight);
+        private static Vector2 s_TextElementSize = new(100f, 100f);
+        private static Vector2 s_ThickElementSize = new(kWidth, kThickHeight);
+        private static Vector2 s_ThinElementSize = new(kWidth, kThinHeight);
 
-        private static Color s_DefaultSelectableColor = new Color(1f, 1f, 1f, 1f);
-        private static Color s_TextColor = new Color(50f / 255f, 50f / 255f, 50f / 255f, 1f);
+        private static Color s_DefaultSelectableColor = new(1f, 1f, 1f, 1f);
+        private static Color s_TextColor = new(50f / 255f, 50f / 255f, 50f / 255f, 1f);
 
 
         private static GameObject CreateUIElementRoot(string name, Vector2 size)
@@ -73,9 +73,9 @@ namespace TMPro
         private static void SetDefaultColorTransitionValues(Selectable slider)
         {
             ColorBlock colors = slider.colors;
-            colors.highlightedColor = new Color(0.882f, 0.882f, 0.882f);
-            colors.pressedColor = new Color(0.698f, 0.698f, 0.698f);
-            colors.disabledColor = new Color(0.521f, 0.521f, 0.521f);
+            colors.highlightedColor = new(0.882f, 0.882f, 0.882f);
+            colors.pressedColor = new(0.698f, 0.698f, 0.698f);
+            colors.disabledColor = new(0.521f, 0.521f, 0.521f);
         }
 
         private static void SetParentAndAlign(GameObject child, GameObject parent)
@@ -117,12 +117,12 @@ namespace TMPro
             handleImage.color = s_DefaultSelectableColor;
 
             RectTransform sliderAreaRect = sliderArea.GetComponent<RectTransform>();
-            sliderAreaRect.sizeDelta = new Vector2(-20, -20);
+            sliderAreaRect.sizeDelta = new(-20, -20);
             sliderAreaRect.anchorMin = Vector2.zero;
             sliderAreaRect.anchorMax = Vector2.one;
 
             RectTransform handleRect = handle.GetComponent<RectTransform>();
-            handleRect.sizeDelta = new Vector2(20, 20);
+            handleRect.sizeDelta = new(20, 20);
 
             Scrollbar scrollbar = AddComponent<Scrollbar>(scrollbarRoot);
             scrollbar.handleRect = handleRect;
@@ -198,14 +198,14 @@ namespace TMPro
             SetDefaultColorTransitionValues(inputField);
 
             RectMask2D rectMask = AddComponent<RectMask2D>(textArea);
-            rectMask.padding = new Vector4(-8, -5, -8, -5);
+            rectMask.padding = new(-8, -5, -8, -5);
 
             RectTransform textAreaRectTransform = textArea.GetComponent<RectTransform>();
             textAreaRectTransform.anchorMin = Vector2.zero;
             textAreaRectTransform.anchorMax = Vector2.one;
             textAreaRectTransform.sizeDelta = Vector2.zero;
-            textAreaRectTransform.offsetMin = new Vector2(10, 6);
-            textAreaRectTransform.offsetMax = new Vector2(-10, -7);
+            textAreaRectTransform.offsetMin = new(10, 6);
+            textAreaRectTransform.offsetMax = new(-10, -7);
 
 
             TextMeshProUGUI text = AddComponent<TextMeshProUGUI>(childText);
@@ -232,15 +232,15 @@ namespace TMPro
             textRectTransform.anchorMin = Vector2.zero;
             textRectTransform.anchorMax = Vector2.one;
             textRectTransform.sizeDelta = Vector2.zero;
-            textRectTransform.offsetMin = new Vector2(0, 0);
-            textRectTransform.offsetMax = new Vector2(0, 0);
+            textRectTransform.offsetMin = new(0, 0);
+            textRectTransform.offsetMax = new(0, 0);
 
             RectTransform placeholderRectTransform = childPlaceholder.GetComponent<RectTransform>();
             placeholderRectTransform.anchorMin = Vector2.zero;
             placeholderRectTransform.anchorMax = Vector2.one;
             placeholderRectTransform.sizeDelta = Vector2.zero;
-            placeholderRectTransform.offsetMin = new Vector2(0, 0);
-            placeholderRectTransform.offsetMax = new Vector2(0, 0);
+            placeholderRectTransform.offsetMin = new(0, 0);
+            placeholderRectTransform.offsetMax = new(0, 0);
 
             inputField.textViewport = textAreaRectTransform;
             inputField.textComponent = text;
@@ -275,7 +275,7 @@ namespace TMPro
             vScrollbarRT.anchorMin = Vector2.right;
             vScrollbarRT.anchorMax = Vector2.one;
             vScrollbarRT.pivot = Vector2.one;
-            vScrollbarRT.sizeDelta = new Vector2(vScrollbarRT.sizeDelta.x, 0);
+            vScrollbarRT.sizeDelta = new(vScrollbarRT.sizeDelta.x, 0);
 
             TextMeshProUGUI itemLabelText = AddComponent<TextMeshProUGUI>(itemLabel);
             SetDefaultTextValues(itemLabelText);
@@ -332,47 +332,47 @@ namespace TMPro
             dropdown.itemText = itemLabelText;
 
             itemLabelText.text = "Option A";
-            dropdown.options.Add(new TMP_Dropdown.OptionData {text = "Option A" });
-            dropdown.options.Add(new TMP_Dropdown.OptionData {text = "Option B" });
-            dropdown.options.Add(new TMP_Dropdown.OptionData {text = "Option C" });
+            dropdown.options.Add(new() {text = "Option A" });
+            dropdown.options.Add(new() {text = "Option B" });
+            dropdown.options.Add(new() {text = "Option C" });
             dropdown.RefreshShownValue();
 
             RectTransform labelRT = label.GetComponent<RectTransform>();
             labelRT.anchorMin = Vector2.zero;
             labelRT.anchorMax = Vector2.one;
-            labelRT.offsetMin = new Vector2(10, 6);
-            labelRT.offsetMax = new Vector2(-25, -7);
+            labelRT.offsetMin = new(10, 6);
+            labelRT.offsetMax = new(-25, -7);
 
             RectTransform arrowRT = arrow.GetComponent<RectTransform>();
-            arrowRT.anchorMin = new Vector2(1, 0.5f);
-            arrowRT.anchorMax = new Vector2(1, 0.5f);
-            arrowRT.sizeDelta = new Vector2(20, 20);
-            arrowRT.anchoredPosition = new Vector2(-15, 0);
+            arrowRT.anchorMin = new(1, 0.5f);
+            arrowRT.anchorMax = new(1, 0.5f);
+            arrowRT.sizeDelta = new(20, 20);
+            arrowRT.anchoredPosition = new(-15, 0);
 
             RectTransform templateRT = template.GetComponent<RectTransform>();
-            templateRT.anchorMin = new Vector2(0, 0);
-            templateRT.anchorMax = new Vector2(1, 0);
-            templateRT.pivot = new Vector2(0.5f, 1);
-            templateRT.anchoredPosition = new Vector2(0, 2);
-            templateRT.sizeDelta = new Vector2(0, 150);
+            templateRT.anchorMin = new(0, 0);
+            templateRT.anchorMax = new(1, 0);
+            templateRT.pivot = new(0.5f, 1);
+            templateRT.anchoredPosition = new(0, 2);
+            templateRT.sizeDelta = new(0, 150);
 
             RectTransform viewportRT = viewport.GetComponent<RectTransform>();
-            viewportRT.anchorMin = new Vector2(0, 0);
-            viewportRT.anchorMax = new Vector2(1, 1);
-            viewportRT.sizeDelta = new Vector2(-18, 0);
-            viewportRT.pivot = new Vector2(0, 1);
+            viewportRT.anchorMin = new(0, 0);
+            viewportRT.anchorMax = new(1, 1);
+            viewportRT.sizeDelta = new(-18, 0);
+            viewportRT.pivot = new(0, 1);
 
             RectTransform contentRT = content.GetComponent<RectTransform>();
-            contentRT.anchorMin = new Vector2(0f, 1);
-            contentRT.anchorMax = new Vector2(1f, 1);
-            contentRT.pivot = new Vector2(0.5f, 1);
-            contentRT.anchoredPosition = new Vector2(0, 0);
-            contentRT.sizeDelta = new Vector2(0, 28);
+            contentRT.anchorMin = new(0f, 1);
+            contentRT.anchorMax = new(1f, 1);
+            contentRT.pivot = new(0.5f, 1);
+            contentRT.anchoredPosition = new(0, 0);
+            contentRT.sizeDelta = new(0, 28);
 
             RectTransform itemRT = item.GetComponent<RectTransform>();
-            itemRT.anchorMin = new Vector2(0, 0.5f);
-            itemRT.anchorMax = new Vector2(1, 0.5f);
-            itemRT.sizeDelta = new Vector2(0, 20);
+            itemRT.anchorMin = new(0, 0.5f);
+            itemRT.anchorMax = new(1, 0.5f);
+            itemRT.sizeDelta = new(0, 20);
 
             RectTransform itemBackgroundRT = itemBackground.GetComponent<RectTransform>();
             itemBackgroundRT.anchorMin = Vector2.zero;
@@ -380,16 +380,16 @@ namespace TMPro
             itemBackgroundRT.sizeDelta = Vector2.zero;
 
             RectTransform itemCheckmarkRT = itemCheckmark.GetComponent<RectTransform>();
-            itemCheckmarkRT.anchorMin = new Vector2(0, 0.5f);
-            itemCheckmarkRT.anchorMax = new Vector2(0, 0.5f);
-            itemCheckmarkRT.sizeDelta = new Vector2(20, 20);
-            itemCheckmarkRT.anchoredPosition = new Vector2(10, 0);
+            itemCheckmarkRT.anchorMin = new(0, 0.5f);
+            itemCheckmarkRT.anchorMax = new(0, 0.5f);
+            itemCheckmarkRT.sizeDelta = new(20, 20);
+            itemCheckmarkRT.anchoredPosition = new(10, 0);
 
             RectTransform itemLabelRT = itemLabel.GetComponent<RectTransform>();
             itemLabelRT.anchorMin = Vector2.zero;
             itemLabelRT.anchorMax = Vector2.one;
-            itemLabelRT.offsetMin = new Vector2(20, 1);
-            itemLabelRT.offsetMax = new Vector2(-10, -2);
+            itemLabelRT.offsetMin = new(20, 1);
+            itemLabelRT.offsetMax = new(-10, -2);
 
             template.SetActive(false);
 

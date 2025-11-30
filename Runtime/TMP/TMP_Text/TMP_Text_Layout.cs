@@ -2,11 +2,57 @@
 using UnityEngine;
 using UnityEngine.TextCore;
 using UnityEngine.TextCore.LowLevel;
+using UnityEngine.UI;
 
 namespace TMPro
 {
     public abstract partial class TMP_Text
     {
+        public float flexibleHeight { get { return m_flexibleHeight; } }
+        protected float m_flexibleHeight = -1f;
+        public float flexibleWidth { get { return m_flexibleWidth; } }
+        protected float m_flexibleWidth = -1f;
+        public float minWidth { get { return m_minWidth; } }
+        protected float m_minWidth;
+        public float minHeight { get { return m_minHeight; } }
+        protected float m_minHeight;
+        public float maxWidth { get { return m_maxWidth; } }
+        protected float m_maxWidth;
+        public float maxHeight { get { return m_maxHeight; } }
+        protected float m_maxHeight;
+        
+        protected LayoutElement layoutElement
+        {
+            get
+            {
+                if (m_LayoutElement == null)
+                {
+                    m_LayoutElement = GetComponent<LayoutElement>();
+                }
+
+                return m_LayoutElement;
+            }
+        }
+        protected LayoutElement m_LayoutElement;
+
+        /// <summary>
+        /// Computed preferred width of the text object.
+        /// </summary>
+        public virtual float preferredWidth { get { m_preferredWidth = GetPreferredWidth(); return m_preferredWidth; } }
+        protected float m_preferredWidth;
+        protected float m_RenderedWidth;
+        protected bool m_isPreferredWidthDirty;
+
+        /// <summary>
+        /// Computed preferred height of the text object.
+        /// </summary>
+        public virtual float preferredHeight { get { m_preferredHeight = GetPreferredHeight(); return m_preferredHeight; } }
+        protected float m_preferredHeight;
+        protected float m_RenderedHeight;
+        protected bool m_isPreferredHeightDirty;
+
+        protected bool m_isCalculatingPreferredValues;
+        
         /// <summary>
         /// Function to Calculate the Preferred Width and Height of the text object.
         /// </summary>
@@ -22,7 +68,7 @@ namespace TMPro
             m_isPreferredWidthDirty = true;
             m_isPreferredHeightDirty = true;
 
-            return new Vector2(preferredWidth, preferredHeight);
+            return new(preferredWidth, preferredHeight);
         }
 
         /// <summary>
@@ -34,55 +80,13 @@ namespace TMPro
             m_isCalculatingPreferredValues = true;
             ParseInputText();
 
-            Vector2 margin = new Vector2(width, height);
+            Vector2 margin = new(width, height);
 
             float preferredWidth = GetPreferredWidth(margin);
 
             float preferredHeight = GetPreferredHeight(margin);
 
-            return new Vector2(preferredWidth, preferredHeight);
-        }
-
-        /// <summary>
-        /// Function to Calculate the Preferred Width and Height of the text object given a certain string.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        public Vector2 GetPreferredValues(string text)
-        {
-            m_isCalculatingPreferredValues = true;
-
-            SetTextInternal(text);
-            SetArraySizes(m_TextProcessingArray);
-
-            Vector2 margin = k_LargePositiveVector2;
-
-            float preferredWidth = GetPreferredWidth(margin);
-
-            float preferredHeight = GetPreferredHeight(margin);
-
-            return new Vector2(preferredWidth, preferredHeight);
-        }
-
-        /// <summary>
-        ///  Function to Calculate the Preferred Width and Height of the text object given a certain string and size of text container.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        public Vector2 GetPreferredValues(string text, float width, float height)
-        {
-            m_isCalculatingPreferredValues = true;
-
-            SetTextInternal(text);
-            SetArraySizes(m_TextProcessingArray);
-
-            Vector2 margin = new Vector2(width, height);
-
-            float preferredWidth = GetPreferredWidth(margin, m_TextWrappingMode);
-
-            float preferredHeight = GetPreferredHeight(margin);
-
-            return new Vector2(preferredWidth, preferredHeight);
+            return new(preferredWidth, preferredHeight);
         }
 
         /// <summary>
@@ -168,7 +172,7 @@ namespace TMPro
             m_maxFontSize = m_fontSizeMax;
             m_charWidthAdjDelta = 0;
 
-            Vector2 margin = new Vector2(m_marginWidth != 0 ? m_marginWidth : k_LargePositiveFloat,
+            Vector2 margin = new(m_marginWidth != 0 ? m_marginWidth : k_LargePositiveFloat,
                 k_LargePositiveFloat);
 
             m_isCalculatingPreferredValues = true;
@@ -300,7 +304,7 @@ namespace TMPro
             m_currentFontAsset = m_fontAsset;
             m_currentMaterial = m_sharedMaterial;
             m_currentMaterialIndex = 0;
-            m_materialReferenceStack.SetDefault(new MaterialReference(0, m_currentFontAsset, null, m_currentMaterial,
+            m_materialReferenceStack.SetDefault(new(0, m_currentFontAsset, null, m_currentMaterial,
                 m_padding));
 
             int totalCharacterCount = m_totalCharacterCount;
@@ -379,12 +383,12 @@ namespace TMPro
             m_isNonBreakingSpace = false;
             bool ignoreNonBreakingSpace = false;
 
-            CharacterSubstitution characterToSubstitute = new CharacterSubstitution(-1, 0);
+            CharacterSubstitution characterToSubstitute = new(-1, 0);
             bool isSoftHyphenIgnored = false;
 
-            WordWrapState internalWordWrapState = new WordWrapState();
-            WordWrapState internalLineState = new WordWrapState();
-            WordWrapState internalSoftLineBreak = new WordWrapState();
+            WordWrapState internalWordWrapState = new();
+            WordWrapState internalLineState = new();
+            WordWrapState internalSoftLineBreak = new();
 
             m_AutoSizeIterationCount += 1;
 
@@ -606,7 +610,7 @@ namespace TMPro
 
                 #region Handle Kerning
 
-                GlyphValueRecord glyphAdjustments = new GlyphValueRecord();
+                GlyphValueRecord glyphAdjustments = new();
                 float characterSpacingAdjustment = m_characterSpacing;
                 if (m_enableKerning && m_textElementType == TMP_TextElementType.Character)
                 {
@@ -759,12 +763,6 @@ namespace TMPro
                 elementDescentLine += glyphAdjustments.yPlacement;
 
                 #endregion
-
-
-                #region Handle Right-to-Left
-
-                #endregion
-
 
                 #region Handle Mono Spacing
 
@@ -1264,7 +1262,7 @@ namespace TMPro
             m_RenderedWidth = (int)(m_RenderedWidth * 100 + 1f) / 100f;
             m_RenderedHeight = (int)(m_RenderedHeight * 100 + 1f) / 100f;
 
-            return new Vector2(m_RenderedWidth, m_RenderedHeight);
+            return new(m_RenderedWidth, m_RenderedHeight);
         }
 
         /// <summary>
@@ -1273,7 +1271,7 @@ namespace TMPro
         /// <returns></returns>
         protected virtual Bounds GetCompoundBounds()
         {
-            return new Bounds();
+            return new();
         }
 
         /// <summary>
@@ -1282,9 +1280,9 @@ namespace TMPro
         /// <returns></returns>
         protected Bounds GetTextBounds()
         {
-            if (m_textInfo == null || m_textInfo.characterCount > m_textInfo.characterInfo.Length) return new Bounds();
+            if (m_textInfo == null || m_textInfo.characterCount > m_textInfo.characterInfo.Length) return new();
 
-            Extents extent = new Extents(k_LargePositiveVector2, k_LargeNegativeVector2);
+            Extents extent = new(k_LargePositiveVector2, k_LargeNegativeVector2);
 
             for (int i = 0; i < m_textInfo.characterCount && i < m_textInfo.characterInfo.Length; i++)
             {
@@ -1304,7 +1302,7 @@ namespace TMPro
 
             Vector3 center = (extent.min + extent.max) / 2;
 
-            return new Bounds(center, size);
+            return new(center, size);
         }
 
         /// <summary>
@@ -1314,9 +1312,9 @@ namespace TMPro
         /// <returns></returns>
         protected Bounds GetTextBounds(bool onlyVisibleCharacters)
         {
-            if (m_textInfo == null) return new Bounds();
+            if (m_textInfo == null) return new();
 
-            Extents extent = new Extents(k_LargePositiveVector2, k_LargeNegativeVector2);
+            Extents extent = new(k_LargePositiveVector2, k_LargeNegativeVector2);
 
             for (int i = 0; i < m_textInfo.characterCount; i++)
             {
@@ -1340,7 +1338,7 @@ namespace TMPro
 
             Vector2 center = (extent.min + extent.max) / 2;
 
-            return new Bounds(center, size);
+            return new(center, size);
         }
 
         /// <summary>
@@ -1351,7 +1349,7 @@ namespace TMPro
         /// <param name="offset"></param>
         protected void AdjustLineOffset(int startIndex, int endIndex, float offset)
         {
-            Vector3 vertexOffset = new Vector3(0, offset, 0);
+            Vector3 vertexOffset = new(0, offset, 0);
 
             for (int i = startIndex; i <= endIndex; i++)
             {
@@ -1400,8 +1398,8 @@ namespace TMPro
             m_textInfo.lineInfo = temp_lineInfo;
         }
 
-        protected static Vector2 k_LargePositiveVector2 = new Vector2(TMP_Math.INT_MAX, TMP_Math.INT_MAX);
-        protected static Vector2 k_LargeNegativeVector2 = new Vector2(TMP_Math.INT_MIN, TMP_Math.INT_MIN);
+        protected static Vector2 k_LargePositiveVector2 = new(TMP_Math.INT_MAX, TMP_Math.INT_MAX);
+        protected static Vector2 k_LargeNegativeVector2 = new(TMP_Math.INT_MIN, TMP_Math.INT_MIN);
         protected static float k_LargePositiveFloat = TMP_Math.FLOAT_MAX;
         protected static float k_LargeNegativeFloat = TMP_Math.FLOAT_MIN;
 

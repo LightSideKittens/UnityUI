@@ -44,8 +44,8 @@ namespace TMPro
         {
             get
             {
-                if (this.sharedMaterial != null)
-                    return this.sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex);
+                if (sharedMaterial != null)
+                    return sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex);
 
                 return null;
             }
@@ -166,7 +166,7 @@ namespace TMPro
             {
                 if (m_mesh == null)
                 {
-                    m_mesh = new Mesh();
+                    m_mesh = new();
                     m_mesh.hideFlags = HideFlags.HideAndDontSave;
                 }
 
@@ -210,7 +210,7 @@ namespace TMPro
         /// <returns></returns>
         public static TMP_SubMeshUI AddSubTextObject(TextMeshProUGUI textComponent, MaterialReference materialReference)
         {
-            GameObject go = new GameObject();
+            GameObject go = new();
             go.hideFlags = TMP_Settings.hideSubTextObjects ? HideFlags.HideAndDontSave : HideFlags.DontSave;
 
             go.transform.SetParent(textComponent.transform, false);
@@ -404,7 +404,7 @@ namespace TMPro
             }
         }
 
-        private void ON_SPRITE_ASSET_PROPERTY_CHANGED(bool isChanged, UnityEngine.Object obj)
+        private void ON_SPRITE_ASSET_PROPERTY_CHANGED(bool isChanged, Object obj)
         {
             if (m_TextComponent != null)
             {
@@ -440,7 +440,7 @@ namespace TMPro
         /// </summary>
         protected override void OnTransformParentChanged()
         {
-            if (!this.IsActive())
+            if (!IsActive())
                 return;
 
             m_ShouldRecalculateStencil = true;
@@ -556,10 +556,10 @@ namespace TMPro
         /// </summary>
         public void SetPivotDirty()
         {
-            if (!this.IsActive())
+            if (!IsActive())
                 return;
 
-            this.rectTransform.pivot = m_TextComponent.rectTransform.pivot;
+            rectTransform.pivot = m_TextComponent.rectTransform.pivot;
         }
 
         private Transform GetRootCanvasTransform()
@@ -685,7 +685,7 @@ namespace TMPro
         /// <returns></returns>
         private Material CreateMaterialInstance(Material source)
         {
-            Material mat = new Material(source);
+            Material mat = new(source);
             mat.shaderKeywords = source.shaderKeywords;
             mat.name += " (Instance)";
 

@@ -203,22 +203,20 @@ namespace UnityEngine.UI
             }
         }
 
-        [NonSerialized] private RectTransform m_RectTransform;
-        [NonSerialized] private CanvasRenderer m_CanvasRenderer;
-        [NonSerialized] private Canvas m_Canvas;
+        private RectTransform m_RectTransform;
+        private CanvasRenderer m_CanvasRenderer;
+        private Canvas m_Canvas;
 
-        [NonSerialized] private bool m_VertsDirty;
-        [NonSerialized] private bool m_MaterialDirty;
+        private bool m_VertsDirty;
+        private bool m_MaterialDirty;
 
-        [NonSerialized] protected UnityAction m_OnDirtyLayoutCallback;
-        [NonSerialized] protected UnityAction m_OnDirtyVertsCallback;
-        [NonSerialized] protected UnityAction m_OnDirtyMaterialCallback;
+        protected UnityAction m_OnDirtyLayoutCallback;
+        protected UnityAction m_OnDirtyVertsCallback;
+        protected UnityAction m_OnDirtyMaterialCallback;
 
-        [NonSerialized] protected static Mesh s_Mesh;
-        [NonSerialized] private static readonly VertexHelper s_VertexHelper = new VertexHelper();
-
-        [NonSerialized] protected Mesh m_CachedMesh;
-        [NonSerialized] protected Vector2[] m_CachedUvs;
+        protected static Mesh s_Mesh;
+        private static readonly VertexHelper s_VertexHelper = new VertexHelper();
+        protected Mesh m_CachedMesh;
         // Tween controls for the Graphic
         [NonSerialized]
         private readonly TweenRunner<ColorTween> m_ColorTweenRunner;
@@ -293,6 +291,7 @@ namespace UnityEngine.UI
                 return;
 
             m_VertsDirty = true;
+            Debug.Log("SetVerticesDirty");
             CanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
 
             if (m_OnDirtyVertsCallback != null)

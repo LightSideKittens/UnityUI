@@ -133,7 +133,7 @@ namespace TMPro
         internal TMP_GlyphAdjustmentRecord(GlyphAdjustmentRecord adjustmentRecord)
         {
             m_GlyphIndex = adjustmentRecord.glyphIndex;
-            m_GlyphValueRecord = new TMP_GlyphValueRecord(adjustmentRecord.glyphValueRecord);
+            m_GlyphValueRecord = new(adjustmentRecord.glyphValueRecord);
         }
     }
 
@@ -186,8 +186,8 @@ namespace TMPro
         /// <param name="secondAdjustmentRecord"></param>
         internal TMP_GlyphPairAdjustmentRecord(GlyphPairAdjustmentRecord glyphPairAdjustmentRecord)
         {
-            m_FirstAdjustmentRecord = new TMP_GlyphAdjustmentRecord(glyphPairAdjustmentRecord.firstAdjustmentRecord);
-            m_SecondAdjustmentRecord = new TMP_GlyphAdjustmentRecord(glyphPairAdjustmentRecord.secondAdjustmentRecord);
+            m_FirstAdjustmentRecord = new(glyphPairAdjustmentRecord.firstAdjustmentRecord);
+            m_SecondAdjustmentRecord = new(glyphPairAdjustmentRecord.secondAdjustmentRecord);
             m_FeatureLookupFlags = FontFeatureLookupFlags.None;
         }
     }

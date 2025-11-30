@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -9,10 +8,8 @@ using UnityEngine.TextCore;
 using UnityEngine.TextCore.LowLevel;
 using Object = UnityEngine.Object;
 
-
 #pragma warning disable 0414
 #pragma warning disable 0618
-
 
 namespace TMPro
 {
@@ -31,10 +28,7 @@ namespace TMPro
         /// <summary>
         /// Get the material that will be used for rendering.
         /// </summary>
-        public override Material materialForRendering
-        {
-            get { return TMP_MaterialManager.GetMaterialForRendering(this, m_sharedMaterial); }
-        }
+        public override Material materialForRendering => TMP_MaterialManager.GetMaterialForRendering(this, m_sharedMaterial);
 
 
         /// <summary>
@@ -42,7 +36,7 @@ namespace TMPro
         /// </summary>
         public override bool autoSizeTextContainer
         {
-            get { return m_autoSizeTextContainer; }
+            get => m_autoSizeTextContainer;
 
             set { if (m_autoSizeTextContainer == value) return; m_autoSizeTextContainer = value; if (m_autoSizeTextContainer) { CanvasUpdateRegistry.RegisterCanvasElementForLayoutRebuild(this); SetLayoutDirty(); } }
         }
@@ -51,10 +45,7 @@ namespace TMPro
         /// <summary>
         /// Reference to the Mesh used by the text object.
         /// </summary>
-        public override Mesh mesh
-        {
-            get { return m_mesh; }
-        }
+        public override Mesh mesh => m_mesh;
 
 
         /// <summary>
@@ -69,16 +60,6 @@ namespace TMPro
                 return m_canvasRenderer;
             }
         }
-
-
-        /// <summary>
-        /// Anchor dampening prevents the anchor position from being adjusted unless the positional change exceeds about 40% of the width of the underline character. This essentially stabilizes the anchor position.
-        /// </summary>
-
-#if !UNITY_2019_3_OR_NEWER
-        [SerializeField]
-        private bool m_Maskable = true;
-        #endif
 
         private bool m_isRebuildingLayout = false;
         private Coroutine m_DelayedGraphicRebuild;
@@ -102,7 +83,7 @@ namespace TMPro
 
         public override void SetVerticesDirty()
         {
-            if (this == null || !this.IsActive())
+            if (this == null || !IsActive())
                 return;
 
             if (CanvasUpdateRegistry.IsRebuildingGraphics())
@@ -123,10 +104,10 @@ namespace TMPro
             m_isPreferredWidthDirty = true;
             m_isPreferredHeightDirty = true;
 
-            if (this == null || !this.IsActive())
+            if (this == null || !IsActive())
                 return;
 
-            LayoutRebuilder.MarkLayoutForRebuild(this.rectTransform);
+            LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
 
             m_isLayoutDirty = true;
 
@@ -140,7 +121,7 @@ namespace TMPro
         /// </summary>
         public override void SetMaterialDirty()
         {
-            if (this == null || !this.IsActive())
+            if (this == null || !IsActive())
                 return;
 
             if (CanvasUpdateRegistry.IsRebuildingGraphics())
@@ -163,42 +144,6 @@ namespace TMPro
             SetVerticesDirty();
             SetMaterialDirty();
         }
-
-
-        /// <summary>
-        /// Delay registration of text object for graphic rebuild by one frame.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator DelayedGraphicRebuild()
-        {
-            yield return null;
-
-            CanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
-
-            if (m_OnDirtyVertsCallback != null)
-                m_OnDirtyVertsCallback();
-
-            m_DelayedGraphicRebuild = null;
-        }
-
-
-        /// <summary>
-        /// Delay registration of text object for graphic rebuild by one frame.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator DelayedMaterialRebuild()
-        {
-            yield return null;
-
-            m_isMaterialDirty = true;
-            CanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
-
-            if (m_OnDirtyMaterialCallback != null)
-                m_OnDirtyMaterialCallback();
-
-            m_DelayedMaterialRebuild = null;
-        }
-
 
         /// <summary>
         ///
@@ -281,17 +226,8 @@ namespace TMPro
         /// </summary>
         public Vector4 maskOffset
         {
-            get { return m_maskOffset; }
+            get => m_maskOffset;
             set { m_maskOffset = value; UpdateMask(); _havePropertiesChanged = true; }
-        }
-
-
-        /// <summary>
-        /// Method called when the state of a parent changes.
-        /// </summary>
-        public override void RecalculateClipping()
-        {
-            base.RecalculateClipping();
         }
 
 
@@ -434,32 +370,6 @@ namespace TMPro
             OnPreRenderCanvas();
         }
 
-
-        /// <summary>
-        /// Function used to evaluate the length of a text string.
-        /// </summary>
-        /// <param name="text"></param>
-        /// <returns></returns>
-        public override TMP_TextInfo GetTextInfo(string text)
-        {
-            SetText(text);
-            SetArraySizes(m_TextProcessingArray);
-
-            var lastRenderMode = m_renderMode;
-            m_renderMode = TextRenderFlags.DontRender;
-
-            ComputeMarginSize();
-
-            if (m_canvas == null) m_canvas = this.canvas;
-
-            GenerateTextMesh();
-
-            m_renderMode = lastRenderMode;
-
-            return this.textInfo;
-        }
-
-
         /// <summary>
         /// Function to clear the geometry of the Primary and Sub Text objects.
         /// </summary>
@@ -498,89 +408,14 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to upload the updated vertex data and renderer.
-        /// </summary>
-        public override void UpdateVertexData(TMP_VertexDataUpdateFlags flags)
-        {
-            int materialCount = m_textInfo.materialCount;
-
-            for (int i = 0; i < materialCount; i++)
-            {
-                Mesh mesh;
-
-                if (i == 0)
-                    mesh = m_mesh;
-                else
-                {
-                    mesh = m_subTextObjects[i].mesh;
-                }
-
-                if ((flags & TMP_VertexDataUpdateFlags.Vertices) == TMP_VertexDataUpdateFlags.Vertices)
-                    mesh.vertices = m_textInfo.meshInfo[i].vertices;
-
-                if ((flags & TMP_VertexDataUpdateFlags.Uv0) == TMP_VertexDataUpdateFlags.Uv0)
-                    mesh.SetUVs(0, m_textInfo.meshInfo[i].uvs0);
-
-                if ((flags & TMP_VertexDataUpdateFlags.Uv2) == TMP_VertexDataUpdateFlags.Uv2)
-                    mesh.uv2 = m_textInfo.meshInfo[i].uvs2;
-
-                if ((flags & TMP_VertexDataUpdateFlags.Colors32) == TMP_VertexDataUpdateFlags.Colors32)
-                    mesh.colors32 = m_textInfo.meshInfo[i].colors32;
-
-                mesh.RecalculateBounds();
-
-                if (i == 0)
-                    m_canvasRenderer.SetMesh(mesh);
-                else
-                    m_subTextObjects[i].canvasRenderer.SetMesh(mesh);
-            }
-        }
-
-
-        /// <summary>
-        /// Function to upload the updated vertex data and renderer.
-        /// </summary>
-        public override void UpdateVertexData()
-        {
-            int materialCount = m_textInfo.materialCount;
-
-            for (int i = 0; i < materialCount; i++)
-            {
-                Mesh mesh;
-
-                if (i == 0)
-                    mesh = m_mesh;
-                else
-                {
-                    m_textInfo.meshInfo[i].ClearUnusedVertices();
-
-                    mesh = m_subTextObjects[i].mesh;
-                }
-
-                mesh.vertices = m_textInfo.meshInfo[i].vertices;
-                mesh.SetUVs(0, m_textInfo.meshInfo[i].uvs0);
-                mesh.uv2 = m_textInfo.meshInfo[i].uvs2;
-                mesh.colors32 = m_textInfo.meshInfo[i].colors32;
-
-                mesh.RecalculateBounds();
-
-                if (i == 0)
-                    m_canvasRenderer.SetMesh(mesh);
-                else
-                    m_subTextObjects[i].canvasRenderer.SetMesh(mesh);
-            }
-        }
-
-
         public void UpdateFontAsset()
         {
             LoadFontAsset();
         }
 
         #region TMPro_UGUI_Private
-                [SerializeField]
-        private bool m_hasFontAssetChanged = false;
+        [SerializeField]
+        private bool m_hasFontAssetChanged;
 
         protected TMP_SubMeshUI[] m_subTextObjects = new TMP_SubMeshUI[8];
 
@@ -590,8 +425,7 @@ namespace TMPro
         private CanvasRenderer m_canvasRenderer;
         private Canvas m_canvas;
         private float m_CanvasScaleFactor;
-
-
+        
         private bool m_isFirstAllocation;
 
         private int m_max_characters = 8;
@@ -604,32 +438,32 @@ namespace TMPro
         [SerializeField]
         private Vector4 m_maskOffset;
 
-        private Matrix4x4 m_EnvMapMatrix = new Matrix4x4();
+        private Matrix4x4 m_EnvMapMatrix;
 
 
         [NonSerialized]
         private bool m_isRegisteredForEvents;
 
-        private static ProfilerMarker k_GenerateTextMarker = new ProfilerMarker("TMP.GenerateText");
-        private static ProfilerMarker k_SetArraySizesMarker = new ProfilerMarker("TMP.SetArraySizes");
-        private static ProfilerMarker k_GenerateTextPhaseIMarker = new ProfilerMarker("TMP GenerateText - Phase I");
-        private static ProfilerMarker k_ParseMarkupTextMarker = new ProfilerMarker("TMP Parse Markup Text");
-        private static ProfilerMarker k_CharacterLookupMarker = new ProfilerMarker("TMP Lookup Character & Glyph Data");
-        private static ProfilerMarker k_HandleGPOSFeaturesMarker = new ProfilerMarker("TMP Handle GPOS Features");
-        private static ProfilerMarker k_CalculateVerticesPositionMarker = new ProfilerMarker("TMP Calculate Vertices Position");
-        private static ProfilerMarker k_ComputeTextMetricsMarker = new ProfilerMarker("TMP Compute Text Metrics");
-        private static ProfilerMarker k_HandleVisibleCharacterMarker = new ProfilerMarker("TMP Handle Visible Character");
-        private static ProfilerMarker k_HandleWhiteSpacesMarker = new ProfilerMarker("TMP Handle White Space & Control Character");
-        private static ProfilerMarker k_HandleHorizontalLineBreakingMarker = new ProfilerMarker("TMP Handle Horizontal Line Breaking");
-        private static ProfilerMarker k_HandleVerticalLineBreakingMarker = new ProfilerMarker("TMP Handle Vertical Line Breaking");
-        private static ProfilerMarker k_SaveGlyphVertexDataMarker = new ProfilerMarker("TMP Save Glyph Vertex Data");
-        private static ProfilerMarker k_ComputeCharacterAdvanceMarker = new ProfilerMarker("TMP Compute Character Advance");
-        private static ProfilerMarker k_HandleCarriageReturnMarker = new ProfilerMarker("TMP Handle Carriage Return");
-        private static ProfilerMarker k_HandleLineTerminationMarker = new ProfilerMarker("TMP Handle Line Termination");
-        private static ProfilerMarker k_SaveTextExtentMarker = new ProfilerMarker("TMP Save Text Extent");
-        private static ProfilerMarker k_SaveProcessingStatesMarker = new ProfilerMarker("TMP Save Processing States");
-        private static ProfilerMarker k_GenerateTextPhaseIIMarker = new ProfilerMarker("TMP GenerateText - Phase II");
-        private static ProfilerMarker k_GenerateTextPhaseIIIMarker = new ProfilerMarker("TMP GenerateText - Phase III");
+        private static ProfilerMarker k_GenerateTextMarker = new("TMP.GenerateText");
+        private static ProfilerMarker k_SetArraySizesMarker = new("TMP.SetArraySizes");
+        private static ProfilerMarker k_GenerateTextPhaseIMarker = new("TMP GenerateText - Phase I");
+        private static ProfilerMarker k_ParseMarkupTextMarker = new("TMP Parse Markup Text");
+        private static ProfilerMarker k_CharacterLookupMarker = new("TMP Lookup Character & Glyph Data");
+        private static ProfilerMarker k_HandleGPOSFeaturesMarker = new("TMP Handle GPOS Features");
+        private static ProfilerMarker k_CalculateVerticesPositionMarker = new("TMP Calculate Vertices Position");
+        private static ProfilerMarker k_ComputeTextMetricsMarker = new("TMP Compute Text Metrics");
+        private static ProfilerMarker k_HandleVisibleCharacterMarker = new("TMP Handle Visible Character");
+        private static ProfilerMarker k_HandleWhiteSpacesMarker = new("TMP Handle White Space & Control Character");
+        private static ProfilerMarker k_HandleHorizontalLineBreakingMarker = new("TMP Handle Horizontal Line Breaking");
+        private static ProfilerMarker k_HandleVerticalLineBreakingMarker = new("TMP Handle Vertical Line Breaking");
+        private static ProfilerMarker k_SaveGlyphVertexDataMarker = new("TMP Save Glyph Vertex Data");
+        private static ProfilerMarker k_ComputeCharacterAdvanceMarker = new("TMP Compute Character Advance");
+        private static ProfilerMarker k_HandleCarriageReturnMarker = new("TMP Handle Carriage Return");
+        private static ProfilerMarker k_HandleLineTerminationMarker = new("TMP Handle Line Termination");
+        private static ProfilerMarker k_SaveTextExtentMarker = new("TMP Save Text Extent");
+        private static ProfilerMarker k_SaveProcessingStatesMarker = new("TMP Save Processing States");
+        private static ProfilerMarker k_GenerateTextPhaseIIMarker = new("TMP GenerateText - Phase II");
+        private static ProfilerMarker k_GenerateTextPhaseIIIMarker = new("TMP GenerateText - Phase III");
 
 
         protected override void Awake()
@@ -643,9 +477,9 @@ namespace TMPro
                 m_isWaitingOnResourceLoad = true;
                 return;
             }
-            #endif
+#endif
 
-            m_canvas = this.canvas;
+            m_canvas = canvas;
 
             m_isOrthographic = true;
 
@@ -659,12 +493,12 @@ namespace TMPro
 
             if (m_mesh == null)
             {
-                m_mesh = new Mesh();
+                m_mesh = new();
                 m_mesh.hideFlags = HideFlags.HideAndDontSave;
                 #if DEVELOPMENT_BUILD || UNITY_EDITOR
                 m_mesh.name = "TextMeshPro UI Mesh";
                 #endif
-                m_textInfo = new TMP_TextInfo(this);
+                m_textInfo = new(this);
             }
 
             LoadDefaultSettings();
@@ -701,9 +535,8 @@ namespace TMPro
                 TMPro_EventManager.TEXT_STYLE_PROPERTY_EVENT.Add(ON_TEXT_STYLE_CHANGED);
                 TMPro_EventManager.COLOR_GRADIENT_PROPERTY_EVENT.Add(ON_COLOR_GRADIENT_CHANGED);
                 TMPro_EventManager.TMP_SETTINGS_PROPERTY_EVENT.Add(ON_TMP_SETTINGS_CHANGED);
-
                 UnityEditor.PrefabUtility.prefabInstanceUpdated += OnPrefabInstanceUpdate;
-                #endif
+#endif
                 m_isRegisteredForEvents = true;
             }
 
@@ -761,7 +594,7 @@ namespace TMPro
                 m_MaskMaterial = null;
             }
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             TMPro_EventManager.MATERIAL_PROPERTY_EVENT.Remove(ON_MATERIAL_PROPERTY_CHANGED);
             TMPro_EventManager.FONT_PROPERTY_EVENT.Remove(ON_FONT_PROPERTY_CHANGED);
             TMPro_EventManager.TEXTMESHPRO_UGUI_PROPERTY_EVENT.Remove(ON_TEXTMESHPRO_UGUI_PROPERTY_CHANGED);
@@ -772,12 +605,12 @@ namespace TMPro
             TMPro_EventManager.RESOURCE_LOAD_EVENT.Remove(ON_RESOURCES_LOADED);
 
             UnityEditor.PrefabUtility.prefabInstanceUpdated -= OnPrefabInstanceUpdate;
-            #endif
+#endif
             m_isRegisteredForEvents = false;
         }
 
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         protected override void Reset()
         {
             if (m_isAwake == false)
@@ -830,7 +663,7 @@ namespace TMPro
                 return;
             }
 
-            if (go == this.gameObject)
+            if (go == gameObject)
             {
                 TMP_SubMeshUI[] subTextObjects = GetComponentsInChildren<TMP_SubMeshUI>();
                 if (subTextObjects.Length > 0)
@@ -988,7 +821,7 @@ namespace TMPro
             _havePropertiesChanged = true;
             SetAllDirty();
         }
-        #endif
+#endif
 
 
         protected override void LoadFontAsset()
@@ -1089,44 +922,16 @@ namespace TMPro
                 return;
 
             Vector3 rotation = m_sharedMaterial.GetVector(ShaderUtilities.ID_EnvMatrixRotation);
-            #if !UNITY_EDITOR
+#if !UNITY_EDITOR
             if (m_currentEnvMapRotation == rotation)
                 return;
-            #endif
+#endif
 
             m_currentEnvMapRotation = rotation;
             m_EnvMapMatrix = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(m_currentEnvMapRotation), Vector3.one);
 
             m_sharedMaterial.SetMatrix(ShaderUtilities.ID_EnvMatrix, m_EnvMapMatrix);
         }
-
-
-        private void EnableMasking()
-        {
-            if (m_fontMaterial == null)
-            {
-                m_fontMaterial = CreateMaterialInstance(m_sharedMaterial);
-                m_canvasRenderer.SetMaterial(m_fontMaterial, m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex));
-            }
-
-            m_sharedMaterial = m_fontMaterial;
-            if (m_sharedMaterial.HasProperty(ShaderUtilities.ID_ClipRect))
-            {
-                m_sharedMaterial.EnableKeyword(ShaderUtilities.Keyword_MASK_SOFT);
-                m_sharedMaterial.DisableKeyword(ShaderUtilities.Keyword_MASK_HARD);
-                m_sharedMaterial.DisableKeyword(ShaderUtilities.Keyword_MASK_TEX);
-
-                UpdateMask();
-            }
-
-            m_isMaskingEnabled = true;
-        }
-
-
-        private void DisableMasking()
-        {
-        }
-
 
         private void UpdateMask()
         {
@@ -1149,7 +954,7 @@ namespace TMPro
 
                 Vector2 center = m_rectTransform.localPosition + new Vector3((0.5f - m_rectTransform.pivot.x) * m_rectTransform.rect.width + (Mathf.Max(m_margin.x, 0) - Mathf.Max(m_margin.z, 0)) / 2, (0.5f - m_rectTransform.pivot.y) * m_rectTransform.rect.height + (-Mathf.Max(m_margin.y, 0) + Mathf.Max(m_margin.w, 0)) / 2);
 
-                Vector4 mask = new Vector4(center.x, center.y, width, height);
+                Vector4 mask = new(center.x, center.y, width, height);
 
 
                 m_sharedMaterial.SetVector(ShaderUtilities.ID_ClipRect, mask);
@@ -1315,21 +1120,6 @@ namespace TMPro
             m_sharedMaterial.SetColor(ShaderUtilities.ID_OutlineColor, color);
         }
 
-
-        protected override void SetShaderDepth()
-        {
-            if (m_canvas == null || m_sharedMaterial == null)
-                return;
-
-            if (m_canvas.renderMode == RenderMode.ScreenSpaceOverlay || m_isOverlay)
-            {
-            }
-            else
-            {
-            }
-        }
-
-
         protected override void SetCulling()
         {
             if (m_isCullingEnabled)
@@ -1368,25 +1158,7 @@ namespace TMPro
             }
         }
 
-
-        private void SetPerspectiveCorrection()
-        {
-            if (m_isOrthographic)
-                m_sharedMaterial.SetFloat(ShaderUtilities.ID_PerspectiveFilter, 0.0f);
-            else
-                m_sharedMaterial.SetFloat(ShaderUtilities.ID_PerspectiveFilter, 0.875f);
-        }
-
-
-        private void SetMeshArrays(int size)
-        {
-            m_textInfo.meshInfo[0].ResizeMeshInfo(size);
-
-            m_canvasRenderer.SetMesh(m_textInfo.meshInfo[0].mesh);
-        }
-
-
-        private Dictionary<int, int> materialIndexPairs = new Dictionary<int, int>();
+        private Dictionary<int, int> materialIndexPairs = new();
 
         internal override int SetArraySizes(TextProcessingElement[] textProcessingArray)
         {
@@ -1408,13 +1180,13 @@ namespace TMPro
             m_currentMaterial = m_sharedMaterial;
             m_currentMaterialIndex = 0;
 
-            m_materialReferenceStack.SetDefault(new MaterialReference(m_currentMaterialIndex, m_currentFontAsset, null, m_currentMaterial, m_padding));
+            m_materialReferenceStack.SetDefault(new(m_currentMaterialIndex, m_currentFontAsset, null, m_currentMaterial, m_padding));
 
             m_materialReferenceIndexLookup.Clear();
             MaterialReference.AddMaterialReference(m_currentMaterial, m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
 
             if (m_textInfo == null)
-                m_textInfo = new TMP_TextInfo(m_InternalTextProcessingArraySize);
+                m_textInfo = new(m_InternalTextProcessingArraySize);
             else if (m_textInfo.characterInfo.Length < m_InternalTextProcessingArraySize)
                 TMP_TextInfo.Resize(ref m_textInfo.characterInfo, m_InternalTextProcessingArraySize, false);
 
@@ -1529,18 +1301,6 @@ namespace TMPro
 
                 uint nextCharacter = i + 1 < textProcessingArray.Length ? textProcessingArray[i + 1].unicode : 0;
 
-                if (emojiFallbackSupport && ((TMP_TextParsingUtilities.IsEmojiPresentationForm(unicode) && nextCharacter != 0xFE0E) || (TMP_TextParsingUtilities.IsEmoji(unicode) && nextCharacter == 0xFE0F)))
-                {
-                    if (TMP_Settings.emojiFallbackTextAssets != null && TMP_Settings.emojiFallbackTextAssets.Count > 0)
-                    {
-                        character = TMP_FontAssetUtilities.GetTextElementFromTextAssets(unicode, m_currentFontAsset, TMP_Settings.emojiFallbackTextAssets, true, fontStyle, fontWeight, out isUsingAlternativeTypeface);
-
-                        if (character != null)
-                        {
-                        }
-                    }
-                }
-
                 if (character == null)
                     character = GetTextElement(unicode, m_currentFontAsset, m_FontStyleInternal, m_FontWeightInternal, out isUsingAlternativeTypeface);
 
@@ -1583,8 +1343,8 @@ namespace TMPro
                     if (!TMP_Settings.warningsDisabled)
                     {
                         string formattedWarning = srcGlyph > 0xFFFF
-                            ? string.Format("The character with Unicode value \\U{0:X8} was not found in the [{1}] font asset or any potential fallbacks. It was replaced by Unicode character \\u{2:X4} in text object [{3}].", srcGlyph, m_fontAsset.name, character.unicode, this.name)
-                            : string.Format("The character with Unicode value \\u{0:X4} was not found in the [{1}] font asset or any potential fallbacks. It was replaced by Unicode character \\u{2:X4} in text object [{3}].", srcGlyph, m_fontAsset.name, character.unicode, this.name);
+                            ? string.Format("The character with Unicode value \\U{0:X8} was not found in the [{1}] font asset or any potential fallbacks. It was replaced by Unicode character \\u{2:X4} in text object [{3}].", srcGlyph, m_fontAsset.name, character.unicode, name)
+                            : string.Format("The character with Unicode value \\u{0:X4} was not found in the [{1}] font asset or any potential fallbacks. It was replaced by Unicode character \\u{2:X4} in text object [{3}].", srcGlyph, m_fontAsset.name, character.unicode, name);
 
                         Debug.LogWarning(formattedWarning, this);
                     }
@@ -1729,7 +1489,7 @@ namespace TMPro
                         }
                         else
                         {
-                            int fallbackMaterialIndex = MaterialReference.AddMaterialReference(new Material(m_currentMaterial), m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
+                            int fallbackMaterialIndex = MaterialReference.AddMaterialReference(new(m_currentMaterial), m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
                             materialIndexPairs[m_currentMaterialIndex] = fallbackMaterialIndex;
                             m_currentMaterialIndex = fallbackMaterialIndex;
                         }
@@ -1738,7 +1498,7 @@ namespace TMPro
                     }
                     else
                     {
-                        m_currentMaterialIndex = MaterialReference.AddMaterialReference(new Material(m_currentMaterial), m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
+                        m_currentMaterialIndex = MaterialReference.AddMaterialReference(new(m_currentMaterial), m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
                         m_materialReferences[m_currentMaterialIndex].referenceCount += 1;
                     }
                 }
@@ -1814,9 +1574,9 @@ namespace TMPro
                     if (m_textInfo.meshInfo[i].vertices == null)
                     {
                         if (i == 0)
-                            m_textInfo.meshInfo[i] = new TMP_MeshInfo(m_mesh, referenceCount + 1);
+                            m_textInfo.meshInfo[i] = new(m_mesh, referenceCount + 1);
                         else
-                            m_textInfo.meshInfo[i] = new TMP_MeshInfo(m_subTextObjects[i].mesh, referenceCount + 1);
+                            m_textInfo.meshInfo[i] = new(m_subTextObjects[i].mesh, referenceCount + 1);
                     }
                     else
                         m_textInfo.meshInfo[i].ResizeMeshInfo(referenceCount > 1024 ? referenceCount + 256 : Mathf.NextPowerOfTwo(referenceCount + 1));
@@ -1841,13 +1601,12 @@ namespace TMPro
             return m_totalCharacterCount;
         }
 
-
         /// <summary>
         /// Update the margin width and height
         /// </summary>
         public override void ComputeMarginSize()
         {
-            if (this.rectTransform != null)
+            if (rectTransform != null)
             {
                 Rect rect = m_rectTransform.rect;
 
@@ -1893,7 +1652,7 @@ namespace TMPro
         {
             base.OnTransformParentChanged();
 
-            m_canvas = this.canvas;
+            m_canvas = canvas;
 
             ComputeMarginSize();
             _havePropertiesChanged = true;
@@ -1902,7 +1661,7 @@ namespace TMPro
 
         protected override void OnRectTransformDimensionsChange()
         {
-            if (!this.gameObject.activeInHierarchy)
+            if (!gameObject.activeInHierarchy)
                 return;
 
             bool hasCanvasScaleFactorChanged = false;
@@ -1950,12 +1709,6 @@ namespace TMPro
                 }
             }
 
-            if (m_isUsingLegacyAnimationComponent)
-            {
-                _havePropertiesChanged = true;
-                OnPreRenderCanvas();
-            }
-
             UpdateEnvMapMatrix();
         }
 
@@ -1965,10 +1718,10 @@ namespace TMPro
         /// </summary>
         private void OnPreRenderCanvas()
         {
-            if (!m_isAwake || (this.IsActive() == false && m_ignoreActiveState == false))
+            if (!m_isAwake || (IsActive() == false && m_ignoreActiveState == false))
                 return;
 
-            if (m_canvas == null) { m_canvas = this.canvas; if (m_canvas == null) return; }
+            if (m_canvas == null) { m_canvas = canvas; if (m_canvas == null) return; }
 
 
             if (_havePropertiesChanged || m_isLayoutDirty)
@@ -1982,8 +1735,7 @@ namespace TMPro
                 OnBeforeRebuild();
                 if (checkPaddingRequired)
                     UpdateMeshPadding();
-
-                needSetArraySizes = true;
+                
                 ParseInputText();
                 TMP_FontAsset.UpdateFontAssetsInUpdateQueue();
 
@@ -2022,7 +1774,7 @@ namespace TMPro
 
             if (m_fontAsset == null || m_fontAsset.characterLookupTable == null)
             {
-                Debug.LogWarning("Can't Generate Mesh! No Font Asset has been assigned to Object ID: " + this.GetInstanceID());
+                Debug.LogWarning("Can't Generate Mesh! No Font Asset has been assigned to Object ID: " + GetInstanceID());
                 m_IsAutoSizePointSizeSet = true;
                 k_GenerateTextMarker.End();
                 return;
@@ -2047,12 +1799,9 @@ namespace TMPro
             m_currentFontAsset = m_fontAsset;
             m_currentMaterial = m_sharedMaterial;
             m_currentMaterialIndex = 0;
-            m_materialReferenceStack.SetDefault(new MaterialReference(m_currentMaterialIndex, m_currentFontAsset, null, m_currentMaterial, m_padding));
+            m_materialReferenceStack.SetDefault(new(m_currentMaterialIndex, m_currentFontAsset, null, m_currentMaterial, m_padding));
 
             m_currentSpriteAsset = m_spriteAsset;
-
-            if (m_spriteAnimator != null)
-                m_spriteAnimator.StopAllAnimations();
 
             int totalCharacterCount = m_totalCharacterCount;
 
@@ -2100,7 +1849,7 @@ namespace TMPro
             m_colorStack.SetDefault(m_htmlColor);
             m_underlineColorStack.SetDefault(m_htmlColor);
             m_strikethroughColorStack.SetDefault(m_htmlColor);
-            m_HighlightStateStack.SetDefault(new HighlightState(m_htmlColor, TMP_Offset.zero));
+            m_HighlightStateStack.SetDefault(new(m_htmlColor, TMP_Offset.zero));
 
             m_colorGradientPreset = null;
             m_colorGradientStack.SetDefault(null);
@@ -2135,10 +1884,6 @@ namespace TMPro
             m_maxLineAscender = k_LargeNegativeFloat;
             m_maxLineDescender = k_LargePositiveFloat;
             m_lineNumber = 0;
-            float lineMinXForGlyphAdvance = float.PositiveInfinity;
-            float lineMaxXForGlyphAdvance = float.NegativeInfinity;
-            float prevLineWidthForGlyphAdvance = 0f;
-            int lastLineNumberForGlyphAdvance = 0;
             m_startOfLineAscender = 0;
             m_startOfLineDescender = 0;
             m_lineVisibleCharacterCount = 0;
@@ -2178,7 +1923,7 @@ namespace TMPro
             bool ignoreNonBreakingSpace = false;
             int lastSoftLineBreak = 0;
 
-            CharacterSubstitution characterToSubstitute = new CharacterSubstitution(-1, 0);
+            CharacterSubstitution characterToSubstitute = new(-1, 0);
             bool isSoftHyphenIgnored = false;
 
             SaveWordWrappingState(ref m_SavedWordWrapState, -1, -1);
@@ -2434,7 +2179,7 @@ namespace TMPro
                 bool isWhiteSpace = charCode <= 0xFFFF && char.IsWhiteSpace((char)charCode);
 
                 #region Handle Kerning
-                GlyphValueRecord glyphAdjustments = new GlyphValueRecord();
+                GlyphValueRecord glyphAdjustments = new();
                 float characterSpacingAdjustment = m_characterSpacing;
                 if (kerning && m_textElementType == TMP_TextElementType.Character)
                 {
@@ -2552,6 +2297,8 @@ namespace TMPro
                 elementDescentLine += glyphAdjustments.yPlacement;
                 #endregion
 
+                float xAdvanceBeforeChar = m_xAdvance;
+                
                 #region Handle Right-to-Left
                 if (m_isRightToLeft)
                 {
@@ -2644,8 +2391,8 @@ namespace TMPro
                 {
                     float shear_value = m_ItalicAngle * 0.01f;
                     float midPoint = ((m_currentFontAsset.m_FaceInfo.capLine - (m_currentFontAsset.m_FaceInfo.baseline + m_baselineOffset)) / 2) * m_fontScaleMultiplier * m_currentFontAsset.m_FaceInfo.scale;
-                    Vector3 topShear = new Vector3(shear_value * ((currentGlyphMetrics.horizontalBearingY + padding + style_padding - midPoint) * currentElementScale), 0, 0);
-                    Vector3 bottomShear = new Vector3(shear_value * (((currentGlyphMetrics.horizontalBearingY - currentGlyphMetrics.height - padding - style_padding - midPoint)) * currentElementScale), 0, 0);
+                    Vector3 topShear = new(shear_value * ((currentGlyphMetrics.horizontalBearingY + padding + style_padding - midPoint) * currentElementScale), 0, 0);
+                    Vector3 bottomShear = new(shear_value * (((currentGlyphMetrics.horizontalBearingY - currentGlyphMetrics.height - padding - style_padding - midPoint)) * currentElementScale), 0, 0);
 
                     top_left += topShear;
                     bottom_left += bottomShear;
@@ -2673,50 +2420,6 @@ namespace TMPro
                 m_textInfo.characterInfo[m_characterCount].topLeft = top_left;
                 m_textInfo.characterInfo[m_characterCount].topRight = top_right;
                 m_textInfo.characterInfo[m_characterCount].bottomRight = bottom_right;
-
-                if (m_lineNumber != lastLineNumberForGlyphAdvance)
-                {
-                    lineMinXForGlyphAdvance = float.PositiveInfinity;
-                    lineMaxXForGlyphAdvance = float.NegativeInfinity;
-                    prevLineWidthForGlyphAdvance = 0f;
-                    lastLineNumberForGlyphAdvance = m_lineNumber;
-                }
-
-                float oldLineWidth = prevLineWidthForGlyphAdvance;
-
-                if (charCode == 10 || charCode == 11 || charCode == 13)
-                {
-                    m_textInfo.characterInfo[m_characterCount].glyphAdvance = 0f;
-                }
-                else
-                {
-                    float charMinX = Mathf.Min(bottom_left.x, top_left.x, top_right.x, bottom_right.x);
-                    float charMaxX = Mathf.Max(bottom_left.x, top_left.x, top_right.x, bottom_right.x);
-
-                    if (float.IsPositiveInfinity(lineMinXForGlyphAdvance))
-                    {
-                        lineMinXForGlyphAdvance = charMinX;
-                        lineMaxXForGlyphAdvance = charMaxX;
-                    }
-                    else
-                    {
-                        if (charMinX < lineMinXForGlyphAdvance)
-                            lineMinXForGlyphAdvance = charMinX;
-                        if (charMaxX > lineMaxXForGlyphAdvance)
-                            lineMaxXForGlyphAdvance = charMaxX;
-                    }
-
-                    float newLineWidth = lineMaxXForGlyphAdvance - lineMinXForGlyphAdvance;
-
-                    float glyphAdvance = newLineWidth - oldLineWidth;
-
-                    if (glyphAdvance < 0f)
-                        glyphAdvance = 0f;
-
-                    m_textInfo.characterInfo[m_characterCount].glyphAdvance = glyphAdvance;
-
-                    prevLineWidthForGlyphAdvance = newLineWidth;
-                }
                 
                 m_textInfo.characterInfo[m_characterCount].origin = m_xAdvance + glyphAdjustments.xPlacement * currentElementScale;
                 m_textInfo.characterInfo[m_characterCount].baseLine = (baselineOffset - m_lineOffset + m_baselineOffset) + glyphAdjustments.yPlacement * currentElementScale;
@@ -3378,6 +3081,20 @@ namespace TMPro
                 k_ComputeCharacterAdvanceMarker.End();
                 #endregion Tabulation & Stops
                 
+                float glyphAdvance = m_xAdvance - xAdvanceBeforeChar;
+
+                if (glyphAdvance < 0f)
+                {
+                    glyphAdvance = -glyphAdvance;
+                }
+
+                if (charCode == 10 || charCode == 11 || charCode == 13 || charCode == 0x2028 || charCode == 0x2029)
+                {
+                    glyphAdvance = 0f;
+                }
+
+                m_textInfo.characterInfo[m_characterCount].glyphAdvance = glyphAdvance;
+                
                 #region Carriage Return
                 if (charCode == 13)
                 {
@@ -3427,8 +3144,8 @@ namespace TMPro
                     m_textInfo.lineInfo[m_lineNumber].characterCount = m_textInfo.lineInfo[m_lineNumber].lastCharacterIndex - m_textInfo.lineInfo[m_lineNumber].firstCharacterIndex + 1;
                     m_textInfo.lineInfo[m_lineNumber].visibleCharacterCount = m_lineVisibleCharacterCount;
                     m_textInfo.lineInfo[m_lineNumber].visibleSpaceCount = (m_textInfo.lineInfo[m_lineNumber].lastVisibleCharacterIndex + 1 - m_textInfo.lineInfo[m_lineNumber].firstCharacterIndex) - m_lineVisibleCharacterCount;
-                    m_textInfo.lineInfo[m_lineNumber].lineExtents.min = new Vector2(m_textInfo.characterInfo[m_firstVisibleCharacterOfLine].bottomLeft.x, lineDescender);
-                    m_textInfo.lineInfo[m_lineNumber].lineExtents.max = new Vector2(m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].topRight.x, lineAscender);
+                    m_textInfo.lineInfo[m_lineNumber].lineExtents.min = new(m_textInfo.characterInfo[m_firstVisibleCharacterOfLine].bottomLeft.x, lineDescender);
+                    m_textInfo.lineInfo[m_lineNumber].lineExtents.max = new(m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].topRight.x, lineAscender);
                     m_textInfo.lineInfo[m_lineNumber].length = m_textInfo.lineInfo[m_lineNumber].lineExtents.max.x - (padding * currentElementScale);
                     m_textInfo.lineInfo[m_lineNumber].width = widthOfTextArea;
 
@@ -3677,13 +3394,13 @@ namespace TMPro
             int wordLastChar = 0;
 
             bool isCameraAssigned = m_canvas.worldCamera == null ? false : true;
-            float lossyScale = m_previousLossyScaleY = this.transform.lossyScale.y;
+            float lossyScale = m_previousLossyScaleY = transform.lossyScale.y;
             RenderMode canvasRenderMode = m_canvas.renderMode;
             float canvasScaleFactor = m_canvas.scaleFactor;
 
             Color32 underlineColor = Color.white;
             Color32 strikethroughColor = Color.white;
-            HighlightState highlightState = new HighlightState(new Color32(255, 255, 0, 64), TMP_Offset.zero);
+            HighlightState highlightState = new(new(255, 255, 0, 64), TMP_Offset.zero);
             float xScale = 0;
             float xScaleMax = 0;
             float underlineStartScale = 0;
@@ -3721,24 +3438,24 @@ namespace TMPro
                 {
                     case HorizontalAlignmentOptions.Left:
                         if (!m_isRightToLeft)
-                            justificationOffset = new Vector3(0 + lineInfo.marginLeft, 0, 0);
+                            justificationOffset = new(0 + lineInfo.marginLeft, 0, 0);
                         else
-                            justificationOffset = new Vector3(0 - lineInfo.maxAdvance, 0, 0);
+                            justificationOffset = new(0 - lineInfo.maxAdvance, 0, 0);
                         break;
 
                     case HorizontalAlignmentOptions.Center:
-                        justificationOffset = new Vector3(lineInfo.marginLeft + lineInfo.width / 2 - lineInfo.maxAdvance / 2, 0, 0);
+                        justificationOffset = new(lineInfo.marginLeft + lineInfo.width / 2 - lineInfo.maxAdvance / 2, 0, 0);
                         break;
 
                     case HorizontalAlignmentOptions.Geometry:
-                        justificationOffset = new Vector3(lineInfo.marginLeft + lineInfo.width / 2 - (lineInfo.lineExtents.min.x + lineInfo.lineExtents.max.x) / 2, 0, 0);
+                        justificationOffset = new(lineInfo.marginLeft + lineInfo.width / 2 - (lineInfo.lineExtents.min.x + lineInfo.lineExtents.max.x) / 2, 0, 0);
                         break;
 
                     case HorizontalAlignmentOptions.Right:
                         if (!m_isRightToLeft)
-                            justificationOffset = new Vector3(lineInfo.marginLeft + lineInfo.width - lineInfo.maxAdvance, 0, 0);
+                            justificationOffset = new(lineInfo.marginLeft + lineInfo.width - lineInfo.maxAdvance, 0, 0);
                         else
-                            justificationOffset = new Vector3(lineInfo.marginLeft + lineInfo.width, 0, 0);
+                            justificationOffset = new(lineInfo.marginLeft + lineInfo.width, 0, 0);
                         break;
 
                     case HorizontalAlignmentOptions.Justified:
@@ -3754,9 +3471,9 @@ namespace TMPro
                             if (currentLine != lastLine || i == 0 || i == m_firstVisibleCharacter)
                             {
                                 if (!m_isRightToLeft)
-                                    justificationOffset = new Vector3(lineInfo.marginLeft, 0, 0);
+                                    justificationOffset = new(lineInfo.marginLeft, 0, 0);
                                 else
-                                    justificationOffset = new Vector3(lineInfo.marginLeft + lineInfo.width, 0, 0);
+                                    justificationOffset = new(lineInfo.marginLeft + lineInfo.width, 0, 0);
 
                                 if (char.IsSeparator(unicode))
                                     isFirstSeperator = true;
@@ -3794,9 +3511,9 @@ namespace TMPro
                         else
                         {
                             if (!m_isRightToLeft)
-                                justificationOffset = new Vector3(lineInfo.marginLeft, 0, 0);
+                                justificationOffset = new(lineInfo.marginLeft, 0, 0);
                             else
-                                justificationOffset = new Vector3(lineInfo.marginLeft + lineInfo.width, 0, 0);
+                                justificationOffset = new(lineInfo.marginLeft + lineInfo.width, 0, 0);
                         }
 
                         break;
@@ -4010,8 +3727,8 @@ namespace TMPro
 
                         lastLineInfo.maxAdvance += offset.x;
 
-                        lastLineInfo.lineExtents.min = new Vector2(m_textInfo.characterInfo[lastLineInfo.firstCharacterIndex].bottomLeft.x, lastLineInfo.descender);
-                        lastLineInfo.lineExtents.max = new Vector2(m_textInfo.characterInfo[lastLineInfo.lastVisibleCharacterIndex].topRight.x, lastLineInfo.ascender);
+                        lastLineInfo.lineExtents.min = new(m_textInfo.characterInfo[lastLineInfo.firstCharacterIndex].bottomLeft.x, lastLineInfo.descender);
+                        lastLineInfo.lineExtents.max = new(m_textInfo.characterInfo[lastLineInfo.lastVisibleCharacterIndex].topRight.x, lastLineInfo.ascender);
                     }
 
                     if (i == m_characterCount - 1)
@@ -4022,8 +3739,8 @@ namespace TMPro
 
                         currLineInfo.maxAdvance += offset.x;
 
-                        currLineInfo.lineExtents.min = new Vector2(m_textInfo.characterInfo[currLineInfo.firstCharacterIndex].bottomLeft.x, currLineInfo.descender);
-                        currLineInfo.lineExtents.max = new Vector2(m_textInfo.characterInfo[currLineInfo.lastVisibleCharacterIndex].topRight.x, currLineInfo.ascender);
+                        currLineInfo.lineExtents.min = new(m_textInfo.characterInfo[currLineInfo.firstCharacterIndex].bottomLeft.x, currLineInfo.descender);
+                        currLineInfo.lineExtents.max = new(m_textInfo.characterInfo[currLineInfo.lastVisibleCharacterIndex].topRight.x, currLineInfo.ascender);
                     }
                 }
                 #endregion
@@ -4117,7 +3834,7 @@ namespace TMPro
                                 underlineMaxScale = underlineStartScale;
                                 xScaleMax = xScale;
                             }
-                            underline_start = new Vector3(m_textInfo.characterInfo[i].bottomLeft.x, underlineBaseLine, 0);
+                            underline_start = new(m_textInfo.characterInfo[i].bottomLeft.x, underlineBaseLine, 0);
                             underlineColor = m_textInfo.characterInfo[i].underlineColor;
                         }
                     }
@@ -4125,7 +3842,7 @@ namespace TMPro
                     if (beginUnderline && m_characterCount == 1)
                     {
                         beginUnderline = false;
-                        underline_end = new Vector3(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
+                        underline_end = new(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
                         underlineEndScale = m_textInfo.characterInfo[i].scale;
 
                         DrawUnderlineMesh(underline_start, underline_end, ref last_vert_index, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
@@ -4138,12 +3855,12 @@ namespace TMPro
                         if (isWhiteSpace || unicode == 0x200B)
                         {
                             int lastVisibleCharacterIndex = lineInfo.lastVisibleCharacterIndex;
-                            underline_end = new Vector3(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, underlineBaseLine, 0);
+                            underline_end = new(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, underlineBaseLine, 0);
                             underlineEndScale = m_textInfo.characterInfo[lastVisibleCharacterIndex].scale;
                         }
                         else
                         {
-                            underline_end = new Vector3(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
+                            underline_end = new(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
                             underlineEndScale = m_textInfo.characterInfo[i].scale;
                         }
 
@@ -4156,7 +3873,7 @@ namespace TMPro
                     else if (beginUnderline && !isUnderlineVisible)
                     {
                         beginUnderline = false;
-                        underline_end = new Vector3(m_textInfo.characterInfo[i - 1].topRight.x, underlineBaseLine, 0);
+                        underline_end = new(m_textInfo.characterInfo[i - 1].topRight.x, underlineBaseLine, 0);
                         underlineEndScale = m_textInfo.characterInfo[i - 1].scale;
 
                         DrawUnderlineMesh(underline_start, underline_end, ref last_vert_index, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
@@ -4167,7 +3884,7 @@ namespace TMPro
                     else if (beginUnderline && i < m_characterCount - 1 && !underlineColor.Compare(m_textInfo.characterInfo[i + 1].underlineColor))
                     {
                         beginUnderline = false;
-                        underline_end = new Vector3(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
+                        underline_end = new(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
                         underlineEndScale = m_textInfo.characterInfo[i].scale;
 
                         DrawUnderlineMesh(underline_start, underline_end, ref last_vert_index, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
@@ -4181,7 +3898,7 @@ namespace TMPro
                     if (beginUnderline == true)
                     {
                         beginUnderline = false;
-                        underline_end = new Vector3(m_textInfo.characterInfo[i - 1].topRight.x, underlineBaseLine, 0);
+                        underline_end = new(m_textInfo.characterInfo[i - 1].topRight.x, underlineBaseLine, 0);
                         underlineEndScale = m_textInfo.characterInfo[i - 1].scale;
 
                         DrawUnderlineMesh(underline_start, underline_end, ref last_vert_index, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
@@ -4211,7 +3928,7 @@ namespace TMPro
                             beginStrikethrough = true;
                             strikethroughPointSize = m_textInfo.characterInfo[i].pointSize;
                             strikethroughScale = m_textInfo.characterInfo[i].scale;
-                            strikethrough_start = new Vector3(m_textInfo.characterInfo[i].bottomLeft.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
+                            strikethrough_start = new(m_textInfo.characterInfo[i].bottomLeft.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
                             strikethroughColor = m_textInfo.characterInfo[i].strikethroughColor;
                             strikethroughBaseline = m_textInfo.characterInfo[i].baseLine;
                         }
@@ -4220,7 +3937,7 @@ namespace TMPro
                     if (beginStrikethrough && m_characterCount == 1)
                     {
                         beginStrikethrough = false;
-                        strikethrough_end = new Vector3(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
+                        strikethrough_end = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
 
                         DrawUnderlineMesh(strikethrough_start, strikethrough_end, ref last_vert_index, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
                     }
@@ -4229,11 +3946,11 @@ namespace TMPro
                         if (isWhiteSpace || unicode == 0x200B)
                         {
                             int lastVisibleCharacterIndex = lineInfo.lastVisibleCharacterIndex;
-                            strikethrough_end = new Vector3(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, m_textInfo.characterInfo[lastVisibleCharacterIndex].baseLine + strikethroughOffset * strikethroughScale, 0);
+                            strikethrough_end = new(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, m_textInfo.characterInfo[lastVisibleCharacterIndex].baseLine + strikethroughOffset * strikethroughScale, 0);
                         }
                         else
                         {
-                            strikethrough_end = new Vector3(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
+                            strikethrough_end = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
                         }
 
                         beginStrikethrough = false;
@@ -4245,23 +3962,23 @@ namespace TMPro
 
                         int lastVisibleCharacterIndex = lineInfo.lastVisibleCharacterIndex;
                         if (i > lastVisibleCharacterIndex)
-                            strikethrough_end = new Vector3(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, m_textInfo.characterInfo[lastVisibleCharacterIndex].baseLine + strikethroughOffset * strikethroughScale, 0);
+                            strikethrough_end = new(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, m_textInfo.characterInfo[lastVisibleCharacterIndex].baseLine + strikethroughOffset * strikethroughScale, 0);
                         else
-                            strikethrough_end = new Vector3(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
+                            strikethrough_end = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
 
                         DrawUnderlineMesh(strikethrough_start, strikethrough_end, ref last_vert_index, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
                     }
                     else if (beginStrikethrough && i < m_characterCount && currentFontAsset.GetInstanceID() != characterInfos[i + 1].fontAsset.GetInstanceID())
                     {
                         beginStrikethrough = false;
-                        strikethrough_end = new Vector3(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
+                        strikethrough_end = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
 
                         DrawUnderlineMesh(strikethrough_start, strikethrough_end, ref last_vert_index, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
                     }
                     else if (beginStrikethrough && !isStrikeThroughVisible)
                     {
                         beginStrikethrough = false;
-                        strikethrough_end = new Vector3(m_textInfo.characterInfo[i - 1].topRight.x, m_textInfo.characterInfo[i - 1].baseLine + strikethroughOffset * strikethroughScale, 0);
+                        strikethrough_end = new(m_textInfo.characterInfo[i - 1].topRight.x, m_textInfo.characterInfo[i - 1].baseLine + strikethroughOffset * strikethroughScale, 0);
 
                         DrawUnderlineMesh(strikethrough_start, strikethrough_end, ref last_vert_index, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
                     }
@@ -4271,7 +3988,7 @@ namespace TMPro
                     if (beginStrikethrough == true)
                     {
                         beginStrikethrough = false;
-                        strikethrough_end = new Vector3(m_textInfo.characterInfo[i - 1].topRight.x, m_textInfo.characterInfo[i - 1].baseLine + strikethroughOffset * strikethroughScale, 0);
+                        strikethrough_end = new(m_textInfo.characterInfo[i - 1].topRight.x, m_textInfo.characterInfo[i - 1].baseLine + strikethroughOffset * strikethroughScale, 0);
 
                         DrawUnderlineMesh(strikethrough_start, strikethrough_end, ref last_vert_index, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
                     }
@@ -4439,7 +4156,7 @@ namespace TMPro
 
                     m_subTextObjects[i].canvasRenderer.cullTransparentMesh = isCullTransparentMeshEnabled;
 
-                    m_subTextObjects[i].raycastTarget = this.raycastTarget;
+                    m_subTextObjects[i].raycastTarget = raycastTarget;
                 }
             }
 
@@ -4459,7 +4176,7 @@ namespace TMPro
         /// <returns></returns>
         protected Vector3[] GetTextContainerLocalCorners()
         {
-            if (m_rectTransform == null) m_rectTransform = this.rectTransform;
+            if (m_rectTransform == null) m_rectTransform = rectTransform;
 
             m_rectTransform.GetLocalCorners(m_RectTransformCorners);
 
@@ -4479,17 +4196,7 @@ namespace TMPro
                     m_subTextObjects[i].enabled = state;
             }
         }
-
-
-        /// <summary>
-        /// Destroy Sub Mesh Objects
-        /// </summary>
-        protected void DestroySubMeshObjects()
-        {
-            for (int i = 1; i < m_subTextObjects.Length && m_subTextObjects[i] != null; i++)
-                DestroyImmediate(m_subTextObjects[i]);
-        }
-
+        
 
         /// <summary>
         ///  Method returning the compound bounds of the text object and child sub objects.
@@ -4513,7 +4220,7 @@ namespace TMPro
 
             Vector3 center = (min + max) / 2;
             Vector2 size = max - min;
-            return new Bounds(center, size);
+            return new(center, size);
         }
 
         internal Rect GetCanvasSpaceClippingRect()
@@ -4529,7 +4236,7 @@ namespace TMPro
             Vector2 canvasLossyScale = rootCanvasTransform.lossyScale;
             Vector2 lossyScale = m_rectTransform.lossyScale / canvasLossyScale;
 
-            return new Rect(position + compoundBounds.min * lossyScale, compoundBounds.size * lossyScale);
+            return new(position + compoundBounds.min * lossyScale, compoundBounds.size * lossyScale);
         }
 
         /// <summary>
