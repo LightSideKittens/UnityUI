@@ -72,13 +72,13 @@ public static class ArabicShaper
             if (initialized)
                 return;
 
-            joiningTypes = ParseDerivedJoiningTypes(Resources.Load<TextAsset>("DerivedJoiningType.txt").text);
-            formEntries  = ParseArabicContextForms(Resources.Load<TextAsset>("ArabicContextForms.txt").text);
+            joiningTypes = ParseDerivedJoiningTypes(Resources.Load<TextAsset>("DerivedJoiningType").text);
+            formEntries  = ParseArabicContextForms(Resources.Load<TextAsset>("ArabicContextForms").text);
 
             initialized = true;
         }
     }
-
+    
     public static string Do(string input, out int[] indexMap)
     {
         if (input == null)
@@ -95,16 +95,11 @@ public static class ArabicShaper
             throw new ArgumentNullException(nameof(codepoints));
         
         int length = codepoints.Length;
-        var output = new int[length];
-        indexMap   = new int[length];
 
         if (length == 0)
-            return output;
-
-        for (int i = 0; i < length; i++)
         {
-            output[i]   = codepoints[i];
-            indexMap[i] = i;
+            indexMap = Array.Empty<int>();
+            return Array.Empty<int>();
         }
 
         bool hasArabic = false;
@@ -118,19 +113,100 @@ public static class ArabicShaper
         }
 
         if (!hasArabic)
-            return output;
+        {
+            var outputNoArabic = new int[length];
+            indexMap = new int[length];
+            for (int i = 0; i < length; i++)
+            {
+                outputNoArabic[i] = codepoints[i];
+                indexMap[i]       = i;
+            }
+            return outputNoArabic;
+        }
 
-        var joiningTypes = new JoiningType[length];
-        var joinPrev     = new bool[length];
-        var joinNext     = new bool[length];
+        var joiningTypesOriginal = new JoiningType[length];
+        var joinPrevOriginal     = new bool[length];
 
         for (int i = 0; i < length; i++)
         {
-            joiningTypes[i] = GetJoiningType(codepoints[i]);
+            joiningTypesOriginal[i] = GetJoiningType(codepoints[i]);
         }
 
         int prevIndex = -1;
         for (int i = 0; i < length; i++)
+        {
+            JoiningType jt = joiningTypesOriginal[i];
+            if (jt == JoiningType.T)
+                continue;
+
+            if (prevIndex >= 0)
+            {
+                JoiningType prevJt = joiningTypesOriginal[prevIndex];
+                if (IsJoinPair(prevJt, jt))
+                {
+                    joinPrevOriginal[i] = true;
+                }
+            }
+
+            prevIndex = i;
+        }
+
+        var newCodepoints = new List<int>(length);
+        var newIndexMap   = new List<int>(length);
+
+        for (int i = 0; i < length;)
+        {
+            int cp = codepoints[i];
+
+            if (cp == 0x0644 && i + 1 < length)
+            {
+                int nextCp = codepoints[i + 1];
+                if (TryGetLamAlefLigature(joinPrevOriginal[i], nextCp, out int ligCp))
+                {
+                    newCodepoints.Add(ligCp);
+                    newIndexMap.Add(i);
+
+                    i += 2;
+                    continue;
+                }
+            }
+
+            newCodepoints.Add(cp);
+            newIndexMap.Add(i);
+            i++;
+        }
+
+        int newLen = newCodepoints.Count;
+        var output = new int[newLen];
+        indexMap   = new int[newLen];
+
+        newCodepoints.CopyTo(output, 0);
+        newIndexMap.CopyTo(indexMap, 0);
+
+        bool hasArabicAfterLig = false;
+        for (int i = 0; i < newLen; i++)
+        {
+            if (IsArabicScript(output[i]))
+            {
+                hasArabicAfterLig = true;
+                break;
+            }
+        }
+
+        if (!hasArabicAfterLig)
+            return output;
+
+        var joiningTypes = new JoiningType[newLen];
+        var joinPrev     = new bool[newLen];
+        var joinNext     = new bool[newLen];
+
+        for (int i = 0; i < newLen; i++)
+        {
+            joiningTypes[i] = GetJoiningType(output[i]);
+        }
+
+        prevIndex = -1;
+        for (int i = 0; i < newLen; i++)
         {
             JoiningType jt = joiningTypes[i];
             if (jt == JoiningType.T)
@@ -149,9 +225,9 @@ public static class ArabicShaper
             prevIndex = i;
         }
 
-        for (int i = 0; i < length; i++)
+        for (int i = 0; i < newLen; i++)
         {
-            int cp = codepoints[i];
+            int cp = output[i];
 
             if (!IsArabicScript(cp))
                 continue;
@@ -174,6 +250,86 @@ public static class ArabicShaper
         }
 
         return output;
+    }
+    
+    public static void ComposeOriginalAndVisualMaps(
+        int originalLength,
+        int[] shapeIndexMap,
+        int[] logicalToVisualMap,
+        out int[] originalToVisual,
+        out int[] visualToOriginal)
+    {
+        if (shapeIndexMap == null)
+            throw new ArgumentNullException(nameof(shapeIndexMap));
+        if (logicalToVisualMap == null)
+            throw new ArgumentNullException(nameof(logicalToVisualMap));
+
+        int shapedLength = shapeIndexMap.Length;
+        if (logicalToVisualMap.Length != shapedLength)
+        {
+            throw new ArgumentException(
+                "logicalToVisualMap length must match shapeIndexMap length. " +
+                "Both maps must be for the same shaped sequence.");
+        }
+
+        if (originalLength < 0)
+            throw new ArgumentOutOfRangeException(nameof(originalLength));
+
+        originalToVisual = new int[originalLength];
+        for (int i = 0; i < originalLength; i++)
+            originalToVisual[i] = -1;
+
+        visualToOriginal = new int[shapedLength];
+        for (int i = 0; i < shapedLength; i++)
+            visualToOriginal[i] = -1;
+
+        for (int logicalIndex = 0; logicalIndex < shapedLength; logicalIndex++)
+        {
+            int originalIndex = shapeIndexMap[logicalIndex];
+            int visualIndex   = logicalToVisualMap[logicalIndex];
+
+            if (visualIndex < 0 || visualIndex >= shapedLength)
+                continue;
+
+            visualToOriginal[visualIndex] = originalIndex;
+
+            if (originalIndex >= 0 && originalIndex < originalLength)
+            {
+                int current = originalToVisual[originalIndex];
+                if (current == -1 || visualIndex < current)
+                {
+                    originalToVisual[originalIndex] = visualIndex;
+                }
+            }
+        }
+    }
+    
+
+    private static bool TryGetLamAlefLigature(bool joinPrevLam, int alefCp, out int ligatureCp)
+    {
+        ligatureCp = 0;
+
+        switch (alefCp)
+        {
+            case 0x0622:
+                ligatureCp = joinPrevLam ? 0xFEF6 : 0xFEF5;
+                return true;
+
+            case 0x0623:
+                ligatureCp = joinPrevLam ? 0xFEF8 : 0xFEF7;
+                return true;
+
+            case 0x0625:
+                ligatureCp = joinPrevLam ? 0xFEFA : 0xFEF9;
+                return true;
+
+            case 0x0627:
+                ligatureCp = joinPrevLam ? 0xFEFC : 0xFEFB;
+                return true;
+
+            default:
+                return false;
+        }
     }
 
     private static bool IsArabicScript(int cp)
@@ -304,10 +460,6 @@ public static class ArabicShaper
             string line;
             while ((line = reader.ReadLine()) != null)
             {
-                line = line.Trim();
-                if (line.Length == 0 || line.StartsWith("#"))
-                    continue;
-
                 var parts = line.Split(';');
                 if (parts.Length < 5)
                     continue;
@@ -327,6 +479,7 @@ public static class ArabicShaper
 
         return dict;
     }
+
 
     private static bool TryParseHex(string s, out int value)
     {

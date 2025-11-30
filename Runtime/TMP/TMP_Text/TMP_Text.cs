@@ -413,10 +413,13 @@ namespace TMPro
             k_ParseTextMarker.Begin();
 
             var input = m_text;
-            input = Normalize();
-            input = ArabicShaper.Do(input, out _);
-            
-            preprocessedText = input;
+
+            if (!isAfterRebuildProcessing)
+            {
+                input = Normalize();
+                input = ArabicShaper.Do(input, out _);
+                preprocessedText = input;
+            }
             
             if (m_TextPreprocessor != null)
             {

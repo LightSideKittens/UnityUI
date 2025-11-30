@@ -105,7 +105,6 @@ public static class BiDi
         
         var logicalText = sb.ToString();
         var cps = StringToCodepoints(logicalText);
-        Debug.Log(string.Join(", ", cps));
         resultDirection = DetectDirection(cps);
         
         if (ContainsRtl(cps))

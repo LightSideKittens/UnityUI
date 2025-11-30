@@ -390,7 +390,6 @@ namespace TMPro.EditorUtilities
                 k_RtlToggleLabel, m_IsRightToLeftProp.boolValue);
 
             EditorGUIUtility.labelWidth = labelWidth;
-
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_TextProp, GUIContent.none);
 
