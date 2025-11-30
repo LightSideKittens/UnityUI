@@ -110,57 +110,9 @@ namespace TMPro
         protected void OnBeforeRebuild()
         {
             if(isAfterRebuildProcessing) return;
-            var input = m_text;
-            if (string.IsNullOrEmpty(input)) return;
-            
-            input = Normalize();
-            preprocessedText = input;
+            if (string.IsNullOrEmpty(preprocessedText)) return;
             lastRenderMode = m_renderMode;
             m_renderMode = TextRenderFlags.DontRender;
-                        
-            string Normalize()
-            {
-
-                StringBuilder sb = null;
-
-                for (int i = 0; i < input.Length; i++)
-                {
-                    char c = input[i];
-
-                    if (c == '\r' ||
-                        (c == '<' &&
-                         i + 3 < input.Length &&
-                         input[i + 1] == 'b' &&
-                         input[i + 2] == 'r' &&
-                         input[i + 3] == '>'))
-                    {
-                        if (sb == null)
-                        {
-                            sb = new(input.Length);
-                            sb.Append(input, 0, i);
-                        }
-
-                        if (c == '\r')
-                        {
-                            if (i + 1 < input.Length && input[i + 1] == '\n')
-                                i++;
-
-                            sb.Append('\n');
-                        }
-                        else
-                        {
-                            sb.Append('\n');
-                            i += 3;
-                        }
-                    }
-                    else
-                    {
-                        sb?.Append(c);
-                    }
-                }
-
-                return sb?.ToString() ?? input;
-            }
         }
 
         protected void OnAfterRebuild()
@@ -169,7 +121,22 @@ namespace TMPro
             var input = preprocessedText;
             if (string.IsNullOrEmpty(input)) return;
             
-            input = BiDi.Do(this, out _);
+            input = BiDi.Do(this, out var logicalToVisualMap, out var direction);
+
+            if (logicalToVisualMap != null)
+            {
+                if (autoHorizontalAlignment && m_HorizontalAlignment is HorizontalAlignmentOptions.Left or HorizontalAlignmentOptions.Right)
+                {
+                    if (direction == BiDi.Direction.LeftToRight)
+                    {
+                        m_HorizontalAlignment = HorizontalAlignmentOptions.Left;
+                    }
+                    else
+                    {
+                        m_HorizontalAlignment = HorizontalAlignmentOptions.Right;
+                    }
+                }
+            }
             
             preprocessedText = input;
             m_renderMode = lastRenderMode;
@@ -445,18 +412,66 @@ namespace TMPro
             Debug.Log($"{GetInstanceID()} ParseInputText Parsing...");
             k_ParseTextMarker.Begin();
 
-            var txt = m_text;
+            var input = m_text;
+            input = Normalize();
+            input = ArabicShaper.Do(input, out _);
+            
+            preprocessedText = input;
+            
             if (m_TextPreprocessor != null)
             {
-                txt = m_TextPreprocessor.PreprocessText(m_text);
-                PreprocessedText = txt;
+                input = m_TextPreprocessor.PreprocessText(m_text);
+                PreprocessedText = input;
             }
             
-            PopulateTextBackingArray(txt);
+            PopulateTextBackingArray(input);
             PopulateTextProcessingArray();
             SetArraySizes(m_TextProcessingArray);
             
             k_ParseTextMarker.End();
+            
+            string Normalize()
+            {
+                StringBuilder sb = null;
+
+                for (int i = 0; i < input.Length; i++)
+                {
+                    char c = input[i];
+
+                    if (c == '\r' ||
+                        (c == '<' &&
+                         i + 3 < input.Length &&
+                         input[i + 1] == 'b' &&
+                         input[i + 2] == 'r' &&
+                         input[i + 3] == '>'))
+                    {
+                        if (sb == null)
+                        {
+                            sb = new(input.Length);
+                            sb.Append(input, 0, i);
+                        }
+
+                        if (c == '\r')
+                        {
+                            if (i + 1 < input.Length && input[i + 1] == '\n')
+                                i++;
+
+                            sb.Append('\n');
+                        }
+                        else
+                        {
+                            sb.Append('\n');
+                            i += 3;
+                        }
+                    }
+                    else
+                    {
+                        sb?.Append(c);
+                    }
+                }
+
+                return sb?.ToString() ?? input;
+            }
         }
 
         /// <summary>

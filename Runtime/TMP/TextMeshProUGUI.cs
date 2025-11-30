@@ -1731,12 +1731,12 @@ namespace TMPro
                     Debug.LogWarning("Please assign a Font Asset to this " + transform.name + " gameobject.", this);
                     return;
                 }
-
-                OnBeforeRebuild();
+                
                 if (checkPaddingRequired)
                     UpdateMeshPadding();
                 
                 ParseInputText();
+                OnBeforeRebuild();
                 TMP_FontAsset.UpdateFontAssetsInUpdateQueue();
 
                 if (m_enableAutoSizing)

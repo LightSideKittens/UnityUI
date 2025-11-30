@@ -56,7 +56,6 @@ namespace TMPro.EditorUtilities
         static readonly GUIContent k_RichTextLabel = new("Rich Text", "Enables the use of rich text tags such as <color> and <font>.");
         static readonly GUIContent k_EscapeCharactersLabel = new("Parse Escape Characters", "Whether to display strings such as \"\\n\" as is or replace them by the character they represent.");
         static readonly GUIContent k_VisibleDescenderLabel = new("Visible Descender", "Compute descender values from visible characters only. Used to adjust layout behavior when hiding and revealing characters dynamically.");
-        static readonly GUIContent k_EmojiFallbackSupportLabel = new("Emoji Fallback Support", "When text contains Emojis, try using and displaying those from the potential Text Assets assigned in the TMP Settings Emoji Fallback Text Assets.");
         static readonly GUIContent k_SpriteAssetLabel = new("Sprite Asset", "The Sprite Asset used when NOT specifically referencing one using <sprite=\"Sprite Asset Name\">.");
         static readonly GUIContent k_StyleSheetAssetLabel = new("Style Sheet Asset", "The Style Sheet Asset used by this text object.");
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using TMPro;
+using UnityEngine;
 
 public static class BiDi
 {
@@ -42,18 +43,12 @@ public static class BiDi
     
     private static string WrapAndReorder(
         string logicalText,
-        int[] cps,
         TMP_Text text,
         out int[] logicalToVisualMap,
-        Direction direction = Direction.Auto)
+        Direction targetDirection)
     {
         var info = text.textInfo;
         var lines = info.lineInfo;
-
-        if (direction == Direction.Auto)
-        {
-            direction = DetectDirection(cps);
-        }
 
         var sb = new StringBuilder();
         var logicalToVisualMapList = new List<int>();
@@ -70,7 +65,7 @@ public static class BiDi
             
             string visualLineText = DoBiDi(
                 logicalSlice,
-                out int[] localMap, direction);
+                out int[] localMap, targetDirection);
 
             if (localMap == null || localMap.Length != length)
             {
@@ -95,7 +90,8 @@ public static class BiDi
     
     public static string Do(TMP_Text text,
         out int[] logicalToVisualMap,
-        Direction direction = Direction.Auto)
+        out Direction resultDirection,
+        Direction targetDirection = Direction.Auto)
     {
         var info = text.textInfo;
         var characters = info.characterInfo;
@@ -109,21 +105,32 @@ public static class BiDi
         
         var logicalText = sb.ToString();
         var cps = StringToCodepoints(logicalText);
+        Debug.Log(string.Join(", ", cps));
+        resultDirection = DetectDirection(cps);
         
         if (ContainsRtl(cps))
         {
             if (text.textWrappingMode == TextWrappingModes.NoWrap)
             { 
-                return DoBiDi(cps, out logicalToVisualMap, direction, true);
+                logicalText = DoBiDi(cps, out logicalToVisualMap, targetDirection, true);
+            }
+            else
+            {
+                if (targetDirection == Direction.Auto)
+                {
+                    targetDirection = resultDirection;
+                }
+            
+                logicalText = WrapAndReorder(logicalText, text, out logicalToVisualMap, targetDirection);
             }
             
-            return WrapAndReorder(logicalText, cps, text, out logicalToVisualMap, direction);
+            return logicalText;
         }
         
         logicalToVisualMap = null;
         return logicalText;
     }
-
+    
     private static bool ContainsRtl(int[] codepoints)
     {
         if (codepoints == null || codepoints.Length == 0)
@@ -180,7 +187,7 @@ public static class BiDi
         return map;
     }
 
-    private static string CodepointsToString(int[] cps, bool reverse = false)
+    public static string CodepointsToString(int[] cps, bool reverse = false)
     {
         var sb = new StringBuilder(cps.Length);
         if (reverse)
@@ -202,8 +209,8 @@ public static class BiDi
         
         return sb.ToString();
     }
-    
-    private static int[] StringToCodepoints(string s)
+
+    public static int[] StringToCodepoints(string s)
     {
         var list = new List<int>(s.Length);
         for (int i = 0; i < s.Length;)

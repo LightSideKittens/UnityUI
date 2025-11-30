@@ -53,8 +53,6 @@ namespace TMPro.EditorUtilities
 
             public static readonly GUIContent defaultSpriteAssetLabel = new("Default Sprite Asset", "The Sprite Asset that will be assigned by default when using the <sprite> tag when no Sprite Asset is specified.");
             public static readonly GUIContent missingSpriteCharacterUnicodeLabel = new("Missing Sprite Unicode", "The unicode value for the sprite character to be displayed when the requested sprite character is not found in any sprite assets or fallbacks.");
-            public static readonly GUIContent enableEmojiSupportLabel = new("iOS Emoji Support", "Enables Emoji support for Touch Screen Keyboards on target devices.");
-            public static readonly GUIContent emojifallbackTextAssetsListLabel = new("Fallback Emoji Text Assets", "The Text Assets that will be searched to display characters defined as Emojis in the Unicode.");
 
             public static readonly GUIContent spriteAssetsPathLabel = new("Path:        Resources/", "The relative path to a Resources folder where the Sprite Assets are located.\nExample \"Sprite Assets/\"");
 
@@ -81,10 +79,7 @@ namespace TMPro.EditorUtilities
 
         SerializedProperty m_PropSpriteAsset;
         SerializedProperty m_PropMissingSpriteCharacterUnicode;
-        SerializedProperty m_PropEnableEmojiSupport;
         SerializedProperty m_PropSpriteAssetPath;
-
-        ReorderableList m_EmojiFallbackTextAssetList;
 
         SerializedProperty m_PropStyleSheet;
         SerializedProperty m_PropStyleSheetsResourcePath;
@@ -133,7 +128,6 @@ namespace TMPro.EditorUtilities
 
             m_PropSpriteAsset = serializedObject.FindProperty("m_defaultSpriteAsset");
             m_PropMissingSpriteCharacterUnicode = serializedObject.FindProperty("m_MissingCharacterSpriteUnicode");
-            m_PropEnableEmojiSupport = serializedObject.FindProperty("m_enableEmojiSupport");
             m_PropSpriteAssetPath = serializedObject.FindProperty("m_defaultSpriteAssetPath");
 
             m_PropStyleSheet = serializedObject.FindProperty("m_defaultStyleSheet");
@@ -157,25 +151,6 @@ namespace TMPro.EditorUtilities
             };
 
             m_GlobalFallbackFontAssetList.onChangedCallback = itemList =>
-            {
-                m_IsFallbackGlyphCacheDirty = true;
-            };
-
-            m_EmojiFallbackTextAssetList = new ReorderableList(serializedObject, serializedObject.FindProperty("m_EmojiFallbackTextAssets"), true, true, true, true);
-
-            m_EmojiFallbackTextAssetList.drawHeaderCallback = rect =>
-            {
-                EditorGUI.LabelField(rect, "Text Asset List");
-            };
-
-            m_EmojiFallbackTextAssetList.drawElementCallback = (rect, index, isActive, isFocused) =>
-            {
-                var element = m_EmojiFallbackTextAssetList.serializedProperty.GetArrayElementAtIndex(index);
-                rect.y += 2;
-                EditorGUI.PropertyField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), element, GUIContent.none);
-            };
-
-            m_EmojiFallbackTextAssetList.onChangedCallback = itemList =>
             {
                 m_IsFallbackGlyphCacheDirty = true;
             };
@@ -310,19 +285,8 @@ namespace TMPro.EditorUtilities
                 m_IsFallbackGlyphCacheDirty = true;
 
             EditorGUILayout.PropertyField(m_PropMissingSpriteCharacterUnicode, Styles.missingSpriteCharacterUnicodeLabel);
-            EditorGUILayout.PropertyField(m_PropEnableEmojiSupport, Styles.enableEmojiSupportLabel);
             EditorGUILayout.PropertyField(m_PropSpriteAssetPath, Styles.spriteAssetsPathLabel);
             EditorGUI.indentLevel = 0;
-
-            EditorGUILayout.Space();
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            GUILayout.Label(Styles.emojifallbackTextAssetsListLabel, EditorStyles.boldLabel);
-            EditorGUI.BeginChangeCheck();
-            m_EmojiFallbackTextAssetList.DoLayoutList();
-            if (EditorGUI.EndChangeCheck())
-                m_IsFallbackGlyphCacheDirty = true;
 
             EditorGUILayout.Space();
             EditorGUILayout.EndVertical();
