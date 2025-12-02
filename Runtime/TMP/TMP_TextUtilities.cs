@@ -399,7 +399,7 @@ namespace TMPro
                     maxAscender = Mathf.Max(maxAscender, currentCharInfo.ascender);
                     minDescender = Mathf.Min(minDescender, currentCharInfo.descender);
 
-                    if (isBeginRegion == false && isCharacterVisible)
+                    if (!isBeginRegion && isCharacterVisible)
                     {
                         isBeginRegion = true;
 
@@ -516,7 +516,7 @@ namespace TMPro
 
                     bool isCharacterVisible = currentCharInfo.isVisible;
 
-                    if (isBeginRegion == false && isCharacterVisible)
+                    if (!isBeginRegion && isCharacterVisible)
                     {
                         isBeginRegion = true;
 
@@ -686,7 +686,7 @@ namespace TMPro
                     TMP_CharacterInfo currentCharInfo = text.textInfo.characterInfo[characterIndex];
                     int currentLine = currentCharInfo.lineNumber;
 
-                    if (isBeginRegion == false)
+                    if (!isBeginRegion)
                     {
                         isBeginRegion = true;
 
@@ -782,7 +782,7 @@ namespace TMPro
                     TMP_CharacterInfo currentCharInfo = text.textInfo.characterInfo[characterIndex];
                     int currentLine = currentCharInfo.lineNumber;
 
-                    if (isBeginRegion == false)
+                    if (!isBeginRegion)
                     {
                         isBeginRegion = true;
 

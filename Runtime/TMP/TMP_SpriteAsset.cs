@@ -124,10 +124,10 @@ namespace TMPro
                 TMP_SpriteGlyph spriteGlyph = m_GlyphTable[i];
                 uint glyphIndex = spriteGlyph.index;
 
-                if (m_GlyphIndexLookup.ContainsKey(glyphIndex) == false)
+                if (!m_GlyphIndexLookup.ContainsKey(glyphIndex))
                     m_GlyphIndexLookup.Add(glyphIndex, i);
 
-                if (m_SpriteGlyphLookup.ContainsKey(glyphIndex) == false)
+                if (!m_SpriteGlyphLookup.ContainsKey(glyphIndex))
                     m_SpriteGlyphLookup.Add(glyphIndex, spriteGlyph);
             }
 
@@ -152,7 +152,7 @@ namespace TMPro
 
                 uint glyphIndex = spriteCharacter.glyphIndex;
 
-                if (m_SpriteGlyphLookup.ContainsKey(glyphIndex) == false)
+                if (!m_SpriteGlyphLookup.ContainsKey(glyphIndex))
                     continue;
 
                 spriteCharacter.glyph = m_SpriteGlyphLookup[glyphIndex];
@@ -160,12 +160,12 @@ namespace TMPro
 
                 int nameHashCode = TMP_TextUtilities.GetHashCode(m_SpriteCharacterTable[i].name);
 
-                if (m_NameLookup.ContainsKey(nameHashCode) == false)
+                if (!m_NameLookup.ContainsKey(nameHashCode))
                     m_NameLookup.Add(nameHashCode, i);
 
                 uint unicode = m_SpriteCharacterTable[i].unicode;
 
-                if (unicode != 0xFFFE && m_SpriteCharacterLookup.ContainsKey(unicode) == false)
+                if (unicode != 0xFFFE && !m_SpriteCharacterLookup.ContainsKey(unicode))
                     m_SpriteCharacterLookup.Add(unicode, spriteCharacter);
             }
 
@@ -283,7 +283,7 @@ namespace TMPro
 
                 int id = temp.GetInstanceID();
 
-                if (k_searchedSpriteAssets.Add(id) == false)
+                if (!k_searchedSpriteAssets.Add(id))
                     continue;
 
                 temp = SearchForSpriteByUnicodeInternal(temp, unicode, includeFallbacks, out spriteIndex);
@@ -410,7 +410,7 @@ namespace TMPro
 
                 int id = temp.instanceID;
 
-                if (k_searchedSpriteAssets.Add(id) == false)
+                if (!k_searchedSpriteAssets.Add(id))
                     continue;
 
                 temp = SearchForSpriteByHashCodeInternal(temp, hashCode, searchFallbacks, out spriteIndex);

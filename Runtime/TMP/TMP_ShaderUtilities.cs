@@ -176,7 +176,7 @@ namespace TMPro
         /// </summary>
         public static void GetShaderPropertyIDs()
         {
-            if (isInitialized == false)
+            if (!isInitialized)
             {
                 isInitialized = true;
 
@@ -344,14 +344,14 @@ namespace TMPro
 
         public static float GetPadding(Material material, bool enableExtraPadding, bool isBold)
         {
-            if (isInitialized == false)
+            if (!isInitialized)
                 GetShaderPropertyIDs();
 
             if (material == null) return 0;
 
             int extraPadding = enableExtraPadding ? 4 : 0;
 
-            if (material.HasProperty(ID_GradientScale) == false)
+            if (!material.HasProperty(ID_GradientScale))
             {
                 if (material.HasProperty(ID_Padding))
                     extraPadding += (int)material.GetFloat(ID_Padding);
@@ -515,7 +515,7 @@ namespace TMPro
 
         public static float GetPadding(Material[] materials, bool enableExtraPadding, bool isBold)
         {
-            if (isInitialized == false)
+            if (!isInitialized)
                 GetShaderPropertyIDs();
 
             if (materials == null) return 0;

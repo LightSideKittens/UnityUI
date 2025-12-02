@@ -70,20 +70,6 @@ namespace TMPro.EditorUtilities
                 {
                     textObject.fontSharedMaterial = duplicate;
                 }
-                else
-                {
-                    TMP_SubMesh subMeshObject = selectedObjects[i].GetComponent<TMP_SubMesh>();
-
-                    if (subMeshObject != null)
-                        subMeshObject.sharedMaterial = duplicate;
-                    else
-                    {
-                        TMP_SubMeshUI subMeshUIObject = selectedObjects[i].GetComponent<TMP_SubMeshUI>();
-
-                        if (subMeshUIObject != null)
-                            subMeshUIObject.sharedMaterial = duplicate;
-                    }
-                }
             }
 
             EditorUtility.FocusProjectWindow();

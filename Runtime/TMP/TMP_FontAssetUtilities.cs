@@ -190,7 +190,7 @@ namespace TMPro
 
                 int id = temp.instanceID;
 
-                if (k_SearchedAssets.Add(id) == false)
+                if (!k_SearchedAssets.Add(id))
                     continue;
 
                 TMP_Character character = GetCharacterFromFontAsset_Internal(unicode, temp, true, fontStyle, fontWeight, out isAlternativeTypeface);
@@ -334,7 +334,7 @@ namespace TMPro
 
                         int id = temp.instanceID;
 
-                        if (k_SearchedAssets.Add(id) == false)
+                        if (!k_SearchedAssets.Add(id))
                             continue;
 
                         spriteCharacter = GetSpriteCharacterFromSpriteAsset_Internal(unicode, temp, true);
@@ -379,7 +379,7 @@ namespace TMPro
 
                         int id = temp.instanceID;
 
-                        if (k_SearchedAssets.Add(id) == false)
+                        if (!k_SearchedAssets.Add(id))
                             continue;
 
                         spriteCharacter = GetSpriteCharacterFromSpriteAsset_Internal(unicode, temp, true);

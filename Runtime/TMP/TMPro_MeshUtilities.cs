@@ -206,10 +206,6 @@ namespace TMPro
         public float marginRight;
 
         public float xAdvance;
-        public float preferredWidth;
-        public float preferredHeight;
-        public float renderedWidth;
-        public float renderedHeight;
 
         public float previousLineScale;
 

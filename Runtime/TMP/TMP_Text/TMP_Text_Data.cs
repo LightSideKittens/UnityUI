@@ -23,16 +23,9 @@ namespace TMPro
         /// <summary>
         /// Returns the bounds of the text of the text object.
         /// </summary>
-        public Bounds textBounds
-        {
-            get
-            {
-                if (m_textInfo == null) return new();
-
-                return GetTextBounds();
-            }
-        }
-
+        public Bounds TextBounds => textBounds;
+        private Bounds textBounds;
+        
         /// <summary>
         /// Event delegate to allow custom loading of TMP_FontAsset when using the <font="Font Asset Name"> tag.
         /// </summary>
@@ -66,12 +59,13 @@ namespace TMPro
         /// <summary>
         /// Compute the rendered width of the text object.
         /// </summary>
-        public virtual Vector2 renderedSize => GetRenderedValues();
+        public virtual Vector2 renderedSize => textBounds.size;
 
         /// <summary>
         ///
         /// </summary>
-        public int layoutPriority { get { return m_layoutPriority; } }
+        public int layoutPriority => m_layoutPriority;
+
         protected int m_layoutPriority = 0;
 
         protected bool m_isLayoutDirty;
@@ -198,8 +192,7 @@ namespace TMPro
         protected float m_baselineOffset;
         protected TMP_TextProcessingStack<float> m_baselineOffsetStack = new(new float[16]);
         protected float m_xAdvance;
-
-        protected TMP_TextElementType m_textElementType;
+        
         protected TMP_TextElement m_cached_TextElement;
 
         protected SpecialCharacter m_Ellipsis;

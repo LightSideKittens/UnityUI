@@ -13,56 +13,6 @@ namespace TMPro.EditorUtilities
 {
     public static class TMPro_CreateObjectMenu
     {
-
-        /// <summary>
-        /// Create a TextMeshPro object that works with the Mesh Renderer
-        /// </summary>
-        /// <param name="command"></param>
-        [MenuItem("GameObject/3D Object/Text - TextMeshPro", false, 30)]
-        static void CreateTextMeshProObjectPerform(MenuCommand command)
-        {
-            GameObject go = ObjectFactory.CreateGameObject("Text (TMP)");
-
-            StageUtility.PlaceGameObjectInCurrentStage(go);
-
-            TextMeshPro textComponent = ObjectFactory.AddComponent<TextMeshPro>(go);
-
-            if (textComponent.m_isWaitingOnResourceLoad == false)
-            {
-                Preset[] presets = Preset.GetDefaultPresetsForObject(textComponent);
-
-                if (presets == null || presets.Length == 0)
-                {
-                    textComponent.text = "Sample text";
-                    textComponent.alignment = TextAlignmentOptions.TopLeft;
-                }
-                else
-                {
-                    textComponent.renderer.sortingLayerID = textComponent._SortingLayerID;
-                    textComponent.renderer.sortingOrder = textComponent._SortingOrder;
-                }
-
-                textComponent.rectTransform.sizeDelta = TMP_Settings.defaultTextMeshProTextContainerSize;
-            }
-            else
-            {
-                textComponent.text = "Sample text";
-                textComponent.alignment = TextAlignmentOptions.TopLeft;
-            }
-
-            Undo.RegisterCreatedObjectUndo(go, "Create " + go.name);
-
-            GameObject contextObject = command.context as GameObject;
-            if (contextObject != null)
-            {
-                GameObjectUtility.SetParentAndAlign(go, contextObject);
-                Undo.SetTransformParent(go.transform, contextObject.transform, "Parent " + go.name);
-            }
-
-            Selection.activeGameObject = go;
-        }
-
-
         /// <summary>
         /// Create a TextMeshPro object that works with the CanvasRenderer
         /// </summary>

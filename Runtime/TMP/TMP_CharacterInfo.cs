@@ -125,8 +125,6 @@ namespace TMPro
     [DebuggerDisplay("Unicode '{character}'  ({((uint)character).ToString(\"X\")})")]
     public struct TMP_CharacterInfo
     {
-        public TMP_TextElementType elementType;
-
         public char character;
 
         /// <summary>

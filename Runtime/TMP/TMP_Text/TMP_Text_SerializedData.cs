@@ -8,6 +8,68 @@ namespace TMPro
 {
     public abstract partial class TMP_Text
     {
+        const string RtlLtrStressTest =
+    "RTL/LTR mixed stress test (Unity TMP + BiDi + shaping):\n" +
+    "\n" +
+    // Арабский + базовые знаки
+    "العربية: مرحباً بالعالم! هذا نَصٌّ لاختبار الاتجاه؛ عربى، عربي، عربي؟\n" +
+    "أرقام عربية-هندية: ١٢٣٤٥٦٧٨٩٠, Arabic digits: 1234567890.\n" +
+    "علامات الترقيم: ، ؛ ؟ ! : ، … — (شرطة طويلة)، \"اقتباس\"، «اقتباس».\n" +
+    "\n" +
+    // LAM–ALEF + диакритика + ZWJ
+    "لام-ألف: لا لَا لَّا ل\u064E\u200Dا (LAM + FATHA + ZWJ + ALEF).\n" +
+    "سلسلة مشكولة: اَللّٰهُ رَبُّ الْعَالَمِينَ، بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ.\n" +
+    "\n" +
+    // Персидский (Farsi) с ZWNJ
+    "فارسی: سلام دنیا! حروف اضافی: پ چ ژ گ ی.\n" +
+    "فاصلهٔ مجازی (ZWNJ): می\u200Cروم، خانه\u200Cها، کتاب\u200Cها، نمی\u200Cخواهم.\n" +
+    "\n" +
+    // Урду
+    "اُردو: یہ ایک جامع ٹیسٹ ٹیکسٹ ہے؛ حروف: ٹ، ڈ، ڑ، ں، ہ، ھ، ے، ں، گ، ک، ی.\n" +
+    "مخلوط جملہ: اردو (Urdu) + English + اعداد ۱۲۳۴.\n" +
+    "\n" +
+    // Иврит + латиница + цифры
+    "עברית: שלום עולם, טקסט בדיקה, מספרים 1234 ו-٥٦٧٨.\n" +
+    "Mixed Hebrew/English: שלום (shalom) world 2025-12-01, test-מספר.\n" +
+    "\n" +
+    // Скобки, кавычки, вложенность
+    "Nested brackets: (AR: مرحبا [نص {تجريبي} مع أقواس]!) and (EN: (nested [brackets] {here})).\n" +
+    "Quotes: \"plain quotes\", ‘single’, “double smart”, «guillemets», „low-high“.\n" +
+    "\n" +
+    // Rich Text TMP
+    "RichText: <b>غامق عربي مرحبا</b>, <i>שלום מודגש</i>, " +
+    "<color=#FF0000>red English text</color>, " +
+    "<size=150%>نص مكبر</size>, <u>خط سفلي</u>.\n" +
+    "\n" +
+    // ZWJ/ZWNJ + формы
+    "ZWJ forms (for shaping): \u200Dب (forced final), ب\u200D (forced initial), \u200Dب\u200D (forced medial).\n" +
+    "Mix with diacritics + ZWJ: \u200Dب\u064E\u200D، \u200Dن\u0651\u064E\u200D.\n" +
+    "ZWNJ breaking join: با\u200Cب، لا\u200Cا، می\u200Cرود.\n" +
+    "\n" +
+    // Bidi control chars
+    "Bidi controls (LRE/RLE/PDF, LRM/RLM):\n" +
+    "English before \u202Bمرحبا بالعالم\u202C after [RLE ... PDF].\n" +
+    "LRM/LRM: EN\u200E-\u200Etag, AR\u200F-\u200Fعلامة.\n" +
+    "\n" +
+    // RTL + LTR в одной строке
+    "Mixed run: مرحبا (hello) 123 in [EN], ثم نص عربي، then Hebrew שלום, ואז again عربى.\n" +
+    "Right-to-left with inner English: هذا \"test\" داخل جملة عربية (with brackets).؟\n" +
+    "\n" +
+    // Скобки и кавычки вокруг RTL
+    "Brackets around RTL: (مرحبا)، [سلام]، {شکریہ} and around mixed [hello مرحبا 123].\n" +
+    "\n" +
+    // Эмодзи + RTL
+    "Emojis: 😀 😃 😁 😂 🤔 👍 ❤️.\n" +
+    "RTL with emojis: مرحبا 😀 بالعالم، رقم ١٢٣، نص 😃 مختلط 👍.\n" +
+    "Family ZWJ emoji: \U0001F468\u200D\U0001F469\u200D\U0001F467, flags: \U0001F1EE\U0001F1F7 (IL), " +
+    "\U0001F1EA\U0001F1F8 (ES), \U0001F1FA\U0001F1F8 (US).\n" +
+    "\n" +
+    // Комбинированная строка «всё подряд»
+    "Big mixed line: لا + لَا + لَّا + فارسی پچژگ + اُردو ٹ،ڈ،ڑ + עברית שלום + English TEXT 1234 " +
+    "++ emoji 😀 + brackets (عربي [EN {עברית} 42]) + ZWNJ می\u200Cروم + ZWJ \u200Dب\u200D + " +
+    "bidi controls \u202Bعربي مع \u202AEN\u202C داخل\u202C done.";
+
+        
         /// <summary>
         /// A string containing the text to be displayed.
         /// </summary>
@@ -15,6 +77,8 @@ namespace TMPro
         {
             get
             {
+                m_text = RtlLtrStressTest;
+                return RtlLtrStressTest;
                 if (m_IsTextBackingStringDirty)
                     return InternalTextBackingArrayToString();
 
@@ -22,12 +86,13 @@ namespace TMPro
             }
             set
             {
-                if (m_IsTextBackingStringDirty == false && m_text != null && value != null && m_text.Length == value.Length && m_text == value)
+                if (!m_IsTextBackingStringDirty && m_text != null && value != null && m_text.Length == value.Length && m_text == value)
                     return;
 
                 m_IsTextBackingStringDirty = false;
                 m_text = value;
                 _havePropertiesChanged = true;
+                m_text = RtlLtrStressTest;
                 SetVerticesDirty();
                 SetLayoutDirty();
             }
@@ -35,7 +100,7 @@ namespace TMPro
         [SerializeField]
         [TextArea(5, 10)]
         protected string m_text;
-
+        
         /// <summary>
         ///
         /// </summary>
@@ -954,7 +1019,7 @@ namespace TMPro
         public virtual Vector4 margin
         {
             get => m_margin;
-            set { if (m_margin == value) return; m_margin = value; ComputeMarginSize(); _havePropertiesChanged = true; SetVerticesDirty(); }
+            set { if (m_margin == value) return; m_margin = value; ComputeMarginSize(); _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
         }
         [SerializeField]
         protected Vector4 m_margin = new(0, 0, 0, 0);

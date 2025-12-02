@@ -5,7 +5,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 
-public static class BiDi
+public static class Bidi
 {
     public enum Direction
     {
@@ -45,6 +45,7 @@ public static class BiDi
         string logicalText,
         TMP_Text text,
         out int[] logicalToVisualMap,
+        out Direction[] resultDirections,
         Direction targetDirection)
     {
         var info = text.textInfo;
@@ -52,6 +53,8 @@ public static class BiDi
 
         var sb = new StringBuilder();
         var logicalToVisualMapList = new List<int>();
+        var isAuto = targetDirection == Direction.Auto;
+        resultDirections = new Direction[info.lineCount];
         
         for (int i = 0; i < info.lineCount; i++)
         {
@@ -62,6 +65,12 @@ public static class BiDi
             var part = logicalText[start..end];
             
             var logicalSlice = StringToCodepoints(part);
+            
+            if (isAuto)
+            { 
+                targetDirection = DetectDirection(logicalSlice);
+                resultDirections[i] = targetDirection;
+            }
             
             string visualLineText = DoBiDi(
                 logicalSlice,
@@ -74,7 +83,10 @@ public static class BiDi
 
             if (i > 0)
             {
-                sb.Append('\n');
+                if (sb[^1] != '\n')
+                { 
+                    sb.Append('\n');
+                }
             }
             
             for (int j = visualLineText.Length - 1; j >= 0; j--)
@@ -90,7 +102,7 @@ public static class BiDi
     
     public static string Do(TMP_Text text,
         out int[] logicalToVisualMap,
-        out Direction resultDirection,
+        out Direction[] resultDirections,
         Direction targetDirection = Direction.Auto)
     {
         var info = text.textInfo;
@@ -105,28 +117,25 @@ public static class BiDi
         
         var logicalText = sb.ToString();
         var cps = StringToCodepoints(logicalText);
-        resultDirection = DetectDirection(cps);
         
         if (ContainsRtl(cps))
         {
             if (text.textWrappingMode == TextWrappingModes.NoWrap)
-            { 
+            {
+                resultDirections = new[] { DetectDirection(cps) };
                 logicalText = DoBiDi(cps, out logicalToVisualMap, targetDirection, true);
             }
             else
             {
-                if (targetDirection == Direction.Auto)
-                {
-                    targetDirection = resultDirection;
-                }
-            
-                logicalText = WrapAndReorder(logicalText, text, out logicalToVisualMap, targetDirection);
+                resultDirections = new[] { DetectDirection(cps) };
+                logicalText = WrapAndReorder(logicalText, text, out logicalToVisualMap, out resultDirections, targetDirection);
             }
             
             return logicalText;
         }
         
         logicalToVisualMap = null;
+        resultDirections = null;
         return logicalText;
     }
     

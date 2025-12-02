@@ -2,11 +2,7 @@
 
 using System;
 using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Unity.Profiling;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.TextCore;
 using UnityEngine.TextCore.LowLevel;
 using UnityEngine.UI;
@@ -86,8 +82,7 @@ namespace TMPro
         DontRender = 0x0,
         Render = 0xFF
     };
-
-    public enum TMP_TextElementType { Character, Sprite };
+    
     public enum MaskingTypes { MaskOff = 0, MaskHard = 1, MaskSoft = 2 };
 
     public enum TextOverflowModes { Overflow = 0, Ellipsis = 1, Truncate = 3};
@@ -101,58 +96,30 @@ namespace TMPro
     /// <summary>
     /// Base class which contains common properties and functions shared between the TextMeshPro and TextMeshProUGUI component.
     /// </summary>
-    public abstract partial class TMP_Text : MaskableGraphic, ITextPreprocessor
+    public abstract partial class TMP_Text : MaskableGraphic
     {
         private string preprocessedText = string.Empty;
         private TextRenderFlags lastRenderMode;
-        private bool isAfterRebuildProcessing;
+        private bool isBidiProcessing;
+        protected Bidi.Direction[] directions;
         
-        protected void OnBeforeRebuild()
+        protected void OnBeforeMeshRender()
         {
-            if(isAfterRebuildProcessing) return;
-            if (string.IsNullOrEmpty(preprocessedText)) return;
+            if(isBidiProcessing) return;
             lastRenderMode = m_renderMode;
             m_renderMode = TextRenderFlags.DontRender;
         }
 
-        protected void OnAfterRebuild()
+        protected void OnAfterMeshRender()
         {
-            if(isAfterRebuildProcessing) return;
-            var input = preprocessedText;
-            if (string.IsNullOrEmpty(input)) return;
-            
-            input = BiDi.Do(this, out var logicalToVisualMap, out var direction);
-
-            if (logicalToVisualMap != null)
-            {
-                if (autoHorizontalAlignment && m_HorizontalAlignment is HorizontalAlignmentOptions.Left or HorizontalAlignmentOptions.Right)
-                {
-                    if (direction == BiDi.Direction.LeftToRight)
-                    {
-                        m_HorizontalAlignment = HorizontalAlignmentOptions.Left;
-                    }
-                    else
-                    {
-                        m_HorizontalAlignment = HorizontalAlignmentOptions.Right;
-                    }
-                }
-            }
-            
+            if(isBidiProcessing) return;
+            var input = Bidi.Do(this, out var logicalToVisualMap, out directions);
+            Debug.Log(string.Join(',', logicalToVisualMap));
             preprocessedText = input;
             m_renderMode = lastRenderMode;
-            isAfterRebuildProcessing = true;
+            isBidiProcessing = true;
             ForceMeshUpdate();
-            isAfterRebuildProcessing = false;
-        }
-        
-        string ITextPreprocessor.PreprocessText(string input)
-        {
-            if (string.IsNullOrEmpty(preprocessedText))
-            {
-                return input;
-            }
-            
-            return preprocessedText;
+            isBidiProcessing = false;
         }
         
         /// <summary>
@@ -353,20 +320,14 @@ namespace TMPro
         /// </summary>
         private struct TextBackingContainer
         {
-            public uint[] Text
-            {
-                get { return m_Array; }
-            }
+            public uint[] Text => m_Array;
 
-            public int Capacity
-            {
-                get { return m_Array.Length; }
-            }
+            public int Capacity => m_Array.Length;
 
             public int Count
             {
-                get { return m_Index; }
-                set { m_Index = value; }
+                get => m_Index;
+                set => m_Index = value;
             }
 
             private uint[] m_Array;
@@ -374,7 +335,7 @@ namespace TMPro
 
             public uint this[int index]
             {
-                get { return m_Array[index]; }
+                get => m_Array[index];
                 set
                 {
                     if (index >= m_Array.Length)
@@ -413,24 +374,25 @@ namespace TMPro
             k_ParseTextMarker.Begin();
 
             var input = m_text;
-
-            if (!isAfterRebuildProcessing)
+            
+            if (!isBidiProcessing)
             {
+                if (m_TextPreprocessor != null)
+                {
+                    input = m_TextPreprocessor.PreprocessText(input);
+                    PreprocessedText = input;
+                }
+
                 input = Normalize();
                 input = ArabicShaper.Do(input, out _);
                 preprocessedText = input;
+                PopulateTextArrays(input);
             }
-            
-            if (m_TextPreprocessor != null)
+            else
             {
-                input = m_TextPreprocessor.PreprocessText(m_text);
-                PreprocessedText = input;
+                PopulateTextArrays(preprocessedText);
             }
-            
-            PopulateTextBackingArray(input);
-            PopulateTextProcessingArray();
-            SetArraySizes(m_TextProcessingArray);
-            
+
             k_ParseTextMarker.End();
             
             string Normalize()
@@ -477,6 +439,13 @@ namespace TMPro
             }
         }
 
+        private void PopulateTextArrays(string input)
+        {
+            PopulateTextBackingArray(input);
+            PopulateTextProcessingArray();
+            SetArraySizes(m_TextProcessingArray);
+        }
+        
         /// <summary>
         /// Method used to determine the number of visible characters and required buffer allocations.
         /// </summary>
@@ -1184,7 +1153,7 @@ namespace TMPro
             k_InsertNewLineMarker.Begin();
 
             float baselineAdjustmentDelta = m_maxLineAscender - m_startOfLineAscender;
-            if (m_lineOffset > 0 && Math.Abs(baselineAdjustmentDelta) > 0.01f && m_IsDrivenLineSpacing == false)
+            if (m_lineOffset > 0 && Math.Abs(baselineAdjustmentDelta) > 0.01f && !m_IsDrivenLineSpacing)
             {
                 AdjustLineOffset(m_firstCharacterOfLine, m_characterCount, baselineAdjustmentDelta);
                 m_ElementDescender -= baselineAdjustmentDelta;
@@ -1201,28 +1170,29 @@ namespace TMPro
             if (m_useMaxVisibleDescender && (m_characterCount >= m_maxVisibleCharacters || m_lineNumber >= m_maxVisibleLines))
                 isMaxVisibleDescenderSet = true;
 
-            m_textInfo.lineInfo[m_lineNumber].firstCharacterIndex = m_firstCharacterOfLine;
-            m_textInfo.lineInfo[m_lineNumber].firstVisibleCharacterIndex = m_firstVisibleCharacterOfLine = m_firstCharacterOfLine > m_firstVisibleCharacterOfLine ? m_firstCharacterOfLine : m_firstVisibleCharacterOfLine;
-            int lastCharacterIndex = m_textInfo.lineInfo[m_lineNumber].lastCharacterIndex = m_lastCharacterOfLine = m_characterCount - 1 > 0 ? m_characterCount - 1 : 0;
-            m_textInfo.lineInfo[m_lineNumber].lastVisibleCharacterIndex = m_lastVisibleCharacterOfLine = m_lastVisibleCharacterOfLine < m_firstVisibleCharacterOfLine ? m_firstVisibleCharacterOfLine : m_lastVisibleCharacterOfLine;
+            ref var lineInfo = ref m_textInfo.lineInfo[m_lineNumber];
+            lineInfo.firstCharacterIndex = m_firstCharacterOfLine;
+            lineInfo.firstVisibleCharacterIndex = m_firstVisibleCharacterOfLine = m_firstCharacterOfLine > m_firstVisibleCharacterOfLine ? m_firstCharacterOfLine : m_firstVisibleCharacterOfLine;
+            lineInfo.lastCharacterIndex = m_lastCharacterOfLine = m_characterCount - 1 > 0 ? m_characterCount - 1 : 0;
+            lineInfo.lastVisibleCharacterIndex = m_lastVisibleCharacterOfLine = m_lastVisibleCharacterOfLine < m_firstVisibleCharacterOfLine ? m_firstVisibleCharacterOfLine : m_lastVisibleCharacterOfLine;
 
-            m_textInfo.lineInfo[m_lineNumber].characterCount = m_textInfo.lineInfo[m_lineNumber].lastCharacterIndex - m_textInfo.lineInfo[m_lineNumber].firstCharacterIndex + 1;
-            m_textInfo.lineInfo[m_lineNumber].visibleCharacterCount = m_lineVisibleCharacterCount;
-            m_textInfo.lineInfo[m_lineNumber].visibleSpaceCount = (m_textInfo.lineInfo[m_lineNumber].lastVisibleCharacterIndex + 1 - m_textInfo.lineInfo[m_lineNumber].firstCharacterIndex) - m_lineVisibleCharacterCount;
-            m_textInfo.lineInfo[m_lineNumber].lineExtents.min = new(m_textInfo.characterInfo[m_firstVisibleCharacterOfLine].bottomLeft.x, lineDescender);
-            m_textInfo.lineInfo[m_lineNumber].lineExtents.max = new(m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].topRight.x, lineAscender);
-            m_textInfo.lineInfo[m_lineNumber].length = m_textInfo.lineInfo[m_lineNumber].lineExtents.max.x;
-            m_textInfo.lineInfo[m_lineNumber].width = width;
+            lineInfo.characterCount = lineInfo.lastCharacterIndex - lineInfo.firstCharacterIndex + 1;
+            lineInfo.visibleCharacterCount = m_lineVisibleCharacterCount;
+            lineInfo.visibleSpaceCount = (lineInfo.lastVisibleCharacterIndex + 1 - lineInfo.firstCharacterIndex) - m_lineVisibleCharacterCount;
+            lineInfo.lineExtents.min = new(m_textInfo.characterInfo[m_firstVisibleCharacterOfLine].bottomLeft.x, lineDescender);
+            lineInfo.lineExtents.max = new(m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].topRight.x, lineAscender);
+            lineInfo.length = lineInfo.lineExtents.max.x;
+            lineInfo.width = width;
 
             float glyphAdjustment = m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].adjustedHorizontalAdvance;
             float maxAdvanceOffset = (glyphAdjustment * currentElementScale + (m_currentFontAsset.normalSpacingOffset + characterSpacingAdjustment + boldSpacingAdjustment) * currentEmScale + m_cSpacing) * (1 - m_charWidthAdjDelta);
-            float adjustedHorizontalAdvance = m_textInfo.lineInfo[m_lineNumber].maxAdvance = m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].xAdvance + (m_isRightToLeft ? maxAdvanceOffset : - maxAdvanceOffset);
+            float adjustedHorizontalAdvance = lineInfo.maxAdvance = m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].xAdvance + (m_isRightToLeft ? maxAdvanceOffset : - maxAdvanceOffset);
             m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].xAdvance = adjustedHorizontalAdvance;
 
-            m_textInfo.lineInfo[m_lineNumber].baseline = 0 - m_lineOffset;
-            m_textInfo.lineInfo[m_lineNumber].ascender = lineAscender;
-            m_textInfo.lineInfo[m_lineNumber].descender = lineDescender;
-            m_textInfo.lineInfo[m_lineNumber].lineHeight = lineAscender - lineDescender + lineGap * baseScale;
+            lineInfo.baseline = 0 - m_lineOffset;
+            lineInfo.ascender = lineAscender;
+            lineInfo.descender = lineDescender;
+            lineInfo.lineHeight = lineAscender - lineDescender + lineGap * baseScale;
 
             m_firstCharacterOfLine = m_characterCount;
             m_lineVisibleCharacterCount = 0;
@@ -1290,11 +1260,7 @@ namespace TMPro
             state.startOfLineAscender = m_startOfLineAscender;
             state.maxLineAscender = m_maxLineAscender;
             state.maxLineDescender = m_maxLineDescender;
-
-            state.preferredWidth = m_preferredWidth;
-            state.preferredHeight = m_preferredHeight;
-            state.renderedWidth = m_RenderedWidth;
-            state.renderedHeight = m_RenderedHeight;
+            
             state.meshExtents = m_meshExtents;
 
             state.lineNumber = m_lineNumber;
@@ -1379,11 +1345,7 @@ namespace TMPro
             m_startOfLineAscender = state.startOfLineAscender;
             m_maxLineAscender = state.maxLineAscender;
             m_maxLineDescender = state.maxLineDescender;
-
-            m_preferredWidth = state.preferredWidth;
-            m_preferredHeight = state.preferredHeight;
-            m_RenderedWidth = state.renderedWidth;
-            m_RenderedHeight = state.renderedHeight;
+            
             m_meshExtents = state.meshExtents;
 
             m_lineNumber = state.lineNumber;
@@ -1933,17 +1895,8 @@ namespace TMPro
                 }
                 else
                 {
-                    if (GetType() == typeof(TextMeshPro))
-                    {
-                        if (m_rectTransform.sizeDelta == new Vector2(100, 100))
-                            m_rectTransform.sizeDelta = TMP_Settings.defaultTextMeshProTextContainerSize;
-                    }
-                    else
-                    {
-                        if (m_rectTransform.sizeDelta == new Vector2(100, 100))
-                            m_rectTransform.sizeDelta = TMP_Settings.defaultTextMeshProUITextContainerSize;
-                    }
-
+                    if (m_rectTransform.sizeDelta == new Vector2(100, 100))
+                        m_rectTransform.sizeDelta = TMP_Settings.defaultTextMeshProUITextContainerSize;
                 }
 
                 m_TextWrappingMode = TMP_Settings.textWrappingMode;
@@ -3222,7 +3175,7 @@ namespace TMPro
                         return true;
 
                     case MarkupTag.A:
-                        if (m_isTextLayoutPhase && !m_isCalculatingPreferredValues)
+                        if (m_isTextLayoutPhase)
                         {
                             if (m_xmlAttribute[1].nameHashCode == (int)MarkupTag.HREF)
                             {
@@ -3239,7 +3192,7 @@ namespace TMPro
                         }
                         return true;
                     case MarkupTag.SLASH_A:
-                        if (m_isTextLayoutPhase && !m_isCalculatingPreferredValues)
+                        if (m_isTextLayoutPhase)
                         {
                             int index = m_textInfo.linkCount;
 
@@ -3249,7 +3202,7 @@ namespace TMPro
                         }
                         return true;
                     case MarkupTag.LINK:
-                        if (m_isTextLayoutPhase && !m_isCalculatingPreferredValues)
+                        if (m_isTextLayoutPhase)
                         {
                             int index = m_textInfo.linkCount;
 
@@ -3266,7 +3219,7 @@ namespace TMPro
                         }
                         return true;
                     case MarkupTag.SLASH_LINK:
-                        if (m_isTextLayoutPhase && !m_isCalculatingPreferredValues)
+                        if (m_isTextLayoutPhase)
                         {
                             if (m_textInfo.linkCount < m_textInfo.linkInfo.Length)
                             {
@@ -3650,8 +3603,7 @@ namespace TMPro
                         if (m_spriteIndex == -1) return false;
 
                         m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentSpriteAsset.material, m_currentSpriteAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
-
-                        m_textElementType = TMP_TextElementType.Sprite;
+                        
                         return true;
                     case MarkupTag.LOWERCASE:
                         m_FontStyleInternal |= FontStyles.LowerCase;

@@ -291,7 +291,6 @@ namespace UnityEngine.UI
                 return;
 
             m_VertsDirty = true;
-            Debug.Log("SetVerticesDirty");
             CanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
 
             if (m_OnDirtyVertsCallback != null)

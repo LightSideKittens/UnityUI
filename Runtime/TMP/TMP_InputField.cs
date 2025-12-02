@@ -505,7 +505,7 @@ namespace TMPro
                         break;
                 }
 
-                if (m_HideSoftKeyboard == true && m_SoftKeyboard != null && TouchScreenKeyboard.isSupported && m_SoftKeyboard.active)
+                if (m_HideSoftKeyboard && m_SoftKeyboard != null && TouchScreenKeyboard.isSupported && m_SoftKeyboard.active)
                 {
                     m_SoftKeyboard.active = false;
                     m_SoftKeyboard = null;
@@ -1372,7 +1372,7 @@ namespace TMPro
         {
             int currentLine = m_TextComponent.textInfo.characterInfo[caretPositionInternal].lineNumber;
 
-            int characterIndex = ctrl == true ? m_TextComponent.textInfo.characterCount - 1 : m_TextComponent.textInfo.lineInfo[currentLine].lastCharacterIndex;
+            int characterIndex = ctrl ? m_TextComponent.textInfo.characterCount - 1 : m_TextComponent.textInfo.lineInfo[currentLine].lastCharacterIndex;
 
             int position = m_TextComponent.textInfo.characterInfo[characterIndex].index;
 
@@ -1401,7 +1401,7 @@ namespace TMPro
         {
             int currentLine = m_TextComponent.textInfo.characterInfo[caretPositionInternal].lineNumber;
 
-            int characterIndex = ctrl == true ? 0 : m_TextComponent.textInfo.lineInfo[currentLine].firstCharacterIndex;
+            int characterIndex = ctrl ? 0 : m_TextComponent.textInfo.lineInfo[currentLine].firstCharacterIndex;
 
             int position = 0;
             if (characterIndex > 0)
@@ -1448,7 +1448,7 @@ namespace TMPro
             if (TouchScreenKeyboard.isSupported && shouldHideSoftKeyboard)
                 return true;
 
-            if (TouchScreenKeyboard.isSupported && shouldHideSoftKeyboard == false && shouldHideMobileInput == false)
+            if (TouchScreenKeyboard.isSupported && !shouldHideSoftKeyboard && !shouldHideMobileInput)
                 return false;
 
             return true;
@@ -1567,7 +1567,7 @@ namespace TMPro
                         return;
                     }
 
-                    if (m_KeepTextSelectionVisible == false && selectedObject.GetComponent<TMP_InputField>() != null)
+                    if (!m_KeepTextSelectionVisible && selectedObject.GetComponent<TMP_InputField>() != null)
                         ReleaseSelection();
 
                     return;
@@ -1858,7 +1858,7 @@ namespace TMPro
             bool hadFocusBefore = m_AllowInput;
             base.OnPointerDown(eventData);
 
-            if (InPlaceEditing() == false)
+            if (!InPlaceEditing())
             {
                 if (m_SoftKeyboard == null || !m_SoftKeyboard.active)
                 {
@@ -2771,7 +2771,7 @@ namespace TMPro
             {
                 float offset = m_TextViewport.rect.height;
 
-                float topTextBounds = m_TextComponent.rectTransform.position.y + m_TextComponent.textBounds.max.y;
+                float topTextBounds = m_TextComponent.rectTransform.position.y + m_TextComponent.TextBounds.max.y;
                 float topViewportBounds = m_TextViewport.position.y + m_TextViewport.rect.yMax;
 
                 offset = topViewportBounds > topTextBounds + offset ? offset : topViewportBounds - topTextBounds;
@@ -2816,7 +2816,7 @@ namespace TMPro
             {
                 float offset = m_TextViewport.rect.height;
 
-                float bottomTextBounds = m_TextComponent.rectTransform.position.y + m_TextComponent.textBounds.min.y;
+                float bottomTextBounds = m_TextComponent.rectTransform.position.y + m_TextComponent.TextBounds.min.y;
                 float bottomViewportBounds = m_TextViewport.position.y + m_TextViewport.rect.yMin;
 
                 offset = bottomViewportBounds > bottomTextBounds + offset ? offset : bottomViewportBounds - bottomTextBounds;
@@ -3030,7 +3030,7 @@ namespace TMPro
             if (m_ReadOnly)
                 return;
 
-            if (InPlaceEditing() == false)
+            if (!InPlaceEditing())
                 return;
 
             for (int i = 0, imax = input.Length; i < imax; ++i)
@@ -3049,7 +3049,7 @@ namespace TMPro
             if (m_ReadOnly)
                 return;
 
-            if (InPlaceEditing() == false)
+            if (!InPlaceEditing())
                 return;
 
             int insertionPosition = Mathf.Min(stringPositionInternal, stringSelectPositionInternal);
@@ -3222,12 +3222,12 @@ namespace TMPro
 
         protected void UpdateLabel()
         {
-            if (m_TextComponent != null && m_TextComponent.font != null && m_PreventCallback == false)
+            if (m_TextComponent != null && m_TextComponent.font != null && !m_PreventCallback)
             {
                 m_PreventCallback = true;
 
                 string fullText;
-                if (compositionLength > 0 && m_ReadOnly == false)
+                if (compositionLength > 0 && !m_ReadOnly)
                 {
                     Delete();
 
@@ -3257,7 +3257,7 @@ namespace TMPro
                 if (m_Placeholder != null)
                     m_Placeholder.enabled = isEmpty;
 
-                if (!isEmpty && m_ReadOnly == false)
+                if (!isEmpty && !m_ReadOnly)
                 {
                     SetCaretVisible();
                 }
@@ -3480,7 +3480,7 @@ namespace TMPro
                 return;
             #endif
 
-            if (InPlaceEditing() == false && isUWP() == false)
+            if (!InPlaceEditing() && !isUWP())
                 return;
 
             if (m_CachedInputRenderer == null)
@@ -3553,7 +3553,7 @@ namespace TMPro
 
         private void GenerateCaret(VertexHelper vbo, Vector2 roundingOffset)
         {
-            if (m_CaretVisible == false || m_TextComponent.canvas == null || m_ReadOnly)
+            if (!m_CaretVisible || m_TextComponent.canvas == null || m_ReadOnly)
                 return;
 
             if (m_CursorVerts == null)
@@ -3990,14 +3990,14 @@ namespace TMPro
 
             m_TouchKeyboardAllowsInPlaceEditing = !s_IsQuestDevice && TouchScreenKeyboard.isInPlaceEditingAllowed;
 
-            if (TouchScreenKeyboardShouldBeUsed() && shouldHideSoftKeyboard == false)
+            if (TouchScreenKeyboardShouldBeUsed() && !shouldHideSoftKeyboard)
             {
                 if (inputSystem != null && inputSystem.touchSupported)
                 {
                     TouchScreenKeyboard.hideInput = shouldHideMobileInput;
                 }
 
-                if (shouldHideSoftKeyboard == false && m_ReadOnly == false)
+                if (!shouldHideSoftKeyboard && !m_ReadOnly)
                 {
                     m_SoftKeyboard = (inputType == InputType.Password) ?
                         TouchScreenKeyboard.Open(m_Text, keyboardType, false, multiLine, true, isAlert, "", characterLimit) :
@@ -4014,7 +4014,7 @@ namespace TMPro
             }
             else
             {
-                if (!TouchScreenKeyboardShouldBeUsed() && m_ReadOnly == false && inputSystem != null)
+                if (!TouchScreenKeyboardShouldBeUsed() && !m_ReadOnly && inputSystem != null)
                     inputSystem.imeCompositionMode = IMECompositionMode.On;
 
                 OnFocus();

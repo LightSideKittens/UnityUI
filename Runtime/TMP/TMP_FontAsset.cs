@@ -814,7 +814,7 @@ namespace TMPro
 
                 uint index = glyph.index;
 
-                if (m_GlyphLookupDictionary.ContainsKey(index) == false)
+                if (!m_GlyphLookupDictionary.ContainsKey(index))
                 {
                     m_GlyphLookupDictionary.Add(index, glyph);
                     m_GlyphIndexList.Add(index);
@@ -836,7 +836,7 @@ namespace TMPro
                 uint unicode = character.unicode;
                 uint glyphIndex = character.glyphIndex;
 
-                if (m_CharacterLookupDictionary.ContainsKey(unicode) == false)
+                if (!m_CharacterLookupDictionary.ContainsKey(unicode))
                 {
                     m_CharacterLookupDictionary.Add(unicode, character);
                     character.textAsset = this;
@@ -1016,7 +1016,7 @@ namespace TMPro
             {
                 if (FontEngine.GetGlyphIndex(unicode) != 0)
                 {
-                    if (addImmediately == false)
+                    if (!addImmediately)
                         return;
 
                     GlyphLoadFlags glyphLoadFlags = ((GlyphRasterModes)m_AtlasRenderMode & GlyphRasterModes.RASTER_MODE_NO_HINTING) == GlyphRasterModes.RASTER_MODE_NO_HINTING
@@ -1060,7 +1060,7 @@ namespace TMPro
                 if (FontEngine.LoadFontFace(m_SourceFontFile, m_FaceInfo.pointSize, m_FaceInfo.faceIndex) == FontEngineError.Success)
                     return FontEngineError.Success;
 
-                if (string.IsNullOrEmpty(m_SourceFontFilePath) == false)
+                if (!string.IsNullOrEmpty(m_SourceFontFilePath))
                     return  FontEngine.LoadFontFace(m_SourceFontFilePath, m_FaceInfo.pointSize, m_FaceInfo.faceIndex);
 
                 return FontEngineError.Invalid_Face;
@@ -1340,7 +1340,7 @@ namespace TMPro
 
                             if (k_SearchedFontAssetLookup.Add(fallbackID))
                             {
-                                if (fallback.HasCharacter_Internal(character, true, tryAddCharacter) == false)
+                                if (!fallback.HasCharacter_Internal(character, true, tryAddCharacter))
                                     continue;
 
                                 isMissingCharacter = false;
@@ -1358,7 +1358,7 @@ namespace TMPro
 
                             if (k_SearchedFontAssetLookup.Add(fallbackID))
                             {
-                                if (fallback.HasCharacter_Internal(character, true, tryAddCharacter) == false)
+                                if (!fallback.HasCharacter_Internal(character, true, tryAddCharacter))
                                     continue;
 
                                 isMissingCharacter = false;
@@ -1749,7 +1749,7 @@ namespace TMPro
                 TMP_Character character = m_CharactersToAdd[i];
                 Glyph glyph;
 
-                if (m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out glyph) == false)
+                if (!m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out glyph))
                 {
                     m_GlyphsToAdd.Add(character.glyphIndex);
                     continue;
@@ -1765,9 +1765,9 @@ namespace TMPro
                 i -= 1;
             }
 
-            if (m_IsMultiAtlasTexturesEnabled && allGlyphsAddedToTexture == false)
+            if (m_IsMultiAtlasTexturesEnabled && !allGlyphsAddedToTexture)
             {
-                while (allGlyphsAddedToTexture == false)
+                while (!allGlyphsAddedToTexture)
                     allGlyphsAddedToTexture = TryAddGlyphsToNewAtlasTexture();
             }
 
@@ -1946,7 +1946,7 @@ namespace TMPro
                 TMP_Character character = m_CharactersToAdd[i];
                 Glyph glyph;
 
-                if (m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out glyph) == false)
+                if (!m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out glyph))
                 {
                     m_GlyphsToAdd.Add(character.glyphIndex);
                     continue;
@@ -1962,9 +1962,9 @@ namespace TMPro
                 i -= 1;
             }
 
-            if (m_IsMultiAtlasTexturesEnabled && allGlyphsAddedToTexture == false)
+            if (m_IsMultiAtlasTexturesEnabled && !allGlyphsAddedToTexture)
             {
-                while (allGlyphsAddedToTexture == false)
+                while (!allGlyphsAddedToTexture)
                     allGlyphsAddedToTexture = TryAddGlyphsToNewAtlasTexture();
             }
 
@@ -2030,7 +2030,7 @@ namespace TMPro
                 return false;
             }
 
-            if (m_AtlasTextures[m_AtlasTextureIndex].isReadable == false)
+            if (!m_AtlasTextures[m_AtlasTextureIndex].isReadable)
             {
                 Debug.LogWarning("Unable to add the requested glyph to font asset [" + name + "]'s atlas texture. Please make the texture [" + m_AtlasTextures[m_AtlasTextureIndex].name + "] readable.", m_AtlasTextures[m_AtlasTextureIndex]);
 
@@ -2171,7 +2171,7 @@ namespace TMPro
 
             Glyph glyph = null;
 
-            if (m_AtlasTextures[m_AtlasTextureIndex].isReadable == false)
+            if (!m_AtlasTextures[m_AtlasTextureIndex].isReadable)
             {
                 Debug.LogWarning("Unable to add the requested character to font asset [" + name + "]'s atlas texture. Please make the texture [" + m_AtlasTextures[m_AtlasTextureIndex].name + "] readable.", m_AtlasTextures[m_AtlasTextureIndex]);
 
@@ -2390,7 +2390,7 @@ namespace TMPro
                 TMP_Character character = m_CharactersToAdd[i];
                 Glyph glyph;
 
-                if (m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out glyph) == false)
+                if (!m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out glyph))
                 {
                     m_GlyphsToAdd.Add(character.glyphIndex);
                     continue;
@@ -2964,7 +2964,7 @@ namespace TMPro
 
             texture = m_AtlasTexture = m_AtlasTextures[0];
 
-            if (texture.isReadable == false)
+            if (!texture.isReadable)
             {
                 #if UNITY_EDITOR
                 SetAtlasTextureIsReadable?.Invoke(texture, true);
