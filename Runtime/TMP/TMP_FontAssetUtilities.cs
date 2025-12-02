@@ -305,9 +305,7 @@ namespace TMPro
             if (spriteAsset == null)
                 return null;
 
-            TMP_SpriteCharacter spriteCharacter;
-
-            if (spriteAsset.spriteCharacterLookupTable.TryGetValue(unicode, out spriteCharacter))
+            if (spriteAsset.spriteCharacterLookupTable.TryGetValue(unicode, out var spriteCharacter))
                 return spriteCharacter;
 
             if (includeFallbacks)
@@ -357,9 +355,7 @@ namespace TMPro
         /// <returns></returns>
         private static TMP_SpriteCharacter GetSpriteCharacterFromSpriteAsset_Internal(uint unicode, TMP_SpriteAsset spriteAsset, bool includeFallbacks)
         {
-            TMP_SpriteCharacter spriteCharacter;
-
-            if (spriteAsset.spriteCharacterLookupTable.TryGetValue(unicode, out spriteCharacter))
+            if (spriteAsset.spriteCharacterLookupTable.TryGetValue(unicode, out var spriteCharacter))
                 return spriteCharacter;
 
             if (includeFallbacks)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using TMPro;
@@ -34,74 +35,72 @@ public static class Bidi
         [In] int[] logicalUtf32,
         int length);
     
-    [DllImport(DLL_NAME,
-        EntryPoint = "fribidi_unity_has_rtl",
-        CallingConvention = CallingConvention.Cdecl)]
-    internal static extern int fribidi_unity_has_rtl(
-        [In] int[] logicalUtf32,
-        int length);
-    
-    private static string WrapAndReorder(
+    static string WrapAndReorder(
         string logicalText,
         TMP_Text text,
-        out int[] logicalToVisualMap,
+        out int[][] logicalToVisualMap,
         out Direction[] resultDirections,
         Direction targetDirection)
     {
         var info = text.textInfo;
         var lines = info.lineInfo;
 
-        var sb = new StringBuilder();
-        var logicalToVisualMapList = new List<int>();
-        var isAuto = targetDirection == Direction.Auto;
+        Debug.Log(logicalText.Count(x => x == '\n'));
+        var sb = new StringBuilder(logicalText.Length);
+        logicalToVisualMap = new int[info.lineCount][];
         resultDirections = new Direction[info.lineCount];
-        
+
+        bool isAuto = targetDirection == Direction.Auto;
+        Debug.Log(info.lineCount);
         for (int i = 0; i < info.lineCount; i++)
         {
             var line = lines[i];
+
             int start = line.firstCharacterIndex;
-            var length = line.characterCount;
+            int length = line.characterCount;
             int end = start + length;
-            var part = logicalText[start..end];
-            
-            var logicalSlice = StringToCodepoints(part);
-            
-            if (isAuto)
-            { 
-                targetDirection = DetectDirection(logicalSlice);
-                resultDirections[i] = targetDirection;
-            }
-            
+
+            string part = logicalText.Substring(start, length);
+
+            bool hasTrailingNewline =
+                part.Length > 0 &&
+                part[^1] == '\n';
+
+            string core = hasTrailingNewline ? part[..^1] : part;
+
+            int[] logicalSlice = StringToCodepoints(core);
+
+            var lineDirection = DetectDirection(logicalSlice);
+            resultDirections[i] = lineDirection;
+
             string visualLineText = DoBiDi(
                 logicalSlice,
-                out int[] localMap, targetDirection);
+                out int[] localMap,
+                targetDirection);
 
-            if (localMap == null || localMap.Length != length)
+            if (localMap == null || localMap.Length != logicalSlice.Length)
             {
-                localMap = BuildIdentityMap(length);
+                localMap = BuildIdentityMap(logicalSlice.Length);
             }
 
-            if (i > 0)
+            logicalToVisualMap[i] = localMap;
+
+            sb.Append(visualLineText);
+
+            if (hasTrailingNewline)
             {
-                if (sb[^1] != '\n')
-                { 
-                    sb.Append('\n');
-                }
-            }
-            
-            for (int j = visualLineText.Length - 1; j >= 0; j--)
-            {
-                logicalToVisualMapList.Add(localMap[j]);
-                sb.Append(visualLineText[j]);
+                sb.Append('\n');
             }
         }
 
-        logicalToVisualMap = logicalToVisualMapList.ToArray();
-        return sb.ToString();
+        var result = sb.ToString();
+        Debug.Log(result.Count(x => x == '\n'));
+        return result;
     }
+
     
     public static string Do(TMP_Text text,
-        out int[] logicalToVisualMap,
+        out int[][] logicalToVisualMap,
         out Direction[] resultDirections,
         Direction targetDirection = Direction.Auto)
     {
@@ -123,7 +122,8 @@ public static class Bidi
             if (text.textWrappingMode == TextWrappingModes.NoWrap)
             {
                 resultDirections = new[] { DetectDirection(cps) };
-                logicalText = DoBiDi(cps, out logicalToVisualMap, targetDirection, true);
+                logicalText = DoBiDi(cps, out var logicalToVisualMapOneLine, targetDirection, true);
+                logicalToVisualMap = new[] { logicalToVisualMapOneLine };
             }
             else
             {
@@ -139,13 +139,30 @@ public static class Bidi
         return logicalText;
     }
     
-    private static bool ContainsRtl(int[] codepoints)
+    static bool ContainsRtl(int[] cps)
     {
-        if (codepoints == null || codepoints.Length == 0)
+        if (cps == null || cps.Length == 0)
             return false;
 
-        int result = fribidi_unity_has_rtl(codepoints, codepoints.Length);
-        return result != 0;
+        for (int i = 0; i < cps.Length; i++)
+        {
+            int cp = cps[i];
+
+            if ((cp >= 0x0590 && cp <= 0x05FF) || // Hebrew
+                (cp >= 0x0600 && cp <= 0x06FF) || // Arabic
+                (cp >= 0x0700 && cp <= 0x074F) || // Syriac
+                (cp >= 0x0750 && cp <= 0x077F) || // Arabic Supplement
+                (cp >= 0x0780 && cp <= 0x07BF) || // Thaana
+                (cp >= 0x07C0 && cp <= 0x07FF) || // N'Ko
+                (cp >= 0x0800 && cp <= 0x083F) || // Samaritan
+                (cp >= 0x0840 && cp <= 0x085F) || // Mandaic
+                (cp >= 0x08A0 && cp <= 0x08FF))   // Arabic Extended
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
     
     private static Direction DetectDirection(int[] cps)

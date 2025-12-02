@@ -1756,9 +1756,7 @@ namespace TMPro
             if (!MayDrag(eventData))
                 return;
 
-            CaretPosition insertionSide;
-
-            int insertionIndex = TMP_TextUtilities.GetCursorIndexFromPosition(m_TextComponent, eventData.position, eventData.pressEventCamera, out insertionSide);
+            int insertionIndex = TMP_TextUtilities.GetCursorIndexFromPosition(m_TextComponent, eventData.position, eventData.pressEventCamera, out var insertionSide);
 
             if (m_isRichTextEditingAllowed)
             {
@@ -1805,9 +1803,7 @@ namespace TMPro
         {
             while (m_UpdateDrag && m_DragPositionOutOfBounds)
             {
-                Vector2 localMousePos;
-
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(textViewport, eventData.position, eventData.pressEventCamera, out localMousePos);
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(textViewport, eventData.position, eventData.pressEventCamera, out var localMousePos);
 
                 Rect rect = textViewport.rect;
 
@@ -1884,9 +1880,7 @@ namespace TMPro
 
             if (hadFocusBefore || !m_OnFocusSelectAll)
             {
-                CaretPosition insertionSide;
-
-                int insertionIndex = TMP_TextUtilities.GetCursorIndexFromPosition(m_TextComponent, eventData.position, eventData.pressEventCamera, out insertionSide);
+                int insertionIndex = TMP_TextUtilities.GetCursorIndexFromPosition(m_TextComponent, eventData.position, eventData.pressEventCamera, out var insertionSide);
 
                 if (shift)
                 {

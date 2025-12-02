@@ -183,9 +183,7 @@ namespace TMPro
             if (m_NameLookup == null)
                 UpdateLookupTables();
 
-            int index;
-
-            if (m_NameLookup.TryGetValue(hashCode, out index))
+            if (m_NameLookup.TryGetValue(hashCode, out var index))
                 return index;
 
             return -1;
@@ -202,9 +200,7 @@ namespace TMPro
             if (m_SpriteCharacterLookup == null)
                 UpdateLookupTables();
 
-            TMP_SpriteCharacter spriteCharacter;
-
-            if (m_SpriteCharacterLookup.TryGetValue(unicode, out spriteCharacter))
+            if (m_SpriteCharacterLookup.TryGetValue(unicode, out var spriteCharacter))
                 return (int)spriteCharacter.glyphIndex;
 
             return -1;

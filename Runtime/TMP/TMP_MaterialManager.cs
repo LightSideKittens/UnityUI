@@ -323,9 +323,8 @@ namespace TMPro
             Texture tex = fontAsset.atlasTextures[atlasIndex];
             int texID = tex.GetInstanceID();
             long key = (long)sourceMaterialID << 32 | (long)(uint)texID;
-            FallbackMaterial fallback;
 
-            if (m_fallbackMaterials.TryGetValue(key, out fallback))
+            if (m_fallbackMaterials.TryGetValue(key, out var fallback))
             {
                 int sourceMaterialCRC = sourceMaterial.ComputeCRC();
                 if (sourceMaterialCRC == fallback.sourceMaterialCRC)
@@ -375,9 +374,8 @@ namespace TMPro
             Texture tex = targetMaterial.GetTexture(ShaderUtilities.ID_MainTex);
             int texID = tex.GetInstanceID();
             long key = (long)sourceID << 32 | (long)(uint)texID;
-            FallbackMaterial fallback;
 
-            if (m_fallbackMaterials.TryGetValue(key, out fallback))
+            if (m_fallbackMaterials.TryGetValue(key, out var fallback))
             {
                 int sourceMaterialCRC = sourceMaterial.ComputeCRC();
                 if (sourceMaterialCRC == fallback.sourceMaterialCRC)
@@ -442,12 +440,10 @@ namespace TMPro
             if (targetMaterial == null) return;
 
             int sourceID = targetMaterial.GetInstanceID();
-            long key;
 
-            if (m_fallbackMaterialLookup.TryGetValue(sourceID, out key))
+            if (m_fallbackMaterialLookup.TryGetValue(sourceID, out var key))
             {
-                FallbackMaterial fallback;
-                if (m_fallbackMaterials.TryGetValue(key, out fallback))
+                if (m_fallbackMaterials.TryGetValue(key, out var fallback))
                 {
                     fallback.count += 1;
                 }
@@ -464,12 +460,10 @@ namespace TMPro
             if (targetMaterial == null) return;
 
             int sourceID = targetMaterial.GetInstanceID();
-            long key;
 
-            if (m_fallbackMaterialLookup.TryGetValue(sourceID, out key))
+            if (m_fallbackMaterialLookup.TryGetValue(sourceID, out var key))
             {
-                FallbackMaterial fallback;
-                if (m_fallbackMaterials.TryGetValue(key, out fallback))
+                if (m_fallbackMaterials.TryGetValue(key, out var fallback))
                 {
                     fallback.count -= 1;
 
@@ -514,12 +508,10 @@ namespace TMPro
             if (fallbackMaterial == null) return;
 
             int materialID = fallbackMaterial.GetInstanceID();
-            long key;
 
-            if (m_fallbackMaterialLookup.TryGetValue(materialID, out key))
+            if (m_fallbackMaterialLookup.TryGetValue(materialID, out var key))
             {
-                FallbackMaterial fallback;
-                if (m_fallbackMaterials.TryGetValue(key, out fallback))
+                if (m_fallbackMaterials.TryGetValue(key, out var fallback))
                 {
                     fallback.count -= 1;
 

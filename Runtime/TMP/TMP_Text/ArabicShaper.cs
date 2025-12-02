@@ -164,7 +164,6 @@ public static class ArabicShaper
 
             if (cp == 0x0644 && i + 1 < length)
             {
-                int ligatureCp = 0;
                 int j = i + 1;
 
                 while (j < length)
@@ -178,7 +177,7 @@ public static class ArabicShaper
                         continue;
                     }
 
-                    if (TryGetLamAlefLigature(joinPrevOriginal[i], cpj, out ligatureCp))
+                    if (TryGetLamAlefLigature(joinPrevOriginal[i], cpj, out var ligatureCp))
                     {
                         newCodepoints.Add(ligatureCp);
                         newIndexMap.Add(i);

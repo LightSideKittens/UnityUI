@@ -36,9 +36,7 @@ namespace TMPro
             if (m_StyleLookupDictionary == null)
                 LoadStyleDictionaryInternal();
 
-            TMP_Style style;
-
-            if (m_StyleLookupDictionary.TryGetValue(hashCode, out style))
+            if (m_StyleLookupDictionary.TryGetValue(hashCode, out var style))
                 return style;
 
             return null;
@@ -55,9 +53,8 @@ namespace TMPro
                 LoadStyleDictionaryInternal();
 
             int hashCode = TMP_TextParsingUtilities.GetHashCode(name);
-            TMP_Style style;
 
-            if (m_StyleLookupDictionary.TryGetValue(hashCode, out style))
+            if (m_StyleLookupDictionary.TryGetValue(hashCode, out var style))
                 return style;
 
             return null;

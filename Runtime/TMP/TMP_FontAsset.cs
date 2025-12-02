@@ -1725,8 +1725,7 @@ namespace TMPro
                 FontEngine.ResetAtlasTexture(m_AtlasTextures[m_AtlasTextureIndex]);
             }
 
-            Glyph[] glyphs;
-            bool allGlyphsAddedToTexture = FontEngine.TryAddGlyphsToTexture(m_GlyphsToAdd, m_AtlasPadding, GlyphPackingMode.BestShortSideFit, m_FreeGlyphRects, m_UsedGlyphRects, m_AtlasRenderMode, m_AtlasTextures[m_AtlasTextureIndex], out glyphs);
+            bool allGlyphsAddedToTexture = FontEngine.TryAddGlyphsToTexture(m_GlyphsToAdd, m_AtlasPadding, GlyphPackingMode.BestShortSideFit, m_FreeGlyphRects, m_UsedGlyphRects, m_AtlasRenderMode, m_AtlasTextures[m_AtlasTextureIndex], out var glyphs);
 
             for (int i = 0; i < glyphs.Length && glyphs[i] != null; i++)
             {
@@ -1747,9 +1746,8 @@ namespace TMPro
             for (int i = 0; i < m_CharactersToAdd.Count; i++)
             {
                 TMP_Character character = m_CharactersToAdd[i];
-                Glyph glyph;
 
-                if (!m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out glyph))
+                if (!m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out var glyph))
                 {
                     m_GlyphsToAdd.Add(character.glyphIndex);
                     continue;
@@ -1921,9 +1919,7 @@ namespace TMPro
                 FontEngine.ResetAtlasTexture(m_AtlasTextures[m_AtlasTextureIndex]);
             }
 
-            Glyph[] glyphs;
-
-            bool allGlyphsAddedToTexture = FontEngine.TryAddGlyphsToTexture(m_GlyphsToAdd, m_AtlasPadding, GlyphPackingMode.BestShortSideFit, m_FreeGlyphRects, m_UsedGlyphRects, m_AtlasRenderMode, m_AtlasTextures[m_AtlasTextureIndex], out glyphs);
+            bool allGlyphsAddedToTexture = FontEngine.TryAddGlyphsToTexture(m_GlyphsToAdd, m_AtlasPadding, GlyphPackingMode.BestShortSideFit, m_FreeGlyphRects, m_UsedGlyphRects, m_AtlasRenderMode, m_AtlasTextures[m_AtlasTextureIndex], out var glyphs);
 
             for (int i = 0; i < glyphs.Length && glyphs[i] != null; i++)
             {
@@ -1944,9 +1940,8 @@ namespace TMPro
             for (int i = 0; i < m_CharactersToAdd.Count; i++)
             {
                 TMP_Character character = m_CharactersToAdd[i];
-                Glyph glyph;
 
-                if (!m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out glyph))
+                if (!m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out var glyph))
                 {
                     m_GlyphsToAdd.Add(character.glyphIndex);
                     continue;
@@ -2169,8 +2164,6 @@ namespace TMPro
                 return true;
             }
 
-            Glyph glyph = null;
-
             if (!m_AtlasTextures[m_AtlasTextureIndex].isReadable)
             {
                 Debug.LogWarning("Unable to add the requested character to font asset [" + name + "]'s atlas texture. Please make the texture [" + m_AtlasTextures[m_AtlasTextureIndex].name + "] readable.", m_AtlasTextures[m_AtlasTextureIndex]);
@@ -2190,7 +2183,7 @@ namespace TMPro
                 FontEngine.ResetAtlasTexture(m_AtlasTextures[m_AtlasTextureIndex]);
             }
 
-            if (FontEngine.TryAddGlyphToTexture(glyphIndex, m_AtlasPadding, GlyphPackingMode.BestShortSideFit, m_FreeGlyphRects, m_UsedGlyphRects, m_AtlasRenderMode, m_AtlasTextures[m_AtlasTextureIndex], out glyph))
+            if (FontEngine.TryAddGlyphToTexture(glyphIndex, m_AtlasPadding, GlyphPackingMode.BestShortSideFit, m_FreeGlyphRects, m_UsedGlyphRects, m_AtlasRenderMode, m_AtlasTextures[m_AtlasTextureIndex], out var glyph))
             {
                 glyph.atlasIndex = m_AtlasTextureIndex;
 
@@ -2316,9 +2309,7 @@ namespace TMPro
                 ? GlyphLoadFlags.LOAD_NO_BITMAP | GlyphLoadFlags.LOAD_NO_HINTING
                 : GlyphLoadFlags.LOAD_NO_BITMAP;
 
-            Glyph glyph = null;
-
-            if (FontEngine.TryGetGlyphWithIndexValue(glyphIndex, glyphLoadFlags, out glyph))
+            if (FontEngine.TryGetGlyphWithIndexValue(glyphIndex, glyphLoadFlags, out var glyph))
             {
                 m_GlyphTable.Add(glyph);
                 m_GlyphLookupDictionary.Add(glyphIndex, glyph);
@@ -2365,9 +2356,7 @@ namespace TMPro
         {
             SetupNewAtlasTexture();
 
-            Glyph[] glyphs;
-
-            bool allGlyphsAddedToTexture = FontEngine.TryAddGlyphsToTexture(m_GlyphsToAdd, m_AtlasPadding, GlyphPackingMode.BestShortSideFit, m_FreeGlyphRects, m_UsedGlyphRects, m_AtlasRenderMode, m_AtlasTextures[m_AtlasTextureIndex], out glyphs);
+            bool allGlyphsAddedToTexture = FontEngine.TryAddGlyphsToTexture(m_GlyphsToAdd, m_AtlasPadding, GlyphPackingMode.BestShortSideFit, m_FreeGlyphRects, m_UsedGlyphRects, m_AtlasRenderMode, m_AtlasTextures[m_AtlasTextureIndex], out var glyphs);
 
             for (int i = 0; i < glyphs.Length && glyphs[i] != null; i++)
             {
@@ -2388,9 +2377,8 @@ namespace TMPro
             for (int i = 0; i < m_CharactersToAdd.Count; i++)
             {
                 TMP_Character character = m_CharactersToAdd[i];
-                Glyph glyph;
 
-                if (!m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out glyph))
+                if (!m_GlyphLookupDictionary.TryGetValue(character.glyphIndex, out var glyph))
                 {
                     m_GlyphsToAdd.Add(character.glyphIndex);
                     continue;
@@ -3163,15 +3151,13 @@ namespace TMPro
                 KerningPair pair = m_KerningTable.kerningPairs[i];
 
                 uint firstGlyphIndex = 0;
-                TMP_Character firstCharacter;
 
-                if (m_CharacterLookupDictionary.TryGetValue(pair.firstGlyph, out firstCharacter))
+                if (m_CharacterLookupDictionary.TryGetValue(pair.firstGlyph, out var firstCharacter))
                     firstGlyphIndex = firstCharacter.glyphIndex;
 
                 uint secondGlyphIndex = 0;
-                TMP_Character secondCharacter;
 
-                if (m_CharacterLookupDictionary.TryGetValue(pair.secondGlyph, out secondCharacter))
+                if (m_CharacterLookupDictionary.TryGetValue(pair.secondGlyph, out var secondCharacter))
                     secondGlyphIndex = secondCharacter.glyphIndex;
 
                 GlyphAdjustmentRecord firstAdjustmentRecord = new(firstGlyphIndex, new(pair.firstGlyphAdjustments.xPlacement, pair.firstGlyphAdjustments.yPlacement, pair.firstGlyphAdjustments.xAdvance, pair.firstGlyphAdjustments.yAdvance));

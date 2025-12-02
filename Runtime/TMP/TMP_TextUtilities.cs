@@ -933,8 +933,7 @@ namespace TMPro
             worldPoint = (Vector3)Vector2.zero;
             Ray ray = RectTransformUtility.ScreenPointToRay(cam, screenPoint);
 
-            float enter;
-            if (!new Plane(transform.rotation * Vector3.back, transform.position).Raycast(ray, out enter))
+            if (!new Plane(transform.rotation * Vector3.back, transform.position).Raycast(ray, out var enter))
                 return false;
 
             worldPoint = ray.GetPoint(enter);

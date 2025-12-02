@@ -146,7 +146,7 @@ namespace TMPro
 
         internal static TMP_TextProcessingStack<WordWrapState> m_EllipsisInsertionCandidateStack = new(8, 8);
 
-        protected int m_characterCount;
+        public int m_characterCount;
 
         protected int m_firstCharacterOfLine;
         protected int m_firstVisibleCharacterOfLine;

@@ -41,7 +41,7 @@ namespace TMPro
         /// Computed preferred height of the text object.
         /// </summary>
         public virtual float preferredHeight => preferredSize.y;
-        private Vector2 preferredSize;
+        protected Vector2 preferredSize;
         
         /// <summary>
         /// Method returning the compound bounds of the text object and child sub objects.

@@ -1,6 +1,7 @@
 ﻿#define TMP_PRESENT
 
 using System;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.TextCore;
@@ -100,7 +101,7 @@ namespace TMPro
     {
         private string preprocessedText = string.Empty;
         private TextRenderFlags lastRenderMode;
-        private bool isBidiProcessing;
+        protected bool isBidiProcessing;
         protected Bidi.Direction[] directions;
         
         protected void OnBeforeMeshRender()
@@ -114,7 +115,10 @@ namespace TMPro
         {
             if(isBidiProcessing) return;
             var input = Bidi.Do(this, out var logicalToVisualMap, out directions);
-            Debug.Log(string.Join(',', logicalToVisualMap));
+            if (logicalToVisualMap != null)
+            { 
+                Debug.Log(string.Join(',', logicalToVisualMap.SelectMany(x => x)));
+            }
             preprocessedText = input;
             m_renderMode = lastRenderMode;
             isBidiProcessing = true;
@@ -1186,7 +1190,7 @@ namespace TMPro
 
             float glyphAdjustment = m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].adjustedHorizontalAdvance;
             float maxAdvanceOffset = (glyphAdjustment * currentElementScale + (m_currentFontAsset.normalSpacingOffset + characterSpacingAdjustment + boldSpacingAdjustment) * currentEmScale + m_cSpacing) * (1 - m_charWidthAdjDelta);
-            float adjustedHorizontalAdvance = lineInfo.maxAdvance = m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].xAdvance + (m_isRightToLeft ? maxAdvanceOffset : - maxAdvanceOffset);
+            float adjustedHorizontalAdvance = lineInfo.maxAdvance = m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].xAdvance - maxAdvanceOffset;
             m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].xAdvance = adjustedHorizontalAdvance;
 
             lineInfo.baseline = 0 - m_lineOffset;
@@ -3034,10 +3038,9 @@ namespace TMPro
                             return true;
                         }
 
-                        TMP_FontAsset tempFont;
                         Material tempMaterial;
 
-                        MaterialReferenceManager.TryGetFontAsset(fontHashCode, out tempFont);
+                        MaterialReferenceManager.TryGetFontAsset(fontHashCode, out var tempFont);
 
                         if (tempFont == null)
                         {
@@ -3352,9 +3355,8 @@ namespace TMPro
 
                     case MarkupTag.GRADIENT:
                         int gradientPresetHashCode = m_xmlAttribute[0].valueHashCode;
-                        TMP_ColorGradient tempColorGradientPreset;
 
-                        if (MaterialReferenceManager.TryGetColorGradientPreset(gradientPresetHashCode, out tempColorGradientPreset))
+                        if (MaterialReferenceManager.TryGetColorGradientPreset(gradientPresetHashCode, out var tempColorGradientPreset))
                         {
                             m_colorGradientPreset = tempColorGradientPreset;
                         }
@@ -3500,7 +3502,6 @@ namespace TMPro
                         return true;
                     case MarkupTag.SPRITE:
                         int spriteAssetHashCode = m_xmlAttribute[0].valueHashCode;
-                        TMP_SpriteAsset tempSpriteAsset;
                         m_spriteIndex = -1;
 
                         if (m_xmlAttribute[0].valueType == TagValueType.None || m_xmlAttribute[0].valueType == TagValueType.NumericalValue)
@@ -3528,7 +3529,7 @@ namespace TMPro
                         }
                         else
                         {
-                            if (MaterialReferenceManager.TryGetSpriteAsset(spriteAssetHashCode, out tempSpriteAsset))
+                            if (MaterialReferenceManager.TryGetSpriteAsset(spriteAssetHashCode, out var tempSpriteAsset))
                             {
                                 m_currentSpriteAsset = tempSpriteAsset;
                             }

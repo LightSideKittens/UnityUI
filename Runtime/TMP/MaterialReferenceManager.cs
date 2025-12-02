@@ -407,9 +407,8 @@ namespace TMPro
         public static int AddMaterialReference(Material material, TMP_FontAsset fontAsset, ref MaterialReference[] materialReferences, Dictionary<int, int> materialReferenceIndexLookup)
         {
             int materialID = material.GetInstanceID();
-            int index;
 
-            if (materialReferenceIndexLookup.TryGetValue(materialID, out index))
+            if (materialReferenceIndexLookup.TryGetValue(materialID, out var index))
                 return index;
 
             index = materialReferenceIndexLookup.Count;
@@ -441,9 +440,8 @@ namespace TMPro
         public static int AddMaterialReference(Material material, TMP_SpriteAsset spriteAsset, ref MaterialReference[] materialReferences, Dictionary<int, int> materialReferenceIndexLookup)
         {
             int materialID = material.GetInstanceID();
-            int index;
 
-            if (materialReferenceIndexLookup.TryGetValue(materialID, out index))
+            if (materialReferenceIndexLookup.TryGetValue(materialID, out var index))
                 return index;
 
             index = materialReferenceIndexLookup.Count;
