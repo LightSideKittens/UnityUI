@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.TextCore.LowLevel;
 
 
 namespace TMPro.EditorUtilities
@@ -80,9 +79,6 @@ namespace TMPro.EditorUtilities
         protected static int s_EventId;
 
         protected SerializedProperty m_TextProp;
-
-        protected SerializedProperty m_IsRightToLeftProp;
-        protected string m_RtlText;
 
         protected SerializedProperty m_FontAssetProp;
 
@@ -169,7 +165,6 @@ namespace TMPro.EditorUtilities
         protected virtual void OnEnable()
         {
             m_TextProp = serializedObject.FindProperty("m_text");
-            m_IsRightToLeftProp = serializedObject.FindProperty("m_isRightToLeft");
             m_FontAssetProp = serializedObject.FindProperty("m_fontAsset");
             m_FontSharedMaterialProp = serializedObject.FindProperty("m_sharedMaterial");
 
@@ -390,9 +385,6 @@ namespace TMPro.EditorUtilities
             float labelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 110f;
 
-            m_IsRightToLeftProp.boolValue = EditorGUI.Toggle(new Rect(rect.width - 120, rect.y + 3, 130, 20),
-                k_RtlToggleLabel, m_IsRightToLeftProp.boolValue);
-
             EditorGUIUtility.labelWidth = labelWidth;
             
             EditorGUI.BeginChangeCheck();
@@ -403,32 +395,6 @@ namespace TMPro.EditorUtilities
             if (EditorGUI.EndChangeCheck() && m_TextProp.stringValue != m_TextComponent.text)
             {
                 m_HavePropertiesChanged = true;
-            }
-
-            if (m_IsRightToLeftProp.boolValue)
-            {
-                m_RtlText = string.Empty;
-                string sourceText = m_TextProp.stringValue;
-
-                for (int i = 0; i < sourceText.Length; i++)
-                    m_RtlText += sourceText[sourceText.Length - i - 1];
-
-                GUILayout.Label("RTL Text Input");
-
-                EditorGUI.BeginChangeCheck();
-                m_RtlText = EditorGUILayout.TextArea(m_RtlText, TMP_UIStyleManager.wrappingTextArea,
-                    GUILayout.Height(EditorGUI.GetPropertyHeight(m_TextProp) - EditorGUIUtility.singleLineHeight),
-                    GUILayout.ExpandWidth(true));
-
-                if (EditorGUI.EndChangeCheck())
-                {
-                    sourceText = string.Empty;
-
-                    for (int i = 0; i < m_RtlText.Length; i++)
-                        sourceText += m_RtlText[m_RtlText.Length - i - 1];
-
-                    m_TextProp.stringValue = sourceText;
-                }
             }
 
             if (m_TextComponent.textPreprocessor != null)
