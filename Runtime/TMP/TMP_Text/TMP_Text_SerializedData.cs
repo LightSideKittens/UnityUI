@@ -120,6 +120,18 @@ namespace TMPro
         public string PreprocessedText { get; private set; } 
 
         /// <summary>
+        ///
+        /// </summary>
+        public bool isRightToLeftText
+        {
+            get => m_isRightToLeft;
+            set { if (m_isRightToLeft == value) return; m_isRightToLeft = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
+        }
+        [SerializeField]
+        protected bool m_isRightToLeft;
+
+
+        /// <summary>
         /// The Font Asset to be assigned to this text object.
         /// </summary>
         public TMP_FontAsset font

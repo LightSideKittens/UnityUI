@@ -1228,8 +1228,9 @@ namespace TMPro
                 if (m_isRichText && unicode == 60)
                 {
                     int prev_MaterialIndex = m_currentMaterialIndex;
+                    int endTagIndex;
 
-                    if (ValidateHtmlTag(textProcessingArray, i + 1, out var endTagIndex))
+                    if (ValidateHtmlTag(textProcessingArray, i + 1, out endTagIndex))
                     {
                         int tagStartIndex = textProcessingArray[i].stringIndex;
                         i = endTagIndex;
@@ -1917,8 +1918,9 @@ namespace TMPro
                     k_ParseMarkupTextMarker.Begin();
 
                     m_isTextLayoutPhase = true;
+                    int endTagIndex;
 
-                    if (ValidateHtmlTag(m_TextProcessingArray, i + 1, out var endTagIndex))
+                    if (ValidateHtmlTag(m_TextProcessingArray, i + 1, out endTagIndex))
                     {
                         i = endTagIndex;
                         k_ParseMarkupTextMarker.End();
@@ -2195,6 +2197,16 @@ namespace TMPro
                 #endregion
 
                 float xAdvanceBeforeChar = m_xAdvance;
+                
+                #region Handle Right-to-Left
+                if (m_isRightToLeft)
+                {
+                    m_xAdvance -= currentGlyphMetrics.horizontalAdvance * (1 - m_charWidthAdjDelta) * currentElementScale;
+
+                    if (isWhiteSpace || charCode == 0x200B)
+                        m_xAdvance -= m_wordSpacing * currentEmScale;
+                }
+                #endregion
 
 
                 #region Handle Mono Spacing
@@ -2392,7 +2404,7 @@ namespace TMPro
 
                     widthOfTextArea = m_width != -1 ? Mathf.Min(marginWidth + 0.0001f - marginLeft - marginRight, m_width) : marginWidth + 0.0001f - marginLeft - marginRight;
 
-                    float textWidth = Mathf.Abs(m_xAdvance) + (currentGlyphMetrics.horizontalAdvance) * (1 - m_charWidthAdjDelta) * (charCode == 0xAD ? currentElementUnmodifiedScale : currentElementScale);
+                    float textWidth = Mathf.Abs(m_xAdvance) + (!m_isRightToLeft ? currentGlyphMetrics.horizontalAdvance : 0) * (1 - m_charWidthAdjDelta) * (charCode == 0xAD ? currentElementUnmodifiedScale : currentElementScale);
                     float textHeight = m_maxTextAscender - (m_maxLineDescender - m_lineOffset) + (m_lineOffset > 0 && !m_IsDrivenLineSpacing ? m_maxLineAscender - m_startOfLineAscender : 0);
 
                     int testedCharacterCount = m_characterCount;
@@ -2894,7 +2906,7 @@ namespace TMPro
                     }
 
                     float textHeight = m_maxTextAscender - (m_maxLineDescender - m_lineOffset) + (m_lineOffset > 0 && !m_IsDrivenLineSpacing ? m_maxLineAscender - m_startOfLineAscender : 0);
-                    float textWidth = Mathf.Abs(m_xAdvance) + (m_Ellipsis.character.m_Glyph.metrics.horizontalAdvance) * (1 - m_charWidthAdjDelta) * scale;
+                    float textWidth = Mathf.Abs(m_xAdvance) + (!m_isRightToLeft ? m_Ellipsis.character.m_Glyph.metrics.horizontalAdvance : 0) * (1 - m_charWidthAdjDelta) * scale;
                     float widthOfTextAreaForEllipsis = m_width != -1 ? Mathf.Min(marginWidth + 0.0001f - marginLeft - marginRight, m_width) : marginWidth + 0.0001f - marginLeft - marginRight;
 
                     if (textWidth < widthOfTextAreaForEllipsis * (isJustifiedOrFlush ? 1.05f : 1.0f) && textHeight < marginHeight + 0.0001f)
@@ -2919,8 +2931,16 @@ namespace TMPro
                 if (charCode == 9)
                 {
                     float tabSize = m_currentFontAsset.m_FaceInfo.tabWidth * m_currentFontAsset.tabSize * currentElementScale;
-                    float tabs = Mathf.Ceil(m_xAdvance / tabSize) * tabSize;
-                    m_xAdvance = tabs > m_xAdvance ? tabs : m_xAdvance + tabSize;
+                    if (m_isRightToLeft)
+                    {
+                        float tabs = Mathf.Floor(m_xAdvance / tabSize) * tabSize;
+                        m_xAdvance = tabs < m_xAdvance ? tabs : m_xAdvance - tabSize;
+                    }
+                    else
+                    {
+                        float tabs = Mathf.Ceil(m_xAdvance / tabSize) * tabSize;
+                        m_xAdvance = tabs > m_xAdvance ? tabs : m_xAdvance + tabSize;
+                    }
                 }
                 else if (m_monoSpacing != 0)
                 {
@@ -2934,6 +2954,13 @@ namespace TMPro
 
                     if (isWhiteSpace || charCode == 0x200B)
                         m_xAdvance += m_wordSpacing * currentEmScale;
+                }
+                else if (m_isRightToLeft)
+                {
+                    m_xAdvance -= ((glyphAdjustments.xAdvance * currentElementScale + (m_currentFontAsset.normalSpacingOffset + characterSpacingAdjustment + boldSpacingAdjustment) * currentEmScale + m_cSpacing) * (1 - m_charWidthAdjDelta));
+
+                    if (isWhiteSpace || charCode == 0x200B)
+                        m_xAdvance -= m_wordSpacing * currentEmScale;
                 }
                 else
                 {
@@ -3020,9 +3047,9 @@ namespace TMPro
 
                     float maxAdvanceOffset = ((m_currentFontAsset.normalSpacingOffset + characterSpacingAdjustment + boldSpacingAdjustment) * currentEmScale + m_cSpacing) * (1 - m_charWidthAdjDelta);
                     if (m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].isVisible)
-                        lineInfo.maxAdvance = m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].xAdvance + (-maxAdvanceOffset);
+                        lineInfo.maxAdvance = m_textInfo.characterInfo[m_lastVisibleCharacterOfLine].xAdvance + (m_isRightToLeft ? maxAdvanceOffset : - maxAdvanceOffset);
                     else
-                        lineInfo.maxAdvance = m_textInfo.characterInfo[m_lastCharacterOfLine].xAdvance + (-maxAdvanceOffset);
+                        lineInfo.maxAdvance = m_textInfo.characterInfo[m_lastCharacterOfLine].xAdvance + (m_isRightToLeft ? maxAdvanceOffset : - maxAdvanceOffset);
 
                     lineInfo.baseline = 0 - m_lineOffset;
                     lineInfo.ascender = lineAscender;
@@ -3277,12 +3304,9 @@ namespace TMPro
             float strikethroughPointSize = 0;
             float strikethroughScale = 0;
             float strikethroughBaseline = 0;
-            int lastLineNumber = -1;
 
             TMP_CharacterInfo[] characterInfos = m_textInfo.characterInfo;
             #region Handle Line Justification & UV Mapping & Character Visibility & More
-
-            Debug.Log($"Count: {m_characterCount}");
             for (int i = 0; i < m_characterCount; i++)
             {
                 ref var chInfo = ref characterInfos[i];
@@ -3300,113 +3324,97 @@ namespace TMPro
                 TMP_LineInfo lineInfo = currLineInfo;
                 lineCount = currentLine + 1;
 
-                #region Handle Line Justification
 
-                if (lastLineNumber != currentLine)
                 {
-                    lastLineNumber = currentLine;
-                    HorizontalAlignmentOptions lineAlignment = lineInfo.alignment;
-
-                    /*if (directions != null)
                     {
-                        if (autoHorizontalAlignment)
                         {
-                            var dir = Bidi.Direction.LeftToRight;
-                            if (currentLine < directions.Length)
+                        }
+                
+                #region Handle Line Justification
+                switch (lineAlignment)
+                {
+                    case HorizontalAlignmentOptions.Left:
+                        if (!m_isRightToLeft)
+                            justificationOffset = new(0 + lineInfo.marginLeft, 0, 0);
+                        else
+                            justificationOffset = new(0 - lineInfo.maxAdvance, 0, 0);
+                        break;
+
+                    case HorizontalAlignmentOptions.Center:
+                        justificationOffset = new(lineInfo.marginLeft + lineInfo.width / 2 - lineInfo.maxAdvance / 2, 0, 0);
+                        break;
+
+                    case HorizontalAlignmentOptions.Geometry:
+                        justificationOffset = new(lineInfo.marginLeft + lineInfo.width / 2 - (lineInfo.lineExtents.min.x + lineInfo.lineExtents.max.x) / 2, 0, 0);
+                        break;
+
+                    case HorizontalAlignmentOptions.Right:
+                        if (!m_isRightToLeft)
+                            justificationOffset = new(lineInfo.marginLeft + lineInfo.width - lineInfo.maxAdvance, 0, 0);
+                        else
+                            justificationOffset = new(lineInfo.marginLeft + lineInfo.width, 0, 0);
+                        break;
+
+                    case HorizontalAlignmentOptions.Justified:
+                    case HorizontalAlignmentOptions.Flush:
+                        if (i > lineInfo.lastVisibleCharacterIndex || unicode == 0x0A || unicode == 0xAD || unicode == 0x200B || unicode == 0x2060 || unicode == 0x03) break;
+
+                        char lastCharOfCurrentLine = characterInfos[lineInfo.lastCharacterIndex].character;
+
+                        bool isFlush = (lineAlignment & HorizontalAlignmentOptions.Flush) == HorizontalAlignmentOptions.Flush;
+
+                        if (char.IsControl(lastCharOfCurrentLine) == false && currentLine < m_lineNumber || isFlush || lineInfo.maxAdvance > lineInfo.width)
+                        {
+                            if (currentLine != lastLine || i == 0 || i == m_firstVisibleCharacter)
                             {
-                                dir = directions[currentLine];
-                            }
-                            
-                            if (dir == Bidi.Direction.LeftToRight)
-                            {
-                                lineAlignment = HorizontalAlignmentOptions.Left;
+                                if (!m_isRightToLeft)
+                                    justificationOffset = new(lineInfo.marginLeft, 0, 0);
+                                else
+                                    justificationOffset = new(lineInfo.marginLeft + lineInfo.width, 0, 0);
+
+                                if (char.IsSeparator(unicode))
+                                    isFirstSeperator = true;
+                                else
+                                    isFirstSeperator = false;
                             }
                             else
                             {
-                                lineAlignment = HorizontalAlignmentOptions.Right;
-                            }
-                        }
-                    }*/
+                                float gap = !m_isRightToLeft ? lineInfo.width - lineInfo.maxAdvance : lineInfo.width + lineInfo.maxAdvance;
+                                int visibleCount = lineInfo.visibleCharacterCount - 1 + lineInfo.controlCharacterCount;
+                                int spaces = lineInfo.visibleSpaceCount - lineInfo.controlCharacterCount;
 
-                    switch (lineAlignment)
-                    {
-                        case HorizontalAlignmentOptions.Left: 
-                            justificationOffset = new(0 + lineInfo.marginLeft, 0, 0);
-                            break;
+                                if (isFirstSeperator) { spaces -= 1; visibleCount += 1; }
 
-                        case HorizontalAlignmentOptions.Center:
-                            justificationOffset = new(lineInfo.marginLeft + lineInfo.width / 2 - lineInfo.maxAdvance / 2, 0, 0);
-                            break;
+                                float ratio = spaces > 0 ? m_wordWrappingRatios : 1;
 
-                        case HorizontalAlignmentOptions.Geometry:
-                            justificationOffset =
-                                new(
-                                    lineInfo.marginLeft + lineInfo.width / 2 -
-                                    (lineInfo.lineExtents.min.x + lineInfo.lineExtents.max.x) / 2, 0, 0);
-                            break;
+                                if (spaces < 1) spaces = 1;
 
-                        case HorizontalAlignmentOptions.Right: 
-                            justificationOffset = new(lineInfo.marginLeft + lineInfo.width - lineInfo.maxAdvance, 0, 0); 
-                            break;
-
-                        case HorizontalAlignmentOptions.Justified:
-                        case HorizontalAlignmentOptions.Flush:
-                            if (i > lineInfo.lastVisibleCharacterIndex || unicode == 0x0A || unicode == 0xAD ||
-                                unicode == 0x200B || unicode == 0x2060 || unicode == 0x03) break;
-
-                            char lastCharOfCurrentLine = characterInfos[lineInfo.lastCharacterIndex].character;
-
-                            bool isFlush = (lineAlignment & HorizontalAlignmentOptions.Flush) ==
-                                           HorizontalAlignmentOptions.Flush;
-
-                            if (char.IsControl(lastCharOfCurrentLine) == false && currentLine < m_lineNumber ||
-                                isFlush || lineInfo.maxAdvance > lineInfo.width)
-                            {
-                                if (currentLine != lastLine || i == 0 || i == m_firstVisibleCharacter)
-                                { 
-                                    justificationOffset = new(lineInfo.marginLeft, 0, 0);
-                                    
-                                    if (char.IsSeparator(unicode))
-                                        isFirstSeperator = true;
+                                if (unicode != 0xA0 && (unicode == 9 || char.IsSeparator(unicode)))
+                                {
+                                    if (!m_isRightToLeft)
+                                        justificationOffset += new Vector3(gap * (1 - ratio) / spaces, 0, 0);
                                     else
-                                        isFirstSeperator = false;
+                                        justificationOffset -= new Vector3(gap * (1 - ratio) / spaces, 0, 0);
                                 }
                                 else
                                 {
-                                    float gap = lineInfo.width - lineInfo.maxAdvance;
-                                    int visibleCount = lineInfo.visibleCharacterCount - 1 +
-                                                       lineInfo.controlCharacterCount;
-                                    int spaces = lineInfo.visibleSpaceCount - lineInfo.controlCharacterCount;
-
-                                    if (isFirstSeperator)
-                                    {
-                                        spaces -= 1;
-                                        visibleCount += 1;
-                                    }
-
-                                    float ratio = spaces > 0 ? m_wordWrappingRatios : 1;
-
-                                    if (spaces < 1) spaces = 1;
-
-                                    if (unicode != 0xA0 && (unicode == 9 || char.IsSeparator(unicode)))
-                                    {
-                                        justificationOffset += new Vector3(gap * (1 - ratio) / spaces, 0, 0);
-                                    }
-                                    else
-                                    {
+                                    if (!m_isRightToLeft)
                                         justificationOffset += new Vector3(gap * ratio / visibleCount, 0, 0);
-                                    }
+                                    else
+                                        justificationOffset -= new Vector3(gap * ratio / visibleCount, 0, 0);
                                 }
                             }
-                            else
-                            {
+                        }
+                        else
+                        {
+                            if (!m_isRightToLeft)
                                 justificationOffset = new(lineInfo.marginLeft, 0, 0);
-                            }
+                            else
+                                justificationOffset = new(lineInfo.marginLeft + lineInfo.width, 0, 0);
+                        }
 
-                            break;
-                    }
+                        break;
                 }
-
                 #endregion End Text Justification
 
                 offset = anchorOffset + justificationOffset;
@@ -4005,7 +4013,7 @@ namespace TMPro
             k_GenerateTextPhaseIIMarker.End();
 
             k_GenerateTextPhaseIIIMarker.Begin();
-            Debug.Log(m_textInfo.lineCount);
+            
             if (m_renderMode == TextRenderFlags.Render && IsActive())
             {
                 OnPreRenderText?.Invoke(m_textInfo);
