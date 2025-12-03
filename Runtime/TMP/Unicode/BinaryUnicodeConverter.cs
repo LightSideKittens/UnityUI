@@ -235,7 +235,6 @@ public class UnicodeDataBuilder
         if (string.IsNullOrWhiteSpace(value))
             throw new InvalidDataException("Joining_Group value is empty in ArabicShaping.txt.");
 
-        // Normalize: trim, split on spaces and underscores, build PascalCase name.
         string[] parts = value.Trim().Split(new[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries);
 
         if (parts.Length == 0)
@@ -249,7 +248,6 @@ public class UnicodeDataBuilder
             if (part.Length == 0)
                 continue;
 
-            // First char upper, rest lower
             char first = char.ToUpperInvariant(part[0]);
             sb.Append(first);
             if (part.Length > 1)
@@ -339,7 +337,6 @@ public class UnicodeDataBuilder
             if (string.IsNullOrWhiteSpace(line))
                 continue;
 
-            // Формат по UCD: "XXXX; YYYY"
             string[] parts = line.Split(';');
             if (parts.Length < 2)
                 continue;
@@ -361,7 +358,6 @@ public class UnicodeDataBuilder
             result.Add(new MirrorEntry(codePoint, mirrored));
         }
 
-        // Бинарный провайдер делает двоичный поиск по mirrors[], поэтому сортируем по codePoint
         result.Sort((a, b) => a.codePoint.CompareTo(b.codePoint));
 
         return result;
@@ -383,10 +379,6 @@ public class UnicodeDataBuilder
             if (string.IsNullOrWhiteSpace(line))
                 continue;
 
-            // Формат по UCD:
-            // Field 0: code point (hex)
-            // Field 1: Bidi_Paired_Bracket (hex или <none>)
-            // Field 2: Bidi_Paired_Bracket_Type: "o", "c", "n"
             string[] parts = line.Split(';');
             if (parts.Length < 3)
                 continue;
@@ -404,8 +396,6 @@ public class UnicodeDataBuilder
 
             int pairedCodePoint;
 
-            // По TR44 / описанию BidiBrackets: при отсутствии пары поле может быть "<none>",
-            // а значение Bidi_Paired_Bracket по умолчанию равно самому символу.
             if (pairedPart.Length == 0 ||
                 string.Equals(pairedPart, "<none>", StringComparison.OrdinalIgnoreCase))
             {
@@ -438,7 +428,6 @@ public class UnicodeDataBuilder
                     break;
 
                 default:
-                    // Строго: неизвестное значение bpt — считаем ошибкой входных данных UCD.
                     throw new InvalidDataException(
                         $"Unknown Bidi_Paired_Bracket_Type '{typePart}' in BidiBrackets.txt.");
             }
@@ -446,7 +435,6 @@ public class UnicodeDataBuilder
             result.Add(new BracketEntry(codePoint, pairedCodePoint, bracketType));
         }
 
-        // Бинарный провайдер делает двоичный поиск по brackets[], поэтому сортируем по codePoint
         result.Sort((a, b) => a.codePoint.CompareTo(b.codePoint));
 
         return result;

@@ -4,8 +4,8 @@ using System.IO;
 
 public readonly struct RangeEntry
 {
-    public readonly int startCodePoint; // inclusive
-    public readonly int endCodePoint; // inclusive
+    public readonly int startCodePoint;
+    public readonly int endCodePoint;
     public readonly BidiClass bidiClass;
     public readonly JoiningType joiningType;
     public readonly JoiningGroup joiningGroup;
@@ -58,7 +58,7 @@ public readonly struct BracketEntry
 
 public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
 {
-    private const uint magic = 0x554C5452; // 'R','T','L','U' little-endian
+    private const uint magic = 0x554C5452;
     private const ushort supportedFormatVersion = 1;
 
     private readonly RangeEntry[] ranges;
@@ -75,7 +75,6 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         using var stream = new MemoryStream(data, writable: false);
         using var reader = new BinaryReader(stream);
 
-        // Header
         uint fileMagic = reader.ReadUInt32();
         if (fileMagic != magic)
             throw new InvalidDataException("Invalid Unicode data blob: magic mismatch.");
@@ -84,7 +83,7 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         if (formatVersion != supportedFormatVersion)
             throw new InvalidDataException($"Unsupported Unicode data format version: {formatVersion}.");
 
-        reader.ReadUInt16(); // reserved
+        reader.ReadUInt16();
 
         uint unicodeVersion = reader.ReadUInt32();
         unicodeVersionRaw = unchecked((int)unicodeVersion);
@@ -96,7 +95,6 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         uint bracketOffset = reader.ReadUInt32();
         uint bracketLength = reader.ReadUInt32();
 
-        // Ranges section
         if (rangeOffset == 0 || rangeLength == 0)
             throw new InvalidDataException("Unicode data blob is missing Range section.");
 
@@ -111,7 +109,7 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
             byte bidi = reader.ReadByte();
             byte jt = reader.ReadByte();
             byte jg = reader.ReadByte();
-            reader.ReadByte(); // padding
+            reader.ReadByte();
 
             ranges[i] = new RangeEntry(
                 startCodePoint: unchecked((int)start),
@@ -121,7 +119,6 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
                 joiningGroup: (JoiningGroup)jg);
         }
 
-        // Mirrors section
         if (mirrorOffset != 0 && mirrorLength != 0)
         {
             stream.Position = mirrorOffset;
@@ -143,7 +140,6 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
             mirrors = Array.Empty<MirrorEntry>();
         }
 
-        // Brackets section
         if (bracketOffset != 0 && bracketLength != 0)
         {
             stream.Position = bracketOffset;
@@ -155,9 +151,9 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
                 uint cp = reader.ReadUInt32();
                 uint paired = reader.ReadUInt32();
                 byte bpt = reader.ReadByte();
-                reader.ReadByte(); // reserved
-                reader.ReadByte(); // reserved
-                reader.ReadByte(); // reserved
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
 
                 brackets[i] = new BracketEntry(
                     codePoint: unchecked((int)cp),
@@ -170,8 +166,6 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
             brackets = Array.Empty<BracketEntry>();
         }
     }
-
-    // IUnicodeDataProvider
 
     public BidiClass GetBidiClass(int codePoint)
     {
@@ -213,8 +207,6 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         var entry = FindRange(codePoint);
         return entry?.joiningGroup ?? JoiningGroup.NoJoiningGroup;
     }
-
-    // public lookup helpers
 
     private RangeEntry? FindRange(int codePoint)
     {

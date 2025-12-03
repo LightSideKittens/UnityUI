@@ -10,13 +10,11 @@ public class UnicodeDataGeneratorWindow : EditorWindow
     [SerializeField] private TextAsset derivedBidiClassAsset;
     [SerializeField] private TextAsset derivedJoiningTypeAsset;
     [SerializeField] private TextAsset arabicShapingAsset;
-    [SerializeField] private TextAsset bidiBracketsAsset;   // BidiBrackets.txt
-    [SerializeField] private TextAsset bidiMirroringAsset;  // BidiMirroring.txt
-    
-    // Папка в Assets, куда будет записан бинарь
+    [SerializeField] private TextAsset bidiBracketsAsset;
+    [SerializeField] private TextAsset bidiMirroringAsset;
+
     [SerializeField] private DefaultAsset outputFolder;
 
-    // Имя выходного файла
     [SerializeField] private string outputFileName = "UnicodeData.bin";
 
     [MenuItem("Tools/RTL/Unicode Data Generator")]
@@ -62,7 +60,6 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             typeof(TextAsset),
             false);
 
-// NEW:
         bidiBracketsAsset = (TextAsset)EditorGUILayout.ObjectField(
             "BidiBrackets.txt",
             bidiBracketsAsset,
@@ -117,7 +114,6 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             string derivedJoiningTypePath = GetAbsolutePathFromTextAsset(derivedJoiningTypeAsset, projectRoot);
             string arabicShapingPath     = GetAbsolutePathFromTextAsset(arabicShapingAsset, projectRoot);
 
-// NEW:
             string bidiBracketsPath  = GetAbsolutePathFromTextAsset(bidiBracketsAsset,  projectRoot);
             string bidiMirroringPath = GetAbsolutePathFromTextAsset(bidiMirroringAsset, projectRoot);
 
@@ -160,11 +156,9 @@ public class UnicodeDataGeneratorWindow : EditorWindow
 
             List<RangeEntry> ranges = builder.BuildRangeEntries();
 
-// NEW: читаем зеркала и скобки строго по формату Unicode 17.0.0
             List<MirrorEntry> mirrors  = UnicodeDataBuilder.BuildMirrorEntries(bidiMirroringPath);
             List<BracketEntry> brackets = UnicodeDataBuilder.BuildBracketEntries(bidiBracketsPath);
 
-// Версию Unicode пока ставим 0, позже можно пробросить реально разобранную версию
             UnicodeBinaryWriter.WriteBinary(
                 outputPath,
                 ranges,
@@ -187,7 +181,6 @@ public class UnicodeDataGeneratorWindow : EditorWindow
 
     private static string GetProjectRootPath()
     {
-        // Application.dataPath = "<projectRoot>/Assets"
         string dataPath = Application.dataPath.Replace('\\', '/');
         const string assetsFolderName = "Assets";
 
@@ -196,7 +189,6 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             return dataPath.Substring(0, dataPath.Length - assetsFolderName.Length);
         }
 
-        // fallback: поднимаемся на один уровень
         return Directory.GetParent(dataPath)?.FullName?.Replace('\\', '/') ?? dataPath;
     }
 
@@ -221,7 +213,6 @@ public class UnicodeDataGeneratorWindow : EditorWindow
     {
         if (outputFolder == null)
         {
-            // по умолчанию — корень Assets
             return "Assets";
         }
 

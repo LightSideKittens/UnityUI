@@ -1,6 +1,4 @@
-﻿// Runtime/Unicode/UnicodeDataTypes.cs
-
-#nullable enable
+﻿#nullable enable
 
 
 /// <summary>
@@ -19,38 +17,33 @@ public enum BidiDirection : byte
 /// </summary>
 public enum BidiClass : byte
 {
-    // Strong types
-    LeftToRight, // L
-    RightToLeft, // R
-    ArabicLetter, // AL
+    LeftToRight,
+    RightToLeft,
+    ArabicLetter,
 
-    // Weak types
-    EuropeanNumber, // EN
-    EuropeanSeparator, // ES
-    EuropeanTerminator, // ET
-    ArabicNumber, // AN
-    CommonSeparator, // CS
-    NonspacingMark, // NSM
+    EuropeanNumber,
+    EuropeanSeparator,
+    EuropeanTerminator,
+    ArabicNumber,
+    CommonSeparator,
+    NonspacingMark,
 
-    // Neutral types
-    BoundaryNeutral, // BN
-    ParagraphSeparator, // B
-    SegmentSeparator, // S
-    WhiteSpace, // WS
-    OtherNeutral, // ON
+    BoundaryNeutral,
+    ParagraphSeparator,
+    SegmentSeparator,
+    WhiteSpace,
+    OtherNeutral,
 
-    // Explicit formatting
-    LeftToRightEmbedding, // LRE
-    LeftToRightOverride, // LRO
-    RightToLeftEmbedding, // RLE
-    RightToLeftOverride, // RLO
-    PopDirectionalFormat, // PDF
+    LeftToRightEmbedding,
+    LeftToRightOverride,
+    RightToLeftEmbedding,
+    RightToLeftOverride,
+    PopDirectionalFormat,
 
-    // Isolates
-    LeftToRightIsolate, // LRI
-    RightToLeftIsolate, // RLI
-    FirstStrongIsolate, // FSI
-    PopDirectionalIsolate // PDI
+    LeftToRightIsolate,
+    RightToLeftIsolate,
+    FirstStrongIsolate,
+    PopDirectionalIsolate
 }
 
 /// <summary>
@@ -58,9 +51,9 @@ public enum BidiClass : byte
 /// </summary>
 public enum BidiPairedBracketType : byte
 {
-    None, // n
-    Open, // o
-    Close // c
+    None,
+    Open,
+    Close
 }
 
 /// <summary>
@@ -68,12 +61,12 @@ public enum BidiPairedBracketType : byte
 /// </summary>
 public enum JoiningType : byte
 {
-    NonJoining, // U
-    Transparent, // T
-    JoinCausing, // C
-    LeftJoining, // L
-    RightJoining, // R
-    DualJoining // D
+    NonJoining,
+    Transparent,
+    JoinCausing,
+    LeftJoining,
+    RightJoining,
+    DualJoining
 }
 
 /// <summary>
@@ -117,7 +110,6 @@ public enum JoiningGroup : byte
     Lam,
     Lamadh,
 
-    // Malayalam joining groups (Syriac extensions)
     MalayalamBha,
     MalayalamJa,
     MalayalamLla,
@@ -130,7 +122,6 @@ public enum JoiningGroup : byte
     MalayalamSsa,
     MalayalamTta,
 
-    // Manichaean joining groups
     ManichaeanAleph,
     ManichaeanAyin,
     ManichaeanBeth,

@@ -46,7 +46,6 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
         {
             lineNumber++;
 
-            // Strip comments (# ...) and skip empty lines
             int hashIndex = line.IndexOf('#');
             if (hashIndex >= 0)
                 line = line.Substring(0, hashIndex);
@@ -64,11 +63,10 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
 
             string codePointsField      = fields[0].Trim();
             string paragraphDirField    = fields[1].Trim();
-            string paragraphLevelField  = fields[2].Trim(); // пока не используем явно
+            string paragraphLevelField  = fields[2].Trim();
             string expectedLevelsField  = fields[3].Trim();
             string expectedReorderField = fields[4].Trim();
 
-            // Paragraph direction: 0 = L, 1 = R, 2 = auto
             if (!int.TryParse(paragraphDirField, NumberStyles.Integer, CultureInfo.InvariantCulture, out int paragraphDir))
             {
                 skipped++;
@@ -137,7 +135,6 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
             BidiResult bidiResult;
             try
             {
-                // ВАЖНО: используем направление параграфа из теста (0=L, 1=R, 2=auto)
                 bidiResult = bidiEngine.Process(codePoints, paragraphDir);
             }
             catch (Exception ex)
@@ -160,7 +157,6 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
                 continue;
             }
 
-            // 1) Compare embedding levels
             if (!CompareLevels(expectedLevels, bidiResult.levels, out string levelsErrorMessage))
             {
                 failed++;
@@ -169,7 +165,6 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
                 continue;
             }
 
-            // 2) Compare visual reordering (permutation) if the test defines it
             if (hasReorderExpectations)
             {
                 if (!CompareReorder(expectedLevels, expectedReorder, bidiResult.levels, out string reorderErrorMessage))
@@ -181,7 +176,6 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
                 }
             }
 
-            // If we reached here, both levels and reorder match for this test
             passed++;
         }
     }
@@ -209,7 +203,6 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
 
         for (int i = 0; i < tokens.Length; i++)
         {
-            // Each token is a hex code like "202E"
             result[i] = int.Parse(tokens[i], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
         }
 
@@ -310,7 +303,7 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
             int? expected = expectedLevels[i];
 
             if (!expected.HasValue)
-                continue; // 'x' in the test data
+                continue;
 
             int actual = actualLevels[i];
 
@@ -343,7 +336,6 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
 
         if (expectedReorder == null || expectedReorder.Length == 0)
         {
-            // No permutation expectations; consider it as passing.
             return true;
         }
 
@@ -356,7 +348,6 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
 
         int length = expectedLevels.Length;
 
-        // 1. Collect logical indices of positions that are actually tested (expected level != null).
         List<int> logicalIndices = new List<int>(length);
 
         for (int i = 0; i < length; i++)
@@ -378,11 +369,9 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
 
         if (filteredLength == 0)
         {
-            // Nothing to test.
             return true;
         }
 
-        // 2. Build compact levels array for these positions.
         byte[] filteredLevels = new byte[filteredLength];
 
         for (int i = 0; i < filteredLength; i++)
@@ -391,11 +380,9 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
             filteredLevels[i] = actualLevels[logicalIndex];
         }
 
-        // 3. Run ReorderLine on the compact array (indices 0..filteredLength-1).
         int[] indexMap = new int[filteredLength];
         BidiEngine.ReorderLine(filteredLevels, 0, filteredLength - 1, indexMap);
 
-        // 4. Map the visual positions back to original logical indices.
         int[] actualReorder = new int[filteredLength];
 
         for (int visualIndex = 0; visualIndex < filteredLength; visualIndex++)
@@ -412,7 +399,6 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
             actualReorder[visualIndex] = logicalIndices[filteredLogicalIndex];
         }
 
-        // 5. Compare with expected reorder indices from the test file.
         for (int i = 0; i < filteredLength; i++)
         {
             int expectedLogical = expectedReorder[i];
