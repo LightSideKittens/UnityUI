@@ -44,14 +44,11 @@ namespace TMPro.EditorUtilities
 
                 DrawParsing();
 
-                DrawSpriteAsset();
-
                 DrawStyleSheet();
                 
                 DrawFontFeatures();
 
                 DrawPadding();
-
             }
         }
 

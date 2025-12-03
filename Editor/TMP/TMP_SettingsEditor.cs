@@ -47,10 +47,7 @@ namespace TMPro.EditorUtilities
             public static readonly GUIContent missingGlyphLabel = new("Missing Character Unicode", "The character to be displayed when the requested character is not found in any font asset or fallbacks.");
             public static readonly GUIContent clearDynamicDataOnBuildLabel = new("Clear Dynamic Data On Build", "Determines if the \"Clear Dynamic Data on Build\" property will be set to true or false on newly created dynamic font assets.");
             public static readonly GUIContent disableWarningsLabel = new("Disable warnings", "Disable warning messages in the Console.");
-
-            public static readonly GUIContent defaultSpriteAssetLabel = new("Default Sprite Asset", "The Sprite Asset that will be assigned by default when using the <sprite> tag when no Sprite Asset is specified.");
-            public static readonly GUIContent missingSpriteCharacterUnicodeLabel = new("Missing Sprite Unicode", "The unicode value for the sprite character to be displayed when the requested sprite character is not found in any sprite assets or fallbacks.");
-
+            
             public static readonly GUIContent spriteAssetsPathLabel = new("Path:        Resources/", "The relative path to a Resources folder where the Sprite Assets are located.\nExample \"Sprite Assets/\"");
 
             public static readonly GUIContent defaultStyleSheetLabel = new("Default Style Sheet", "The Style Sheet that will be used for all text objects in this project.");
@@ -72,10 +69,6 @@ namespace TMPro.EditorUtilities
         SerializedProperty m_PropDefaultTextMeshProUITextContainerSize;
         SerializedProperty m_PropAutoSizeTextContainer;
         SerializedProperty m_PropEnableRaycastTarget;
-
-        SerializedProperty m_PropSpriteAsset;
-        SerializedProperty m_PropMissingSpriteCharacterUnicode;
-        SerializedProperty m_PropSpriteAssetPath;
 
         SerializedProperty m_PropStyleSheet;
         SerializedProperty m_PropStyleSheetsResourcePath;
@@ -120,10 +113,6 @@ namespace TMPro.EditorUtilities
             m_PropDefaultTextMeshProUITextContainerSize = serializedObject.FindProperty("m_defaultTextMeshProUITextContainerSize");
             m_PropAutoSizeTextContainer = serializedObject.FindProperty("m_autoSizeTextContainer");
             m_PropEnableRaycastTarget = serializedObject.FindProperty("m_EnableRaycastTarget");
-
-            m_PropSpriteAsset = serializedObject.FindProperty("m_defaultSpriteAsset");
-            m_PropMissingSpriteCharacterUnicode = serializedObject.FindProperty("m_MissingCharacterSpriteUnicode");
-            m_PropSpriteAssetPath = serializedObject.FindProperty("m_defaultSpriteAssetPath");
 
             m_PropStyleSheet = serializedObject.FindProperty("m_defaultStyleSheet");
             m_PropStyleSheetsResourcePath = serializedObject.FindProperty("m_StyleSheetsResourcePath");
@@ -265,21 +254,6 @@ namespace TMPro.EditorUtilities
 
             EditorGUILayout.PropertyField(m_PropParseEscapeCharacters, Styles.parseEscapeCharactersLabel);
 
-            EditorGUI.indentLevel = 0;
-
-            EditorGUILayout.Space();
-            EditorGUILayout.EndVertical();
-
-            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            GUILayout.Label(Styles.defaultSpriteAssetLabel, EditorStyles.boldLabel);
-            EditorGUI.indentLevel = 1;
-            EditorGUI.BeginChangeCheck();
-            EditorGUILayout.PropertyField(m_PropSpriteAsset, Styles.defaultSpriteAssetLabel);
-            if (EditorGUI.EndChangeCheck())
-                m_IsFallbackGlyphCacheDirty = true;
-
-            EditorGUILayout.PropertyField(m_PropMissingSpriteCharacterUnicode, Styles.missingSpriteCharacterUnicodeLabel);
-            EditorGUILayout.PropertyField(m_PropSpriteAssetPath, Styles.spriteAssetsPathLabel);
             EditorGUI.indentLevel = 0;
 
             EditorGUILayout.Space();

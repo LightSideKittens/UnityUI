@@ -1218,8 +1218,6 @@ namespace TMPro
 
                     #region Current Line Horizontal Bounds Check
 
-                    Debug.Log((textWidth, widthOfTextArea * (isJustifiedOrFlush ? 1.05f : 1.0f), isJustifiedOrFlush, widthOfTextArea));
-                    
                     if (isBaseGlyph && textWidth > widthOfTextArea * (isJustifiedOrFlush ? 1.05f : 1.0f))
                     {
                         k_HandleHorizontalLineBreakingMarker.Begin();

@@ -138,9 +138,6 @@ namespace TMPro.EditorUtilities
         protected SerializedProperty m_EnableEscapeCharacterParsingProp;
         protected SerializedProperty m_UseMaxVisibleDescenderProp;
         protected SerializedProperty m_GeometrySortingOrderProp;
-        protected SerializedProperty m_IsTextObjectScaleStaticProp;
-
-        protected SerializedProperty m_SpriteAssetProp;
 
         protected SerializedProperty m_StyleSheetAssetProp;
         protected SerializedProperty m_TextStyleHashCodeProp;
@@ -212,9 +209,6 @@ namespace TMPro.EditorUtilities
             m_UseMaxVisibleDescenderProp = serializedObject.FindProperty("m_useMaxVisibleDescender");
 
             m_GeometrySortingOrderProp = serializedObject.FindProperty("m_geometrySortingOrder");
-            m_IsTextObjectScaleStaticProp = serializedObject.FindProperty("m_IsTextObjectScaleStatic");
-
-            m_SpriteAssetProp = serializedObject.FindProperty("m_spriteAsset");
 
             m_StyleSheetAssetProp = serializedObject.FindProperty("m_StyleSheet");
             m_TextStyleHashCodeProp = serializedObject.FindProperty("m_TextStyleHashCode");
@@ -995,18 +989,6 @@ namespace TMPro.EditorUtilities
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(m_EnableEscapeCharacterParsingProp, k_EscapeCharactersLabel);
             EditorGUILayout.PropertyField(m_UseMaxVisibleDescenderProp, k_VisibleDescenderLabel);
-
-            if (EditorGUI.EndChangeCheck())
-                m_HavePropertiesChanged = true;
-
-            EditorGUILayout.Space();
-        }
-
-        protected void DrawSpriteAsset()
-        {
-            EditorGUI.BeginChangeCheck();
-
-            EditorGUILayout.PropertyField(m_SpriteAssetProp, k_SpriteAssetLabel, true);
 
             if (EditorGUI.EndChangeCheck())
                 m_HavePropertiesChanged = true;
