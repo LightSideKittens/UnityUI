@@ -4,10 +4,6 @@ using UnityEngine.EventSystems;
 namespace UnityEditor.EventSystems
 {
     [CustomEditor(typeof(EventSystem), true)]
-    /// <summary>
-    /// Custom Editor for the EventSystem Component.
-    /// Extend this class to write a custom editor for a component derived from EventSystem.
-    /// </summary>
     public class EventSystemEditor : Editor
     {
         public override void OnInspectorGUI()

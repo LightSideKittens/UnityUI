@@ -20,27 +20,15 @@ namespace TMPro
         }
         internal static TMP_Style k_NormalStyle;
 
-        /// <summary>
-        /// The name identifying this style. ex. <style="name">.
-        /// </summary>
         public string name
         { get { return m_Name; } set { if (value != m_Name) m_Name = value; } }
 
-        /// <summary>
-        /// The hash code corresponding to the name of this style.
-        /// </summary>
         public int hashCode
         { get { return m_HashCode; } set { if (value != m_HashCode) m_HashCode = value; } }
 
-        /// <summary>
-        /// The initial definition of the style. ex. <b> <u>.
-        /// </summary>
         public string styleOpeningDefinition
         { get { return m_OpeningDefinition; } }
 
-        /// <summary>
-        /// The closing definition of the style. ex. </b> </u>.
-        /// </summary>
         public string styleClosingDefinition
         { get { return m_ClosingDefinition; } }
 
@@ -71,9 +59,6 @@ namespace TMPro
         [SerializeField]
         private uint[] m_ClosingTagArray;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         /// <param name="styleName">Name of the style.</param>
         /// <param name="styleOpeningDefinition">Style opening definition.</param>
         /// <param name="styleClosingDefinition">Style closing definition.</param>
@@ -88,9 +73,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to update the content of the int[] resulting from changes to OpeningDefinition & ClosingDefinition.
-        /// </summary>
         public void RefreshStyle()
         {
             m_HashCode = TMP_TextParsingUtilities.GetHashCode(m_Name);

@@ -6,9 +6,6 @@ using System.Collections.Generic;
 
 namespace TMPro
 {
-    /// <summary>
-    /// Class which contains information about every element contained within the text object.
-    /// </summary>
     [Serializable]
     public class TMP_TextInfo
     {
@@ -71,9 +68,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to clear the counters of the text object.
-        /// </summary>
         internal void Clear()
         {
             characterCount = 0;
@@ -90,9 +84,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         internal void ClearAllData()
         {
             characterCount = 0;
@@ -113,9 +104,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to clear the content of the MeshInfo array while preserving the Triangles, Normals and Tangents.
-        /// </summary>
         public void ClearMeshInfo(bool updateMesh)
         {
             for (int i = 0; i < meshInfo.Length; i++)
@@ -123,9 +111,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to clear the content of all the MeshInfo arrays while preserving their Triangles, Normals and Tangents.
-        /// </summary>
         public void ClearAllMeshInfo()
         {
             for (int i = 0; i < meshInfo.Length; i++)
@@ -133,9 +118,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public void ResetVertexLayout(bool isVolumetric)
         {
             for (int i = 0; i < meshInfo.Length; i++)
@@ -143,9 +125,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function used to mark unused vertices as degenerate.
-        /// </summary>
         /// <param name="materials"></param>
         public void ClearUnusedVertices(MaterialReference[] materials)
         {
@@ -157,9 +136,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to clear and initialize the lineInfo array.
-        /// </summary>
         internal void ClearLineInfo()
         {
             if (lineInfo == null)
@@ -191,9 +167,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Function to copy the MeshInfo Arrays and their primary vertex data content.
-        /// </summary>
         /// <returns>A copy of the MeshInfo[]</returns>
         public TMP_MeshInfo[] CopyMeshInfoVertexData()
         {
@@ -236,9 +209,6 @@ namespace TMPro
 
 
 
-        /// <summary>
-        /// Function to resize any of the structure contained in the TMP_TextInfo class.
-        /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
         /// <param name="size"></param>
@@ -250,9 +220,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to resize any of the structure contained in the TMP_TextInfo class.
-        /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
         /// <param name="size"></param>

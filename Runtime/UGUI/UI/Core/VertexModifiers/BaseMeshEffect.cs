@@ -4,9 +4,6 @@ using UnityEngine.EventSystems;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// Base class for effects that modify the generated Mesh.
-    /// </summary>
     /// <example>
     /// <code>
     /// <![CDATA[
@@ -46,9 +43,6 @@ namespace UnityEngine.UI
         [NonSerialized]
         private Graphic m_Graphic;
 
-        /// <summary>
-        /// The graphic component that the Mesh Effect will aplly to.
-        /// </summary>
         protected Graphic graphic
         {
             get
@@ -74,9 +68,6 @@ namespace UnityEngine.UI
             base.OnDisable();
         }
 
-        /// <summary>
-        /// Called from the native side any time a animation property is changed.
-        /// </summary>
         protected override void OnDidApplyAnimationProperties()
         {
             if (graphic != null)

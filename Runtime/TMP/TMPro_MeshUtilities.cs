@@ -5,9 +5,6 @@ using System;
 
 namespace TMPro
 {
-    /// <summary>
-    /// TMP custom data type to represent 32 bit characters.
-    /// </summary>
     [Serializable]
     public struct VertexGradient
     {
@@ -24,9 +21,6 @@ namespace TMPro
             bottomRight = color;
         }
 
-        /// <summary>
-        /// The vertex colors at the corners of the characters.
-        /// </summary>
         /// <param name="color0">Top left color.</param>
         /// <param name="color1">Top right color.</param>
         /// <param name="color2">Bottom left color.</param>
@@ -41,9 +35,6 @@ namespace TMPro
     }
 
 
-    /// <summary>
-    /// Structure containing information about individual links contained in the text object.
-    /// </summary>
     public struct TMP_LinkInfo
     {
         public TMP_Text textComponent;
@@ -68,9 +59,6 @@ namespace TMPro
             linkIdLength = length;
         }
 
-        /// <summary>
-        /// Function which returns the text contained in a link.
-        /// </summary>
         /// <param name="textInfo"></param>
         /// <returns></returns>
         public string GetLinkText()
@@ -84,18 +72,12 @@ namespace TMPro
             return text;
         }
 
-        /// <summary>
-        /// Function which returns the link as a string.
-        /// </summary>
         /// <returns></returns>
         public string GetLink()
         {
             return GetLinkID();
         }
 
-        /// <summary>
-        /// Function which returns the link ID as a string.
-        /// </summary>
         /// <param name="text">The source input text.</param>
         /// <returns></returns>
         public string GetLinkID()
@@ -108,9 +90,6 @@ namespace TMPro
     }
 
 
-    /// <summary>
-    /// Structure containing information about the individual words contained in the text object.
-    /// </summary>
     public struct TMP_WordInfo
     {
         public TMP_Text textComponent;
@@ -119,9 +98,6 @@ namespace TMPro
         public int lastCharacterIndex;
         public int characterCount;
 
-        /// <summary>
-        /// Returns the word as a string.
-        /// </summary>
         /// <returns></returns>
         public string GetWord()
         {
@@ -249,7 +225,6 @@ namespace TMPro
         public int spriteAnimationID;
 
         public TMP_FontAsset currentFontAsset;
-        public TMP_SpriteAsset currentSpriteAsset;
         public Material currentMaterial;
         public int currentMaterialIndex;
 
@@ -263,9 +238,6 @@ namespace TMPro
     }
 
 
-    /// <summary>
-    /// Structure used to store retrieve the name and hashcode of the font and material
-    /// </summary>
     internal struct TagAttribute
     {
         public int startIndex;

@@ -2,9 +2,6 @@
 
 namespace UnityEngine.TextCore
 {
-    /// <summary>
-    /// Enumeration of currently supported OpenType Layout features.
-    /// </summary>
     public enum OTL_FeatureTag : uint
     {
         kern = 'k' << 24 | 'e' << 16 | 'r' << 8 | 'n',

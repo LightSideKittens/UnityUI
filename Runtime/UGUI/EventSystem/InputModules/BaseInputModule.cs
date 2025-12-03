@@ -4,9 +4,6 @@ using System.Collections.Generic;
 namespace UnityEngine.EventSystems
 {
     [RequireComponent(typeof(EventSystem))]
-    /// <summary>
-    /// A base module that raises events and sends them to GameObjects.
-    /// </summary>
     /// <remarks>
     /// An Input Module is a component of the EventSystem that is responsible for raising events and sending them to GameObjects for handling. The BaseInputModule is a class that all Input Modules in the EventSystem inherit from. Examples of provided modules are TouchInputModule and StandaloneInputModule, if these are inadequate for your project you can create your own by extending from the BaseInputModule.
     /// </remarks>
@@ -39,15 +36,9 @@ namespace UnityEngine.EventSystems
         [NonSerialized]
         protected List<RaycastResult> m_RaycastResultCache = new List<RaycastResult>();
 
-        /// <summary>
-        /// True if pointer hover events will be sent to the parent
-        /// </summary>
         [SerializeField] private bool m_SendPointerHoverToParent = true;
 
         //This is needed for testing
-        /// <summary>
-        /// True if pointer hover events will be sent to the parent
-        /// </summary>
         protected internal bool sendPointerHoverToParent { get { return m_SendPointerHoverToParent; } set { m_SendPointerHoverToParent = value; } }
 
         private AxisEventData m_AxisEventData;
@@ -58,9 +49,6 @@ namespace UnityEngine.EventSystems
         protected BaseInput m_InputOverride;
         private BaseInput m_DefaultInput;
 
-        /// <summary>
-        /// The current BaseInput being used by the input module.
-        /// </summary>
         public BaseInput input
         {
             get
@@ -89,9 +77,6 @@ namespace UnityEngine.EventSystems
             }
         }
 
-        /// <summary>
-        /// Used to override the default BaseInput for the input module.
-        /// </summary>
         /// <remarks>
         /// With this it is possible to bypass the Input system with your own but still use the same InputModule. For example this can be used to feed fake input into the UI or interface with a different input system.
         /// </remarks>
@@ -119,14 +104,8 @@ namespace UnityEngine.EventSystems
             base.OnDisable();
         }
 
-        /// <summary>
-        /// Process the current tick for the module.
-        /// </summary>
         public abstract void Process();
 
-        /// <summary>
-        /// Return the first valid RaycastResult.
-        /// </summary>
         protected static RaycastResult FindFirstRaycast(List<RaycastResult> candidates)
         {
             var candidatesCount = candidates.Count;
@@ -140,9 +119,6 @@ namespace UnityEngine.EventSystems
             return new RaycastResult();
         }
 
-        /// <summary>
-        /// Given an input movement, determine the best MoveDirection.
-        /// </summary>
         /// <param name="x">X movement.</param>
         /// <param name="y">Y movement.</param>
         protected static MoveDirection DetermineMoveDirection(float x, float y)
@@ -150,9 +126,6 @@ namespace UnityEngine.EventSystems
             return DetermineMoveDirection(x, y, 0.6f);
         }
 
-        /// <summary>
-        /// Given an input movement, determine the best MoveDirection.
-        /// </summary>
         /// <param name="x">X movement.</param>
         /// <param name="y">Y movement.</param>
         /// <param name="deadZone">Dead zone.</param>
@@ -170,9 +143,6 @@ namespace UnityEngine.EventSystems
             return y > 0 ? MoveDirection.Up : MoveDirection.Down;
         }
 
-        /// <summary>
-        /// Given 2 GameObjects, return a common root GameObject (or null).
-        /// </summary>
         /// <param name="g1">GameObject to compare</param>
         /// <param name="g2">GameObject to compare</param>
         /// <returns></returns>
@@ -305,9 +275,6 @@ namespace UnityEngine.EventSystems
             }
         }
 
-        /// <summary>
-        /// Given some input data generate an AxisEventData that can be used by the event system.
-        /// </summary>
         /// <param name="x">X movement.</param>
         /// <param name="y">Y movement.</param>
         /// <param name="deadZone">Dead zone.</param>
@@ -322,9 +289,6 @@ namespace UnityEngine.EventSystems
             return m_AxisEventData;
         }
 
-        /// <summary>
-        /// Generate a BaseEventData that can be used by the EventSystem.
-        /// </summary>
         protected virtual BaseEventData GetBaseEventData()
         {
             if (m_BaseEventData == null)
@@ -334,9 +298,6 @@ namespace UnityEngine.EventSystems
             return m_BaseEventData;
         }
 
-        /// <summary>
-        /// If the module is pointer based, then override this to return true if the pointer is over an event system object.
-        /// </summary>
         /// <param name="pointerId">Pointer ID</param>
         /// <returns>Is the given pointer over an event system object?</returns>
         public virtual bool IsPointerOverGameObject(int pointerId)
@@ -344,44 +305,26 @@ namespace UnityEngine.EventSystems
             return false;
         }
 
-        /// <summary>
-        /// Should the module be activated.
-        /// </summary>
         public virtual bool ShouldActivateModule()
         {
             return enabled && gameObject.activeInHierarchy;
         }
 
-        /// <summary>
-        /// Called when the module is deactivated. Override this if you want custom code to execute when you deactivate your module.
-        /// </summary>
         public virtual void DeactivateModule()
         {}
 
-        /// <summary>
-        /// Called when the module is activated. Override this if you want custom code to execute when you activate your module.
-        /// </summary>
         public virtual void ActivateModule()
         {}
 
-        /// <summary>
-        /// Update the internal state of the Module.
-        /// </summary>
         public virtual void UpdateModule()
         {}
 
-        /// <summary>
-        /// Check to see if the module is supported. Override this if you have a platform specific module (eg. TouchInputModule that you do not want to activate on standalone.)
-        /// </summary>
         /// <returns>Is the module supported.</returns>
         public virtual bool IsModuleSupported()
         {
             return true;
         }
 
-        /// <summary>
-        /// Returns Id of the pointer following <see cref="UnityEngine.UIElements.PointerId"/> convention.
-        /// </summary>
         /// <param name="sourcePointerData">PointerEventData whose pointerId will be converted to UI Toolkit pointer convention.</param>
         /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
         public virtual int ConvertUIToolkitPointerId(PointerEventData sourcePointerData)
@@ -395,9 +338,6 @@ namespace UnityEngine.EventSystems
 #endif
         }
 
-        /// <summary>
-        /// Converts PointerEventData.scrollDelta to corresponding number of ticks of the scroll wheel.
-        /// </summary>
         /// <remarks>
         /// Input Module implementations are free to apply a scaling factor to their PointerEventData's scrollDelta.
         /// This method can be used when a system needs to treat scaling-independent input values.
@@ -407,9 +347,6 @@ namespace UnityEngine.EventSystems
             return scrollDelta / input.mouseScrollDeltaPerTick;
         }
 
-        /// <summary>
-        /// Returns the type of device that generated this event.
-        /// </summary>
         /// <remarks>
         /// This method is used by UI Toolkit's TextField to allow navigation in and out
         /// of the TextField when using a device other than a keyboard.
@@ -428,34 +365,22 @@ namespace UnityEngine.EventSystems
         }
     }
 
-    /// <summary>
-    /// The type of device that generated a navigation event.
-    /// </summary>
     /// <remarks>
     /// This can help avoid duplicated treatment of events when some controls react to keyboard input
     /// and navigation events at the same time.
     /// </remarks>
     public enum NavigationDeviceType
     {
-        /// <summary>
-        /// Indicates that no specific information is known about this device.
-        /// </summary>
         /// <remarks>
         /// Controls reacting to navigation events from an unknown device should react conservatively.
         /// For example, if there is a conflict between a keyboard event and a subsequent navigation event,
         /// a control could assume that the device type is a keyboard and conservatively block the navigation event.
         /// </remarks>
         Unknown = 0,
-        /// <summary>
-        /// Indicates that this device is known to be a keyboard.
-        /// </summary>
         /// <remarks>
         /// This device sends keyboard events along with any navigation event it generates.
         /// </remarks>
         Keyboard,
-        /// <summary>
-        /// Indicates that this device is anything else than a keyboard (it could be a Gamepad, for example).
-        /// </summary>
         /// <remarks>
         /// This device never sends keyboard events along with any navigation event it generates.
         /// </remarks>

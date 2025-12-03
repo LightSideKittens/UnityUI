@@ -14,9 +14,6 @@ using UnityEditor;
 
 namespace TMPro
 {
-    /// <summary>
-    /// Atlas population modes which ultimately determines the type of font asset.
-    /// </summary>
     public enum AtlasPopulationMode
     {
         Static = 0x0,
@@ -28,16 +25,10 @@ namespace TMPro
     [Serializable][ExcludeFromPresetAttribute]
     public class TMP_FontAsset : TMP_Asset
     {
-        /// <summary>
-        /// This field is set when the font asset is first created.
-        /// </summary>
         [SerializeField]
         internal string m_SourceFontFileGUID;
 
         #if UNITY_EDITOR
-        /// <summary>
-        /// Persistent reference to the source font file maintained in the editor.
-        /// </summary>
         internal Font SourceFont_EditorRef
         {
             get
@@ -63,9 +54,6 @@ namespace TMPro
 
         #endif
 
-        /// <summary>
-        /// The settings used in the Font Asset Creator when this font asset was created or edited.
-        /// </summary>
         public FontAssetCreationSettings creationSettings
         {
             get { return m_CreationSettings; }
@@ -74,9 +62,6 @@ namespace TMPro
         [SerializeField]
         internal FontAssetCreationSettings m_CreationSettings;
 
-        /// <summary>
-        /// Source font file when atlas population mode is set to dynamic. Null when the atlas population mode is set to static.
-        /// </summary>
         public Font sourceFontFile
         {
             get { return m_SourceFontFile; }
@@ -106,15 +91,9 @@ namespace TMPro
         [SerializeField]
         private AtlasPopulationMode m_AtlasPopulationMode;
 
-        /// <summary>
-        /// Field used to identify dynamic OS font assets used internally.
-        /// </summary>
         [SerializeField]
         internal bool InternalDynamicOS;
 
-        /// <summary>
-        ///
-        /// </summary>
         internal int familyNameHashCode
         {
             get
@@ -128,9 +107,6 @@ namespace TMPro
         }
         private int m_FamilyNameHashCode;
 
-        /// <summary>
-        ///
-        /// </summary>
         internal int styleNameHashCode
         {
             get
@@ -144,9 +120,6 @@ namespace TMPro
         }
         private int m_StyleNameHashCode;
 
-        /// <summary>
-        /// List of glyphs contained in the font asset.
-        /// </summary>
         public List<Glyph> glyphTable
         {
             get { return m_GlyphTable; }
@@ -155,9 +128,6 @@ namespace TMPro
         [SerializeField]
         internal List<Glyph> m_GlyphTable = new();
 
-        /// <summary>
-        /// Dictionary used to lookup glyphs contained in the font asset by their index.
-        /// </summary>
         public Dictionary<uint, Glyph> glyphLookupTable
         {
             get
@@ -171,9 +141,6 @@ namespace TMPro
         internal Dictionary<uint, Glyph> m_GlyphLookupDictionary;
 
 
-        /// <summary>
-        /// List containing the characters of the given font asset.
-        /// </summary>
         public List<TMP_Character> characterTable
         {
             get { return m_CharacterTable; }
@@ -182,9 +149,6 @@ namespace TMPro
         [SerializeField]
         internal List<TMP_Character> m_CharacterTable = new();
 
-        /// <summary>
-        /// Dictionary used to lookup characters contained in the font asset by their unicode values.
-        /// </summary>
         public Dictionary<uint, TMP_Character> characterLookupTable
         {
             get
@@ -199,14 +163,7 @@ namespace TMPro
         internal Dictionary<uint, TMP_Character> m_CharacterLookupDictionary;
 
 
-        /// <summary>
-        /// Determines if the font asset is using a shared atlas texture(s)
-        /// </summary>
 
-        /// <summary>
-        /// The font atlas used by this font asset.
-        /// This is always the texture at index [0] of the fontAtlasTextures.
-        /// </summary>
         public Texture2D atlasTexture
         {
             get
@@ -221,9 +178,6 @@ namespace TMPro
         }
         internal Texture2D m_AtlasTexture;
 
-        /// <summary>
-        /// Array of atlas textures that contain the glyphs used by this font asset.
-        /// </summary>
         public Texture2D[] atlasTextures
         {
             get
@@ -243,20 +197,11 @@ namespace TMPro
         [SerializeField]
         internal Texture2D[] m_AtlasTextures;
 
-        /// <summary>
-        /// Index of the font atlas texture that still has available space to add new glyphs.
-        /// </summary>
         [SerializeField]
         internal int m_AtlasTextureIndex;
 
-        /// <summary>
-        /// Number of atlas textures used by this font asset.
-        /// </summary>
         public int atlasTextureCount { get { return m_AtlasTextureIndex + 1; } }
 
-        /// <summary>
-        /// Enables the font asset to create additional atlas textures as needed.
-        /// </summary>
         public bool isMultiAtlasTexturesEnabled
         {
             get { return m_IsMultiAtlasTexturesEnabled; }
@@ -266,9 +211,6 @@ namespace TMPro
         [SerializeField]
         private bool m_IsMultiAtlasTexturesEnabled;
 
-        /// <summary>
-        /// Determines if OpenType font features should be retrieved from the source font file as new characters and glyphs are added dynamically to the font asset.
-        /// </summary>
         public bool getFontFeatures
         {
             get { return m_GetFontFeatures; }
@@ -277,9 +219,6 @@ namespace TMPro
         [SerializeField]
         private bool m_GetFontFeatures = true;
 
-        /// <summary>
-        /// Determines if dynamic font asset data should be cleared before builds.
-        /// </summary>
         internal bool clearDynamicDataOnBuild
         {
             get { return m_ClearDynamicDataOnBuild; }
@@ -288,9 +227,6 @@ namespace TMPro
         [SerializeField]
         private bool m_ClearDynamicDataOnBuild;
 
-        /// <summary>
-        /// The width of the atlas texture(s) used by this font asset.
-        /// </summary>
         public int atlasWidth
         {
             get { return m_AtlasWidth; }
@@ -299,9 +235,6 @@ namespace TMPro
         [SerializeField]
         internal int m_AtlasWidth;
 
-        /// <summary>
-        /// The height of the atlas texture(s) used by this font asset.
-        /// </summary>
         public int atlasHeight
         {
             get { return m_AtlasHeight; }
@@ -310,9 +243,6 @@ namespace TMPro
         [SerializeField]
         internal int m_AtlasHeight;
 
-        /// <summary>
-        /// The padding used between glyphs contained in the atlas texture(s) used by this font asset.
-        /// </summary>
         public int atlasPadding
         {
             get { return m_AtlasPadding; }
@@ -329,9 +259,6 @@ namespace TMPro
         [SerializeField]
         internal GlyphRenderMode m_AtlasRenderMode;
 
-        /// <summary>
-        /// List of spaces occupied by glyphs in a given texture.
-        /// </summary>
         internal List<GlyphRect> usedGlyphRects
         {
             get { return m_UsedGlyphRects; }
@@ -340,9 +267,6 @@ namespace TMPro
         [SerializeField]
         private List<GlyphRect> m_UsedGlyphRects;
 
-        /// <summary>
-        /// List of spaces available in a given texture to add new glyphs.
-        /// </summary>
         internal List<GlyphRect> freeGlyphRects
         {
             get { return m_FreeGlyphRects; }
@@ -351,9 +275,6 @@ namespace TMPro
         [SerializeField]
         private List<GlyphRect> m_FreeGlyphRects;
 
-        /// <summary>
-        /// Table containing the various font features of this font asset.
-        /// </summary>
         public TMP_FontFeatureTable fontFeatureTable
         {
             get { return m_FontFeatureTable; }
@@ -362,14 +283,8 @@ namespace TMPro
         [SerializeField]
         internal TMP_FontFeatureTable m_FontFeatureTable = new();
 
-        /// <summary>
-        ///
-        /// </summary>
         [SerializeField] internal bool m_ShouldReimportFontFeatures;
 
-        /// <summary>
-        /// List containing the Fallback font assets for this font.
-        /// </summary>
         public List<TMP_FontAsset> fallbackFontAssetTable
         {
             get { return m_FallbackFontAssetTable; }
@@ -378,9 +293,6 @@ namespace TMPro
         [SerializeField]
         internal List<TMP_FontAsset> m_FallbackFontAssetTable;
 
-        /// <summary>
-        /// Array containing font assets to be used as alternative typefaces for the various potential font weights of this font asset.
-        /// </summary>
         public TMP_FontWeightPair[] fontWeightTable
         {
             get { return m_FontWeightTable; }
@@ -389,41 +301,19 @@ namespace TMPro
         [SerializeField]
         private TMP_FontWeightPair[] m_FontWeightTable = new TMP_FontWeightPair[10];
 
-        /// <summary>
-        /// Font weights used by font asset prior to version 1.1.0.
-        /// This is legacy and will be removed at some point in the future.
-        /// </summary>
         [SerializeField]
         private TMP_FontWeightPair[] fontWeights;
 
-        /// <summary>
-        /// Defines the dilation of the text when using regular style.
-        /// </summary>
         public float normalStyle;
 
-        /// <summary>
-        /// The spacing between characters when using regular style.
-        /// </summary>
         public float normalSpacingOffset;
 
-        /// <summary>
-        /// Defines the dilation of the text when using bold style.
-        /// </summary>
         public float boldStyle = 0.75f;
 
-        /// <summary>
-        /// The spacing between characters when using regular style.
-        /// </summary>
         public float boldSpacing = 7f;
 
-        /// <summary>
-        /// Defines the slant of the text when using italic style.
-        /// </summary>
         public byte italicStyle = 35;
 
-        /// <summary>
-        ///
-        /// </summary>
         public byte tabSize = 10;
 
         internal bool IsFontAssetLookupTablesDirty;
@@ -443,15 +333,9 @@ namespace TMPro
         #pragma warning disable 0649
         private List<TMP_FontAsset> fallbackFontAssets;
 
-        /// <summary>
-        ///
-        /// </summary>
         [SerializeField]
         public Texture2D atlas;
 
-        /// <summary>
-        /// Creates a new font asset instance from the given family name and style.
-        /// </summary>
         /// <param name="familyName">The family name of the source font.</param>
         /// <param name="styleName">The style name of the source font face.</param>
         /// <param name="pointSize">Optional point size.</param>
@@ -466,9 +350,6 @@ namespace TMPro
             return null;
         }
 
-        /// <summary>
-        /// Creates a new font asset instance from the font file at the given file path.
-        /// </summary>
         /// <param name="fontFilePath">The file path of the font file.</param>
         /// <param name="faceIndex">The index of font face.</param>
         /// <param name="samplingPointSize">The sampling point size.</param>
@@ -497,9 +378,6 @@ namespace TMPro
             return fontAsset;
         }
 
-        /// <summary>
-        /// Creates a new font asset instance from the provided font object.
-        /// </summary>
         /// <param name="font">The source font object.</param>
         /// <returns>An instance of the newly created font asset.</returns>
         public static TMP_FontAsset CreateFontAsset(Font font)
@@ -507,9 +385,6 @@ namespace TMPro
             return CreateFontAsset(font, 90, 9, GlyphRenderMode.SDFAA, 1024, 1024);
         }
 
-        /// <summary>
-        /// Creates a new font asset instance from the provided font object.
-        /// </summary>
         /// <param name="font">The source font object.</param>
         /// <param name="samplingPointSize">The sampling point size.</param>
         /// <param name="atlasPadding">The padding between individual glyphs in the font atlas texture.</param>
@@ -630,14 +505,8 @@ namespace TMPro
         internal static Func<Font, string> SetSourceFontGUID;
         #endif
 
-        /// <summary>
-        /// Weak reference to all <see cref="TMP_FontAsset"/> instances.
-        /// </summary>
         private static readonly List<WeakReference<TMP_FontAsset>> s_CallbackInstances = new();
 
-        /// <summary>
-        /// Register an instance for static lookup.
-        /// </summary>
         /// <param name="instance">The instance to register.</param>
         private void RegisterCallbackInstance(TMP_FontAsset instance)
         {
@@ -701,9 +570,6 @@ namespace TMPro
 
         private static string s_DefaultMaterialSuffix = " Atlas Material";
 
-        /// <summary>
-        /// Reads the various data tables of the font asset and populates various data structures to allow for faster lookup of related font asset data.
-        /// </summary>
         public void ReadFontAssetDefinition()
         {
             k_ReadFontAssetDefinitionMarker.Begin();
@@ -768,9 +634,6 @@ namespace TMPro
             k_ReadFontAssetDefinitionMarker.End();
         }
 
-        /// <summary>
-        /// Read the various data tables of the font asset to populate its different dictionaries to allow for faster lookup of related font asset data.
-        /// </summary>
         internal void InitializeDictionaryLookupTables()
         {
             InitializeGlyphLookupDictionary();
@@ -1044,9 +907,6 @@ namespace TMPro
             m_CharacterLookupDictionary.TryAdd(lookupKey, character);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <returns></returns>
         internal FontEngineError LoadFontFace()
         {
@@ -1077,18 +937,12 @@ namespace TMPro
             return FontEngine.LoadFontFace(m_FaceInfo.familyName, m_FaceInfo.styleName, m_FaceInfo.pointSize);
         }
 
-        /// <summary>
-        /// Sort the Character table by Unicode values.
-        /// </summary>
         internal void SortCharacterTable()
         {
             if (m_CharacterTable != null && m_CharacterTable.Count > 0)
                 m_CharacterTable = m_CharacterTable.OrderBy(c => c.unicode).ToList();
         }
 
-        /// <summary>
-        /// Sort the Glyph table by index values.
-        /// </summary>
         internal void SortGlyphTable()
         {
             if (m_GlyphTable != null && m_GlyphTable.Count > 0)
@@ -1102,9 +956,6 @@ namespace TMPro
             m_FontFeatureTable.SortMarkToMarkAdjustmentRecords();
         }
 
-        /// <summary>
-        /// Sort both glyph and character tables.
-        /// </summary>
         internal void SortAllTables()
         {
             SortGlyphTable();
@@ -1112,14 +963,8 @@ namespace TMPro
             SortFontFeatureTable();
         }
 
-        /// <summary>
-        /// HashSet of font asset instance ID used in the process of searching for through fallback font assets for a given character or characters.
-        /// </summary>
         private static HashSet<int> k_SearchedFontAssetLookup;
 
-        /// <summary>
-        /// Function to check if a certain character exists in the font asset.
-        /// </summary>
         /// <param name="character"></param>
         /// <returns></returns>
         public bool HasCharacter(int character)
@@ -1130,9 +975,6 @@ namespace TMPro
             return m_CharacterLookupDictionary.ContainsKey((uint)character);
         }
 
-        /// <summary>
-        /// Function to check if a character is contained in the font asset with the option to also check potential local fallbacks.
-        /// </summary>
         /// <param name="character"></param>
         /// <param name="searchFallbacks"></param>
         /// <param name="tryAddCharacter"></param>
@@ -1209,10 +1051,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to check if a character is contained in a font asset with the option to also check through fallback font assets.
-        /// This private implementation does not search the fallback font asset in the TMP Settings file.
-        /// </summary>
         /// <param name="character"></param>
         /// <param name="searchFallbacks"></param>
         /// <param name="tryAddCharacter"></param>
@@ -1259,9 +1097,6 @@ namespace TMPro
             return false;
         }
 
-        /// <summary>
-        /// Function to check if certain characters exists in the font asset. Function returns a list of missing characters.
-        /// </summary>
         /// <param name="text">String containing the characters to check.</param>
         /// <param name="missingCharacters">List of missing characters.</param>
         /// <returns></returns>
@@ -1289,9 +1124,6 @@ namespace TMPro
             return false;
         }
 
-        /// <summary>
-        /// Function to check if the characters in the given string are contained in the font asset with the option to also check its potential local fallbacks.
-        /// </summary>
         /// <param name="text">String containing the characters to check.</param>
         /// <param name="missingCharacters">Array containing the unicode values of the missing characters.</param>
         /// <param name="searchFallbacks">Determines if fallback font assets assigned to this font asset should be searched.</param>
@@ -1393,9 +1225,6 @@ namespace TMPro
             return true;
         }
 
-        /// <summary>
-        /// Function to check if certain characters exists in the font asset. Function returns false if any characters are missing.
-        /// </summary>
         /// <param name="text">String containing the characters to check</param>
         /// <returns></returns>
         public bool HasCharacters(string text)
@@ -1414,9 +1243,6 @@ namespace TMPro
             return true;
         }
 
-        /// <summary>
-        /// Function to extract all the characters from a font asset.
-        /// </summary>
         /// <param name="fontAsset"></param>
         /// <returns></returns>
         public static string GetCharacters(TMP_FontAsset fontAsset)
@@ -1431,9 +1257,6 @@ namespace TMPro
             return characters;
         }
 
-        /// <summary>
-        /// Function which returns an array that contains all the characters from a font asset.
-        /// </summary>
         /// <param name="fontAsset"></param>
         /// <returns></returns>
         public static int[] GetCharactersArray(TMP_FontAsset fontAsset)
@@ -1448,9 +1271,6 @@ namespace TMPro
             return characters;
         }
 
-        /// <summary>
-        /// Internal function used to get the glyph index for the given Unicode.
-        /// </summary>
         /// <param name="unicode"></param>
         /// <returns></returns>
         internal uint GetGlyphIndex(uint unicode)
@@ -1461,9 +1281,6 @@ namespace TMPro
             return LoadFontFace() == FontEngineError.Success ? FontEngine.GetGlyphIndex(unicode) : 0;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="unicode"></param>
         /// <param name="variantSelectorUnicode"></param>
         /// <returns></returns>
@@ -1482,9 +1299,6 @@ namespace TMPro
         private static List<Texture2D> k_FontAssets_AtlasTexturesUpdateQueue = new();
         private static HashSet<int> k_FontAssets_AtlasTexturesUpdateQueueLookup = new();
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="fontAsset"></param>
         internal static void RegisterFontAssetForFontFeatureUpdate(TMP_FontAsset fontAsset)
         {
@@ -1494,10 +1308,6 @@ namespace TMPro
                 k_FontAssets_FontFeaturesUpdateQueue.Add(fontAsset);
         }
 
-        /// <summary>
-        /// Function called to update the font atlas texture and character data of font assets to which
-        /// new characters were added.
-        /// </summary>
         internal static void UpdateFontFeaturesForFontAssetsInQueue()
         {
             int count = k_FontAssets_FontFeaturesUpdateQueue.Count;
@@ -1514,9 +1324,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Register Atlas Texture for Apply()
-        /// </summary>
         /// <param name="texture">The texture on which to call Apply().</param>
         internal static void RegisterAtlasTextureForApply(Texture2D texture)
         {
@@ -1526,9 +1333,6 @@ namespace TMPro
                 k_FontAssets_AtlasTexturesUpdateQueue.Add(texture);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         internal static void UpdateAtlasTexturesInQueue()
         {
             int count = k_FontAssets_AtlasTexturesUpdateQueueLookup.Count;
@@ -1543,9 +1347,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         internal static void UpdateFontAssetsInUpdateQueue()
         {
             UpdateAtlasTexturesInQueue();
@@ -1553,58 +1354,27 @@ namespace TMPro
             UpdateFontFeaturesForFontAssetsInQueue();
         }
 
-        /// <summary>
-        ///
-        /// </summary>
 
-        /// <summary>
-        /// List of glyphs that need to be rendered and added to an atlas texture.
-        /// </summary>
         private List<Glyph> m_GlyphsToRender = new();
 
-        /// <summary>
-        /// List of glyphs that we just rendered and added to an atlas texture.
-        /// </summary>
         private List<Glyph> m_GlyphsRendered = new();
 
-        /// <summary>
-        /// List of all the glyph indexes contained in the font asset.
-        /// </summary>
         private List<uint> m_GlyphIndexList = new();
 
-        /// <summary>
-        /// List of glyph indexes newly added to the font asset.
-        /// This list is used in the process of retrieving font features.
-        /// </summary>
         private List<uint> m_GlyphIndexListNewlyAdded = new();
 
-        /// <summary>
-        ///
-        /// </summary>
         internal List<uint> m_GlyphsToAdd = new();
         internal HashSet<uint> m_GlyphsToAddLookup = new();
 
         internal List<TMP_Character> m_CharactersToAdd = new();
         internal HashSet<uint> m_CharactersToAddLookup = new();
 
-        /// <summary>
-        /// Internal list used to track characters that could not be added to the font asset.
-        /// </summary>
         internal List<uint> s_MissingCharacterList = new();
 
-        /// <summary>
-        /// Hash table used to track characters that are known to be missing from the font file.
-        /// </summary>
         internal HashSet<uint> m_MissingUnicodesFromFontFile = new();
 
-        /// <summary>
-        /// Internal static array used to avoid allocations when using the GetGlyphPairAdjustmentTable().
-        /// </summary>
         internal static uint[] k_GlyphIndexArray;
 
-        /// <summary>
-        /// Try adding the characters from the provided string to the font asset.
-        /// </summary>
         /// <param name="unicodes">Array that contains the characters to add to the font asset.</param>
         /// <param name="includeFontFeatures"></param>
         /// <returns>Returns true if all the characters were successfully added to the font asset. Return false otherwise.</returns>
@@ -1615,9 +1385,6 @@ namespace TMPro
             return TryAddCharacters(unicodes, out missingUnicodes, includeFontFeatures);
         }
 
-        /// <summary>
-        /// Try adding the characters from the provided string to the font asset.
-        /// </summary>
         /// <param name="unicodes">Array that contains the characters to add to the font asset.</param>
         /// <param name="missingUnicodes">Array containing the characters that could not be added to the font asset.</param>
         /// <param name="includeFontFeatures"></param>
@@ -1794,9 +1561,6 @@ namespace TMPro
             return allGlyphsAddedToTexture && !isMissingCharacters;
         }
 
-        /// <summary>
-        /// Try adding the characters from the provided string to the font asset.
-        /// </summary>
         /// <param name="characters">String containing the characters to add to the font asset.</param>
         /// <param name="includeFontFeatures"></param>
         /// <returns>Returns true if all the characters were successfully added to the font asset. Return false otherwise.</returns>
@@ -1807,9 +1571,6 @@ namespace TMPro
             return TryAddCharacters(characters, out missingCharacters, includeFontFeatures);
         }
 
-        /// <summary>
-        /// Try adding the characters from the provided string to the font asset.
-        /// </summary>
         /// <param name="characters">String containing the characters to add to the font asset.</param>
         /// <param name="missingCharacters">String containing the characters that could not be added to the font asset.</param>
         /// <param name="includeFontFeatures"></param>
@@ -1993,9 +1754,6 @@ namespace TMPro
             return TryAddGlyphInternal(glyphIndex, out glyph);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="glyphIndex"></param>
         /// <param name="glyph"></param>
         /// <returns></returns>
@@ -2102,10 +1860,6 @@ namespace TMPro
             return false;
         }
 
-        /// <summary>
-        /// Try adding character using Unicode value to font asset.
-        /// Function assumes internal user has already checked to make sure the character is not already contained in the font asset.
-        /// </summary>
         /// <param name="unicode">The Unicode value of the character.</param>
         /// <param name="character">The character data if successfully added to the font asset. Null otherwise.</param>
         /// <returns>Returns true if the character has been added. False otherwise.</returns>
@@ -2341,16 +2095,10 @@ namespace TMPro
             return false;
         }
 
-        /// <summary>
-        /// This function requires an update to the TextCore:FontEngine
-        /// </summary>
         internal void TryAddGlyphsToAtlasTextures()
         {
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <returns></returns>
         private bool TryAddGlyphsToNewAtlasTexture()
         {
@@ -2397,9 +2145,6 @@ namespace TMPro
             return allGlyphsAddedToTexture;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         private void SetupNewAtlasTexture()
         {
             m_AtlasTextureIndex += 1;
@@ -2428,9 +2173,6 @@ namespace TMPro
             #endif
         }
 
-        /// <summary>
-        /// Not used currently
-        /// </summary>
         internal void UpdateAtlasTexture()
         {
             if (m_GlyphsToRender.Count == 0)
@@ -2480,9 +2222,6 @@ namespace TMPro
             m_GlyphIndexListNewlyAdded.Clear();
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         internal void ImportFontFeatures()
         {
             if (LoadFontFace() != FontEngineError.Success)
@@ -2524,9 +2263,6 @@ namespace TMPro
         }
 
         #if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
-        /// <summary>
-        ///
-        /// </summary>
         internal void UpdateLigatureSubstitutionRecords()
         {
             k_UpdateLigatureSubstitutionRecordsMarker.Begin();
@@ -2571,9 +2307,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         internal void UpdateGlyphAdjustmentRecords()
         {
             k_UpdateGlyphAdjustmentRecordsMarker.Begin();
@@ -2616,9 +2349,6 @@ namespace TMPro
             }
         }
         #else
-        /// <summary>
-        ///
-        /// </summary>
         internal void UpdateGlyphAdjustmentRecords()
         {
             k_UpdateGlyphAdjustmentRecordsMarker.Begin();
@@ -2651,9 +2381,6 @@ namespace TMPro
         }
         #endif
 
-        /// <summary>
-        /// Function used for debugging and performance testing.
-        /// </summary>
         /// <param name="glyphIndexes"></param>
         internal void UpdateGlyphAdjustmentRecords(uint[] glyphIndexes)
         {
@@ -2687,9 +2414,6 @@ namespace TMPro
         }
 
         #if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
-        /// <summary>
-        ///
-        /// </summary>
         internal void UpdateDiacriticalMarkAdjustmentRecords()
         {
             k_UpdateDiacriticalMarkAdjustmentRecordsMarker.Begin();
@@ -2705,9 +2429,6 @@ namespace TMPro
             k_UpdateDiacriticalMarkAdjustmentRecordsMarker.End();
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="records"></param>
         private void AddMarkToBaseAdjustmentRecords(UnityEngine.TextCore.LowLevel.MarkToBaseAdjustmentRecord[] records)
         {
@@ -2737,9 +2458,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="records"></param>
         private void AddMarkToMarkAdjustmentRecords(UnityEngine.TextCore.LowLevel.MarkToMarkAdjustmentRecord[] records)
         {
@@ -2770,9 +2488,6 @@ namespace TMPro
         }
         #endif
 
-        /// <summary>
-        /// Internal method to copy generic list data to generic array of the same type.
-        /// </summary>
         /// <param name="srcList">Source</param>
         /// <param name="dstArray">Destination</param>
         /// <typeparam name="T">Element type</typeparam>
@@ -2789,9 +2504,6 @@ namespace TMPro
                 dstArray[i] = srcList[i];
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         internal void UpdateFontAssetData()
         {
             k_UpdateFontAssetDataMarker.Begin();
@@ -2815,10 +2527,6 @@ namespace TMPro
             k_UpdateFontAssetDataMarker.End();
         }
 
-        /// <summary>
-        /// Clears font asset data including the glyph and character tables and textures.
-        /// Function might be changed to Internal and only used in tests.
-        /// </summary>
         /// <param name="setAtlasSizeToZero">Will set the atlas texture size to zero width and height if true.</param>
         public void ClearFontAssetData(bool setAtlasSizeToZero = false)
         {
@@ -2848,9 +2556,6 @@ namespace TMPro
             k_ClearFontAssetDataMarker.End();
         }
 
-        /// <summary>
-        /// Clear character and glyph tables along with atlas textures.
-        /// </summary>
         internal void ClearCharacterAndGlyphTablesInternal()
         {
             ClearCharacterAndGlyphTables();
@@ -2875,9 +2580,6 @@ namespace TMPro
             #endif
         }
 
-        /// <summary>
-        /// Clear character and glyph tables.
-        /// </summary>
         private void ClearCharacterAndGlyphTables()
         {
             if (m_GlyphTable != null)
@@ -2903,9 +2605,6 @@ namespace TMPro
                 m_GlyphsRendered.Clear();
         }
 
-        /// <summary>
-        /// Clear OpenType font features
-        /// </summary>
         private void ClearFontFeaturesTables()
         {
             if (m_FontFeatureTable != null && m_FontFeatureTable.m_LigatureSubstitutionRecords != null)
@@ -2921,9 +2620,6 @@ namespace TMPro
                 m_FontFeatureTable.m_MarkToMarkAdjustmentRecords.Clear();
         }
 
-        /// <summary>
-        /// Internal function to clear all atlas textures.
-        /// </summary>
         /// <param name="setAtlasSizeToZero">Set main atlas texture size to zero if true.</param>
         internal void ClearAtlasTextures(bool setAtlasSizeToZero = false)
         {
@@ -3001,9 +2697,6 @@ namespace TMPro
         }
 
         #if UNITY_EDITOR
-        /// <summary>
-        /// Internal method used to upgrade font asset to support Dynamic SDF.
-        /// </summary>
         internal void UpgradeFontAsset()
         {
             m_Version = "1.1.0";
@@ -3132,9 +2825,6 @@ namespace TMPro
         }
         #endif
 
-        /// <summary>
-        ///
-        /// </summary>
         private void UpgradeGlyphAdjustmentTableToFontFeatureTable()
         {
             Debug.Log("Upgrading font asset [" + name + "] Glyph Adjustment Table.", this);

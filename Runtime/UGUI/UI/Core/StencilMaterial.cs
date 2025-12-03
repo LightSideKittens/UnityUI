@@ -4,10 +4,6 @@ using UnityEngine.Rendering;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// Dynamic material class makes it possible to create custom materials on the fly on a per-Graphic basis,
-    /// and still have them get cleaned up correctly.
-    /// </summary>
     public static class StencilMaterial
     {
         private class MatEntry
@@ -27,9 +23,6 @@ namespace UnityEngine.UI
 
         private static List<MatEntry> m_List = new List<MatEntry>();
 
-        /// <summary>
-        /// Add a new material using the specified base and stencil ID.
-        /// </summary>
         public static Material Add(Material baseMat, int stencilID, StencilOp operation, CompareFunction compareFunction, ColorWriteMask colorWriteMask)
         {
             return Add(baseMat, stencilID, operation, compareFunction, colorWriteMask, 255, 255);
@@ -42,9 +35,6 @@ namespace UnityEngine.UI
                 Debug.LogWarning(warning, context);
         }
 
-        /// <summary>
-        /// Add a new material using the specified base and stencil ID.
-        /// </summary>
         public static Material Add(Material baseMat, int stencilID, StencilOp operation, CompareFunction compareFunction, ColorWriteMask colorWriteMask, int readMask, int writeMask)
         {
             if ((stencilID <= 0 && colorWriteMask == ColorWriteMask.All) || baseMat == null)
@@ -131,9 +121,6 @@ namespace UnityEngine.UI
             return newEnt.customMat;
         }
 
-        /// <summary>
-        /// Remove an existing material, automatically cleaning it up if it's no longer in use.
-        /// </summary>
         public static void Remove(Material customMat)
         {
             if (customMat == null)

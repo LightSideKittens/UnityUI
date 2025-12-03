@@ -50,9 +50,6 @@ namespace TMPro.EditorUtilities
             return glyphProxyLookup;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="so"></param>
         /// <param name="lookupDictionary"></param>
         static void PopulateGlyphProxyLookupDictionary(SerializedObject so, Dictionary<uint, GlyphProxy> lookupDictionary)
@@ -98,9 +95,6 @@ namespace TMPro.EditorUtilities
             return glyphMetrics;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="property"></param>
         /// <returns></returns>
         internal static GlyphProxy GetGlyphProxyFromSerializedProperty(SerializedProperty property)
@@ -114,9 +108,6 @@ namespace TMPro.EditorUtilities
             return proxy;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="serializedObject"></param>
         /// <param name="glyphIndex"></param>
         /// <param name="texture"></param>
@@ -133,9 +124,6 @@ namespace TMPro.EditorUtilities
             return true;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="serializedObject"></param>
         /// <param name="texture"></param>
         /// <param name="mat"></param>

@@ -6,10 +6,6 @@ namespace UnityEditor.UI
 {
     [CustomEditor(typeof(AspectRatioFitter), true)]
     [CanEditMultipleObjects]
-    /// <summary>
-    ///   Custom Editor for the AspectRatioFitter component.
-    ///   Extend this class to write a custom editor for a component derived from AspectRatioFitter.
-    /// </summary>
     public class AspectRatioFitterEditor : SelfControllerEditor
     {
         SerializedProperty m_AspectMode;

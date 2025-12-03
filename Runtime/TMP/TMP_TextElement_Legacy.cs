@@ -6,9 +6,6 @@ using System.Collections;
 namespace TMPro
 {
 
-    /// <summary>
-    /// Base class for all text elements like characters (glyphs) and sprites.
-    /// </summary>
     [Serializable]
     public class TMP_TextElement_Legacy
     {

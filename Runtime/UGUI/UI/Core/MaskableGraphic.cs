@@ -4,9 +4,6 @@ using UnityEngine.Rendering;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// A Graphic that is capable of being masked out.
-    /// </summary>
     public abstract class MaskableGraphic : Graphic, IClippable, IMaskable, IMaterialModifier
     {
         [NonSerialized]
@@ -36,9 +33,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private CullStateChangedEvent m_OnCullStateChanged = new CullStateChangedEvent();
 
-        /// <summary>
-        /// Callback issued when culling changes.
-        /// </summary>
         /// <remarks>
         /// Called whene the culling state of this MaskableGraphic either becomes culled or visible. You can use this to control other elements of your UI as culling happens.
         /// </remarks>
@@ -48,9 +42,6 @@ namespace UnityEngine.UI
             set { m_OnCullStateChanged = value; }
         }
 
-        /// <summary>
-        /// Does this graphic allow masking.
-        /// </summary>
         public bool maskable
         {
             get { return m_Maskable; }
@@ -65,9 +56,6 @@ namespace UnityEngine.UI
         }
 
 
-        /// <summary>
-        /// Is this graphic the graphic on the same object as a Mask that is enabled.
-        /// </summary>
         /// <remarks>
         /// If toggled ensure to call MaskUtilities.NotifyStencilStateChanged(this); manually as it changes how stenciles are calculated for this image.
         /// </remarks>
@@ -86,9 +74,6 @@ namespace UnityEngine.UI
         [NonSerialized]
         protected int m_StencilValue;
 
-        /// <summary>
-        /// See IMaterialModifier.GetModifiedMaterial
-        /// </summary>
         public virtual Material GetModifiedMaterial(Material baseMaterial)
         {
             var toUse = baseMaterial;
@@ -119,9 +104,6 @@ namespace UnityEngine.UI
             return toUse;
         }
 
-        /// <summary>
-        /// See IClippable.Cull
-        /// </summary>
         public virtual void Cull(Rect clipRect, bool validRect)
         {
             var cull = !validRect || !clipRect.Overlaps(rootCanvasRect, true);
@@ -139,9 +121,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// See IClippable.SetClipRect
-        /// </summary>
         public virtual void SetClipRect(Rect clipRect, bool validRect)
         {
             if (validRect)
@@ -266,17 +245,11 @@ namespace UnityEngine.UI
             m_ParentMask = newParent;
         }
 
-        /// <summary>
-        /// See IClippable.RecalculateClipping
-        /// </summary>
         public virtual void RecalculateClipping()
         {
             UpdateClipParent();
         }
 
-        /// <summary>
-        /// See IMaskable.RecalculateMasking
-        /// </summary>
         public virtual void RecalculateMasking()
         {
             // Remove the material reference as either the graphic of the mask has been enable/ disabled.

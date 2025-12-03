@@ -8,9 +8,6 @@ using UnityEditor;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// Utility class for creating default implementations of builtin UI controls.
-    /// </summary>
     /// <remarks>
     /// The recommended workflow for using UI controls with the UI system is to create a prefab for each type of control and instantiate those when needed. This way changes can be made to the prefabs which immediately have effect on all used instances.
     ///
@@ -31,10 +28,6 @@ namespace UnityEngine.UI
 #endif
         }
 
-        /// <summary>
-        /// Factory interface to create a GameObject in this class.
-        /// It is necessary to use this interface in the whole class so MenuOption and Editor can work using ObjectFactory and default Presets.
-        /// </summary>
         /// <remarks>
         /// The only available method is CreateGameObject.
         /// It needs to be called with every Components the created Object will need because of a bug with Undo and RectTransform.
@@ -56,44 +49,20 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Object used to pass resources to use for the default controls.
-        /// </summary>
         public struct Resources
         {
-            /// <summary>
-            /// The primary sprite to be used for graphical UI elements, used by the button, toggle, and dropdown controls, among others.
-            /// </summary>
             public Sprite standard;
 
-            /// <summary>
-            /// Sprite used for background elements.
-            /// </summary>
             public Sprite background;
 
-            /// <summary>
-            /// Sprite used as background for input fields.
-            /// </summary>
             public Sprite inputField;
 
-            /// <summary>
-            /// Sprite used for knobs that can be dragged, such as on a slider.
-            /// </summary>
             public Sprite knob;
 
-            /// <summary>
-            /// Sprite used for representation of an "on" state when present, such as a checkmark.
-            /// </summary>
             public Sprite checkmark;
 
-            /// <summary>
-            /// Sprite used to indicate that a button will open a dropdown when clicked.
-            /// </summary>
             public Sprite dropdown;
 
-            /// <summary>
-            /// Sprite used for masking purposes, for example to be used for the viewport of a scroll view.
-            /// </summary>
             public Sprite mask;
         }
 
@@ -166,9 +135,6 @@ namespace UnityEngine.UI
                 SetLayerRecursively(t.GetChild(i).gameObject, layer);
         }
 
-        /// <summary>
-        /// Create the basic UI Panel.
-        /// </summary>
         /// <remarks>
         /// Hierarchy:
         /// (root)
@@ -195,9 +161,6 @@ namespace UnityEngine.UI
             return panelRoot;
         }
 
-        /// <summary>
-        /// Create the basic UI button.
-        /// </summary>
         /// <remarks>
         /// Hierarchy:
         /// (root)
@@ -233,9 +196,6 @@ namespace UnityEngine.UI
             return buttonRoot;
         }
 
-        /// <summary>
-        /// Create the basic UI Text.
-        /// </summary>
         /// <remarks>
         /// Hierarchy:
         /// (root)
@@ -254,9 +214,6 @@ namespace UnityEngine.UI
             return go;
         }
 
-        /// <summary>
-        /// Create the basic UI Image.
-        /// </summary>
         /// <remarks>
         /// Hierarchy:
         /// (root)
@@ -270,9 +227,6 @@ namespace UnityEngine.UI
             return go;
         }
 
-        /// <summary>
-        /// Create the basic UI RawImage.
-        /// </summary>
         /// <remarks>
         /// Hierarchy:
         /// (root)
@@ -286,9 +240,6 @@ namespace UnityEngine.UI
             return go;
         }
 
-        /// <summary>
-        /// Create the basic UI Slider.
-        /// </summary>
         /// <remarks>
         /// Hierarchy:
         /// (root)
@@ -363,9 +314,6 @@ namespace UnityEngine.UI
             return root;
         }
 
-        /// <summary>
-        /// Create the basic UI Scrollbar.
-        /// </summary>
         /// <remarks>
         /// Hierarchy:
         /// (root)
@@ -409,9 +357,6 @@ namespace UnityEngine.UI
             return scrollbarRoot;
         }
 
-        /// <summary>
-        /// Create the basic UI Toggle.
-        /// </summary>
         /// <remarks>
         /// Hierarchy:
         /// (root)
@@ -472,9 +417,6 @@ namespace UnityEngine.UI
             return toggleRoot;
         }
 
-        /// <summary>
-        /// Create the basic UI input field.
-        /// </summary>
         /// <remarks>
         /// Hierarchy:
         /// (root)
@@ -532,9 +474,6 @@ namespace UnityEngine.UI
             return root;
         }
 
-        /// <summary>
-        /// Create the basic UI dropdown.
-        /// </summary>
         /// <remarks>
         /// Hierarchy:
         /// (root)
@@ -711,9 +650,6 @@ namespace UnityEngine.UI
             return root;
         }
 
-        /// <summary>
-        /// Create the basic UI Scrollview.
-        /// </summary>
         /// <remarks>
         /// Hierarchy:
         /// (root)

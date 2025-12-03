@@ -7,9 +7,6 @@ namespace UnityEngine.UI
     [AddComponentMenu("UI/Slider", 34)]
     [ExecuteAlways]
     [RequireComponent(typeof(RectTransform))]
-    /// <summary>
-    /// A standard slider that can be moved between a minimum and maximum value.
-    /// </summary>
     /// <remarks>
     /// The slider component is a Selectable that controls a fill, a handle, or both. The fill, when used, spans from the minimum value to the current value while the handle, when used, follow the current value.
     /// The anchors of the fill and handle RectTransforms are driven by the Slider. The fill and handle can be direct children of the GameObject with the Slider, or intermediary RectTransforms can be placed in between for additional control.
@@ -17,44 +14,23 @@ namespace UnityEngine.UI
     /// </remarks>
     public class Slider : Selectable, IDragHandler, IInitializePotentialDragHandler, ICanvasElement
     {
-        /// <summary>
-        /// Setting that indicates one of four directions.
-        /// </summary>
         public enum Direction
         {
-            /// <summary>
-            /// From the left to the right
-            /// </summary>
             LeftToRight,
 
-            /// <summary>
-            /// From the right to the left
-            /// </summary>
             RightToLeft,
 
-            /// <summary>
-            /// From the bottom to the top.
-            /// </summary>
             BottomToTop,
 
-            /// <summary>
-            /// From the top to the bottom.
-            /// </summary>
             TopToBottom,
         }
 
         [Serializable]
-        /// <summary>
-        /// Event type used by the UI.Slider.
-        /// </summary>
         public class SliderEvent : UnityEvent<float> {}
 
         [SerializeField]
         private RectTransform m_FillRect;
 
-        /// <summary>
-        /// Optional RectTransform to use as fill for the slider.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -83,9 +59,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private RectTransform m_HandleRect;
 
-        /// <summary>
-        /// Optional RectTransform to use as a handle for the slider.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -117,9 +90,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private Direction m_Direction = Direction.LeftToRight;
 
-        /// <summary>
-        /// The direction of the slider, from minimum to maximum value.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -148,9 +118,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private float m_MinValue = 0;
 
-        /// <summary>
-        /// The minimum allowed value of the slider.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -176,9 +143,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private float m_MaxValue = 1;
 
-        /// <summary>
-        /// The maximum allowed value of the slider.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -204,9 +168,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private bool m_WholeNumbers = false;
 
-        /// <summary>
-        /// Should the value only be allowed to be whole numbers?
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -232,9 +193,6 @@ namespace UnityEngine.UI
         [SerializeField]
         protected float m_Value;
 
-        /// <summary>
-        /// The current value of the slider.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -268,18 +226,12 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Set the value of the slider without invoking onValueChanged callback.
-        /// </summary>
         /// <param name="input">The new value for the slider.</param>
         public virtual void SetValueWithoutNotify(float input)
         {
             Set(input, false);
         }
 
-        /// <summary>
-        /// The current value of the slider normalized into a value between 0 and 1.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -320,9 +272,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private SliderEvent m_OnValueChanged = new SliderEvent();
 
-        /// <summary>
-        /// Callback executed when the value of the slider is changed.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -409,15 +358,9 @@ namespace UnityEngine.UI
 #endif
         }
 
-        /// <summary>
-        /// See ICanvasElement.LayoutComplete
-        /// </summary>
         public virtual void LayoutComplete()
         {}
 
-        /// <summary>
-        /// See ICanvasElement.GraphicUpdateComplete
-        /// </summary>
         public virtual void GraphicUpdateComplete()
         {}
 
@@ -436,10 +379,6 @@ namespace UnityEngine.UI
             base.OnDisable();
         }
 
-        /// <summary>
-        /// Update the rect based on the delayed update visuals.
-        /// Got around issue of calling sendMessage from onValidate.
-        /// </summary>
         protected virtual void Update()
         {
             if (m_DelayedUpdateVisuals)
@@ -515,9 +454,6 @@ namespace UnityEngine.UI
             return newValue;
         }
 
-        /// <summary>
-        /// Set the value of the slider.
-        /// </summary>
         /// <param name="input">The new value for the slider.</param>
         /// <param name="sendCallback">If the OnValueChanged callback should be invoked.</param>
         /// <remarks>
@@ -695,9 +631,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// See Selectable.FindSelectableOnLeft
-        /// </summary>
         public override Selectable FindSelectableOnLeft()
         {
             if (navigation.mode == Navigation.Mode.Automatic && axis == Axis.Horizontal)
@@ -705,9 +638,6 @@ namespace UnityEngine.UI
             return base.FindSelectableOnLeft();
         }
 
-        /// <summary>
-        /// See Selectable.FindSelectableOnRight
-        /// </summary>
         public override Selectable FindSelectableOnRight()
         {
             if (navigation.mode == Navigation.Mode.Automatic && axis == Axis.Horizontal)
@@ -715,9 +645,6 @@ namespace UnityEngine.UI
             return base.FindSelectableOnRight();
         }
 
-        /// <summary>
-        /// See Selectable.FindSelectableOnUp
-        /// </summary>
         public override Selectable FindSelectableOnUp()
         {
             if (navigation.mode == Navigation.Mode.Automatic && axis == Axis.Vertical)
@@ -725,9 +652,6 @@ namespace UnityEngine.UI
             return base.FindSelectableOnUp();
         }
 
-        /// <summary>
-        /// See Selectable.FindSelectableOnDown
-        /// </summary>
         public override Selectable FindSelectableOnDown()
         {
             if (navigation.mode == Navigation.Mode.Automatic && axis == Axis.Vertical)
@@ -740,9 +664,6 @@ namespace UnityEngine.UI
             eventData.useDragThreshold = false;
         }
 
-        /// <summary>
-        /// Sets the direction of this slider, optionally changing the layout as well.
-        /// </summary>
         /// <param name="direction">The direction of the slider</param>
         /// <param name="includeRectLayouts">Should the layout be flipped together with the slider direction</param>
         /// <example>

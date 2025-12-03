@@ -5,10 +5,6 @@ namespace UnityEditor.UI
 {
     [CustomEditor(typeof(ContentSizeFitter), true)]
     [CanEditMultipleObjects]
-    /// <summary>
-    /// Custom Editor for the ContentSizeFitter Component.
-    /// Extend this class to write a custom editor for a component derived from ContentSizeFitter.
-    /// </summary>
     public class ContentSizeFitterEditor : SelfControllerEditor
     {
         SerializedProperty m_HorizontalFit;

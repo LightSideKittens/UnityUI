@@ -7,9 +7,6 @@ using UnityEngine.UI;
 
 namespace UnityEditor.UI
 {
-    /// <summary>
-    /// This script adds the UI menu options to the Unity Editor.
-    /// </summary>
 
     static internal class MenuOptions
     {

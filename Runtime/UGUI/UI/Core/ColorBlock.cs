@@ -4,9 +4,6 @@ using UnityEngine.Serialization;
 namespace UnityEngine.UI
 {
     [Serializable]
-    /// <summary>
-    /// Structure that stores the state of a color transition on a Selectable.
-    /// </summary>
     public struct ColorBlock : IEquatable<ColorBlock>
     {
         [FormerlySerializedAs("normalColor")]
@@ -37,9 +34,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private float m_FadeDuration;
 
-        /// <summary>
-        /// The normal color for this color block.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -65,9 +59,6 @@ namespace UnityEngine.UI
         /// </example>
         public Color normalColor       { get { return m_NormalColor; } set { m_NormalColor = value; } }
 
-        /// <summary>
-        /// The highlight color for this color block.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -93,9 +84,6 @@ namespace UnityEngine.UI
         /// </example>
         public Color highlightedColor  { get { return m_HighlightedColor; } set { m_HighlightedColor = value; } }
 
-        /// <summary>
-        /// The pressed color for this color block.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -121,9 +109,6 @@ namespace UnityEngine.UI
         /// </example>
         public Color pressedColor      { get { return m_PressedColor; } set { m_PressedColor = value; } }
 
-        /// <summary>
-        /// The selected color for this color block.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -149,9 +134,6 @@ namespace UnityEngine.UI
         /// </example>
         public Color selectedColor     { get { return m_SelectedColor; } set { m_SelectedColor = value; } }
 
-        /// <summary>
-        /// The disabled color for this color block.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -177,19 +159,10 @@ namespace UnityEngine.UI
         /// </example>
         public Color disabledColor     { get { return m_DisabledColor; } set { m_DisabledColor = value; } }
 
-        /// <summary>
-        /// Multiplier applied to colors (allows brightening greater then base color).
-        /// </summary>
         public float colorMultiplier   { get { return m_ColorMultiplier; } set { m_ColorMultiplier = value; } }
 
-        /// <summary>
-        /// How long a color transition between states should take.
-        /// </summary>
         public float fadeDuration      { get { return m_FadeDuration; } set { m_FadeDuration = value; } }
 
-        /// <summary>
-        /// Simple getter for a code generated default ColorBlock.
-        /// </summary>
         public static ColorBlock defaultColorBlock;
 
         static ColorBlock()

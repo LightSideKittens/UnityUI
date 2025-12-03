@@ -35,6 +35,13 @@ public static class Bidi
         [In] int[] logicalUtf32,
         int length);
     
+    [DllImport(DLL_NAME,
+        EntryPoint = "fribidi_unity_has_rtl",
+        CallingConvention = CallingConvention.Cdecl)]
+    internal static extern int fribidi_unity_has_rtl(
+        [In] int[] logicalUtf32,
+        int length);
+    
     static string WrapAndReorder(
         string logicalText,
         TMP_Text text,
@@ -49,8 +56,7 @@ public static class Bidi
         var sb = new StringBuilder(logicalText.Length);
         logicalToVisualMap = new int[info.lineCount][];
         resultDirections = new Direction[info.lineCount];
-
-        bool isAuto = targetDirection == Direction.Auto;
+        Direction? dir = null;
         Debug.Log(info.lineCount);
         for (int i = 0; i < info.lineCount; i++)
         {
@@ -70,14 +76,19 @@ public static class Bidi
 
             int[] logicalSlice = StringToCodepoints(core);
 
-            var lineDirection = DetectDirection(logicalSlice);
-            resultDirections[i] = lineDirection;
-
+            var currDir = DetectDirection(logicalSlice);
+            var alignment = currDir;
+            
+            dir ??= currDir;
+            resultDirections[i] = currDir;
+            
             string visualLineText = DoBiDi(
                 logicalSlice,
                 out int[] localMap,
-                targetDirection);
+                dir.Value);
 
+            Debug.Log($"Logical text: {core}\nVisual Text: {visualLineText}\nDirection: {dir.Value} | Alignment: {alignment}");
+            
             if (localMap == null || localMap.Length != logicalSlice.Length)
             {
                 localMap = BuildIdentityMap(logicalSlice.Length);
@@ -139,30 +150,13 @@ public static class Bidi
         return logicalText;
     }
     
-    static bool ContainsRtl(int[] cps)
+    private static bool ContainsRtl(int[] codepoints)
     {
-        if (cps == null || cps.Length == 0)
+        if (codepoints == null || codepoints.Length == 0)
             return false;
 
-        for (int i = 0; i < cps.Length; i++)
-        {
-            int cp = cps[i];
-
-            if ((cp >= 0x0590 && cp <= 0x05FF) || // Hebrew
-                (cp >= 0x0600 && cp <= 0x06FF) || // Arabic
-                (cp >= 0x0700 && cp <= 0x074F) || // Syriac
-                (cp >= 0x0750 && cp <= 0x077F) || // Arabic Supplement
-                (cp >= 0x0780 && cp <= 0x07BF) || // Thaana
-                (cp >= 0x07C0 && cp <= 0x07FF) || // N'Ko
-                (cp >= 0x0800 && cp <= 0x083F) || // Samaritan
-                (cp >= 0x0840 && cp <= 0x085F) || // Mandaic
-                (cp >= 0x08A0 && cp <= 0x08FF))   // Arabic Extended
-            {
-                return true;
-            }
-        }
-
-        return false;
+        int result = fribidi_unity_has_rtl(codepoints, codepoints.Length);
+        return result != 0;
     }
     
     private static Direction DetectDirection(int[] cps)

@@ -7,10 +7,6 @@ namespace UnityEditor.UI
 {
     [CustomEditor(typeof(HorizontalOrVerticalLayoutGroup), true)]
     [CanEditMultipleObjects]
-    /// <summary>
-    /// Custom Editor for the HorizontalOrVerticalLayoutGroupEditor Component.
-    /// Extend this class to write a custom editor for a component derived from HorizontalOrVerticalLayoutGroupEditor.
-    /// </summary>
     public class HorizontalOrVerticalLayoutGroupEditor : Editor
     {
         SerializedProperty m_Padding;

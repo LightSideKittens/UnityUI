@@ -4,9 +4,6 @@ using UnityEngine.Serialization;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// Displays a Texture2D for the UI System.
-    /// </summary>
     /// <remarks>
     /// If you don't have or don't wish to create an atlas, you can simply use this script to draw a texture.
     /// Keep in mind though that this will create an extra draw call with each RawImage present, so it's
@@ -21,9 +18,6 @@ namespace UnityEngine.UI
         [SerializeField] protected Texture m_Texture;
         [SerializeField] Rect m_UVRect = new Rect(0f, 0f, 1f, 1f);
 
-        /// <summary>
-        /// Returns the texture used to draw this Graphic.
-        /// </summary>
         public override Texture mainTexture
         {
             get
@@ -41,9 +35,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// The RawImage's texture to be used.
-        /// </summary>
         /// <remarks>
         /// Use this to alter or return the Texture the RawImage displays. The Raw Image can display any Texture whereas an Image component can only show a Sprite Texture.
         /// Note : Keep in mind that using a RawImage creates an extra draw call with each RawImage present, so it's best to use it only for backgrounds or temporary visible graphics.Note: Keep in mind that using a RawImage creates an extra draw call with each RawImage present, so it's best to use it only for backgrounds or temporary visible graphics.
@@ -90,9 +81,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// UV rectangle used by the texture.
-        /// </summary>
         public Rect uvRect
         {
             get
@@ -108,9 +96,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Adjust the scale of the Graphic to make it pixel-perfect.
-        /// </summary>
         /// <remarks>
         /// This means setting the RawImage's RectTransform.sizeDelta  to be equal to the Texture dimensions.
         /// </remarks>

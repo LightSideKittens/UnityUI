@@ -21,9 +21,6 @@ namespace TMPro
             public string filePath;
             public ulong hashCode;
 
-            /// <summary>
-            /// Constructor for new FontReference
-            /// </summary>
             /// <param name="faceNameAndStyle">String that combines the family name with style name</param>
             /// <param name="index">Index of the font face and style.</param>
             public FontReference(string fontFilePath, string faceNameAndStyle, int index)
@@ -118,9 +115,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="familyName"></param>
         /// <param name="fontRef"></param>
         /// <returns></returns>
@@ -129,9 +123,6 @@ namespace TMPro
             return s_Instance.TryGetSystemFontReferenceInternal(familyName, null, out fontRef);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="familyName"></param>
         /// <param name="styleName"></param>
         /// <param name="fontRef"></param>

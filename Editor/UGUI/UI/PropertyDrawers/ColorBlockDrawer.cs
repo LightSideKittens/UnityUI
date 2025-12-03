@@ -6,9 +6,6 @@ using UnityEngine.UIElements;
 namespace UnityEditor.UI
 {
     [CustomPropertyDrawer(typeof(ColorBlock), true)]
-    /// <summary>
-    /// This is a PropertyDrawer for ColorBlock. It is implemented using the standard Unity PropertyDrawer framework..
-    /// </summary>
     public class ColorBlockDrawer : PropertyDrawer
     {
         const string kNormalColor = "m_NormalColor";

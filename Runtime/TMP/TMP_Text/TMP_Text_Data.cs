@@ -7,9 +7,6 @@ namespace TMPro
 {
     public abstract partial class TMP_Text
     {
-        /// <summary>
-        /// Returns the bounds of the mesh of the text object in world space.
-        /// </summary>
         public Bounds bounds
         {
             get
@@ -20,25 +17,11 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Returns the bounds of the text of the text object.
-        /// </summary>
         public Bounds TextBounds => textBounds;
         private Bounds textBounds;
         
-        /// <summary>
-        /// Event delegate to allow custom loading of TMP_FontAsset when using the <font="Font Asset Name"> tag.
-        /// </summary>
         public static event Func<int, string, TMP_FontAsset> OnFontAssetRequest;
 
-        /// <summary>
-        /// Event delegate to allow custom loading of TMP_SpriteAsset when using the <sprite="Sprite Asset Name"> tag.
-        /// </summary>
-        public static event Func<int, string, TMP_SpriteAsset> OnSpriteAssetRequest;
-
-        /// <summary>
-        /// Delegate for the OnMissingCharacter event called when the requested Unicode character is missing from the font asset.
-        /// </summary>
         /// <param name="unicode">The Unicode of the missing character.</param>
         /// <param name="stringIndex">The index of the missing character in the source string.</param>
         /// <param name="text">The source text that contains the missing character.</param>
@@ -46,24 +29,12 @@ namespace TMPro
         /// <param name="textComponent">The text component where the requested character is missing.</param>
         public delegate void MissingCharacterEventCallback(int unicode, int stringIndex, string text, TMP_FontAsset fontAsset, TMP_Text textComponent);
 
-        /// <summary>
-        /// Event delegate to be called when the requested Unicode character is missing from the font asset.
-        /// </summary>
         public static event MissingCharacterEventCallback OnMissingCharacter;
 
-        /// <summary>
-        /// Event delegate to allow modifying the text geometry before it is uploaded to the mesh and rendered.
-        /// </summary>
         public virtual event Action<TMP_TextInfo> OnPreRenderText = delegate { };
         
-        /// <summary>
-        /// Compute the rendered width of the text object.
-        /// </summary>
         public virtual Vector2 renderedSize => textBounds.size;
 
-        /// <summary>
-        ///
-        /// </summary>
         public int layoutPriority => m_layoutPriority;
 
         protected int m_layoutPriority = 0;
@@ -100,14 +71,8 @@ namespace TMPro
         protected Quaternion m_FXRotation;
         protected Vector3 m_FXScale;
 
-        /// <summary>
-        /// Array containing the Unicode characters to be parsed.
-        /// </summary>
         internal TextProcessingElement[] m_TextProcessingArray = new TextProcessingElement[8];
 
-        /// <summary>
-        /// The number of Unicode characters that have been parsed and contained in the m_InternalParsingBuffer
-        /// </summary>
         internal int m_InternalTextProcessingArraySize;
 
         [System.Diagnostics.DebuggerDisplay("Unicode ({unicode})  '{(char)unicode}'")]
@@ -197,9 +162,7 @@ namespace TMPro
 
         protected SpecialCharacter m_Ellipsis;
         protected SpecialCharacter m_Underline;
-
-        protected TMP_SpriteAsset m_defaultSpriteAsset;
-        protected TMP_SpriteAsset m_currentSpriteAsset;
+        
         protected int m_spriteCount = 0;
         protected int m_spriteIndex;
         protected int m_spriteAnimationID;

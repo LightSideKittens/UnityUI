@@ -24,9 +24,6 @@ namespace TMPro
         private const ColorMode k_DefaultColorMode = ColorMode.FourCornersGradient;
         private static readonly Color k_DefaultColor = Color.white;
 
-        /// <summary>
-        /// Default Constructor which sets each of the colors as white.
-        /// </summary>
         public TMP_ColorGradient()
         {
             colorMode = k_DefaultColorMode;
@@ -36,9 +33,6 @@ namespace TMPro
             bottomRight = k_DefaultColor;
         }
 
-        /// <summary>
-        /// Constructor allowing to set the default color of the Color Gradient.
-        /// </summary>
         /// <param name="color"></param>
         public TMP_ColorGradient(Color color)
         {
@@ -49,9 +43,6 @@ namespace TMPro
             bottomRight = color;
         }
 
-        /// <summary>
-        /// The vertex colors at the corners of the characters.
-        /// </summary>
         /// <param name="color0">Top left color.</param>
         /// <param name="color1">Top right color.</param>
         /// <param name="color2">Bottom left color.</param>

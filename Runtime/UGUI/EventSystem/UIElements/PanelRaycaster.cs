@@ -9,18 +9,11 @@ namespace UnityEngine.UIElements
     // This code is disabled unless the com.unity.modules.uielements module is present.
     // The UIElements module is always present in the Editor but it can be stripped from a project build if unused.
 #if PACKAGE_UITOOLKIT
-    /// <summary>
-    /// A derived BaseRaycaster to raycast against UI Toolkit panel instances at runtime.
-    /// </summary>
     [AddComponentMenu("UI Toolkit/Panel Raycaster (UI Toolkit)")]
     public class PanelRaycaster : BaseRaycaster, IRuntimePanelComponent
     {
         private BaseRuntimePanel m_Panel;
 
-        /// <summary>
-        /// The panel that this component relates to. If panel is null, this component will have no effect.
-        /// Will be set to null automatically if panel is Disposed from an external source.
-        /// </summary>
         public IPanel panel
         {
             get => m_Panel;

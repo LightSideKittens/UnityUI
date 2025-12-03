@@ -4,10 +4,6 @@ namespace UnityEditor.UI
 {
     [CustomEditor(typeof(Dropdown), true)]
     [CanEditMultipleObjects]
-    /// <summary>
-    /// Custom editor for the Dropdown component
-    /// Extend this class to write a custom editor for a component derived from Dropdown.
-    /// </summary>
     public class DropdownEditor : SelectableEditor
     {
         SerializedProperty m_Template;

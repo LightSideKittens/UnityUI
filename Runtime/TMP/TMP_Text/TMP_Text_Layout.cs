@@ -32,29 +32,17 @@ namespace TMPro
         }
         protected LayoutElement m_LayoutElement;
 
-        /// <summary>
-        /// Computed preferred width of the text object.
-        /// </summary>
         public virtual float preferredWidth => preferredSize.x;
 
-        /// <summary>
-        /// Computed preferred height of the text object.
-        /// </summary>
         public virtual float preferredHeight => preferredSize.y;
         protected Vector2 preferredSize;
         
-        /// <summary>
-        /// Method returning the compound bounds of the text object and child sub objects.
-        /// </summary>
         /// <returns></returns>
         protected virtual Bounds GetCompoundBounds()
         {
             return new();
         }
         
-        /// <summary>
-        /// Method which returns the bounds of the text object;
-        /// </summary>
         /// <returns></returns>
         protected void SetTextBounds()
         {
@@ -91,9 +79,6 @@ namespace TMPro
             if (m_margin.w > 0) preferredSize.y += m_margin.w;
         }
         
-        /// <summary>
-        /// Method to adjust line spacing as a result of using different fonts or font point size.
-        /// </summary>
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
         /// <param name="offset"></param>
@@ -123,9 +108,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Function to increase the size of the Line Extents Array.
-        /// </summary>
         /// <param name="size"></param>
         protected void ResizeLineExtents(int size)
         {
@@ -154,9 +136,6 @@ namespace TMPro
         protected static float k_LargePositiveFloat = TMP_Math.FLOAT_MAX;
         protected static float k_LargeNegativeFloat = TMP_Math.FLOAT_MIN;
 
-        /// <summary>
-        /// Function to force an update of the margin size.
-        /// </summary>
         public virtual void ComputeMarginSize()
         {
         }

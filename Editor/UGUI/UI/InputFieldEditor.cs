@@ -6,10 +6,6 @@ namespace UnityEditor.UI
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(InputField), true)]
-    /// <summary>
-    /// Custom Editor for the InputField Component.
-    /// Extend this class to write a custom editor for a component derived from InputField.
-    /// </summary>
     public class InputFieldEditor : SelectableEditor
     {
         SerializedProperty m_TextComponent;

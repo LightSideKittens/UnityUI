@@ -7,23 +7,13 @@ namespace UnityEngine.UIElements
     // This code is disabled unless the com.unity.modules.uielements module is present.
     // The UIElements module is always present in the Editor but it can be stripped from a project build if unused.
 #if PACKAGE_UITOOLKIT
-    /// <summary>
-    /// A derived BaseRaycaster to raycast against UI Toolkit world-space document instances at runtime.
-    /// </summary>
     [AddComponentMenu("UI Toolkit/World Document Raycaster (UI Toolkit)")]
     public class WorldDocumentRaycaster : BaseRaycaster
     {
         [SerializeField] private Camera m_EventCamera;
 
-        /// <summary>
-        /// The camera that will generate rays for this raycaster.
-        /// </summary>
         public override Camera eventCamera => m_EventCamera;
 
-        /// <summary>
-        /// The camera used by this Raycaster to convert screen coordinates to Rays.
-        /// If empty, Camera.main is going to be used.
-        /// </summary>
         public new Camera camera
         {
             get => m_EventCamera;
@@ -32,9 +22,6 @@ namespace UnityEngine.UIElements
 
         private static PhysicsDocumentPicker worldPicker = new();
 
-        /// <summary>
-        /// Raycast against the scene.
-        /// </summary>
         /// <param name="eventData">Current event data.</param>
         /// <param name="resultAppendList">List of hit Objects.</param>
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
@@ -77,10 +64,6 @@ namespace UnityEngine.UIElements
             });
         }
 
-        /// <summary>
-        /// Creates a ray from a given pointer event, according to this raycaster's properties.
-        /// Also allows the raycaster to constrain the distance and layers that the ray can use.
-        /// </summary>
         /// <param name="eventData">Current event data.</param>
         /// <param name="worldRay">The created ray.</param>
         /// <param name="maxDistance">A distance constraint for the created ray.</param>

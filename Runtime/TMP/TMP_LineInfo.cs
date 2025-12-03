@@ -1,9 +1,6 @@
 ﻿namespace TMPro
 {
 
-    /// <summary>
-    /// Structure which contains information about the individual lines of text.
-    /// </summary>
     public struct TMP_LineInfo
     {
         internal int controlCharacterCount;
@@ -32,9 +29,6 @@
         public HorizontalAlignmentOptions alignment;
         public Extents lineExtents;
 
-        /// <summary>
-        /// Function returning the current line of text.
-        /// </summary>
         /// <returns></returns>
     }
 }

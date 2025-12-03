@@ -9,24 +9,15 @@ namespace TMPro
     {
         private static readonly TMP_TextParsingUtilities s_Instance = new();
 
-        /// <summary>
-        /// Default constructor
-        /// </summary>
         static TMP_TextParsingUtilities() { }
 
 
-        /// <summary>
-        /// Get a singleton instance of the TextModuleUtilities.
-        /// </summary>
         public static TMP_TextParsingUtilities instance
         {
             get { return s_Instance; }
         }
 
 
-        /// <summary>
-        /// Function returning the hashcode value of a given string.
-        /// </summary>
         public static int GetHashCode(string s)
         {
             int hashCode = 0;
@@ -48,20 +39,11 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Table used to convert character to lowercase.
-        /// </summary>
         private const string k_LookupStringL = "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[-]^_`abcdefghijklmnopqrstuvwxyz{|}~-";
 
-        /// <summary>
-        /// Table used to convert character to uppercase.
-        /// </summary>
         private const string k_LookupStringU = "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[-]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~-";
 
 
-        /// <summary>
-        /// Get lowercase version of this ASCII character.
-        /// </summary>
         public static char ToLowerASCIIFast(char c)
         {
             if (c > k_LookupStringL.Length - 1)
@@ -71,9 +53,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Get uppercase version of this ASCII character.
-        /// </summary>
         public static char ToUpperASCIIFast(char c)
         {
             if (c > k_LookupStringU.Length - 1)
@@ -83,9 +62,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Get uppercase version of this ASCII character.
-        /// </summary>
         public static uint ToUpperASCIIFast(uint c)
         {
             if (c > k_LookupStringU.Length - 1)
@@ -95,9 +71,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Get lowercase version of this ASCII character.
-        /// </summary>
         public static uint ToLowerASCIIFast(uint c)
         {
             if (c > k_LookupStringL.Length - 1)
@@ -107,9 +80,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Check if Unicode is High Surrogate
-        /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
         public static bool IsHighSurrogate(uint c)
@@ -117,9 +87,6 @@ namespace TMPro
             return c > 0xD800 && c < 0xDBFF;
         }
 
-        /// <summary>
-        /// Check if Unicode is Low Surrogate
-        /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
         public static bool IsLowSurrogate(uint c)
@@ -127,9 +94,6 @@ namespace TMPro
             return c > 0xDC00 && c < 0xDFFF;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="highSurrogate"></param>
         /// <param name="lowSurrogate"></param>
         /// <returns></returns>
@@ -138,9 +102,6 @@ namespace TMPro
             return ((highSurrogate - CodePoint.HIGH_SURROGATE_START) * 0x400) + ((lowSurrogate - CodePoint.LOW_SURROGATE_START) + CodePoint.UNICODE_PLANE01_START);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="c"></param>
         /// <returns></returns>
         internal static bool IsDiacriticalMark(uint c)

@@ -69,9 +69,6 @@ namespace TMPro.EditorUtilities
             public int atlasHeight;
         }
 
-        /// <summary>
-        /// Material used to display SDF glyphs in the Character and Glyph tables.
-        /// </summary>
         internal static Material internalSDFMaterial
         {
             get
@@ -89,9 +86,6 @@ namespace TMPro.EditorUtilities
         }
         static Material s_InternalSDFMaterial;
 
-        /// <summary>
-        /// Material used to display Bitmap glyphs in the Character and Glyph tables.
-        /// </summary>
         internal static Material internalBitmapMaterial
         {
             get
@@ -109,9 +103,6 @@ namespace TMPro.EditorUtilities
         }
         static Material s_InternalBitmapMaterial;
 
-        /// <summary>
-        /// Material used to display color glyphs in the Character and Glyph tables.
-        /// </summary>
         internal static Material internalRGBABitmapMaterial
         {
             get
@@ -1768,18 +1759,12 @@ namespace TMPro.EditorUtilities
             }
         }
 
-        /// <summary>
-        /// Overrided method from the Editor class.
-        /// </summary>
         /// <returns></returns>
         public override bool HasPreviewGUI()
         {
             return true;
         }
 
-        /// <summary>
-        /// Overrided method to implement custom preview inspector.
-        /// </summary>
         /// <param name="rect"></param>
         /// <param name="background"></param>
         public override void OnPreviewGUI(Rect rect, GUIStyle background)
@@ -2057,9 +2042,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="srcGlyphID"></param>
         /// <param name="dstGlyphID"></param>
         bool AddNewGlyph(int srcIndex, int dstGlyphID)
@@ -2088,9 +2070,6 @@ namespace TMPro.EditorUtilities
             return true;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="glyphID"></param>
         void RemoveGlyphFromList(int index)
         {
@@ -2367,9 +2346,6 @@ namespace TMPro.EditorUtilities
             return adjustmentRecord;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="srcGlyph"></param>
         /// <param name="dstGlyph"></param>
         void CopyGlyphSerializedProperty(SerializedProperty srcGlyph, ref SerializedProperty dstGlyph)
@@ -2410,9 +2386,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="searchPattern"></param>
         /// <returns></returns>
         void SearchGlyphTable(string searchPattern, ref List<int> searchResults)

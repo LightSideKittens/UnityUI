@@ -6,10 +6,6 @@ namespace UnityEditor.UI
 {
     [CustomEditor(typeof(ScrollRect), true)]
     [CanEditMultipleObjects]
-    /// <summary>
-    /// Custom Editor for the ScrollRect Component.
-    /// Extend this class to write a custom editor for a component derived from ScrollRect.
-    /// </summary>
     public class ScrollRectEditor : Editor
     {
         SerializedProperty m_Content;

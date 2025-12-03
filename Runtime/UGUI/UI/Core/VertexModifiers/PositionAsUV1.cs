@@ -3,9 +3,6 @@ using System.Linq;
 namespace UnityEngine.UI
 {
     [AddComponentMenu("UI/Effects/Position As UV1", 82)]
-    /// <summary>
-    /// An IVertexModifier which sets the raw vertex position into UV1 of the generated verts.
-    /// </summary>
     public class PositionAsUV1 : BaseMeshEffect
     {
         protected PositionAsUV1()

@@ -4,36 +4,18 @@ using UnityEngine.UI;
 
 namespace UnityEngine.EventSystems
 {
-    /// <summary>
-    /// A BaseInputModule for pointer input.
-    /// </summary>
     public abstract class PointerInputModule : BaseInputModule
     {
-        /// <summary>
-        /// Id of the cached left mouse pointer event.
-        /// </summary>
         public const int kMouseLeftId = -1;
 
-        /// <summary>
-        /// Id of the cached right mouse pointer event.
-        /// </summary>
         public const int kMouseRightId = -2;
 
-        /// <summary>
-        /// Id of the cached middle mouse pointer event.
-        /// </summary>
         public const int kMouseMiddleId = -3;
 
-        /// <summary>
-        /// Touch id for when simulating touches on a non touch device.
-        /// </summary>
         public const int kFakeTouchesId = -4;
 
         protected Dictionary<int, PointerEventData> m_PointerData = new Dictionary<int, PointerEventData>();
 
-        /// <summary>
-        /// Search the cache for currently active pointers, return true if found.
-        /// </summary>
         /// <param name="id">Touch ID</param>
         /// <param name="data">Found data</param>
         /// <param name="create">If not found should it be created</param>
@@ -52,17 +34,11 @@ namespace UnityEngine.EventSystems
             return false;
         }
 
-        /// <summary>
-        /// Remove the PointerEventData from the cache.
-        /// </summary>
         protected void RemovePointerData(PointerEventData data)
         {
             m_PointerData.Remove(data.pointerId);
         }
 
-        /// <summary>
-        /// Given a touch populate the PointerEventData and return if we are pressed or released.
-        /// </summary>
         /// <param name="input">Touch being processed</param>
         /// <param name="pressed">Are we pressed this frame</param>
         /// <param name="released">Are we released this frame</param>
@@ -111,9 +87,6 @@ namespace UnityEngine.EventSystems
             return pointerData;
         }
 
-        /// <summary>
-        /// Copy one PointerEventData to another.
-        /// </summary>
         protected void CopyFromTo(PointerEventData @from, PointerEventData @to)
         {
             @to.position = @from.position;
@@ -131,9 +104,6 @@ namespace UnityEngine.EventSystems
             @to.radiusVariance = @from.radiusVariance;
         }
 
-        /// <summary>
-        /// Given a mouse button return the current state for the frame.
-        /// </summary>
         /// <param name="buttonId">Mouse button ID</param>
         protected PointerEventData.FramePressState StateForMouseButton(int buttonId)
         {
@@ -222,32 +192,17 @@ namespace UnityEngine.EventSystems
             }
         }
 
-        /// <summary>
-        /// Information about a mouse button event.
-        /// </summary>
         public class MouseButtonEventData
         {
-            /// <summary>
-            /// The state of the button this frame.
-            /// </summary>
             public PointerEventData.FramePressState buttonState;
 
-            /// <summary>
-            /// Pointer data associated with the mouse event.
-            /// </summary>
             public PointerEventData buttonData;
 
-            /// <summary>
-            /// Was the button pressed this frame?
-            /// </summary>
             public bool PressedThisFrame()
             {
                 return buttonState == PointerEventData.FramePressState.Pressed || buttonState == PointerEventData.FramePressState.PressedAndReleased;
             }
 
-            /// <summary>
-            /// Was the button released this frame?
-            /// </summary>
             public bool ReleasedThisFrame()
             {
                 return buttonState == PointerEventData.FramePressState.Released || buttonState == PointerEventData.FramePressState.PressedAndReleased;
@@ -256,17 +211,11 @@ namespace UnityEngine.EventSystems
 
         private readonly MouseState m_MouseState = new MouseState();
 
-        /// <summary>
-        /// Return the current MouseState. Using the default pointer.
-        /// </summary>
         protected virtual MouseState GetMousePointerEventData()
         {
             return GetMousePointerEventData(0);
         }
 
-        /// <summary>
-        /// Return the current MouseState.
-        /// </summary>
         protected virtual MouseState GetMousePointerEventData(int id)
         {
             // Populate the left button...
@@ -319,9 +268,6 @@ namespace UnityEngine.EventSystems
             return m_MouseState;
         }
 
-        /// <summary>
-        /// Return the last PointerEventData for the given touch / mouse id.
-        /// </summary>
         protected PointerEventData GetLastPointerEventData(int id)
         {
             PointerEventData data;
@@ -337,18 +283,12 @@ namespace UnityEngine.EventSystems
             return (pressPos - currentPos).sqrMagnitude >= threshold * threshold;
         }
 
-        /// <summary>
-        /// Process movement for the current frame with the given pointer event.
-        /// </summary>
         protected virtual void ProcessMove(PointerEventData pointerEvent)
         {
             var targetGO = (Cursor.lockState == CursorLockMode.Locked ? null : pointerEvent.pointerCurrentRaycast.gameObject);
             HandlePointerExitAndEnter(pointerEvent, targetGO);
         }
 
-        /// <summary>
-        /// Process the drag for the current frame with the given pointer event.
-        /// </summary>
         protected virtual void ProcessDrag(PointerEventData pointerEvent)
         {
             if (!pointerEvent.IsPointerMoving() ||
@@ -388,9 +328,6 @@ namespace UnityEngine.EventSystems
             return false;
         }
 
-        /// <summary>
-        /// Clear all pointers and deselect any selected objects in the EventSystem.
-        /// </summary>
         protected void ClearSelection()
         {
             var baseEventData = GetBaseEventData();
@@ -419,9 +356,6 @@ namespace UnityEngine.EventSystems
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Deselect the current selected GameObject if the currently pointed-at GameObject is different.
-        /// </summary>
         /// <param name="currentOverGo">The GameObject the pointer is currently over.</param>
         /// <param name="pointerEvent">Current event data.</param>
         protected void DeselectIfSelectionChanged(GameObject currentOverGo, BaseEventData pointerEvent)

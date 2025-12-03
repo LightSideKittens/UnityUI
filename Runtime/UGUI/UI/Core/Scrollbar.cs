@@ -8,9 +8,6 @@ namespace UnityEngine.UI
     [AddComponentMenu("UI/Scrollbar", 36)]
     [ExecuteAlways]
     [RequireComponent(typeof(RectTransform))]
-    /// <summary>
-    /// A standard scrollbar with a variable sized handle that can be dragged between 0 and 1.
-    /// </summary>
     /// <remarks>
     /// The slider component is a Selectable that controls a handle which follow the current value and is sized according to the size property.
     /// The anchors of the handle RectTransforms are driven by the Scrollbar. The handle can be a direct child of the GameObject with the Scrollbar, or intermediary RectTransforms can be placed in between for additional control.
@@ -18,53 +15,29 @@ namespace UnityEngine.UI
     /// </remarks>
     public class Scrollbar : Selectable, IBeginDragHandler, IDragHandler, IInitializePotentialDragHandler, ICanvasElement
     {
-        /// <summary>
-        /// Setting that indicates one of four directions the scrollbar will travel.
-        /// </summary>
         public enum Direction
         {
-            /// <summary>
-            /// Starting position is the Left.
-            /// </summary>
             LeftToRight,
 
-            /// <summary>
-            /// Starting position is the Right
-            /// </summary>
             RightToLeft,
 
-            /// <summary>
-            /// Starting position is the Bottom.
-            /// </summary>
             BottomToTop,
 
-            /// <summary>
-            /// Starting position is the Top.
-            /// </summary>
             TopToBottom,
         }
 
         [Serializable]
-        /// <summary>
-        /// UnityEvent callback for when a scrollbar is scrolled.
-        /// </summary>
         public class ScrollEvent : UnityEvent<float> {}
 
         [SerializeField]
         private RectTransform m_HandleRect;
 
-        /// <summary>
-        /// The RectTransform to use for the handle.
-        /// </summary>
         public RectTransform handleRect { get { return m_HandleRect; } set { if (SetPropertyUtility.SetClass(ref m_HandleRect, value)) { UpdateCachedReferences(); UpdateVisuals(); } } }
 
         // Direction of movement.
         [SerializeField]
         private Direction m_Direction = Direction.LeftToRight;
 
-        /// <summary>
-        /// The direction of the scrollbar from minimum to maximum value.
-        /// </summary>
         public Direction direction { get { return m_Direction; } set { if (SetPropertyUtility.SetStruct(ref m_Direction, value)) UpdateVisuals(); } }
 
         protected Scrollbar()
@@ -74,9 +47,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private float m_Value;
 
-        /// <summary>
-        /// The current value of the scrollbar, between 0 and 1.
-        /// </summary>
         public float value
         {
             get
@@ -92,9 +62,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Set the value of the scrollbar without invoking onValueChanged callback.
-        /// </summary>
         /// <param name="input">The new value for the scrollbar.</param>
         public virtual void SetValueWithoutNotify(float input)
         {
@@ -105,18 +72,12 @@ namespace UnityEngine.UI
         [SerializeField]
         private float m_Size = 0.2f;
 
-        /// <summary>
-        /// The size of the scrollbar handle where 1 means it fills the entire scrollbar.
-        /// </summary>
         public float size { get { return m_Size; } set { if (SetPropertyUtility.SetStruct(ref m_Size, Mathf.Clamp01(value))) UpdateVisuals(); } }
 
         [Range(0, 11)]
         [SerializeField]
         private int m_NumberOfSteps = 0;
 
-        /// <summary>
-        /// The number of steps to use for the value. A value of 0 disables use of steps.
-        /// </summary>
         public int numberOfSteps { get { return m_NumberOfSteps; } set { if (SetPropertyUtility.SetStruct(ref m_NumberOfSteps, value)) { Set(m_Value); UpdateVisuals(); } } }
 
         [Space(6)]
@@ -124,9 +85,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private ScrollEvent m_OnValueChanged = new ScrollEvent();
 
-        /// <summary>
-        /// Handling for when the scrollbar value is changed.
-        /// </summary>
         /// <remarks>
         /// Allow for delegate-based subscriptions for faster events than 'eventReceiver', and allowing for multiple receivers.
         /// </remarks>
@@ -182,15 +140,9 @@ namespace UnityEngine.UI
 #endif
         }
 
-        /// <summary>
-        /// See ICanvasElement.LayoutComplete.
-        /// </summary>
         public virtual void LayoutComplete()
         {}
 
-        /// <summary>
-        /// See ICanvasElement.GraphicUpdateComplete.
-        /// </summary>
         public virtual void GraphicUpdateComplete()
         {}
 
@@ -209,10 +161,6 @@ namespace UnityEngine.UI
             base.OnDisable();
         }
 
-        /// <summary>
-        /// Update the rect based on the delayed update visuals.
-        /// Got around issue of calling sendMessage from onValidate.
-        /// </summary>
         protected virtual void Update()
         {
             if (m_DelayedUpdateVisuals)
@@ -358,9 +306,6 @@ namespace UnityEngine.UI
             return IsActive() && IsInteractable() && eventData.button == PointerEventData.InputButton.Left;
         }
 
-        /// <summary>
-        /// Handling for when the scrollbar value is begin being dragged.
-        /// </summary>
         public virtual void OnBeginDrag(PointerEventData eventData)
         {
             isPointerDownAndNotDragging = false;
@@ -380,9 +325,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Handling for when the scrollbar value is dragged.
-        /// </summary>
         public virtual void OnDrag(PointerEventData eventData)
         {
             if (!MayDrag(eventData))
@@ -392,9 +334,6 @@ namespace UnityEngine.UI
                 UpdateDrag(eventData);
         }
 
-        /// <summary>
-        /// Event triggered when pointer is pressed down on the scrollbar.
-        /// </summary>
         public override void OnPointerDown(PointerEventData eventData)
         {
             if (!MayDrag(eventData))
@@ -410,9 +349,6 @@ namespace UnityEngine.UI
             return ClickRepeat(eventData.pointerPressRaycast.screenPosition, eventData.enterEventCamera);
         }
 
-        /// <summary>
-        /// Coroutine function for handling continual press during Scrollbar.OnPointerDown.
-        /// </summary>
         protected IEnumerator ClickRepeat(Vector2 screenPosition, Camera camera)
         {
             while (isPointerDownAndNotDragging)
@@ -426,18 +362,12 @@ namespace UnityEngine.UI
             StopCoroutine(m_PointerDownRepeat);
         }
 
-        /// <summary>
-        /// Event triggered when pointer is released after pressing on the scrollbar.
-        /// </summary>
         public override void OnPointerUp(PointerEventData eventData)
         {
             base.OnPointerUp(eventData);
             isPointerDownAndNotDragging = false;
         }
 
-        /// <summary>
-        /// Handling for movement events.
-        /// </summary>
         public override void OnMove(AxisEventData eventData)
         {
             if (!IsActive() || !IsInteractable())
@@ -475,9 +405,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Prevents selection if we we move on the Horizontal axis. See Selectable.FindSelectableOnLeft.
-        /// </summary>
         public override Selectable FindSelectableOnLeft()
         {
             if (navigation.mode == Navigation.Mode.Automatic && axis == Axis.Horizontal)
@@ -485,9 +412,6 @@ namespace UnityEngine.UI
             return base.FindSelectableOnLeft();
         }
 
-        /// <summary>
-        /// Prevents selection if we we move on the Horizontal axis.  See Selectable.FindSelectableOnRight.
-        /// </summary>
         public override Selectable FindSelectableOnRight()
         {
             if (navigation.mode == Navigation.Mode.Automatic && axis == Axis.Horizontal)
@@ -495,9 +419,6 @@ namespace UnityEngine.UI
             return base.FindSelectableOnRight();
         }
 
-        /// <summary>
-        /// Prevents selection if we we move on the Vertical axis. See Selectable.FindSelectableOnUp.
-        /// </summary>
         public override Selectable FindSelectableOnUp()
         {
             if (navigation.mode == Navigation.Mode.Automatic && axis == Axis.Vertical)
@@ -505,9 +426,6 @@ namespace UnityEngine.UI
             return base.FindSelectableOnUp();
         }
 
-        /// <summary>
-        /// Prevents selection if we we move on the Vertical axis. See Selectable.FindSelectableOnDown.
-        /// </summary>
         public override Selectable FindSelectableOnDown()
         {
             if (navigation.mode == Navigation.Mode.Automatic && axis == Axis.Vertical)
@@ -515,17 +433,11 @@ namespace UnityEngine.UI
             return base.FindSelectableOnDown();
         }
 
-        /// <summary>
-        /// See: IInitializePotentialDragHandler.OnInitializePotentialDrag
-        /// </summary>
         public virtual void OnInitializePotentialDrag(PointerEventData eventData)
         {
             eventData.useDragThreshold = false;
         }
 
-        /// <summary>
-        /// Set the direction of the scrollbar, optionally setting the layout as well.
-        /// </summary>
         /// <param name="direction">The direction of the scrollbar.</param>
         /// <param name="includeRectLayouts">Should the layout be flipped together with the direction?</param>
         public void SetDirection(Direction direction, bool includeRectLayouts)

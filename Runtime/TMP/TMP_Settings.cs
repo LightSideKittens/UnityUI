@@ -9,18 +9,12 @@ using System.Threading.Tasks;
 
 namespace TMPro
 {
-    /// <summary>
-    /// Scaling options for the sprites
-    /// </summary>
     [Serializable][ExcludeFromPresetAttribute]
     [HelpURL("https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/TextMeshPro/Settings.html")]
     public class TMP_Settings : ScriptableObject
     {
         private static TMP_Settings s_Instance;
 
-        /// <summary>
-        /// Returns the release version of the product.
-        /// </summary>
         public static string version
         {
             get { return "1.4.0"; }
@@ -36,9 +30,6 @@ namespace TMPro
             assetVersion = s_CurrentAssetVersion;
         }
 
-        /// <summary>
-        /// Controls the text wrapping mode of newly created text objects.
-        /// </summary>
         public static TextWrappingModes textWrappingMode
         {
             get { return instance.m_TextWrappingMode; }
@@ -50,9 +41,6 @@ namespace TMPro
         [SerializeField]
         private bool m_enableKerning;
 
-        /// <summary>
-        /// Controls which font features are enabled by default on newly created text objects.
-        /// </summary>
         public static List<OTL_FeatureTag> fontFeatures
         {
             get { return instance.m_ActiveFontFeatures; }
@@ -60,9 +48,6 @@ namespace TMPro
         [SerializeField]
         private List<OTL_FeatureTag> m_ActiveFontFeatures = new() { 0 };
 
-        /// <summary>
-        /// Controls if Extra Padding is enabled on newly created text objects by default.
-        /// </summary>
         public static bool enableExtraPadding
         {
             get { return instance.m_enableExtraPadding; }
@@ -70,9 +55,6 @@ namespace TMPro
         [SerializeField]
         private bool m_enableExtraPadding;
 
-        /// <summary>
-        /// Controls if TintAllSprites is enabled on newly created text objects by default.
-        /// </summary>
         public static bool enableTintAllSprites
         {
             get { return instance.m_enableTintAllSprites; }
@@ -80,9 +62,6 @@ namespace TMPro
         [SerializeField]
         private bool m_enableTintAllSprites;
 
-        /// <summary>
-        /// Controls if Escape Characters will be parsed in the Text Input Box on newly created text objects.
-        /// </summary>
         public static bool enableParseEscapeCharacters
         {
             get { return instance.m_enableParseEscapeCharacters; }
@@ -90,9 +69,6 @@ namespace TMPro
         [SerializeField]
         private bool m_enableParseEscapeCharacters;
 
-        /// <summary>
-        /// Controls if Raycast Target is enabled by default on newly created text objects.
-        /// </summary>
         public static bool enableRaycastTarget
         {
             get { return instance.m_EnableRaycastTarget; }
@@ -100,9 +76,6 @@ namespace TMPro
         [SerializeField]
         private bool m_EnableRaycastTarget = true;
 
-        /// <summary>
-        /// Determines if OpenType Font Features should be retrieved at runtime from the source font file.
-        /// </summary>
         public static bool getFontFeaturesAtRuntime
         {
             get { return instance.m_GetFontFeaturesAtRuntime; }
@@ -110,9 +83,6 @@ namespace TMPro
         [SerializeField]
         private bool m_GetFontFeaturesAtRuntime = true;
 
-        /// <summary>
-        /// The character that will be used as a replacement for missing glyphs in a font asset.
-        /// </summary>
         public static int missingGlyphCharacter
         {
             get { return instance.m_missingGlyphCharacter; }
@@ -121,9 +91,6 @@ namespace TMPro
         [SerializeField]
         private int m_missingGlyphCharacter;
 
-        /// <summary>
-        /// Determines if the "Clear Dynamic Data on Build" property will be set to true or false on newly created dynamic font assets.
-        /// </summary>
         public static bool clearDynamicDataOnBuild
         {
             get { return instance.m_ClearDynamicDataOnBuild; }
@@ -131,9 +98,6 @@ namespace TMPro
 
         [SerializeField] private bool m_ClearDynamicDataOnBuild = true;
 
-        /// <summary>
-        /// Controls the display of warning message in the console.
-        /// </summary>
         public static bool warningsDisabled
         {
             get { return instance.m_warningsDisabled; }
@@ -141,9 +105,6 @@ namespace TMPro
         [SerializeField]
         private bool m_warningsDisabled;
 
-        /// <summary>
-        /// Returns the Default Font Asset to be used by newly created text objects.
-        /// </summary>
         public static TMP_FontAsset defaultFontAsset
         {
             get { return instance.m_defaultFontAsset; }
@@ -152,9 +113,6 @@ namespace TMPro
         [SerializeField]
         private TMP_FontAsset m_defaultFontAsset;
 
-        /// <summary>
-        /// The relative path to a Resources folder in the project.
-        /// </summary>
         public static string defaultFontAssetPath
         {
             get { return instance.m_defaultFontAssetPath; }
@@ -162,9 +120,6 @@ namespace TMPro
         [SerializeField]
         private string m_defaultFontAssetPath;
 
-        /// <summary>
-        /// The Default Point Size of newly created text objects.
-        /// </summary>
         public static float defaultFontSize
         {
             get { return instance.m_defaultFontSize; }
@@ -172,9 +127,6 @@ namespace TMPro
         [SerializeField]
         private float m_defaultFontSize;
 
-        /// <summary>
-        /// The multiplier used to computer the default Min point size when Text Auto Sizing is used.
-        /// </summary>
         public static float defaultTextAutoSizingMinRatio
         {
             get { return instance.m_defaultAutoSizeMinRatio; }
@@ -182,9 +134,6 @@ namespace TMPro
         [SerializeField]
         private float m_defaultAutoSizeMinRatio;
 
-        /// <summary>
-        /// The multiplier used to computer the default Max point size when Text Auto Sizing is used.
-        /// </summary>
         public static float defaultTextAutoSizingMaxRatio
         {
             get { return instance.m_defaultAutoSizeMaxRatio; }
@@ -192,9 +141,6 @@ namespace TMPro
         [SerializeField]
         private float m_defaultAutoSizeMaxRatio;
 
-        /// <summary>
-        /// The Default Size of the Text Container of a TextMeshPro object.
-        /// </summary>
         public static Vector2 defaultTextMeshProTextContainerSize
         {
             get { return instance.m_defaultTextMeshProTextContainerSize; }
@@ -202,9 +148,6 @@ namespace TMPro
         [SerializeField]
         private Vector2 m_defaultTextMeshProTextContainerSize;
 
-        /// <summary>
-        /// The Default Width of the Text Container of a TextMeshProUI object.
-        /// </summary>
         public static Vector2 defaultTextMeshProUITextContainerSize
         {
             get { return instance.m_defaultTextMeshProUITextContainerSize; }
@@ -212,9 +155,6 @@ namespace TMPro
         [SerializeField]
         private Vector2 m_defaultTextMeshProUITextContainerSize;
 
-        /// <summary>
-        /// Set the size of the text container of newly created text objects to match the size of the text.
-        /// </summary>
         public static bool autoSizeTextContainer
         {
             get { return instance.m_autoSizeTextContainer; }
@@ -222,21 +162,6 @@ namespace TMPro
         [SerializeField]
         private bool m_autoSizeTextContainer;
 
-        /// <summary>
-        /// Disables InternalUpdate() calls when true. This can improve performance when the scale of the text object is static.
-        /// </summary>
-        public static bool isTextObjectScaleStatic
-        {
-            get { return instance.m_IsTextObjectScaleStatic; }
-            set { instance.m_IsTextObjectScaleStatic = value; }
-        }
-        [SerializeField]
-        private bool m_IsTextObjectScaleStatic;
-
-
-        /// <summary>
-        /// Returns the list of Fallback Fonts defined in the TMP Settings file.
-        /// </summary>
         public static List<TMP_FontAsset> fallbackFontAssets
         {
             get { return instance.m_fallbackFontAssets; }
@@ -245,9 +170,6 @@ namespace TMPro
         [SerializeField]
         private List<TMP_FontAsset> m_fallbackFontAssets;
 
-        /// <summary>
-        /// Controls whether or not TMP will create a matching material preset or use the default material of the fallback font asset.
-        /// </summary>
         public static bool matchMaterialPreset
         {
             get { return instance.m_matchMaterialPreset; }
@@ -255,29 +177,12 @@ namespace TMPro
         [SerializeField]
         private bool m_matchMaterialPreset;
 
-        /// <summary>
-        /// Determines if sub text objects will be hidden in the scene hierarchy.
-        /// </summary>
         public static bool hideSubTextObjects
         {
             get { return instance.m_HideSubTextObjects; }
         }
         [SerializeField] private bool m_HideSubTextObjects = true;
 
-        /// <summary>
-        /// The Default Sprite Asset to be used by default.
-        /// </summary>
-        public static TMP_SpriteAsset defaultSpriteAsset
-        {
-            get { return instance.m_defaultSpriteAsset; }
-            set { instance.m_defaultSpriteAsset = value; }
-        }
-        [SerializeField]
-        private TMP_SpriteAsset m_defaultSpriteAsset;
-
-        /// <summary>
-        /// The relative path to a Resources folder in the project.
-        /// </summary>
         public static string defaultSpriteAssetPath
         {
             get { return instance.m_defaultSpriteAssetPath; }
@@ -285,9 +190,6 @@ namespace TMPro
         [SerializeField]
         private string m_defaultSpriteAssetPath;
 
-        /// <summary>
-        /// The unicode value of the sprite that will be used when the requested sprite is missing from the sprite asset and potential fallbacks.
-        /// </summary>
         public static uint missingCharacterSpriteUnicode
         {
             get { return instance.m_MissingCharacterSpriteUnicode; }
@@ -296,13 +198,7 @@ namespace TMPro
         [SerializeField]
         private uint m_MissingCharacterSpriteUnicode;
 
-        /// <summary>
-        /// Determines if sprites will be scaled relative to the primary font asset assigned to the text object or relative to the current font asset.
-        /// </summary>
 
-        /// <summary>
-        /// The relative path to a Resources folder in the project that contains Color Gradient Presets.
-        /// </summary>
         public static string defaultColorGradientPresetsPath
         {
             get { return instance.m_defaultColorGradientPresetsPath; }
@@ -310,9 +206,6 @@ namespace TMPro
         [SerializeField]
         private string m_defaultColorGradientPresetsPath;
 
-        /// <summary>
-        /// The Default Style Sheet used by the text objects.
-        /// </summary>
         public static TMP_StyleSheet defaultStyleSheet
         {
             get { return instance.m_defaultStyleSheet; }
@@ -321,9 +214,6 @@ namespace TMPro
         [SerializeField]
         private TMP_StyleSheet m_defaultStyleSheet;
 
-        /// <summary>
-        /// The relative path to a Resources folder in the project that contains the TMP Style Sheets.
-        /// </summary>
         public static string styleSheetsResourcePath
         {
             get { return instance.m_StyleSheetsResourcePath; }
@@ -331,9 +221,6 @@ namespace TMPro
         [SerializeField]
         private string m_StyleSheetsResourcePath;
 
-        /// <summary>
-        /// Text file that contains the leading characters used for line breaking for Asian languages.
-        /// </summary>
         public static TextAsset leadingCharacters
         {
             get { return instance.m_leadingCharacters; }
@@ -341,9 +228,6 @@ namespace TMPro
         [SerializeField]
         private TextAsset m_leadingCharacters;
 
-        /// <summary>
-        /// Text file that contains the following characters used for line breaking for Asian languages.
-        /// </summary>
         public static TextAsset followingCharacters
         {
             get { return instance.m_followingCharacters; }
@@ -351,9 +235,6 @@ namespace TMPro
         [SerializeField]
         private TextAsset m_followingCharacters;
 
-        /// <summary>
-        ///
-        /// </summary>
         public static LineBreakingTable linebreakingRules
         {
             get
@@ -367,9 +248,6 @@ namespace TMPro
         [SerializeField]
         private LineBreakingTable m_linebreakingRules;
 
-        /// <summary>
-        /// Determines if Modern or Traditional line breaking rules should be used for Korean text.
-        /// </summary>
         public static bool useModernHangulLineBreakingRules
         {
             get { return instance.m_UseModernHangulLineBreakingRules; }
@@ -378,9 +256,6 @@ namespace TMPro
         [SerializeField]
         private bool m_UseModernHangulLineBreakingRules;
 
-        /// <summary>
-        /// Get a singleton instance of the settings class.
-        /// </summary>
         public static TMP_Settings instance
         {
             get
@@ -423,9 +298,6 @@ namespace TMPro
 #endif
 
 
-        /// <summary>
-        /// Static Function to load the TMP Settings file.
-        /// </summary>
         /// <returns></returns>
         public static TMP_Settings LoadDefaultSettings()
         {
@@ -440,9 +312,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Returns the Sprite Asset defined in the TMP Settings file.
-        /// </summary>
         /// <returns></returns>
         public static TMP_Settings GetSettings()
         {
@@ -452,9 +321,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Returns the Font Asset defined in the TMP Settings file.
-        /// </summary>
         /// <returns></returns>
         public static TMP_FontAsset GetFontAsset()
         {
@@ -463,22 +329,6 @@ namespace TMPro
             return instance.m_defaultFontAsset;
         }
 
-
-        /// <summary>
-        /// Returns the Sprite Asset defined in the TMP Settings file.
-        /// </summary>
-        /// <returns></returns>
-        public static TMP_SpriteAsset GetSpriteAsset()
-        {
-            if (instance == null) return null;
-
-            return instance.m_defaultSpriteAsset;
-        }
-
-
-        /// <summary>
-        /// Returns the Style Sheet defined in the TMP Settings file.
-        /// </summary>
         /// <returns></returns>
         public static TMP_StyleSheet GetStyleSheet()
         {
@@ -500,9 +350,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///  Get the characters from the line breaking files
-        /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
         private static HashSet<uint> GetCharacters(TextAsset file)

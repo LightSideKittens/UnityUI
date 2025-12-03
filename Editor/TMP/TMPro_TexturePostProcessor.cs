@@ -5,10 +5,6 @@ using UnityEditor;
 
 namespace TMPro.EditorUtilities
 {
-    /// <summary>
-    /// Asset post processor used to handle text assets changes.
-    /// This includes tracking of changes to textures used by sprite assets as well as font assets potentially getting updated outside of the Unity editor.
-    /// </summary>
     internal class TMPro_TexturePostProcessor : AssetPostprocessor
     {
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)

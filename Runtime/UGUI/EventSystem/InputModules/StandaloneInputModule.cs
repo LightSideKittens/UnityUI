@@ -5,9 +5,6 @@ using UnityEngine.Serialization;
 namespace UnityEngine.EventSystems
 {
     [AddComponentMenu("Event/Standalone Input Module")]
-    /// <summary>
-    /// A BaseInputModule designed for mouse / keyboard / controller input.
-    /// </summary>
     /// <remarks>
     /// Input module for working with, mouse, keyboard, or controller.
     /// </remarks>
@@ -33,21 +30,12 @@ namespace UnityEngine.EventSystems
         [SerializeField]
         private string m_HorizontalAxis = "Horizontal";
 
-        /// <summary>
-        /// Name of the vertical axis for movement (if axis events are used).
-        /// </summary>
         [SerializeField]
         private string m_VerticalAxis = "Vertical";
 
-        /// <summary>
-        /// Name of the submit button.
-        /// </summary>
         [SerializeField]
         private string m_SubmitButton = "Submit";
 
-        /// <summary>
-        /// Name of the submit button.
-        /// </summary>
         [SerializeField]
         private string m_CancelButton = "Cancel";
 
@@ -62,18 +50,12 @@ namespace UnityEngine.EventSystems
         [HideInInspector]
         private bool m_ForceModuleActive;
 
-        /// <summary>
-        /// Number of keyboard / controller inputs allowed per second.
-        /// </summary>
         public float inputActionsPerSecond
         {
             get { return m_InputActionsPerSecond; }
             set { m_InputActionsPerSecond = value; }
         }
 
-        /// <summary>
-        /// Delay in seconds before the input actions per second repeat rate takes effect.
-        /// </summary>
         /// <remarks>
         /// If the same direction is sustained, the inputActionsPerSecond property can be used to control the rate at which events are fired. However, it can be desirable that the first repetition is delayed, so the user doesn't get repeated actions by accident.
         /// </remarks>
@@ -83,36 +65,24 @@ namespace UnityEngine.EventSystems
             set { m_RepeatDelay = value; }
         }
 
-        /// <summary>
-        /// Name of the horizontal axis for movement (if axis events are used).
-        /// </summary>
         public string horizontalAxis
         {
             get { return m_HorizontalAxis; }
             set { m_HorizontalAxis = value; }
         }
 
-        /// <summary>
-        /// Name of the vertical axis for movement (if axis events are used).
-        /// </summary>
         public string verticalAxis
         {
             get { return m_VerticalAxis; }
             set { m_VerticalAxis = value; }
         }
 
-        /// <summary>
-        /// Maximum number of input events handled per second.
-        /// </summary>
         public string submitButton
         {
             get { return m_SubmitButton; }
             set { m_SubmitButton = value; }
         }
 
-        /// <summary>
-        /// Input manager name for the 'cancel' button.
-        /// </summary>
         public string cancelButton
         {
             get { return m_CancelButton; }
@@ -205,9 +175,6 @@ namespace UnityEngine.EventSystems
             return shouldActivate;
         }
 
-        /// <summary>
-        /// See BaseInputModule.
-        /// </summary>
         public override void ActivateModule()
         {
             if (!eventSystem.isFocused && ShouldIgnoreEventsOnNoFocus())
@@ -224,9 +191,6 @@ namespace UnityEngine.EventSystems
             eventSystem.SetSelectedGameObject(toSelect, GetBaseEventData());
         }
 
-        /// <summary>
-        /// See BaseInputModule.
-        /// </summary>
         public override void DeactivateModule()
         {
             base.DeactivateModule();
@@ -283,9 +247,6 @@ namespace UnityEngine.EventSystems
             return input.touchCount > 0;
         }
 
-        /// <summary>
-        /// This method is called by Unity whenever a touch event is processed. Override this method with a custom implementation to process touch events yourself.
-        /// </summary>
         /// <param name="pointerEvent">Event data relating to the touch event, such as position and ID to be passed to the touch event destination object.</param>
         /// <param name="pressed">This is true for the first frame of a touch event, and false thereafter. This can therefore be used to determine the instant a touch event occurred.</param>
         /// <param name="released">This is true only for the last frame of a touch event.</param>
@@ -405,9 +366,6 @@ namespace UnityEngine.EventSystems
             m_InputPointerEvent = pointerEvent;
         }
 
-        /// <summary>
-        /// Calculate and send a submit event to the current selected object.
-        /// </summary>
         /// <returns>If the submit event was used by the selected object.</returns>
         protected bool SendSubmitEventToSelectedObject()
         {
@@ -446,9 +404,6 @@ namespace UnityEngine.EventSystems
             return move;
         }
 
-        /// <summary>
-        /// Calculate and send a move event to the current selected object.
-        /// </summary>
         /// <returns>If the move event was used by the selected object.</returns>
         protected bool SendMoveEventToSelectedObject()
         {
@@ -500,9 +455,6 @@ namespace UnityEngine.EventSystems
             ProcessMouseEvent(0);
         }
 
-        /// <summary>
-        /// Process all mouse events.
-        /// </summary>
         protected void ProcessMouseEvent(int id)
         {
             var mouseData = GetMousePointerEventData(id);
@@ -538,9 +490,6 @@ namespace UnityEngine.EventSystems
             return data.used;
         }
 
-        /// <summary>
-        /// Calculate and process any mouse button state changes.
-        /// </summary>
         protected void ProcessMousePress(MouseButtonEventData data)
         {
             var pointerEvent = data.buttonData;

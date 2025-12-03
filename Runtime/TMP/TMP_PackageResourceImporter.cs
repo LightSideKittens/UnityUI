@@ -115,9 +115,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="packageName"></param>
         private void ImportCallback(string packageName)
         {
@@ -194,9 +191,6 @@ namespace TMPro
             return null;
         }
 
-        /// <summary>
-        /// Imports the specified TMP resources.
-        /// </summary>
         /// <param name="importEssentials">Should import the TMP Essential Resources.</param>
         /// <param name="importExamples">Should import the TMP Examples & Extras.</param>
         /// <param name="interactive">If interactive is true, an import package dialog will be opened, else all assets in the package will be imported into the current project silently.</param>
@@ -254,9 +248,6 @@ namespace TMPro
             Repaint();
         }
 
-        /// <summary>
-        /// Limits the minimum size of the editor window.
-        /// </summary>
         private void SetEditorWindowSize()
         {
             EditorWindow editorWindow = this;
@@ -296,9 +287,6 @@ namespace TMPro
             GUILayout.Space(5f);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="packageName"></param>
         private void ImportCallback(string packageName)
         {
@@ -317,9 +305,6 @@ namespace TMPro
             AssetDatabase.importPackageCompleted -= ImportCallback;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="interactive"></param>
         internal static void ImportShaders(bool interactive)
         {
@@ -384,9 +369,6 @@ namespace TMPro
             Repaint();
         }
 
-        /// <summary>
-        /// Limits the minimum size of the editor window.
-        /// </summary>
         private void SetEditorWindowSize()
         {
             EditorWindow editorWindow = this;

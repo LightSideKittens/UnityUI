@@ -254,14 +254,8 @@ internal class TMP_MarkupTagUpdateUtility
         Debug.Log(output);
     }
 
-    /// <summary>
-    /// Table used to convert character to uppercase.
-    /// </summary>
     const string k_lookupStringU = "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[-]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~-";
 
-    /// <summary>
-    /// Get uppercase version of this ASCII character.
-    /// </summary>
     public static char ToUpperFast(char c)
     {
         if (c > k_lookupStringU.Length - 1)

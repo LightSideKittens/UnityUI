@@ -9,14 +9,8 @@ using UnityEngine.U2D;
 
 namespace UnityEngine.EventSystems
 {
-    /// <summary>
-    /// Simple event system using physics raycasts.
-    /// </summary>
     [AddComponentMenu("Event/Physics 2D Raycaster")]
     [RequireComponent(typeof(Camera))]
-    /// <summary>
-    /// Raycaster for casting against 2D Physics components.
-    /// </summary>
     public class Physics2DRaycaster : PhysicsRaycaster
     {
 #if PACKAGE_PHYSICS2D
@@ -26,9 +20,6 @@ namespace UnityEngine.EventSystems
         protected Physics2DRaycaster()
         {}
 
-        /// <summary>
-        /// Raycast against 2D elements in the scene.
-        /// </summary>
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
 #if PACKAGE_PHYSICS2D

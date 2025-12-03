@@ -3,9 +3,6 @@ using UnityEngine.Serialization;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// Structure that stores the state of an animation transition on a Selectable.
-    /// </summary>
     [Serializable]
     public class AnimationTriggers
     {
@@ -35,9 +32,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private string m_DisabledTrigger = kDefaultDisabledAnimName;
 
-        /// <summary>
-        /// Trigger to send to animator when entering normal state.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -60,9 +54,6 @@ namespace UnityEngine.UI
         /// </example>
         public string normalTrigger      { get { return m_NormalTrigger; } set { m_NormalTrigger = value; } }
 
-        /// <summary>
-        /// Trigger to send to animator when entering highlighted state.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -85,9 +76,6 @@ namespace UnityEngine.UI
         /// </example>
         public string highlightedTrigger { get { return m_HighlightedTrigger; } set { m_HighlightedTrigger = value; } }
 
-        /// <summary>
-        /// Trigger to send to animator when entering pressed state.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -110,9 +98,6 @@ namespace UnityEngine.UI
         /// </example>
         public string pressedTrigger     { get { return m_PressedTrigger; } set { m_PressedTrigger = value; } }
 
-        /// <summary>
-        /// Trigger to send to animator when entering selected state.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -135,9 +120,6 @@ namespace UnityEngine.UI
         /// </example>
         public string selectedTrigger    { get { return m_SelectedTrigger; } set { m_SelectedTrigger = value; } }
 
-        /// <summary>
-        /// Trigger to send to animator when entering disabled state.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[

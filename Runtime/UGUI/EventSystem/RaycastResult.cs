@@ -2,45 +2,24 @@ using UnityEngine.UIElements;
 
 namespace UnityEngine.EventSystems
 {
-    /// <summary>
-    /// A hit result from a BaseRaycaster.
-    /// </summary>
     public struct RaycastResult
     {
         private GameObject m_GameObject; // Game object hit by the raycast
 
-        /// <summary>
-        /// The GameObject that was hit by the raycast.
-        /// </summary>
         public GameObject gameObject
         {
             get { return m_GameObject; }
             set { m_GameObject = value; }
         }
 
-        /// <summary>
-        /// BaseRaycaster that raised the hit.
-        /// </summary>
         public BaseRaycaster module;
 
-        /// <summary>
-        /// Distance to the hit.
-        /// </summary>
         public float distance;
 
-        /// <summary>
-        /// Hit index
-        /// </summary>
         public float index;
 
-        /// <summary>
-        /// Used by raycasters where elements may have the same unit distance, but have specific ordering.
-        /// </summary>
         public int depth;
 
-        /// <summary>
-        /// The sorting group ID when the hit object is influenced by a SortingGroup.
-        /// </summary>
         /// <remarks>
         /// For UI.Graphic elements will always be 0.
         /// For 3D objects this will always be 0.
@@ -48,9 +27,6 @@ namespace UnityEngine.EventSystems
         /// </remarks>
         public int sortingGroupID;
 
-        /// <summary>
-        /// The sorting group order when the hit object is influenced by a SortingGroup.
-        /// </summary>
         /// <remarks>
         /// For UI.Graphic elements this will always be 0.
         /// For 3D objects this will always be 0.
@@ -58,9 +34,6 @@ namespace UnityEngine.EventSystems
         /// </remarks>
         public int sortingGroupOrder;
 
-        /// <summary>
-        /// The SortingLayer of the hit object.
-        /// </summary>
         /// <remarks>
         /// For UI.Graphic elements this will be the values from that graphic's Canvas
         /// For 3D objects this will always be 0.
@@ -68,9 +41,6 @@ namespace UnityEngine.EventSystems
         /// </remarks>
         public int sortingLayer;
 
-        /// <summary>
-        /// The SortingOrder for the hit object.
-        /// </summary>
         /// <remarks>
         /// For Graphic elements this will be the values from that graphics Canvas
         /// For 3D objects this will always be 0.
@@ -78,34 +48,16 @@ namespace UnityEngine.EventSystems
         /// </remarks>
         public int sortingOrder;
 
-        /// <summary>
-        /// The world position of the raycast ray origin.
-        /// </summary>
         public Vector3 origin;
 
-        /// <summary>
-        /// The world position of the where the raycast has hit.
-        /// </summary>
         public Vector3 worldPosition;
 
-        /// <summary>
-        /// The normal at the hit location of the raycast.
-        /// </summary>
         public Vector3 worldNormal;
 
-        /// <summary>
-        /// The screen position from which the raycast was generated.
-        /// </summary>
         public Vector2 screenPosition;
 
-        /// <summary>
-        /// The display index from which the raycast was generated.
-        /// </summary>
         public int displayIndex;
 
-        /// <summary>
-        /// Is there an associated module and a hit GameObject.
-        /// </summary>
         public bool isValid
         {
             get { return module != null && gameObject != null; }
@@ -114,24 +66,15 @@ namespace UnityEngine.EventSystems
         // This code is disabled unless the com.unity.modules.uielements module is present.
         // The UIElements module is always present in the Editor but it can be stripped from a project build if unused.
 #if PACKAGE_UITOOLKIT
-        /// <summary>
-        /// The UIToolkit Document that was intersected by this raycast, if any.
-        /// </summary>
         /// <remarks>This is only useful in the context of EventSystem UI Toolkit interoperability.</remarks>
         /// <seealso cref="UnityEngine.UIElements.EventSystemUIToolkitInteroperabilityBridge"/>
         public UIDocument document;
 
-        /// <summary>
-        /// The UIToolkit Visual Element that was intersected by this raycast, if any.
-        /// </summary>
         /// <remarks>This is only useful in the context of EventSystem UI Toolkit interoperability.</remarks>
         /// <seealso cref="UnityEngine.UIElements.EventSystemUIToolkitInteroperabilityBridge"/>
         public VisualElement element;
 #endif
 
-        /// <summary>
-        /// Reset the result.
-        /// </summary>
         public void Clear()
         {
             gameObject = null;

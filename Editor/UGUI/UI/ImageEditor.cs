@@ -5,16 +5,9 @@ using UnityEngine.UI;
 
 namespace UnityEditor.UI
 {
-    /// <summary>
-    /// Editor class used to edit UI Sprites.
-    /// </summary>
 
     [CustomEditor(typeof(Image), true)]
     [CanEditMultipleObjects]
-    /// <summary>
-    ///   Custom Editor for the Image Component.
-    ///   Extend this class to write a custom editor for a component derived from Image.
-    /// </summary>
     public class ImageEditor : GraphicEditor
     {
         SerializedProperty m_FillMethod;
@@ -168,9 +161,6 @@ namespace UnityEditor.UI
             base.SetShowNativeSize(showNativeSize, instant);
         }
 
-        /// <summary>
-        /// Draw the atlas and Image selection fields.
-        /// </summary>
 
         protected void SpriteGUI()
         {
@@ -195,9 +185,6 @@ namespace UnityEditor.UI
             }
         }
 
-        /// <summary>
-        /// Sprites's custom properties based on the type.
-        /// </summary>
 
         protected void TypeGUI()
         {
@@ -284,15 +271,9 @@ namespace UnityEditor.UI
             --EditorGUI.indentLevel;
         }
 
-        /// <summary>
-        /// All graphics have a preview.
-        /// </summary>
 
         public override bool HasPreviewGUI() { return true; }
 
-        /// <summary>
-        /// Draw the Image preview.
-        /// </summary>
 
         public override void OnPreviewGUI(Rect rect, GUIStyle background)
         {
@@ -305,9 +286,6 @@ namespace UnityEditor.UI
             SpriteDrawUtility.DrawSprite(sf, rect, image.canvasRenderer.GetColor());
         }
 
-        /// <summary>
-        /// A string containing the Image details to be used as a overlay on the component Preview.
-        /// </summary>
         /// <returns>
         /// The Image details.
         /// </returns>

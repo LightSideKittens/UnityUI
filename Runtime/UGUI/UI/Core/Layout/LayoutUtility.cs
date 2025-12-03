@@ -2,14 +2,8 @@ using UnityEngine.Pool;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// Utility functions for querying layout elements for their minimum, preferred, and flexible sizes.
-    /// </summary>
     public static class LayoutUtility
     {
-        /// <summary>
-        /// Returns the minimum size of the layout element.
-        /// </summary>
         /// <param name="rect">The RectTransform of the layout element to query.</param>
         /// <param name="axis">The axis to query. This can be 0 or 1.</param>
         /// <remarks>All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.</remarks>
@@ -18,9 +12,6 @@ namespace UnityEngine.UI
             return axis == 0 ? GetMinWidth(rect) : GetMinHeight(rect);
         }
 
-        /// <summary>
-        /// Returns the preferred size of the layout element.
-        /// </summary>
         /// <param name="rect">The RectTransform of the layout element to query.</param>
         /// <param name="axis">The axis to query. This can be 0 or 1.</param>
         /// <remarks>
@@ -31,9 +22,6 @@ namespace UnityEngine.UI
             return axis == 0 ? GetPreferredWidth(rect) : GetPreferredHeight(rect);
         }
 
-        /// <summary>
-        /// Returns the flexible size of the layout element.
-        /// </summary>
         /// <remarks>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
         /// </remarks>
@@ -44,9 +32,6 @@ namespace UnityEngine.UI
             return axis == 0 ? GetFlexibleWidth(rect) : GetFlexibleHeight(rect);
         }
 
-        /// <summary>
-        /// Returns the minimum width of the layout element.
-        /// </summary>
         /// <param name="rect">The RectTransform of the layout element to query.</param>
         /// <remarks>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
@@ -56,9 +41,6 @@ namespace UnityEngine.UI
             return GetLayoutProperty(rect, e => e.minWidth, 0);
         }
 
-        /// <summary>
-        /// Returns the preferred width of the layout element.
-        /// </summary>
         /// <param name="rect">The RectTransform of the layout element to query.</param>
         /// <returns>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
@@ -68,9 +50,6 @@ namespace UnityEngine.UI
             return Mathf.Max(GetLayoutProperty(rect, e => e.minWidth, 0), GetLayoutProperty(rect, e => e.preferredWidth, 0));
         }
 
-        /// <summary>
-        /// Returns the flexible width of the layout element.
-        /// </summary>
         /// <remarks>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used
         /// </remarks>
@@ -80,9 +59,6 @@ namespace UnityEngine.UI
             return GetLayoutProperty(rect, e => e.flexibleWidth, 0);
         }
 
-        /// <summary>
-        /// Returns the minimum height of the layout element.
-        /// </summary>
         /// <param name="rect">The RectTransform of the layout element to query.</param>
         /// <remarks>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
@@ -92,9 +68,6 @@ namespace UnityEngine.UI
             return GetLayoutProperty(rect, e => e.minHeight, 0);
         }
 
-        /// <summary>
-        /// Returns the preferred height of the layout element.
-        /// </summary>
         /// <param name="rect">The RectTransform of the layout element to query.</param>
         /// <remarks>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
@@ -104,9 +77,6 @@ namespace UnityEngine.UI
             return Mathf.Max(GetLayoutProperty(rect, e => e.minHeight, 0), GetLayoutProperty(rect, e => e.preferredHeight, 0));
         }
 
-        /// <summary>
-        /// Returns the flexible height of the layout element.
-        /// </summary>
         /// <remarks>
         /// All components on the GameObject that implement the ILayoutElement are queried. The one with the highest priority which has a value for this setting is used. If multiple componets have this setting and have the same priority, the maximum value out of those is used.
         /// </remarks>
@@ -116,9 +86,6 @@ namespace UnityEngine.UI
             return GetLayoutProperty(rect, e => e.flexibleHeight, 0);
         }
 
-        /// <summary>
-        /// Gets a calculated layout property for the layout element with the given RectTransform.
-        /// </summary>
         /// <param name="rect">The RectTransform of the layout element to get a property for.</param>
         /// <param name="property">The property to calculate.</param>
         /// <param name="defaultValue">The default value to use if no component on the layout element supplies the given property</param>
@@ -129,9 +96,6 @@ namespace UnityEngine.UI
             return GetLayoutProperty(rect, property, defaultValue, out dummy);
         }
 
-        /// <summary>
-        /// Gets a calculated layout property for the layout element with the given RectTransform.
-        /// </summary>
         /// <param name="rect">The RectTransform of the layout element to get a property for.</param>
         /// <param name="property">The property to calculate.</param>
         /// <param name="defaultValue">The default value to use if no component on the layout element supplies the given property</param>

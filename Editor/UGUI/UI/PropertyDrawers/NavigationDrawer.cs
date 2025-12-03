@@ -7,9 +7,6 @@ using UnityEngine.UIElements;
 namespace UnityEditor.UI
 {
     [CustomPropertyDrawer(typeof(Navigation), true)]
-    /// <summary>
-    /// This is a PropertyDrawer for Navigation. It is implemented using the standard Unity PropertyDrawer framework.
-    /// </summary>
     public class NavigationDrawer : PropertyDrawer
     {
         const string kNavigation = "Navigation";

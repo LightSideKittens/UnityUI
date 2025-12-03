@@ -36,8 +36,6 @@ namespace TMPro.EditorUtilities
 
                 DrawGeometrySorting();
 
-                DrawIsTextObjectScaleStatic();
-
                 DrawRichText();
 
                 DrawRaycastTarget();

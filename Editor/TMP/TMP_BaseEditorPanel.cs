@@ -980,23 +980,7 @@ namespace TMPro.EditorUtilities
 
             EditorGUILayout.Space();
         }
-
-        protected void DrawIsTextObjectScaleStatic()
-        {
-            EditorGUI.BeginChangeCheck();
-
-            EditorGUILayout.PropertyField(m_IsTextObjectScaleStaticProp, k_IsTextObjectScaleStatic);
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                m_TextComponent.isTextObjectScaleStatic = m_IsTextObjectScaleStaticProp.boolValue;
-                m_HavePropertiesChanged = true;
-            }
-
-            EditorGUILayout.Space();
-        }
-
-
+        
         protected void DrawRichText()
         {
             EditorGUI.BeginChangeCheck();
@@ -1125,9 +1109,6 @@ namespace TMPro.EditorUtilities
             }
         }
 
-        /// <summary>
-        /// Method to retrieve the material presets that match the currently selected font asset.
-        /// </summary>
         protected GUIContent[] GetMaterialPresets()
         {
             TMP_FontAsset fontAsset = m_FontAssetProp.objectReferenceValue as TMP_FontAsset;

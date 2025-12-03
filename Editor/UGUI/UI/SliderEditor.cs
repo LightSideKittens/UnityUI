@@ -6,10 +6,6 @@ namespace UnityEditor.UI
 {
     [CustomEditor(typeof(Slider), true)]
     [CanEditMultipleObjects]
-    /// <summary>
-    /// Custom Editor for the Slider Component.
-    /// Extend this class to write a custom editor for a component derived from Slider.
-    /// </summary>
     public class SliderEditor : SelectableEditor
     {
         SerializedProperty m_Direction;

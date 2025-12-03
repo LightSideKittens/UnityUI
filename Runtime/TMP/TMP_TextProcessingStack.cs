@@ -4,9 +4,6 @@ using UnityEngine;
 
 namespace TMPro
 {
-    /// <summary>
-    /// Structure used to track basic XML tags which are binary (on / off)
-    /// </summary>
     public struct TMP_FontStyleStack
     {
         public byte bold;
@@ -20,9 +17,6 @@ namespace TMPro
         public byte lowercase;
         public byte smallcaps;
 
-        /// <summary>
-        /// Clear the basic XML tag stack.
-        /// </summary>
         public void Clear()
         {
             bold = 0;
@@ -138,9 +132,6 @@ namespace TMPro
     }
 
 
-    /// <summary>
-    /// Structure used to track XML tags of various types.
-    /// </summary>
     /// <typeparam name="T"></typeparam>
     [DebuggerDisplay("Item count = {m_Count}")]
     public struct TMP_TextProcessingStack<T>
@@ -156,9 +147,6 @@ namespace TMPro
         private const int k_DefaultCapacity = 4;
 
 
-        /// <summary>
-        /// Constructor to create a new item stack.
-        /// </summary>
         /// <param name="stack"></param>
         public TMP_TextProcessingStack(T[] stack)
         {
@@ -172,9 +160,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Constructor for a new item stack with the given capacity.
-        /// </summary>
         /// <param name="capacity"></param>
         public TMP_TextProcessingStack(int capacity)
         {
@@ -200,18 +185,12 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public int Count
         {
             get { return m_Count; }
         }
 
 
-        /// <summary>
-        /// Returns the current item on the stack.
-        /// </summary>
         public T current
         {
             get
@@ -224,9 +203,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public int rolloverSize
         {
             get { return m_RolloverSize; }
@@ -237,9 +213,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Set stack elements to default item.
-        /// </summary>
         /// <param name="stack">The stack of elements.</param>
         /// <param name="item"></param>
         internal static void SetDefault(TMP_TextProcessingStack<T>[] stack, T item)
@@ -249,9 +222,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to clear and reset stack to first item.
-        /// </summary>
         public void Clear()
         {
             index = 0;
@@ -259,9 +229,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to set the first item on the stack and reset index.
-        /// </summary>
         /// <param name="item"></param>
         public void SetDefault(T item)
         {
@@ -278,9 +245,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to add a new item to the stack.
-        /// </summary>
         /// <param name="item"></param>
         public void Add(T item)
         {
@@ -292,9 +256,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to retrieve an item from the stack.
-        /// </summary>
         /// <returns></returns>
         public T Remove()
         {
@@ -359,9 +320,6 @@ namespace TMPro
             return item;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <returns></returns>
         public T Peek()
         {
@@ -372,9 +330,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to retrieve the current item from the stack.
-        /// </summary>
         /// <returns>itemStack <T></returns>
         public T CurrentItem()
         {
@@ -385,9 +340,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to retrieve the previous item without affecting the stack.
-        /// </summary>
         /// <returns></returns>
         public T PreviousItem()
         {

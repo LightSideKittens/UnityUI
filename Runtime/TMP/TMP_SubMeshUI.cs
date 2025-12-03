@@ -13,9 +13,6 @@ namespace TMPro
     [RequireComponent(typeof(CanvasRenderer))]
     public class TMP_SubMeshUI : MaskableGraphic
     {
-        /// <summary>
-        /// The TMP Font Asset assigned to this sub text object.
-        /// </summary>
         public TMP_FontAsset fontAsset
         {
             get { return m_fontAsset; }
@@ -25,21 +22,6 @@ namespace TMPro
         private TMP_FontAsset m_fontAsset;
 
 
-        /// <summary>
-        /// The TMP Sprite Asset assigned to this sub text object.
-        /// </summary>
-        public TMP_SpriteAsset spriteAsset
-        {
-            get { return m_spriteAsset; }
-            set { m_spriteAsset = value; }
-        }
-        [SerializeField]
-        private TMP_SpriteAsset m_spriteAsset;
-
-
-        /// <summary>
-        ///
-        /// </summary>
         public override Texture mainTexture
         {
             get
@@ -52,9 +34,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// The material to be assigned to this object. Returns an instance of the material.
-        /// </summary>
         public override Material material
         {
             get { return GetMaterial(m_sharedMaterial); }
@@ -76,9 +55,6 @@ namespace TMPro
         private Material m_material;
 
 
-        /// <summary>
-        /// The material to be assigned to this text object.
-        /// </summary>
         public Material sharedMaterial
         {
             get { return m_sharedMaterial; }
@@ -88,9 +64,6 @@ namespace TMPro
         private Material m_sharedMaterial;
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public Material fallbackMaterial
         {
             get { return m_fallbackMaterial; }
@@ -110,9 +83,6 @@ namespace TMPro
         private Material m_fallbackMaterial;
 
 
-        /// <summary>
-        /// The source material used by the fallback font
-        /// </summary>
         public Material fallbackSourceMaterial
         {
             get { return m_fallbackSourceMaterial; }
@@ -121,9 +91,6 @@ namespace TMPro
         private Material m_fallbackSourceMaterial;
 
 
-        /// <summary>
-        /// Get the material that will be used for rendering.
-        /// </summary>
         public override Material materialForRendering
         {
             get
@@ -133,9 +100,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Is the text object using the default font asset material.
-        /// </summary>
         public bool isDefaultMaterial
         {
             get { return m_isDefaultMaterial; }
@@ -145,9 +109,6 @@ namespace TMPro
         private bool m_isDefaultMaterial;
 
 
-        /// <summary>
-        /// Padding value resulting for the property settings on the material.
-        /// </summary>
         public float padding
         {
             get { return m_padding; }
@@ -157,9 +118,6 @@ namespace TMPro
         private float m_padding;
 
 
-        /// <summary>
-        /// The Mesh of this text sub object.
-        /// </summary>
         public Mesh mesh
         {
             get
@@ -177,9 +135,6 @@ namespace TMPro
         private Mesh m_mesh;
 
 
-        /// <summary>
-        /// Reference to the parent Text Component.
-        /// </summary>
         public TMP_Text textComponent
         {
             get
@@ -202,9 +157,6 @@ namespace TMPro
 
 
 
-        /// <summary>
-        /// Function to add a new sub text object.
-        /// </summary>
         /// <param name="textComponent"></param>
         /// <param name="materialReference"></param>
         /// <returns></returns>
@@ -234,7 +186,6 @@ namespace TMPro
             subMesh.m_TextComponent = textComponent;
             subMesh.m_materialReferenceIndex = materialReference.index;
             subMesh.m_fontAsset = materialReference.fontAsset;
-            subMesh.m_spriteAsset = materialReference.spriteAsset;
             subMesh.m_isDefaultMaterial = materialReference.isDefaultMaterial;
             subMesh.maskable = textComponent.maskable;
             subMesh.SetSharedMaterial(materialReference.material);
@@ -244,9 +195,6 @@ namespace TMPro
 
 
 
-        /// <summary>
-        ///
-        /// </summary>
         protected override void OnEnable()
         {
             if (!m_isRegisteredForEvents)
@@ -427,17 +375,11 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Event received when the TMP Settings are changed.
-        /// </summary>
         private void ON_TMP_SETTINGS_CHANGED()
         {
         }
         #endif
 
-        /// <summary>
-        ///
-        /// </summary>
         protected override void OnTransformParentChanged()
         {
             if (!IsActive())
@@ -449,9 +391,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the modified material for masking if necessary.
-        /// </summary>
         /// <param name="baseMaterial"></param>
         /// <returns></returns>
         public override Material GetModifiedMaterial(Material baseMaterial)
@@ -477,9 +416,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function called when the padding value for the material needs to be re-calculated.
-        /// </summary>
         /// <returns></returns>
         public float GetPaddingForMaterial()
         {
@@ -489,9 +425,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function called when the padding value for the material needs to be re-calculated.
-        /// </summary>
         /// <returns></returns>
         public float GetPaddingForMaterial(Material mat)
         {
@@ -501,9 +434,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="isExtraPadding"></param>
         /// <param name="isBold"></param>
         public void UpdateMeshPadding(bool isExtraPadding, bool isUsingBold)
@@ -512,34 +442,22 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public override void SetAllDirty()
         {
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public override void SetVerticesDirty()
         {
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public override void SetLayoutDirty()
         {
 
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public override void SetMaterialDirty()
         {
             m_materialDirty = true;
@@ -551,9 +469,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public void SetPivotDirty()
         {
             if (!IsActive())
@@ -571,9 +486,6 @@ namespace TMPro
         }
         private Transform m_RootCanvasTransform;
 
-        /// <summary>
-        /// Override Cull function as this is handled by the parent text object.
-        /// </summary>
         /// <param name="clipRect"></param>
         /// <param name="validRect"></param>
         public override void Cull(Rect clipRect, bool validRect)
@@ -581,17 +493,11 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         protected override void UpdateGeometry()
         {
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="update"></param>
         public override void Rebuild(CanvasUpdate update)
         {
@@ -605,18 +511,12 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to update the material from the parent text object.
-        /// </summary>
         public void RefreshMaterial()
         {
             UpdateMaterial();
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         protected override void UpdateMaterial()
         {
             if (m_sharedMaterial == null)
@@ -638,23 +538,14 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method called when the state of a parent changes.
-        /// </summary>
         public override void RecalculateClipping()
         {
             base.RecalculateClipping();
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
 
 
-        /// <summary>
-        /// Method which returns an instance of the shared material
-        /// </summary>
         /// <returns></returns>
         private Material GetMaterial()
         {
@@ -678,9 +569,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method used to create an instance of the material
-        /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
         private Material CreateMaterialInstance(Material source)
@@ -693,9 +581,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method returning the shared material assigned to the text object.
-        /// </summary>
         /// <returns></returns>
         private Material GetSharedMaterial()
         {
@@ -703,9 +588,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method to set the shared material.
-        /// </summary>
         /// <param name="mat"></param>
         private void SetSharedMaterial(Material mat)
         {

@@ -5,9 +5,6 @@ using System.Collections.Generic;
 
 namespace TMPro
 {
-    /// <summary>
-    /// Alternative Action delegate with increased performance when adding or removing delegates.
-    /// </summary>
     public class FastAction
     {
         private LinkedList<System.Action> delegates = new();
@@ -41,9 +38,6 @@ namespace TMPro
         }
     }
 
-    /// <summary>
-    /// Alternative Action delegate with increased performance when adding or removing delegates.
-    /// </summary>
     /// <typeparam name="A">The parameter of the method that this delegate encapsulates.</typeparam>
     public class FastAction<A>
     {
@@ -78,9 +72,6 @@ namespace TMPro
         }
     }
 
-    /// <summary>
-    /// Alternative Action delegate with increased performance when adding or removing delegates.
-    /// </summary>
     /// <typeparam name="A">The first parameter of the method that this delegate encapsulates.</typeparam>
     /// <typeparam name="B">The second parameter of the method that this delegate encapsulates.</typeparam>
     public class FastAction<A, B>
@@ -116,9 +107,6 @@ namespace TMPro
         }
     }
 
-    /// <summary>
-    /// Alternative Action delegate with increased performance when adding or removing delegates.
-    /// </summary>
     /// <typeparam name="A">The first parameter of the method that this delegate encapsulates.</typeparam>
     /// <typeparam name="B">The second parameter of the method that this delegate encapsulates.</typeparam>
     /// <typeparam name="C">The third parameter of the method that this delegate encapsulates.</typeparam>

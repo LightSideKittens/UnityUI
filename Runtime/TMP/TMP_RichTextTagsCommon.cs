@@ -4,9 +4,6 @@ using UnityEngine.Bindings;
 
 namespace TMPro
 {
-    /// <summary>
-    /// Rich text markup tags and attribute definitions and respective hash code values.
-    /// </summary>
     internal enum MarkupTag
     {
         BOLD = 66,
@@ -30,7 +27,6 @@ namespace TMPro
         SLASH_A = 1614,
         SIZE = 3061285,
         SLASH_SIZE = 58429962,
-        SPRITE = -991527447,
         NO_BREAK = 2856657,
         SLASH_NO_BREAK = 57477502,
         STYLE = 100252951,
@@ -164,9 +160,6 @@ namespace TMPro
         REGULAR = 1291372090,
     }
 
-    /// <summary>
-    /// Defines the type of value used by a rich text tag or tag attribute.
-    /// </summary>
     public enum TagValueType
     {
         None = 0x0,
@@ -182,9 +175,6 @@ namespace TMPro
         Percentage = 0x2,
     }
 
-    /// <summary>
-    /// Commonly referenced Unicode characters in the text generation process.
-    /// </summary>
     internal static class CodePoint
     {
         public const uint SPACE = 0x20;

@@ -58,26 +58,17 @@ namespace TMPro
         Converted = 0xFFFF
     };
 
-    /// <summary>
-    /// Horizontal text alignment options.
-    /// </summary>
     public enum HorizontalAlignmentOptions
     {
         Left = 0x1, Center = 0x2, Right = 0x4, Justified = 0x8, Flush = 0x10, Geometry = 0x20
     }
 
-    /// <summary>
-    /// Vertical text alignment options.
-    /// </summary>
     public enum VerticalAlignmentOptions
     {
         Top = 0x100, Middle = 0x200, Bottom = 0x400, Baseline = 0x800, Geometry = 0x1000, Capline = 0x2000,
     }
 
 
-    /// <summary>
-    /// Flags controlling what vertex data gets pushed to the mesh.
-    /// </summary>
     public enum TextRenderFlags
     {
         DontRender = 0x0,
@@ -94,79 +85,25 @@ namespace TMPro
     public enum FontStyles { Normal = 0x0, Bold = 0x1, Italic = 0x2, Underline = 0x4, LowerCase = 0x8, UpperCase = 0x10, SmallCaps = 0x20, Strikethrough = 0x40, Superscript = 0x80, Subscript = 0x100, Highlight = 0x200 };
     public enum FontWeight { Thin = 100, ExtraLight = 200, Light = 300, Regular = 400, Medium = 500, SemiBold = 600, Bold = 700, Heavy = 800, Black = 900 };
 
-    /// <summary>
-    /// Base class which contains common properties and functions shared between the TextMeshPro and TextMeshProUGUI component.
-    /// </summary>
     public abstract partial class TMP_Text : MaskableGraphic
     {
-        private string preprocessedText = string.Empty;
-        private TextRenderFlags lastRenderMode;
-        protected bool isBidiProcessing;
-        protected Bidi.Direction[] directions;
-        
-        protected void OnBeforeMeshRender()
-        {
-            if(isBidiProcessing) return;
-            lastRenderMode = m_renderMode;
-            m_renderMode = TextRenderFlags.DontRender;
-        }
-
-        protected void OnAfterMeshRender()
-        {
-            if(isBidiProcessing) return;
-            var input = Bidi.Do(this, out var logicalToVisualMap, out directions);
-            if (logicalToVisualMap != null)
-            { 
-                Debug.Log(string.Join(',', logicalToVisualMap.SelectMany(x => x)));
-            }
-            preprocessedText = input;
-            m_renderMode = lastRenderMode;
-            isBidiProcessing = true;
-            ForceMeshUpdate();
-            isBidiProcessing = false;
-        }
-        
-        /// <summary>
-        /// Method which derived classes need to override to load Font Assets.
-        /// </summary>
         protected virtual void LoadFontAsset() { }
 
-        /// <summary>
-        /// Function called internally when a new shared material is assigned via the fontSharedMaterial property.
-        /// </summary>
         /// <param name="mat"></param>
         protected virtual void SetSharedMaterial(Material mat) { }
 
-        /// <summary>
-        /// Function called internally when a new material is assigned via the fontMaterial property.
-        /// </summary>
         protected virtual Material GetMaterial(Material mat) { return null; }
 
-        /// <summary>
-        /// Method which returns an array containing the materials used by the text object.
-        /// </summary>
         /// <returns></returns>
         protected virtual Material[] GetSharedMaterials() { return null; }
 
-        /// <summary>
-        ///
-        /// </summary>
         protected virtual void SetSharedMaterials(Material[] materials) { }
 
-        /// <summary>
-        /// Method returning instances of the materials used by the text object.
-        /// </summary>
         /// <returns></returns>
         protected virtual Material[] GetMaterials(Material[] mats) { return null; }
 
-        /// <summary>
-        /// Method to set the materials of the text and sub text objects.
-        /// </summary>
         /// <param name="mats"></param>
 
-        /// <summary>
-        /// Function used to create an instance of the material
-        /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
         protected virtual Material CreateMaterialInstance(Material source)
@@ -178,42 +115,21 @@ namespace TMPro
             return mat;
         }
 
-        /// <summary>
-        /// Function called internally to set the face color of the material. This will results in an instance of the material.
-        /// </summary>
         /// <param name="color"></param>
         protected virtual void SetFaceColor(Color32 color) { }
 
-        /// <summary>
-        /// Function called internally to set the outline color of the material. This will results in an instance of the material.
-        /// </summary>
         /// <param name="color"></param>
         protected virtual void SetOutlineColor(Color32 color) { }
 
-        /// <summary>
-        /// Function called internally to set the outline thickness property of the material. This will results in an instance of the material.
-        /// </summary>
         /// <param name="thickness"></param>
         protected virtual void SetOutlineThickness(float thickness) { }
 
-        /// <summary>
-        /// Set the Render Queue and ZTest mode on the current material
-        /// </summary>
         protected virtual void SetShaderDepth() { }
 
-        /// <summary>
-        /// Set the culling mode on the material.
-        /// </summary>
         protected virtual void SetCulling() { }
 
-        /// <summary>
-        ///
-        /// </summary>
         internal virtual void UpdateCulling() {}
 
-        /// <summary>
-        /// Get the padding value for the currently assigned material
-        /// </summary>
         /// <returns></returns>
         protected virtual float GetPaddingForMaterial()
         {
@@ -229,9 +145,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Get the padding value for the given material
-        /// </summary>
         /// <returns></returns>
         protected virtual float GetPaddingForMaterial(Material mat)
         {
@@ -247,35 +160,20 @@ namespace TMPro
 
 
         protected bool m_ignoreActiveState;
-        /// <summary>
-        /// Function to force regeneration of the text object before its normal process time. This is useful when changes to the text object properties need to be applied immediately.
-        /// </summary>
         /// <param name="ignoreActiveState">Ignore Active State of text objects. Inactive objects are ignored by default.</param>
         public virtual void ForceMeshUpdate(bool ignoreActiveState = false) { }
 
 
-        /// <summary>
-        /// Function to update the geometry of the main and sub text objects.
-        /// </summary>
         /// <param name="mesh"></param>
         /// <param name="index"></param>
         public virtual void UpdateGeometry(Mesh mesh, int index) { }
 
 
-        /// <summary>
-        /// Function to be used to force recomputing of character padding when Shader / Material properties have been changed via script.
-        /// </summary>
         public virtual void UpdateMeshPadding() { }
 
 
-        /// <summary>
-        ///
-        /// </summary>
 
 
-        /// <summary>
-        /// Tweens the CanvasRenderer color associated with this Graphic.
-        /// </summary>
         /// <param name="targetColor">Target color.</param>
         /// <param name="duration">Tween duration.</param>
         /// <param name="ignoreTimeScale">Should ignore Time.scale?</param>
@@ -287,9 +185,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Tweens the alpha of the CanvasRenderer color associated with this Graphic.
-        /// </summary>
         /// <param name="alpha">Target alpha.</param>
         /// <param name="duration">Duration of the tween in seconds.</param>
         /// <param name="ignoreTimeScale">Should ignore Time.scale?</param>
@@ -300,9 +195,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="targetColor"></param>
         /// <param name="duration"></param>
         /// <param name="ignoreTimeScale"></param>
@@ -311,17 +203,11 @@ namespace TMPro
         protected virtual void InternalCrossFadeColor(Color targetColor, float duration, bool ignoreTimeScale, bool useAlpha) { }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="alpha"></param>
         /// <param name="duration"></param>
         /// <param name="ignoreTimeScale"></param>
         protected virtual void InternalCrossFadeAlpha(float alpha, float duration, bool ignoreTimeScale) { }
 
-        /// <summary>
-        ///
-        /// </summary>
         private struct TextBackingContainer
         {
             public uint[] Text => m_Array;
@@ -364,362 +250,7 @@ namespace TMPro
 
         }
 
-        /// <summary>
-        /// Internal array containing the converted source text used in the text parsing process.
-        /// </summary>
-        private TextBackingContainer m_TextBackingArray = new(4);
-        
-        /// <summary>
-        /// Method to parse the input text based on its source
-        /// </summary>
-        protected void ParseInputText()
-        {
-            Debug.Log($"{GetInstanceID()} ParseInputText Parsing...");
-            k_ParseTextMarker.Begin();
 
-            var input = m_text;
-            
-            if (!isBidiProcessing)
-            {
-                if (m_TextPreprocessor != null)
-                {
-                    input = m_TextPreprocessor.PreprocessText(input);
-                    PreprocessedText = input;
-                }
-
-                input = Normalize();
-                input = ArabicShaper.Do(input, out _);
-                preprocessedText = input;
-                PopulateTextArrays(input);
-            }
-            else
-            {
-                PopulateTextArrays(preprocessedText);
-            }
-
-            k_ParseTextMarker.End();
-            
-            string Normalize()
-            {
-                StringBuilder sb = null;
-
-                for (int i = 0; i < input.Length; i++)
-                {
-                    char c = input[i];
-
-                    if (c == '\r' ||
-                        (c == '<' &&
-                         i + 3 < input.Length &&
-                         input[i + 1] == 'b' &&
-                         input[i + 2] == 'r' &&
-                         input[i + 3] == '>'))
-                    {
-                        if (sb == null)
-                        {
-                            sb = new(input.Length);
-                            sb.Append(input, 0, i);
-                        }
-
-                        if (c == '\r')
-                        {
-                            if (i + 1 < input.Length && input[i + 1] == '\n')
-                                i++;
-
-                            sb.Append('\n');
-                        }
-                        else
-                        {
-                            sb.Append('\n');
-                            i += 3;
-                        }
-                    }
-                    else
-                    {
-                        sb?.Append(c);
-                    }
-                }
-
-                return sb?.ToString() ?? input;
-            }
-        }
-
-        private void PopulateTextArrays(string input)
-        {
-            PopulateTextBackingArray(input);
-            PopulateTextProcessingArray();
-            SetArraySizes(m_TextProcessingArray);
-        }
-        
-        /// <summary>
-        /// Method used to determine the number of visible characters and required buffer allocations.
-        /// </summary>
-        /// <param name="unicodeChars"></param>
-        /// <returns></returns>
-        internal virtual int SetArraySizes(TextProcessingElement[] unicodeChars) { return 0; }
-
-        /// <summary>
-        /// Convert source text to Unicode (uint) and populate internal text backing array.
-        /// </summary>
-        /// <param name="sourceText">Source text to be converted</param>
-        private void PopulateTextBackingArray(string sourceText)
-        {
-            int srcLength = sourceText?.Length ?? 0;
-
-            PopulateTextBackingArray(sourceText, 0, srcLength);
-        }
-
-        /// <summary>
-        /// Convert source text to uint and populate internal text backing array.
-        /// </summary>
-        /// <param name="sourceText">string containing the source text to be converted</param>
-        /// <param name="start">Index of the first element of the source array to be converted and copied to the internal text backing array.</param>
-        /// <param name="length">Number of elements in the array to be converted and copied to the internal text backing array.</param>
-        private void PopulateTextBackingArray(string sourceText, int start, int length)
-        {
-            int readIndex;
-            int writeIndex = 0;
-
-            if (sourceText == null)
-            {
-                readIndex = 0;
-                length = 0;
-            }
-            else
-            {
-                readIndex = Mathf.Clamp(start, 0, sourceText.Length);
-                length = Mathf.Clamp(length, 0, start + length < sourceText.Length ? length : sourceText.Length - start);
-            }
-
-            if (length >= m_TextBackingArray.Capacity)
-                m_TextBackingArray.Resize((length));
-
-            int end = readIndex + length;
-            for (; readIndex < end; readIndex++)
-            {
-                m_TextBackingArray[writeIndex] = sourceText[readIndex];
-                writeIndex += 1;
-            }
-
-            m_TextBackingArray[writeIndex] = 0;
-            m_TextBackingArray.Count = writeIndex;
-        }
-        
-
-        /// <summary>
-        ///
-        /// </summary>
-        private void PopulateTextProcessingArray()
-        {
-            TMP_TextProcessingStack<int>.SetDefault(m_TextStyleStacks, 0);
-
-            int srcLength = m_TextBackingArray.Count;
-            int requiredCapacity = srcLength + (textStyle.styleOpeningDefinition?.Length ?? 0);
-            if (m_TextProcessingArray.Length < requiredCapacity)
-                ResizeInternalArray(ref m_TextProcessingArray, requiredCapacity);
-
-            m_TextStyleStackDepth = 0;
-            int writeIndex = 0;
-
-            if (textStyle.hashCode != (int)MarkupTag.NORMAL)
-                InsertOpeningStyleTag(m_TextStyle, ref m_TextProcessingArray, ref writeIndex);
-
-            tag_NoParsing = false;
-
-            int readIndex = 0;
-            for (; readIndex < srcLength; readIndex++)
-            {
-                uint c = m_TextBackingArray[readIndex];
-
-                if (c == 0)
-                    break;
-
-                if (c == '\\' && readIndex < srcLength - 1)
-                {
-                    switch (m_TextBackingArray[readIndex + 1])
-                    {
-                        case 92:
-                            if (!m_parseCtrlCharacters) break;
-
-                            readIndex += 1;
-                            break;
-                        case 110:
-                            if (!m_parseCtrlCharacters) break;
-
-                            m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 1, unicode = 10 };
-                            readIndex += 1;
-                            writeIndex += 1;
-                            continue;
-                        case 114:
-                            if (!m_parseCtrlCharacters) break;
-
-                            m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 1, unicode = 13 };
-                            readIndex += 1;
-                            writeIndex += 1;
-                            continue;
-                        case 116:
-                            if (!m_parseCtrlCharacters) break;
-
-                            m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 1, unicode = 9 };
-                            readIndex += 1;
-                            writeIndex += 1;
-                            continue;
-                        case 118:
-                            if (!m_parseCtrlCharacters) break;
-
-                            m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 1, unicode = 11 };
-                            readIndex += 1;
-                            writeIndex += 1;
-                            continue;
-                        case 117:
-                            if (srcLength > readIndex + 5 && IsValidUTF16(m_TextBackingArray, readIndex + 2))
-                            {
-                                m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 6, unicode = GetUTF16(m_TextBackingArray, readIndex + 2) };
-                                readIndex += 5;
-                                writeIndex += 1;
-                                continue;
-                            }
-                            break;
-                        case 85:
-                            if (srcLength > readIndex + 9 && IsValidUTF32(m_TextBackingArray, readIndex + 2))
-                            {
-                                m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 10, unicode = GetUTF32(m_TextBackingArray, readIndex + 2) };
-                                readIndex += 9;
-                                writeIndex += 1;
-                                continue;
-                            }
-                            break;
-                    }
-                }
-
-                if (c >= CodePoint.HIGH_SURROGATE_START && c <= CodePoint.HIGH_SURROGATE_END && srcLength > readIndex + 1 && m_TextBackingArray[readIndex + 1] >= CodePoint.LOW_SURROGATE_START && m_TextBackingArray[readIndex + 1] <= CodePoint.LOW_SURROGATE_END)
-                {
-                    m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 2, unicode = TMP_TextParsingUtilities.ConvertToUTF32(c, m_TextBackingArray[readIndex + 1]) };
-                    readIndex += 1;
-                    writeIndex += 1;
-                    continue;
-                }
-
-                if (c == '<' && m_isRichText)
-                {
-                    int hashCode = GetMarkupTagHashCode(m_TextBackingArray, readIndex + 1);
-
-                    switch ((MarkupTag)hashCode)
-                    {
-                        case MarkupTag.NO_PARSE:
-                            tag_NoParsing = true;
-                            break;
-                        case MarkupTag.SLASH_NO_PARSE:
-                            tag_NoParsing = false;
-                            break;
-                        case MarkupTag.BR:
-                            if (tag_NoParsing) break;
-                            if (writeIndex == m_TextProcessingArray.Length) ResizeInternalArray(ref m_TextProcessingArray);
-
-                            m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 4, unicode = 10 };
-                            writeIndex += 1;
-                            readIndex += 3;
-                            continue;
-                        case MarkupTag.CR:
-                            if (tag_NoParsing) break;
-                            if (writeIndex == m_TextProcessingArray.Length) ResizeInternalArray(ref m_TextProcessingArray);
-
-                            m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 4, unicode = 13 };
-                            writeIndex += 1;
-                            readIndex += 3;
-                            continue;
-                        case MarkupTag.NBSP:
-                            if (tag_NoParsing) break;
-                            if (writeIndex == m_TextProcessingArray.Length) ResizeInternalArray(ref m_TextProcessingArray);
-
-                            m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 6, unicode = 0xA0 };
-                            writeIndex += 1;
-                            readIndex += 5;
-                            continue;
-                        case MarkupTag.ZWSP:
-                            if (tag_NoParsing) break;
-                            if (writeIndex == m_TextProcessingArray.Length) ResizeInternalArray(ref m_TextProcessingArray);
-
-                            m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 6, unicode = 0x200B };
-                            writeIndex += 1;
-                            readIndex += 5;
-                            continue;
-                        case MarkupTag.ZWJ:
-                            if (tag_NoParsing) break;
-                            if (writeIndex == m_TextProcessingArray.Length) ResizeInternalArray(ref m_TextProcessingArray);
-
-                            m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 5, unicode = 0x200D };
-                            writeIndex += 1;
-                            readIndex += 4;
-                            continue;
-                        case MarkupTag.SHY:
-                            if (tag_NoParsing) break;
-                            if (writeIndex == m_TextProcessingArray.Length) ResizeInternalArray(ref m_TextProcessingArray);
-
-                            m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 5, unicode = 0xAD };
-                            writeIndex += 1;
-                            readIndex += 4;
-                            continue;
-                        case MarkupTag.A:
-                            if (m_TextBackingArray.Count > readIndex + 4 && m_TextBackingArray[readIndex + 3] == 'h' && m_TextBackingArray[readIndex + 4] == 'r')
-                                InsertOpeningTextStyle(GetStyle((int)MarkupTag.A), ref m_TextProcessingArray, ref writeIndex);
-                            break;
-                        case MarkupTag.STYLE:
-                            if (tag_NoParsing) break;
-
-                            int openWriteIndex = writeIndex;
-                            if (ReplaceOpeningStyleTag(ref m_TextBackingArray, readIndex, out int srcOffset, ref m_TextProcessingArray, ref writeIndex))
-                            {
-                                for (; openWriteIndex < writeIndex; openWriteIndex++)
-                                {
-                                    m_TextProcessingArray[openWriteIndex].stringIndex = readIndex;
-                                    m_TextProcessingArray[openWriteIndex].length = (srcOffset - readIndex) + 1;
-                                }
-
-                                readIndex = srcOffset;
-                                continue;
-                            }
-                            break;
-                        case MarkupTag.SLASH_A:
-                            InsertClosingTextStyle(GetStyle((int)MarkupTag.A), ref m_TextProcessingArray, ref writeIndex);
-                            break;
-                        case MarkupTag.SLASH_STYLE:
-                            if (tag_NoParsing) break;
-
-                            int closeWriteIndex = writeIndex;
-                            ReplaceClosingStyleTag(ref m_TextProcessingArray, ref writeIndex);
-
-                            for (; closeWriteIndex < writeIndex; closeWriteIndex++)
-                            {
-                                m_TextProcessingArray[closeWriteIndex].stringIndex = readIndex;
-                                m_TextProcessingArray[closeWriteIndex].length = 8;
-                            }
-
-                            readIndex += 7;
-                            continue;
-                    }
-                }
-
-                if (writeIndex == m_TextProcessingArray.Length) ResizeInternalArray(ref m_TextProcessingArray);
-
-                m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 1, unicode = c };
-
-                writeIndex += 1;
-            }
-
-            m_TextStyleStackDepth = 0;
-
-            if (textStyle.hashCode != (int)MarkupTag.NORMAL)
-                InsertClosingStyleTag(ref m_TextProcessingArray, ref writeIndex);
-
-            if (writeIndex == m_TextProcessingArray.Length) ResizeInternalArray(ref m_TextProcessingArray);
-
-            m_TextProcessingArray[writeIndex].unicode = 0;
-            m_InternalTextProcessingArraySize = writeIndex;
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="hashCode"></param>
         /// <returns></returns>
         private TMP_Style GetStyle(int hashCode)
@@ -897,9 +428,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Method to handle inline replacement of style tag by opening style definition.
-        /// </summary>
         /// <param name="sourceText"></param>
         /// <param name="srcIndex"></param>
         /// <param name="srcOffset"></param>
@@ -926,9 +454,6 @@ namespace TMPro
             return true;
         }
 
-        /// <summary>
-        /// Method to handle inline replacement of style tag by opening style definition.
-        /// </summary>
         /// <param name="sourceText"></param>
         /// <param name="srcIndex"></param>
         /// <param name="srcOffset"></param>
@@ -955,9 +480,6 @@ namespace TMPro
             return true;
         }
 
-        /// <summary>
-        /// Method to handle inline replacement of style tag by closing style definition.
-        /// </summary>
         /// <param name="sourceText"></param>
         /// <param name="srcIndex"></param>
         /// <param name="charBuffer"></param>
@@ -979,9 +501,6 @@ namespace TMPro
             m_TextStyleStackDepth -= 1;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="style"></param>
         /// <param name="srcIndex"></param>
         /// <param name="charBuffer"></param>
@@ -1000,9 +519,6 @@ namespace TMPro
             m_TextStyleStackDepth = 0;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="charBuffer"></param>
         /// <param name="writeIndex"></param>
         private void InsertClosingStyleTag(ref TextProcessingElement[] charBuffer, ref int writeIndex)
@@ -1017,9 +533,6 @@ namespace TMPro
             m_TextStyleStackDepth = 0;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="styleDefinition"></param>
         /// <param name="readIndex"></param>
         /// <returns></returns>
@@ -1042,9 +555,6 @@ namespace TMPro
             return hashCode;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="styleDefinition"></param>
         /// <param name="readIndex"></param>
         /// <returns></returns>
@@ -1067,9 +577,6 @@ namespace TMPro
             return hashCode;
         }
 
-        /// <summary>
-        /// Get Hashcode for a given tag.
-        /// </summary>
         /// <param name="text"></param>
         /// <param name="index"></param>
         /// <param name="closeIndex"></param>
@@ -1091,9 +598,6 @@ namespace TMPro
             return hashCode;
         }
 
-        /// <summary>
-        /// Get Hashcode for a given tag.
-        /// </summary>
         /// <param name="text"></param>
         /// <param name="index"></param>
         /// <param name="closeIndex"></param>
@@ -1115,9 +619,6 @@ namespace TMPro
             return hashCode;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         private void ResizeInternalArray <T>(ref T[] array)
         {
             int size = Mathf.NextPowerOfTwo(array.Length + 1);
@@ -1230,16 +731,12 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Save the State of various variables used in the mesh creation loop in conjunction with Word Wrapping
-        /// </summary>
         /// <param name="state"></param>
         /// <param name="index"></param>
         /// <param name="count"></param>
         internal void SaveWordWrappingState(ref WordWrapState state, int index, int count)
         {
             state.currentFontAsset = m_currentFontAsset;
-            state.currentSpriteAsset = m_currentSpriteAsset;
             state.currentMaterial = m_currentMaterial;
             state.currentMaterialIndex = m_currentMaterialIndex;
 
@@ -1314,9 +811,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Restore the State of various variables used in the mesh creation loop.
-        /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
         internal int RestoreWordWrappingState(ref WordWrapState state)
@@ -1324,7 +818,6 @@ namespace TMPro
             int index = state.previous_WordBreak;
 
             m_currentFontAsset = state.currentFontAsset;
-            m_currentSpriteAsset = state.currentSpriteAsset;
             m_currentMaterial = state.currentMaterial;
             m_currentMaterialIndex = state.currentMaterialIndex;
 
@@ -1401,9 +894,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Store vertex information for each character.
-        /// </summary>
         /// <param name="style_padding">Style_padding.</param>
         /// <param name="vertexColor">Vertex color.</param>
         protected virtual void SaveGlyphVertexInfo(float padding, float style_padding, Color32 vertexColor)
@@ -1519,90 +1009,6 @@ namespace TMPro
             #endregion end Normals & Tangents
         }
 
-
-        /// <summary>
-        /// Store vertex information for each sprite.
-        /// </summary>
-        /// <param name="padding"></param>
-        /// <param name="style_padding"></param>
-        /// <param name="vertexColor"></param>
-        protected virtual void SaveSpriteVertexInfo(Color32 vertexColor)
-        {
-            #region Setup Mesh Vertices
-            m_textInfo.characterInfo[m_characterCount].vertex_BL.position = m_textInfo.characterInfo[m_characterCount].bottomLeft;
-            m_textInfo.characterInfo[m_characterCount].vertex_TL.position = m_textInfo.characterInfo[m_characterCount].topLeft;
-            m_textInfo.characterInfo[m_characterCount].vertex_TR.position = m_textInfo.characterInfo[m_characterCount].topRight;
-            m_textInfo.characterInfo[m_characterCount].vertex_BR.position = m_textInfo.characterInfo[m_characterCount].bottomRight;
-            #endregion
-
-            if (m_tintAllSprites) m_tintSprite = true;
-            Color32 spriteColor = m_tintSprite ? m_spriteColor.Multiply(vertexColor) : m_spriteColor;
-            spriteColor.a = spriteColor.a < m_fontColor32.a ? spriteColor.a < vertexColor.a ? spriteColor.a : vertexColor.a : m_fontColor32.a;
-
-            Color32 c0 = spriteColor;
-            Color32 c1 = spriteColor;
-            Color32 c2 = spriteColor;
-            Color32 c3 = spriteColor;
-
-            if (m_enableVertexGradient)
-            {
-                if (m_fontColorGradientPreset != null)
-                {
-                    c0 = m_tintSprite ? c0.Multiply(m_fontColorGradientPreset.bottomLeft) : c0;
-                    c1 = m_tintSprite ? c1.Multiply(m_fontColorGradientPreset.topLeft) : c1;
-                    c2 = m_tintSprite ? c2.Multiply(m_fontColorGradientPreset.topRight) : c2;
-                    c3 = m_tintSprite ? c3.Multiply(m_fontColorGradientPreset.bottomRight) : c3;
-                }
-                else
-                {
-                    c0 = m_tintSprite ? c0.Multiply(m_fontColorGradient.bottomLeft) : c0;
-                    c1 = m_tintSprite ? c1.Multiply(m_fontColorGradient.topLeft) : c1;
-                    c2 = m_tintSprite ? c2.Multiply(m_fontColorGradient.topRight) : c2;
-                    c3 = m_tintSprite ? c3.Multiply(m_fontColorGradient.bottomRight) : c3;
-                }
-            }
-
-            if (m_colorGradientPreset != null)
-            {
-                c0 = m_tintSprite ? c0.Multiply(m_colorGradientPreset.bottomLeft) : c0;
-                c1 = m_tintSprite ? c1.Multiply(m_colorGradientPreset.topLeft) : c1;
-                c2 = m_tintSprite ? c2.Multiply(m_colorGradientPreset.topRight) : c2;
-                c3 = m_tintSprite ? c3.Multiply(m_colorGradientPreset.bottomRight) : c3;
-            }
-
-            m_tintSprite = false;
-
-            m_textInfo.characterInfo[m_characterCount].vertex_BL.color = c0;
-            m_textInfo.characterInfo[m_characterCount].vertex_TL.color = c1;
-            m_textInfo.characterInfo[m_characterCount].vertex_TR.color = c2;
-            m_textInfo.characterInfo[m_characterCount].vertex_BR.color = c3;
-
-
-            #region Setup UVs
-            GlyphRect glyphRect = m_cached_TextElement.m_Glyph.glyphRect;
-
-            Vector2 uv0 = new((float)glyphRect.x / m_currentSpriteAsset.spriteSheet.width, (float)glyphRect.y / m_currentSpriteAsset.spriteSheet.height);
-            Vector2 uv1 = new(uv0.x, (float)(glyphRect.y + glyphRect.height) / m_currentSpriteAsset.spriteSheet.height);
-            Vector2 uv2 = new((float)(glyphRect.x + glyphRect.width) / m_currentSpriteAsset.spriteSheet.width, uv1.y);
-            Vector2 uv3 = new(uv2.x, uv0.y);
-
-            m_textInfo.characterInfo[m_characterCount].vertex_BL.uv = uv0;
-            m_textInfo.characterInfo[m_characterCount].vertex_TL.uv = uv1;
-            m_textInfo.characterInfo[m_characterCount].vertex_TR.uv = uv2;
-            m_textInfo.characterInfo[m_characterCount].vertex_BR.uv = uv3;
-            #endregion Setup UVs
-
-
-            #region Setup Normals & Tangents
-
-            #endregion end Normals & Tangents
-
-        }
-
-
-        /// <summary>
-        /// Store vertex attributes into the appropriate TMP_MeshInfo.
-        /// </summary>
         /// <param name="i"></param>
         /// <param name="index_X4"></param>
         protected virtual void FillCharacterVertexBuffers(int i)
@@ -1655,9 +1061,6 @@ namespace TMPro
             meshInfo.vertexCount = index_X4 + 4;
         }
 
-        /// <summary>
-        /// Method to add the underline geometry.
-        /// </summary>
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <param name="startScale"></param>
@@ -1884,9 +1287,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Internal function used to load the default settings of text objects.
-        /// </summary>
         protected void LoadDefaultSettings()
         {
             if (m_fontSize == -99 || m_isWaitingOnResourceLoad)
@@ -1915,7 +1315,6 @@ namespace TMPro
                 m_fontSizeMax = m_fontSize * TMP_Settings.defaultTextAutoSizingMaxRatio;
                 m_isWaitingOnResourceLoad = false;
                 raycastTarget = TMP_Settings.enableRaycastTarget;
-                m_IsTextObjectScaleStatic = TMP_Settings.isTextObjectScaleStatic;
             }
             else
             {
@@ -1940,9 +1339,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method used to find and cache references to the Underline and Ellipsis characters.
-        /// </summary>
         /// <param name=""></param>
         protected void GetSpecialCharacters(TMP_FontAsset fontAsset)
         {
@@ -2019,14 +1415,6 @@ namespace TMPro
                 }
             }
 
-            if (m_spriteAsset != null)
-            {
-                TMP_SpriteCharacter spriteCharacter = TMP_FontAssetUtilities.GetSpriteCharacterFromSpriteAsset(unicode, m_spriteAsset, true);
-
-                if (spriteCharacter != null)
-                    return spriteCharacter;
-            }
-
             if (TMP_Settings.fallbackFontAssets != null && TMP_Settings.fallbackFontAssets.Count > 0)
                 character = TMP_FontAssetUtilities.GetCharacterFromFontAssets(unicode, fontAsset, TMP_Settings.fallbackFontAssets, true, fontStyle, fontWeight, out isUsingAlternativeTypeface);
 
@@ -2045,14 +1433,6 @@ namespace TMPro
                 fontAsset.AddCharacterToLookupCache(unicode, character, fontStyle, fontWeight, isUsingAlternativeTypeface);
 
                 return character;
-            }
-
-            if (TMP_Settings.defaultSpriteAsset != null)
-            {
-                TMP_SpriteCharacter spriteCharacter = TMP_FontAssetUtilities.GetSpriteCharacterFromSpriteAsset(unicode, TMP_Settings.defaultSpriteAsset, true);
-
-                if (spriteCharacter != null)
-                    return spriteCharacter;
             }
 
             if (fontStyle != FontStyles.Normal || fontWeight != FontWeight.Regular)
@@ -2091,15 +1471,9 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to clear the geometry of the Primary and Sub Text objects.
-        /// </summary>
         public virtual void ClearMesh() { }
 
 
-        /// <summary>
-        /// Function to clear the geometry of the Primary and Sub Text objects.
-        /// </summary>
         public virtual void ClearMesh(bool uploadGeometry) { }
 
         protected void DoMissingGlyphCallback(int unicode, int stringIndex, TMP_FontAsset fontAsset)
@@ -2108,32 +1482,20 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function used as a replacement for LateUpdate()
-        /// </summary>
         internal virtual void InternalUpdate() { }
 
 
-        /// <summary>
-        /// Function to pack scale information in the UV2 Channel.
-        /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <param name="scale"></param>
         /// <returns></returns>
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Method to convert Hex to Int
-        /// </summary>
         /// <param name="hex"></param>
         /// <returns></returns>
         protected uint HexToInt(char hex)
@@ -2239,9 +1601,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method to convert Hex color values to Color32
-        /// </summary>
         /// <param name="hexChars"></param>
         /// <param name="tagCount"></param>
         /// <returns></returns>
@@ -2320,9 +1679,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method to convert Hex Color values to Color32
-        /// </summary>
         /// <param name="hexChars"></param>
         /// <param name="startIndex"></param>
         /// <param name="length"></param>
@@ -2351,9 +1707,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method which returns the number of parameters used in a tag attribute and populates an array with such values.
-        /// </summary>
         /// <param name="chars">Char[] containing the tag attribute and data</param>
         /// <param name="startIndex">The index of the first char of the data</param>
         /// <param name="length">The length of the data</param>
@@ -2378,9 +1731,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Extracts a float value from char[] assuming we know the position of the start, end and decimal point.
-        /// </summary>
         /// <param name="chars"></param>
         /// <param name="startIndex"></param>
         /// <param name="length"></param>
@@ -2393,9 +1743,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Extracts a float value from char[] given a start index and length.
-        /// </summary>
         /// <param name="chars"></param> The Char[] containing the numerical sequence.
         /// <param name="startIndex"></param> The index of the start of the numerical sequence.
         /// <param name="length"></param> The length of the numerical sequence.
@@ -2480,9 +1827,6 @@ namespace TMPro
                 m_xmlAttribute[i] = new();
         }
 
-        /// <summary>
-        /// Function to identify and validate the rich tag. Returns the position of the > if the tag was valid.
-        /// </summary>
         /// <param name="chars"></param>
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
@@ -3499,112 +2843,6 @@ namespace TMPro
                         return true;
                     case MarkupTag.SLASH_LINE_INDENT:
                         tag_LineIndent = 0;
-                        return true;
-                    case MarkupTag.SPRITE:
-                        int spriteAssetHashCode = m_xmlAttribute[0].valueHashCode;
-                        m_spriteIndex = -1;
-
-                        if (m_xmlAttribute[0].valueType == TagValueType.None || m_xmlAttribute[0].valueType == TagValueType.NumericalValue)
-                        {
-                            if (m_spriteAsset != null)
-                            {
-                                m_currentSpriteAsset = m_spriteAsset;
-                            }
-                            else if (m_defaultSpriteAsset != null)
-                            {
-                                m_currentSpriteAsset = m_defaultSpriteAsset;
-                            }
-                            else if (m_defaultSpriteAsset == null)
-                            {
-                                if (TMP_Settings.defaultSpriteAsset != null)
-                                    m_defaultSpriteAsset = TMP_Settings.defaultSpriteAsset;
-                                else
-                                    m_defaultSpriteAsset = Resources.Load<TMP_SpriteAsset>("Sprite Assets/Default Sprite Asset");
-
-                                m_currentSpriteAsset = m_defaultSpriteAsset;
-                            }
-
-                            if (m_currentSpriteAsset == null)
-                                return false;
-                        }
-                        else
-                        {
-                            if (MaterialReferenceManager.TryGetSpriteAsset(spriteAssetHashCode, out var tempSpriteAsset))
-                            {
-                                m_currentSpriteAsset = tempSpriteAsset;
-                            }
-                            else
-                            {
-                                if (tempSpriteAsset == null)
-                                {
-                                    tempSpriteAsset = OnSpriteAssetRequest?.Invoke(spriteAssetHashCode, new(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength));
-
-                                    if (tempSpriteAsset == null)
-                                        tempSpriteAsset = Resources.Load<TMP_SpriteAsset>(TMP_Settings.defaultSpriteAssetPath + new string(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength));
-                                }
-
-                                if (tempSpriteAsset == null)
-                                    return false;
-
-                                MaterialReferenceManager.AddSpriteAsset(spriteAssetHashCode, tempSpriteAsset);
-                                m_currentSpriteAsset = tempSpriteAsset;
-                            }
-                        }
-
-                        if (m_xmlAttribute[0].valueType == TagValueType.NumericalValue)
-                        {
-                            int index = (int)ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                            if (index == Int16.MinValue) return false;
-
-                            if (index > m_currentSpriteAsset.spriteCharacterTable.Count - 1) return false;
-
-                            m_spriteIndex = index;
-                        }
-
-                        m_spriteColor = s_colorWhite;
-                        m_tintSprite = false;
-
-                        for (int i = 0; i < m_xmlAttribute.Length && m_xmlAttribute[i].nameHashCode != 0; i++)
-                        {
-                            int nameHashCode = m_xmlAttribute[i].nameHashCode;
-                            int index = 0;
-
-                            switch ((MarkupTag)nameHashCode)
-                            {
-                                case MarkupTag.NAME:
-                                    m_currentSpriteAsset = TMP_SpriteAsset.SearchForSpriteByHashCode(m_currentSpriteAsset, m_xmlAttribute[i].valueHashCode, true, out index);
-                                    if (index == -1) return false;
-
-                                    m_spriteIndex = index;
-                                    break;
-                                case MarkupTag.INDEX:
-                                    index = (int)ConvertToFloat(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength);
-
-                                    if (index == Int16.MinValue) return false;
-
-                                    if (index > m_currentSpriteAsset.spriteCharacterTable.Count - 1) return false;
-
-                                    m_spriteIndex = index;
-                                    break;
-                                case MarkupTag.TINT:
-                                    m_tintSprite = ConvertToFloat(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength) != 0;
-                                    break;
-                                case MarkupTag.COLOR:
-                                    m_spriteColor = HexCharsToColor(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength);
-                                    break;
-
-                                default:
-                                    if (nameHashCode != (int)MarkupTag.SPRITE)
-                                        return false;
-                                    break;
-                            }
-                        }
-
-                        if (m_spriteIndex == -1) return false;
-
-                        m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentSpriteAsset.material, m_currentSpriteAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
-                        
                         return true;
                     case MarkupTag.LOWERCASE:
                         m_FontStyleInternal |= FontStyles.LowerCase;

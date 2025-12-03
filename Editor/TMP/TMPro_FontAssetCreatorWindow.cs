@@ -301,9 +301,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Method which returns the character corresponding to a decimal value.
-        /// </summary>
         /// <param name="sequence"></param>
         /// <returns></returns>
         static uint[] ParseNumberSequence(string sequence)
@@ -337,9 +334,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Method which returns the character (decimal value) from a hex sequence.
-        /// </summary>
         /// <param name="sequence"></param>
         /// <returns></returns>
         static uint[] ParseHexNumberSequence(string sequence)
@@ -1082,9 +1076,6 @@ namespace TMPro.EditorUtilities
                 ClearGeneratedData();
         }
 
-        /// <summary>
-        /// Clear the previously generated data.
-        /// </summary>
         void ClearGeneratedData()
         {
             m_IsFontAtlasInvalid = false;
@@ -1109,9 +1100,6 @@ namespace TMPro.EditorUtilities
             m_WarningMessage = string.Empty;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <returns></returns>
         string[] GetFontFaces()
         {
@@ -1121,9 +1109,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Function to update the feedback window showing the results of the latest generation.
-        /// </summary>
         void UpdateRenderFeedbackWindow()
         {
             m_PointSize = (int)m_FaceInfo.pointSize;
@@ -1260,9 +1245,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Open Save Dialog to provide the option save the font asset using the name of the source font file. This also appends SDF to the name if using any of the SDF Font Asset creation modes.
-        /// </summary>
         /// <param name="sourceObject"></param>
         void SaveNewFontAsset(Object sourceObject)
         {
@@ -1291,9 +1273,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Open Save Dialog to provide the option to save the font asset under the same name.
-        /// </summary>
         /// <param name="sourceObject"></param>
         void SaveNewFontAssetWithSameName(Object sourceObject)
         {
@@ -1610,9 +1589,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Internal method to save the Font Asset Creation Settings
-        /// </summary>
         /// <returns></returns>
         FontAssetCreationSettings SaveFontCreationSettings()
         {
@@ -1638,9 +1614,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Internal method to load the Font Asset Creation Settings
-        /// </summary>
         /// <param name="settings"></param>
         void LoadFontCreationSettings(FontAssetCreationSettings settings)
         {
@@ -1664,9 +1637,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Save the latest font asset creation settings to EditorPrefs.
-        /// </summary>
         /// <param name="settings"></param>
         void SaveCreationSettingsToEditorPrefs(FontAssetCreationSettings settings)
         {
@@ -1772,9 +1742,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <returns></returns>
         TMP_FontFeatureTable GetAllFontFeatures()
         {

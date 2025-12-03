@@ -4,9 +4,6 @@ namespace UnityEngine.UI
 {
     internal static class MultipleDisplayUtilities
     {
-        /// <summary>
-        /// Converts the current drag position into a relative position for the display.
-        /// </summary>
         /// <param name="eventData"></param>
         /// <param name="position"></param>
         /// <returns>Returns true except when the drag operation is not on the same display as it originated</returns>
@@ -57,11 +54,6 @@ namespace UnityEngine.UI
             return eventPosition;
         }
 
-        /// <summary>
-        /// A version of Display.RelativeMouseAt that scales the position when the main display has a different rendering resolution to the system resolution.
-        /// By default, the mouse position is relative to the main render area, we need to adjust this so it is relative to the system resolution
-        /// in order to correctly determine the position on other displays.
-        /// </summary>
         /// <returns></returns>
         public static Vector3 RelativeMouseAtScaled(Vector2 position, int displayIndex)
         {

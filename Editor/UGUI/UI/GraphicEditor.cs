@@ -5,10 +5,6 @@ using UnityEngine.UI;
 
 namespace UnityEditor.UI
 {
-    /// <summary>
-    /// Editor class used to edit UI Graphics.
-    /// Extend this class to write your own graphic editor.
-    /// </summary>
 
     [CustomEditor(typeof(MaskableGraphic), false)]
     [CanEditMultipleObjects]
@@ -101,9 +97,6 @@ namespace UnityEditor.UI
             Handles.DrawLine(p3, p0);
         }
 
-        /// <summary>
-        /// Set if the 'Set Native Size' button should be visible for this editor.
-        /// </summary>
         /// <param name="show">Are we showing or hiding the AnimBool for the size.</param>
         /// <param name="instant">Should the size AnimBool change instantly.</param>
         protected void SetShowNativeSize(bool show, bool instant)
@@ -114,9 +107,6 @@ namespace UnityEditor.UI
                 m_ShowNativeSize.target = show;
         }
 
-        /// <summary>
-        /// GUI for showing a button that sets the size of the RectTransform to the native size for this Graphic.
-        /// </summary>
         protected void NativeSizeButtonGUI()
         {
             if (EditorGUILayout.BeginFadeGroup(m_ShowNativeSize.faded))
@@ -144,18 +134,12 @@ namespace UnityEditor.UI
             EditorGUILayout.PropertyField(m_Maskable);
         }
 
-        /// <summary>
-        /// GUI related to the appearance of the Graphic. Color and Material properties appear here.
-        /// </summary>
         protected void AppearanceControlsGUI()
         {
             EditorGUILayout.PropertyField(m_Color);
             EditorGUILayout.PropertyField(m_Material);
         }
 
-        /// <summary>
-        /// GUI related to the Raycasting settings for the graphic.
-        /// </summary>
         protected void RaycastControlsGUI()
         {
             EditorGUI.BeginChangeCheck();

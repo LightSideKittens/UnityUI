@@ -5,9 +5,6 @@ using UnityEngine.Serialization;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// A standard toggle that has an on / off state.
-    /// </summary>
     /// <remarks>
     /// The toggle component is a Selectable that controls a child graphic which displays the on / off state.
     /// When a toggle event occurs a callback is sent to any registered listeners of UI.Toggle._onValueChanged.
@@ -16,45 +13,24 @@ namespace UnityEngine.UI
     [RequireComponent(typeof(RectTransform))]
     public class Toggle : Selectable, IPointerClickHandler, ISubmitHandler, ICanvasElement
     {
-        /// <summary>
-        /// Display settings for when a toggle is activated or deactivated.
-        /// </summary>
         public enum ToggleTransition
         {
-            /// <summary>
-            /// Show / hide the toggle instantly
-            /// </summary>
             None,
 
-            /// <summary>
-            /// Fade the toggle in / out smoothly.
-            /// </summary>
             Fade
         }
 
         [Serializable]
-        /// <summary>
-        /// UnityEvent callback for when a toggle is toggled.
-        /// </summary>
         public class ToggleEvent : UnityEvent<bool>
         {}
 
-        /// <summary>
-        /// Transition mode for the toggle.
-        /// </summary>
         public ToggleTransition toggleTransition = ToggleTransition.Fade;
 
-        /// <summary>
-        /// Graphic the toggle should be working with.
-        /// </summary>
         public Graphic graphic;
 
         [SerializeField]
         private ToggleGroup m_Group;
 
-        /// <summary>
-        /// Group the toggle belongs to.
-        /// </summary>
         public ToggleGroup group
         {
             get { return m_Group; }
@@ -65,9 +41,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Allow for delegate-based subscriptions for faster events than 'eventReceiver', and allowing for multiple receivers.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -198,9 +171,6 @@ namespace UnityEngine.UI
                 newGroup.NotifyToggleOn(this);
         }
 
-        /// <summary>
-        /// Whether the toggle is currently active.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -248,9 +218,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Set isOn without invoking onValueChanged callback.
-        /// </summary>
         /// <param name="value">New Value for isOn.</param>
         public void SetIsOnWithoutNotify(bool value)
         {
@@ -285,9 +252,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Play the appropriate effect.
-        /// </summary>
         private void PlayEffect(bool instant)
         {
             if (graphic == null)
@@ -301,9 +265,6 @@ namespace UnityEngine.UI
             graphic.CrossFadeAlpha(m_IsOn ? 1f : 0f, instant ? 0f : 0.1f, true);
         }
 
-        /// <summary>
-        /// Assume the correct visual state.
-        /// </summary>
         protected override void Start()
         {
             PlayEffect(true);
@@ -317,9 +278,6 @@ namespace UnityEngine.UI
             isOn = !isOn;
         }
 
-        /// <summary>
-        /// React to clicks.
-        /// </summary>
         public virtual void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button != PointerEventData.InputButton.Left)

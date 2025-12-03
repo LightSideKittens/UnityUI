@@ -14,34 +14,16 @@ namespace TMPro
         public static int ID_FaceDilate;
         public static int ID_Shininess;
 
-        /// <summary>
-        /// Property ID for the _OutlineOffset1 shader property used by URP and HDRP shaders
-        /// </summary>
         public static int ID_OutlineOffset1;
 
-        /// <summary>
-        /// Property ID for the _OutlineOffset2 shader property used by URP and HDRP shaders
-        /// </summary>
         public static int ID_OutlineOffset2;
 
-        /// <summary>
-        /// Property ID for the _OutlineOffset3 shader property used by URP and HDRP shaders
-        /// </summary>
         public static int ID_OutlineOffset3;
 
-        /// <summary>
-        /// Property ID for the ID_AdditiveOutlineMode shader property used by URP and HDRP shaders
-        /// </summary>
         public static int ID_OutlineMode;
 
-        /// <summary>
-        /// Property ID for the _IsoPerimeter shader property used by URP and HDRP shaders
-        /// </summary>
         public static int ID_IsoPerimeter;
 
-        /// <summary>
-        /// Property ID for the _Softness shader property used by URP and HDRP shaders
-        /// </summary>
         public static int ID_Softness;
 
         public static int ID_UnderlayColor;
@@ -50,14 +32,8 @@ namespace TMPro
         public static int ID_UnderlayDilate;
         public static int ID_UnderlaySoftness;
 
-        /// <summary>
-        /// Property ID for the _UnderlayOffset shader property used by URP and HDRP shaders
-        /// </summary>
         public static int ID_UnderlayOffset;
 
-        /// <summary>
-        /// Property ID for the _UnderlayIsoPerimeter shader property used by URP and HDRP shaders
-        /// </summary>
         public static int ID_UnderlayIsoPerimeter;
 
         public static int ID_WeightNormal;
@@ -130,9 +106,6 @@ namespace TMPro
         public static bool isInitialized;
 
 
-        /// <summary>
-        /// Returns a reference to the mobile distance field shader.
-        /// </summary>
         internal static Shader ShaderRef_MobileSDF
         {
             get
@@ -146,9 +119,6 @@ namespace TMPro
 
         private static Shader k_ShaderRef_MobileSDF;
 
-        /// <summary>
-        /// Returns a reference to the mobile bitmap shader.
-        /// </summary>
         internal static Shader ShaderRef_MobileBitmap
         {
             get
@@ -163,17 +133,11 @@ namespace TMPro
         private static Shader k_ShaderRef_MobileBitmap;
 
 
-        /// <summary>
-        ///
-        /// </summary>
         static ShaderUtilities()
         {
             GetShaderPropertyIDs();
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         public static void GetShaderPropertyIDs()
         {
             if (!isInitialized)

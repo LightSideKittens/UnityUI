@@ -8,10 +8,6 @@ using UnityEditor.AnimatedValues;
 namespace UnityEditor.UI
 {
     [CustomEditor(typeof(Selectable), true)]
-    /// <summary>
-    /// Custom Editor for the Selectable Component.
-    /// Extend this class to write a custom editor for a component derived from Selectable.
-    /// </summary>
     public class SelectableEditor : Editor
     {
         SerializedProperty m_Script;

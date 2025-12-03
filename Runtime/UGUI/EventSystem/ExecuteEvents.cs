@@ -287,9 +287,6 @@ namespace UnityEngine.EventSystems
             return handlerCount > 0;
         }
 
-        /// <summary>
-        /// Execute the specified event on the first game object underneath the current touch.
-        /// </summary>
         private static readonly List<Transform> s_InternalTransformList = new List<Transform>(30);
 
         public static GameObject ExecuteHierarchy<T>(GameObject root, BaseEventData eventData, EventFunction<T> callbackFunction) where T : IEventSystemHandler
@@ -306,9 +303,6 @@ namespace UnityEngine.EventSystems
             return null;
         }
 
-        /// <summary>
-        /// Get the specified object's event event.
-        /// </summary>
         private static void GetEventList<T>(GameObject go, IList<IEventSystemHandler> results) where T : IEventSystemHandler
         {
             // Debug.LogWarning("GetEventList<" + typeof(T).Name + ">");
@@ -341,9 +335,6 @@ namespace UnityEngine.EventSystems
             ListPool<IUIControlElement>.Release(components1);
         }
 
-        /// <summary>
-        /// Whether the specified game object will be able to handle the specified event.
-        /// </summary>
         public static bool CanHandleEvent<T>(GameObject go) where T : IEventSystemHandler
         {
             var internalHandlers = ListPool<IEventSystemHandler>.Get();
@@ -353,9 +344,6 @@ namespace UnityEngine.EventSystems
             return handlerCount != 0;
         }
 
-        /// <summary>
-        /// Bubble the specified event on the game object, figuring out which object will actually receive the event.
-        /// </summary>
         public static GameObject GetEventHandler<T>(GameObject root) where T : IEventSystemHandler
         {
             if (root == null)

@@ -9,9 +9,6 @@ namespace TMPro
     [Serializable][ExcludeFromPresetAttribute]
     public class TMP_StyleSheet : ScriptableObject
     {
-        /// <summary>
-        ///
-        /// </summary>
         internal List<TMP_Style> styles
         {
             get { return m_StyleList; }
@@ -26,9 +23,6 @@ namespace TMPro
             LoadStyleDictionaryInternal();
         }
 
-        /// <summary>
-        /// Get the Style for the given hash code value.
-        /// </summary>
         /// <param name="hashCode">Hash code of the style.</param>
         /// <returns>The style matching the hash code.</returns>
         public TMP_Style GetStyle(int hashCode)
@@ -42,9 +36,6 @@ namespace TMPro
             return null;
         }
 
-        /// <summary>
-        /// Get the Style for the given name.
-        /// </summary>
         /// <param name="name">The name of the style.</param>
         /// <returns>The style if found.</returns>
         public TMP_Style GetStyle(string name)
@@ -60,17 +51,11 @@ namespace TMPro
             return null;
         }
 
-        /// <summary>
-        /// Function to refresh the Style Dictionary.
-        /// </summary>
         public void RefreshStyles()
         {
             LoadStyleDictionaryInternal();
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         private void LoadStyleDictionaryInternal()
         {
             if (m_StyleLookupDictionary == null)

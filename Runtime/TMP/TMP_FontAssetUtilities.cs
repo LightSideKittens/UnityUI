@@ -9,33 +9,18 @@ namespace TMPro
     {
         private static readonly TMP_FontAssetUtilities s_Instance = new();
 
-        /// <summary>
-        /// Default constructor
-        /// </summary>
         static TMP_FontAssetUtilities() { }
 
 
-        /// <summary>
-        /// Get a singleton instance of the Font Asset Utilities class.
-        /// </summary>
         public static TMP_FontAssetUtilities instance
         {
             get { return s_Instance; }
         }
 
 
-        /// <summary>
-        /// HashSet containing instance ID of font assets already searched.
-        /// </summary>
         private static HashSet<int> k_SearchedAssets;
 
 
-        /// <summary>
-        /// Returns the text element (character) for the given unicode value taking into consideration the requested font style and weight.
-        /// Function searches the source font asset, its list of font assets assigned as alternative typefaces and potentially its fallbacks.
-        /// The font asset out parameter contains a reference to the font asset containing the character.
-        /// The typeface type indicates whether the returned font asset is the source font asset, an alternative typeface or fallback font asset.
-        /// </summary>
         /// <param name="unicode">The unicode value of the requested character</param>
         /// <param name="sourceFontAsset">The font asset to be searched</param>
         /// <param name="includeFallbacks">Include the fallback font assets in the search</param>
@@ -58,10 +43,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Internal function returning the text element character for the given unicode value taking into consideration the font style and weight.
-        /// Function searches the source font asset, list of font assets assigned as alternative typefaces and list of fallback font assets.
-        /// </summary>
         private static TMP_Character GetCharacterFromFontAsset_Internal(uint unicode, TMP_FontAsset sourceFontAsset, bool includeFallbacks, FontStyles fontStyle, FontWeight fontWeight, out bool isAlternativeTypeface)
         {
             isAlternativeTypeface = false;
@@ -203,12 +184,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Returns the text element (character) for the given unicode value taking into consideration the requested font style and weight.
-        /// Function searches the provided list of font assets, the list of font assets assigned as alternative typefaces to them as well as their fallbacks.
-        /// The font asset out parameter contains a reference to the font asset containing the character.
-        /// The typeface type indicates whether the returned font asset is the source font asset, an alternative typeface or fallback font asset.
-        /// </summary>
         /// <param name="unicode">The unicode value of the requested character</param>
         /// <param name="sourceFontAsset">The font asset originating the search query</param>
         /// <param name="fontAssets">The list of font assets to search</param>
@@ -272,126 +247,16 @@ namespace TMPro
 
                 if (textAsset == null) continue;
 
-                if (textAsset.GetType() == typeof(TMP_FontAsset))
-                {
-                    TMP_FontAsset fontAsset = textAsset as TMP_FontAsset;
-                    TMP_Character character = GetCharacterFromFontAsset_Internal(unicode, fontAsset, includeFallbacks, fontStyle, fontWeight, out isAlternativeTypeface);
+                TMP_FontAsset fontAsset = textAsset as TMP_FontAsset;
+                TMP_Character character = GetCharacterFromFontAsset_Internal(unicode, fontAsset, includeFallbacks, fontStyle, fontWeight, out isAlternativeTypeface);
 
-                    if (character != null)
-                        return character;
-                }
-                else
-                {
-                    TMP_SpriteAsset spriteAsset = textAsset as TMP_SpriteAsset;
-                    TMP_SpriteCharacter spriteCharacter = GetSpriteCharacterFromSpriteAsset_Internal(unicode, spriteAsset, true);
-
-                    if (spriteCharacter != null)
-                        return spriteCharacter;
-                }
+                if (character != null)
+                    return character;
             }
 
             return null;
         }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="unicode"></param>
-        /// <param name="spriteAsset"></param>
-        /// <param name="includeFallbacks"></param>
-        /// <returns></returns>
-        public static TMP_SpriteCharacter GetSpriteCharacterFromSpriteAsset(uint unicode, TMP_SpriteAsset spriteAsset, bool includeFallbacks)
-        {
-            if (spriteAsset == null)
-                return null;
-
-            if (spriteAsset.spriteCharacterLookupTable.TryGetValue(unicode, out var spriteCharacter))
-                return spriteCharacter;
-
-            if (includeFallbacks)
-            {
-                if (k_SearchedAssets == null)
-                    k_SearchedAssets = new();
-                else
-                    k_SearchedAssets.Clear();
-
-                k_SearchedAssets.Add(spriteAsset.instanceID);
-
-                List<TMP_SpriteAsset> fallbackSpriteAsset = spriteAsset.fallbackSpriteAssets;
-
-                if (fallbackSpriteAsset != null && fallbackSpriteAsset.Count > 0)
-                {
-                    int fallbackCount = fallbackSpriteAsset.Count;
-
-                    for (int i = 0; i < fallbackCount; i++)
-                    {
-                        TMP_SpriteAsset temp = fallbackSpriteAsset[i];
-
-                        if (temp == null)
-                            continue;
-
-                        int id = temp.instanceID;
-
-                        if (!k_SearchedAssets.Add(id))
-                            continue;
-
-                        spriteCharacter = GetSpriteCharacterFromSpriteAsset_Internal(unicode, temp, true);
-
-                        if (spriteCharacter != null)
-                            return spriteCharacter;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="unicode"></param>
-        /// <param name="spriteAsset"></param>
-        /// <param name="includeFallbacks"></param>
-        /// <returns></returns>
-        private static TMP_SpriteCharacter GetSpriteCharacterFromSpriteAsset_Internal(uint unicode, TMP_SpriteAsset spriteAsset, bool includeFallbacks)
-        {
-            if (spriteAsset.spriteCharacterLookupTable.TryGetValue(unicode, out var spriteCharacter))
-                return spriteCharacter;
-
-            if (includeFallbacks)
-            {
-                List<TMP_SpriteAsset> fallbackSpriteAsset = spriteAsset.fallbackSpriteAssets;
-
-                if (fallbackSpriteAsset != null && fallbackSpriteAsset.Count > 0)
-                {
-                    int fallbackCount = fallbackSpriteAsset.Count;
-
-                    for (int i = 0; i < fallbackCount; i++)
-                    {
-                        TMP_SpriteAsset temp = fallbackSpriteAsset[i];
-
-                        if (temp == null)
-                            continue;
-
-                        int id = temp.instanceID;
-
-                        if (!k_SearchedAssets.Add(id))
-                            continue;
-
-                        spriteCharacter = GetSpriteCharacterFromSpriteAsset_Internal(unicode, temp, true);
-
-                        if (spriteCharacter != null)
-                            return spriteCharacter;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Extracts a Unicode code point from a string at the specified index, handling surrogate pairs if present.
-        /// </summary>
+        
         /// <param name="text">The input string containing the characters to process.</param>
         /// <param name="index">The current index in the string. This will be incremented if a surrogate pair is found.</param>
         /// <returns>The Unicode code point at the specified index.</returns>
@@ -410,9 +275,6 @@ namespace TMPro
             return c;
         }
 
-        /// <summary>
-        /// Extracts a Unicode code point from an array of uint values at the specified index, handling surrogate pairs if present.
-        /// </summary>
         /// <param name="codesPoints">The array of uint values representing characters to process.</param>
         /// <param name="index">The current index in the array. This will be incremented if a surrogate pair is found.</param>
         /// <returns>The Unicode code point at the specified index.</returns>

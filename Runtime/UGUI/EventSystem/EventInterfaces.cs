@@ -1,86 +1,49 @@
 namespace UnityEngine.EventSystems
 {
-    /// <summary>
-    /// Base class that all EventSystem events inherit from.
-    /// </summary>
     public interface IEventSystemHandler
     {
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnPointerMove callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IPointerMoveHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Use this callback to detect pointer move events
-        /// </summary>
         void OnPointerMove(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnPointerEnter callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IPointerEnterHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Use this callback to detect pointer enter events
-        /// </summary>
         void OnPointerEnter(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnPointerExit callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IPointerExitHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Use this callback to detect pointer exit events
-        /// </summary>
         void OnPointerExit(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnPointerDown callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IPointerDownHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Use this callback to detect pointer down events.
-        /// </summary>
         void OnPointerDown(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnPointerUp callbacks.
-    /// Note: In order to receive OnPointerUp callbacks, you must also implement the EventSystems.IPointerDownHandler|IPointerDownHandler interface
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IPointerUpHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Use this callback to detect pointer up events.
-        /// </summary>
         void OnPointerUp(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnPointerClick callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
@@ -107,44 +70,25 @@ namespace UnityEngine.EventSystems
     /// </example>
     public interface IPointerClickHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Use this callback to detect clicks.
-        /// </summary>
         void OnPointerClick(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnBeginDrag callbacks.
-    /// Note: You need to implement IDragHandler in addition to IBeginDragHandler.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IBeginDragHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Called by a BaseInputModule before a drag is started.
-        /// </summary>
         void OnBeginDrag(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnInitializePotentialDrag callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IInitializePotentialDragHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Called by a BaseInputModule when a drag has been found but before it is valid to begin the drag.
-        /// </summary>
         void OnInitializePotentialDrag(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnDrag callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
@@ -237,30 +181,17 @@ namespace UnityEngine.EventSystems
     /// </example>
     public interface IDragHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// When dragging is occurring this will be called every time the cursor is moved.
-        /// </summary>
         void OnDrag(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnEndDrag callbacks.
-    /// Note: You need to implement IDragHandler in addition to IEndDragHandler.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IEndDragHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Called by a BaseInputModule when a drag is ended.
-        /// </summary>
         void OnEndDrag(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnDrop callbacks.
-    /// </summary>
     /// <example>
     /// <code>
     /// <![CDATA[
@@ -285,37 +216,22 @@ namespace UnityEngine.EventSystems
     /// </remarks>
     public interface IDropHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Called by a BaseInputModule on a target that can accept a drop.
-        /// </summary>
         void OnDrop(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnScroll callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IScrollHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Use this callback to detect scroll events.
-        /// </summary>
         void OnScroll(PointerEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnUpdateSelected callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IUpdateSelectedHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Called by the EventSystem when the object associated with this EventTrigger is updated.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -335,9 +251,6 @@ namespace UnityEngine.EventSystems
         void OnUpdateSelected(BaseEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnSelect callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
@@ -346,37 +259,22 @@ namespace UnityEngine.EventSystems
         void OnSelect(BaseEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnDeselect callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IDeselectHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Called by the EventSystem when a new object is being selected.
-        /// </summary>
         void OnDeselect(BaseEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnMove callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
     public interface IMoveHandler : IEventSystemHandler
     {
-        /// <summary>
-        /// Called by a BaseInputModule when a move event occurs.
-        /// </summary>
         void OnMove(AxisEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnSubmit callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>
@@ -385,9 +283,6 @@ namespace UnityEngine.EventSystems
         void OnSubmit(BaseEventData eventData);
     }
 
-    /// <summary>
-    /// Interface to implement if you wish to receive OnCancel callbacks.
-    /// </summary>
     /// <remarks>
     /// Criteria for this event is implementation dependent. For example see StandAloneInputModule.
     /// </remarks>

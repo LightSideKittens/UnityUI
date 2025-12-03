@@ -18,9 +18,6 @@ namespace TMPro.EditorUtilities
             s_OutlineUvSpeedNames = { "_OutlineUVSpeedX", "_OutlineUVSpeedY" },
             s_OutlineUvSpeedName = { "_OutlineUVSpeed" };
 
-        /// <summary>
-        ///
-        /// </summary>
         static TMP_SDF_HDRPLitShaderGUI()
         {
             s_OutlineFeature = new ShaderFeature()
@@ -64,9 +61,6 @@ namespace TMPro.EditorUtilities
             };
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         public TMP_SDF_HDRPLitShaderGUI()
         {
             uiBlocks.RemoveAll(b => b is ShaderGraphUIBlock);

@@ -10,9 +10,6 @@ namespace TMPro.EditorUtilities
     public static class EditorShaderUtilities 
     {
 
-        /// <summary>
-        /// Copy Shader properties from source to destination material.
-        /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
         public static void CopyMaterialProperties(Material source, Material destination)

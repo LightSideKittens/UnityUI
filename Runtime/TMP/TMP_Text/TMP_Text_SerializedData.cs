@@ -70,9 +70,6 @@ namespace TMPro
     "bidi controls \u202Bعربي مع \u202AEN\u202C داخل\u202C done.";
 
         
-        /// <summary>
-        /// A string containing the text to be displayed.
-        /// </summary>
         public virtual string text
         {
             get
@@ -101,14 +98,8 @@ namespace TMPro
         [TextArea(5, 10)]
         protected string m_text;
         
-        /// <summary>
-        ///
-        /// </summary>
         private bool m_IsTextBackingStringDirty;
 
-        /// <summary>
-        /// The ITextPreprocessor component referenced by the text object (if any)
-        /// </summary>
         public ITextPreprocessor textPreprocessor
         {
             get => m_TextPreprocessor;
@@ -119,9 +110,6 @@ namespace TMPro
 
         public string PreprocessedText { get; private set; } 
 
-        /// <summary>
-        /// The Font Asset to be assigned to this text object.
-        /// </summary>
         public TMP_FontAsset font
         {
             get => m_fontAsset;
@@ -133,9 +121,6 @@ namespace TMPro
         protected bool m_isSDFShader;
 
 
-        /// <summary>
-        /// The material to be assigned to this text object.
-        /// </summary>
         public virtual Material fontSharedMaterial
         {
             get => m_sharedMaterial;
@@ -151,9 +136,6 @@ namespace TMPro
         protected int m_currentMaterialIndex;
 
 
-        /// <summary>
-        /// An array containing the materials used by the text object.
-        /// </summary>
         public virtual Material[] fontSharedMaterials
         {
             get => GetSharedMaterials();
@@ -163,9 +145,6 @@ namespace TMPro
         protected Material[] m_fontSharedMaterials;
 
 
-        /// <summary>
-        /// The material to be assigned to this text object. An instance of the material will be assigned to the object's renderer.
-        /// </summary>
         public Material fontMaterial
         {
             get => GetMaterial(m_sharedMaterial);
@@ -187,9 +166,6 @@ namespace TMPro
         protected Material m_fontMaterial;
 
 
-        /// <summary>
-        /// The materials to be assigned to this text object. An instance of the materials will be assigned.
-        /// </summary>
         public virtual Material[] fontMaterials
         {
             get => GetMaterials(m_fontSharedMaterials);
@@ -202,9 +178,6 @@ namespace TMPro
         protected bool m_isMaterialDirty;
 
 
-        /// <summary>
-        /// This is the default vertex color assigned to each vertices. Color tags will override vertex colors unless the overrideColorTags is set.
-        /// </summary>
         public override Color color
         {
             get => m_fontColor;
@@ -221,9 +194,6 @@ namespace TMPro
         internal HighlightState m_HighlightState = new(s_colorWhite, TMP_Offset.zero);
         internal bool m_ConvertToLinearSpace;
 
-        /// <summary>
-        /// Sets the vertex color alpha value.
-        /// </summary>
         public float alpha
         {
             get => m_fontColor.a;
@@ -231,9 +201,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Determines if Vertex Color Gradient should be used
-        /// </summary>
         /// <value><c>true</c> if enable vertex gradient; otherwise, <c>false</c>.</value>
         public bool enableVertexGradient
         {
@@ -246,9 +213,6 @@ namespace TMPro
         [SerializeField]
         protected ColorMode m_colorMode = ColorMode.FourCornersGradient;
 
-        /// <summary>
-        /// Sets the vertex colors for each of the 4 vertices of the character quads.
-        /// </summary>
         /// <value>The color gradient.</value>
         public VertexGradient colorGradient
         {
@@ -259,9 +223,6 @@ namespace TMPro
         protected VertexGradient m_fontColorGradient = new(Color.white);
 
 
-        /// <summary>
-        /// Set the vertex colors of the 4 vertices of each character quads.
-        /// </summary>
         public TMP_ColorGradient colorGradientPreset
         {
             get => m_fontColorGradientPreset;
@@ -271,21 +232,6 @@ namespace TMPro
         protected TMP_ColorGradient m_fontColorGradientPreset;
 
 
-        /// <summary>
-        /// Sprite Asset used by the text object.
-        /// </summary>
-        public TMP_SpriteAsset spriteAsset
-        {
-            get => m_spriteAsset;
-            set { m_spriteAsset = value; _havePropertiesChanged = true; SetVerticesDirty(); SetLayoutDirty(); }
-        }
-        [SerializeField]
-        protected TMP_SpriteAsset m_spriteAsset;
-
-
-        /// <summary>
-        /// Determines whether or not the sprite color is multiplies by the vertex color of the text.
-        /// </summary>
         public bool tintAllSprites
         {
             get => m_tintAllSprites;
@@ -296,9 +242,6 @@ namespace TMPro
         protected bool m_tintSprite;
         protected Color32 m_spriteColor;
 
-        /// <summary>
-        /// Style sheet used by the text object.
-        /// </summary>
         public TMP_StyleSheet styleSheet
         {
             get => m_StyleSheet;
@@ -307,9 +250,6 @@ namespace TMPro
         [SerializeField]
         protected TMP_StyleSheet m_StyleSheet;
 
-        /// <summary>
-        ///
-        /// </summary>
         public TMP_Style textStyle
         {
             get
@@ -331,9 +271,6 @@ namespace TMPro
         [SerializeField]
         protected int m_TextStyleHashCode;
 
-        /// <summary>
-        /// This overrides the color tags forcing the vertex colors to be the default font color.
-        /// </summary>
         public bool overrideColorTags
         {
             get => m_overrideHtmlColors;
@@ -343,9 +280,6 @@ namespace TMPro
         protected bool m_overrideHtmlColors;
 
 
-        /// <summary>
-        /// Sets the color of the _FaceColor property of the assigned material. Changing face color will result in an instance of the material.
-        /// </summary>
         public Color32 faceColor
         {
             get
@@ -362,9 +296,6 @@ namespace TMPro
         protected Color32 m_faceColor = Color.white;
 
 
-        /// <summary>
-        /// Sets the color of the _OutlineColor property of the assigned material. Changing outline color will result in an instance of the material.
-        /// </summary>
         public Color32 outlineColor
         {
             get
@@ -381,9 +312,6 @@ namespace TMPro
         protected Color32 m_outlineColor = Color.black;
 
 
-        /// <summary>
-        /// Sets the thickness of the outline of the font. Setting this value will result in an instance of the material.
-        /// </summary>
         public float outlineWidth
         {
             get
@@ -398,19 +326,10 @@ namespace TMPro
         protected float m_outlineWidth;
 
 
-        /// <summary>
-        /// The rotation for the environment map lighting.
-        /// </summary>
         protected Vector3 m_currentEnvMapRotation;
-        /// <summary>
-        /// Determine if the environment map property is valid.
-        /// </summary>
         protected bool m_hasEnvMapProperty;
 
 
-        /// <summary>
-        /// The point size of the font.
-        /// </summary>
         public float fontSize
         {
             get => m_fontSize;
@@ -425,9 +344,6 @@ namespace TMPro
         protected TMP_TextProcessingStack<float> m_sizeStack = new(16);
 
 
-        /// <summary>
-        /// Control the weight of the font if an alternative font asset is assigned for the given weight in the font asset editor.
-        /// </summary>
         public FontWeight fontWeight
         {
             get => m_fontWeight;
@@ -438,9 +354,6 @@ namespace TMPro
         protected FontWeight m_FontWeightInternal = FontWeight.Regular;
         protected TMP_TextProcessingStack<FontWeight> m_FontWeightStack = new(8);
 
-        /// <summary>
-        ///
-        /// </summary>
         public float pixelsPerUnit
         {
             get
@@ -457,9 +370,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Enable text auto-sizing
-        /// </summary>
         public bool enableAutoSizing
         {
             get => m_enableAutoSizing;
@@ -475,9 +385,6 @@ namespace TMPro
         protected bool m_IsAutoSizePointSizeSet;
 
 
-        /// <summary>
-        /// Minimum point size of the font when text auto-sizing is enabled.
-        /// </summary>
         public float fontSizeMin
         {
             get => m_fontSizeMin;
@@ -487,9 +394,6 @@ namespace TMPro
         protected float m_fontSizeMin;
 
 
-        /// <summary>
-        /// Maximum point size of the font when text auto-sizing is enabled.
-        /// </summary>
         public float fontSizeMax
         {
             get => m_fontSizeMax;
@@ -499,9 +403,6 @@ namespace TMPro
         protected float m_fontSizeMax;
 
 
-        /// <summary>
-        /// The style of the text
-        /// </summary>
         public FontStyles fontStyle
         {
             get => m_fontStyle;
@@ -512,16 +413,10 @@ namespace TMPro
         protected FontStyles m_FontStyleInternal = FontStyles.Normal;
         protected TMP_FontStyleStack m_fontStyleStack;
 
-        /// <summary>
-        /// Property used in conjunction with padding calculation for the geometry.
-        /// </summary>
         public bool isUsingBold => m_isUsingBold;
 
         protected bool m_isUsingBold = false;
 
-        /// <summary>
-        /// Horizontal alignment options
-        /// </summary>
         public HorizontalAlignmentOptions horizontalAlignment
         {
             get => m_HorizontalAlignment;
@@ -539,9 +434,6 @@ namespace TMPro
         [SerializeField]
         protected HorizontalAlignmentOptions m_HorizontalAlignment = HorizontalAlignmentOptions.Left;
 
-        /// <summary>
-        /// Vertical alignment options
-        /// </summary>
         public VerticalAlignmentOptions verticalAlignment
         {
             get => m_VerticalAlignment;
@@ -559,9 +451,6 @@ namespace TMPro
         [SerializeField]
         protected VerticalAlignmentOptions m_VerticalAlignment = VerticalAlignmentOptions.Top;
 
-        /// <summary>
-        /// Text alignment options
-        /// </summary>
         public TextAlignmentOptions alignment
         {
             get => (TextAlignmentOptions)((int)m_HorizontalAlignment | (int)m_VerticalAlignment);
@@ -588,14 +477,8 @@ namespace TMPro
         protected HorizontalAlignmentOptions m_lineJustification;
         protected TMP_TextProcessingStack<HorizontalAlignmentOptions> m_lineJustificationStack = new(new HorizontalAlignmentOptions[16]);
 
-        /// <summary>
-        /// Use the extents of the text geometry for alignment instead of font metrics.
-        /// </summary>
 
 
-        /// <summary>
-        /// The amount of additional spacing between characters.
-        /// </summary>
         public float characterSpacing
         {
             get => m_characterSpacing;
@@ -607,9 +490,6 @@ namespace TMPro
         protected float m_monoSpacing = 0;
         protected bool m_duoSpace;
 
-        /// <summary>
-        /// The amount of additional spacing between words.
-        /// </summary>
         public float wordSpacing
         {
             get => m_wordSpacing;
@@ -618,9 +498,6 @@ namespace TMPro
         [SerializeField]
         protected float m_wordSpacing;
 
-        /// <summary>
-        /// The amount of additional spacing to add between each lines of text.
-        /// </summary>
         public float lineSpacing
         {
             get => m_lineSpacing;
@@ -633,9 +510,6 @@ namespace TMPro
         protected bool m_IsDrivenLineSpacing;
 
 
-        /// <summary>
-        /// The amount of potential line spacing adjustment before text auto sizing kicks in.
-        /// </summary>
         public float lineSpacingAdjustment
         {
             get => m_lineSpacingMax;
@@ -644,9 +518,6 @@ namespace TMPro
         [SerializeField]
         protected float m_lineSpacingMax;
 
-        /// <summary>
-        /// The amount of additional spacing to add between each lines of text.
-        /// </summary>
         public float paragraphSpacing
         {
             get => m_paragraphSpacing;
@@ -656,9 +527,6 @@ namespace TMPro
         protected float m_paragraphSpacing;
 
 
-        /// <summary>
-        /// Percentage the width of characters can be adjusted before text auto-sizing begins to reduce the point size.
-        /// </summary>
         public float characterWidthAdjustment
         {
             get => m_charWidthMaxAdj;
@@ -670,9 +538,6 @@ namespace TMPro
         protected float m_charWidthAdjDelta = 0;
 
 
-        /// <summary>
-        /// Controls the text wrapping mode.
-        /// </summary>
         public TextWrappingModes textWrappingMode
         {
             get => m_TextWrappingMode;
@@ -684,9 +549,6 @@ namespace TMPro
         protected TextWrappingModes m_TextWrappingMode;
         protected bool m_isNonBreakingSpace = false;
 
-        /// <summary>
-        /// Controls the blending between using character and word spacing to fill-in the space for justified text.
-        /// </summary>
         public float wordWrappingRatios
         {
             get => m_wordWrappingRatios;
@@ -696,14 +558,8 @@ namespace TMPro
         protected float m_wordWrappingRatios = 0.4f;
 
 
-        /// <summary>
-        ///
-        /// </summary>
 
 
-        /// <summary>
-        /// Controls the Text Overflow Mode
-        /// </summary>
         public TextOverflowModes overflowMode
         {
             get => m_overflowMode;
@@ -713,26 +569,17 @@ namespace TMPro
         protected TextOverflowModes m_overflowMode = TextOverflowModes.Overflow;
 
 
-        /// <summary>
-        /// Indicates if the text exceeds the vertical bounds of its text container.
-        /// </summary>
         public bool isTextOverflowing
         {
             get { if (m_firstOverflowCharacterIndex != -1) return true; return false; }
         }
 
 
-        /// <summary>
-        /// The first character which exceeds the vertical bounds of its text container.
-        /// </summary>
         public int firstOverflowCharacterIndex => m_firstOverflowCharacterIndex;
 
         protected int m_firstOverflowCharacterIndex = -1;
 
 
-        /// <summary>
-        /// Property indicating whether the text is Truncated or using Ellipsis.
-        /// </summary>
         public bool isTextTruncated => m_isTextTruncated;
 
         protected bool m_isTextTruncated;
@@ -742,9 +589,6 @@ namespace TMPro
         protected bool m_enableKerning;
         protected int m_LastBaseGlyphIndex;
 
-        /// <summary>
-        /// List of OpenType font features that are enabled.
-        /// </summary>
         public List<OTL_FeatureTag> fontFeatures
         {
             get => m_ActiveFontFeatures;
@@ -759,9 +603,6 @@ namespace TMPro
         [SerializeField]
         protected List<OTL_FeatureTag> m_ActiveFontFeatures = new() { 0 };
 
-        /// <summary>
-        /// Adds extra padding around each character. This may be necessary when the displayed text is very small to prevent clipping.
-        /// </summary>
         public bool extraPadding
         {
             get => m_enableExtraPadding;
@@ -774,9 +615,6 @@ namespace TMPro
         protected bool checkPaddingRequired;
 
 
-        /// <summary>
-        /// Enables or Disables Rich Text Tags
-        /// </summary>
         public bool richText
         {
             get => m_isRichText;
@@ -785,9 +623,6 @@ namespace TMPro
         [SerializeField]
         protected bool m_isRichText = true;
 
-        /// <summary>
-        /// Enables or Disables parsing of CTRL characters in input text.
-        /// </summary>
         public bool parseCtrlCharacters
         {
             get => m_parseCtrlCharacters;
@@ -797,9 +632,6 @@ namespace TMPro
         protected bool m_parseCtrlCharacters = true;
 
 
-        /// <summary>
-        /// Sets the RenderQueue along with Ztest to force the text to be drawn last and on top of scene elements.
-        /// </summary>
         public bool isOverlay
         {
             get => m_isOverlay;
@@ -808,9 +640,6 @@ namespace TMPro
         protected bool m_isOverlay;
 
 
-        /// <summary>
-        /// Sets Perspective Correction to Zero for Orthographic Camera mode & 0.875f for Perspective Camera mode.
-        /// </summary>
         public bool isOrthographic
         {
             get => m_isOrthographic;
@@ -820,9 +649,6 @@ namespace TMPro
         protected bool m_isOrthographic;
 
 
-        /// <summary>
-        /// Sets the culling on the shaders. Note changing this value will result in an instance of the material.
-        /// </summary>
         public bool enableCulling
         {
             get => m_isCullingEnabled;
@@ -834,9 +660,6 @@ namespace TMPro
         protected bool m_isMaskingEnabled;
         protected bool isMaskUpdateRequired;
 
-        /// <summary>
-        /// Forces objects that are not visible to get refreshed.
-        /// </summary>
         public bool ignoreVisibility
         {
             get => m_ignoreCulling;
@@ -846,9 +669,6 @@ namespace TMPro
         protected bool m_ignoreCulling = true;
 
 
-        /// <summary>
-        /// Controls how the face and outline textures will be applied to the text object.
-        /// </summary>
         public TextureMappingOptions horizontalMapping
         {
             get => m_horizontalMapping;
@@ -858,9 +678,6 @@ namespace TMPro
         protected TextureMappingOptions m_horizontalMapping = TextureMappingOptions.Character;
 
 
-        /// <summary>
-        /// Controls how the face and outline textures will be applied to the text object.
-        /// </summary>
         public TextureMappingOptions verticalMapping
         {
             get => m_verticalMapping;
@@ -870,14 +687,8 @@ namespace TMPro
         protected TextureMappingOptions m_verticalMapping = TextureMappingOptions.Character;
 
 
-        /// <summary>
-        /// Controls the UV Offset for the various texture mapping mode on the text object.
-        /// </summary>
 
 
-        /// <summary>
-        /// Controls the horizontal offset of the UV of the texture mapping mode for each line of the text object.
-        /// </summary>
         public float mappingUvLineOffset
         {
             get => m_uvLineOffset;
@@ -887,9 +698,6 @@ namespace TMPro
         protected float m_uvLineOffset;
 
 
-        /// <summary>
-        /// Determines if the Mesh will be rendered.
-        /// </summary>
         public TextRenderFlags renderMode
         {
             get => m_renderMode;
@@ -898,9 +706,6 @@ namespace TMPro
         protected TextRenderFlags m_renderMode = TextRenderFlags.Render;
 
 
-        /// <summary>
-        /// Determines the sorting order of the geometry of the text object.
-        /// </summary>
         public VertexSortingOrder geometrySortingOrder
         {
             get => m_geometrySortingOrder;
@@ -911,33 +716,6 @@ namespace TMPro
         [SerializeField]
         protected VertexSortingOrder m_geometrySortingOrder;
 
-
-        /// <summary>
-        /// Determines if a text object will be excluded from the InternalUpdate callback used to handle updates of SDF Scale when the scale of the text object or parent(s) changes.
-        /// </summary>
-        public bool isTextObjectScaleStatic
-        {
-            get => m_IsTextObjectScaleStatic;
-            set
-            {
-                m_IsTextObjectScaleStatic = value;
-
-                if (!isActiveAndEnabled)
-                    return;
-
-                if (m_IsTextObjectScaleStatic)
-                    TMP_UpdateManager.UnRegisterTextObjectForUpdate(this);
-                else
-                    TMP_UpdateManager.RegisterTextObjectForUpdate(this);
-            }
-        }
-        [SerializeField]
-        protected bool m_IsTextObjectScaleStatic;
-
-        /// <summary>
-        /// Determines if the data structures allocated to contain the geometry of the text object will be reduced in size if the number of characters required to display the text is reduced by more than 256 characters.
-        /// This reduction has the benefit of reducing the amount of vertex data being submitted to the graphic device but results in GC when it occurs.
-        /// </summary>
         public bool vertexBufferAutoSizeReduction
         {
             get => m_VertexBufferAutoSizeReduction;
@@ -946,9 +724,6 @@ namespace TMPro
         [SerializeField]
         protected bool m_VertexBufferAutoSizeReduction;
 
-        /// <summary>
-        /// The first character which should be made visible in conjunction with the Text Overflow Linked mode.
-        /// </summary>
         public int firstVisibleCharacter
         {
             get => m_firstVisibleCharacter;
@@ -957,9 +732,6 @@ namespace TMPro
 
         protected int m_firstVisibleCharacter;
 
-        /// <summary>
-        /// Allows to control how many characters are visible from the input.
-        /// </summary>
         public int maxVisibleCharacters
         {
             get => m_maxVisibleCharacters;
@@ -968,9 +740,6 @@ namespace TMPro
         protected int m_maxVisibleCharacters = 99999;
 
 
-        /// <summary>
-        /// Allows to control how many words are visible from the input.
-        /// </summary>
         public int maxVisibleWords
         {
             get => m_maxVisibleWords;
@@ -979,9 +748,6 @@ namespace TMPro
         protected int m_maxVisibleWords = 99999;
 
 
-        /// <summary>
-        /// Allows control over how many lines of text are displayed.
-        /// </summary>
         public int maxVisibleLines
         {
             get => m_maxVisibleLines;
@@ -990,9 +756,6 @@ namespace TMPro
         protected int m_maxVisibleLines = 99999;
 
 
-        /// <summary>
-        /// Determines if the text's vertical alignment will be adjusted based on visible descender of the text.
-        /// </summary>
         public bool useMaxVisibleDescender
         {
             get => m_useMaxVisibleDescender;
@@ -1001,9 +764,6 @@ namespace TMPro
         [SerializeField]
         protected bool m_useMaxVisibleDescender = true;
         
-        /// <summary>
-        /// The margins of the text object.
-        /// </summary>
         public virtual Vector4 margin
         {
             get => m_margin;
@@ -1018,9 +778,6 @@ namespace TMPro
         protected float m_width = -1;
 
 
-        /// <summary>
-        /// Returns data about the text object which includes information about each character, word, line, link, etc.
-        /// </summary>
         public TMP_TextInfo textInfo
         {
             get
@@ -1034,9 +791,6 @@ namespace TMPro
 
         protected TMP_TextInfo m_textInfo;
 
-        /// <summary>
-        /// Property tracking if any of the text properties have changed. Flag is set before the text is regenerated.
-        /// </summary>
         public bool havePropertiesChanged
         {
             get => m_havePropertiesChanged;
@@ -1051,9 +805,6 @@ namespace TMPro
 
         protected bool m_havePropertiesChanged;
 
-        /// <summary>
-        /// Returns are reference to the Transform
-        /// </summary>
         public new Transform transform
         {
             get
@@ -1066,9 +817,6 @@ namespace TMPro
         protected Transform m_transform;
 
 
-        /// <summary>
-        /// Returns are reference to the RectTransform
-        /// </summary>
         public new RectTransform rectTransform
         {
             get
@@ -1081,20 +829,11 @@ namespace TMPro
         protected RectTransform m_rectTransform;
 
 
-        /// <summary>
-        /// Used to track potential changes in RectTransform size to allow us to ignore OnRectTransformDimensionsChange getting called due to rounding errors when using Stretch Anchors.
-        /// </summary>
         protected Vector2 m_PreviousRectTransformSize;
 
-        /// <summary>
-        /// Used to track potential changes in pivot position to allow us to ignore OnRectTransformDimensionsChange getting called due to rounding errors when using Stretch Anchors.
-        /// </summary>
         protected Vector2 m_PreviousPivotPosition;
 
 
-        /// <summary>
-        /// Enables control over setting the size of the text container to match the text object.
-        /// </summary>
         public virtual bool autoSizeTextContainer
         {
             get;
@@ -1103,17 +842,11 @@ namespace TMPro
         protected bool m_autoSizeTextContainer;
 
 
-        /// <summary>
-        /// The mesh used by the font asset and material assigned to the text object.
-        /// </summary>
         public virtual Mesh mesh => m_mesh;
 
         protected Mesh m_mesh;
 
 
-        /// <summary>
-        /// Determines if the geometry of the characters will be quads or volumetric (cubes).
-        /// </summary>
         public bool isVolumetricText
         {
             get => m_isVolumetricText;

@@ -6,9 +6,6 @@ using UnityEngine.UIElements;
 namespace UnityEditor.UI
 {
     [CustomPropertyDrawer(typeof(SpriteState), true)]
-    /// <summary>
-    /// This is a PropertyDrawer for SpriteState. It is implemented using the standard Unity PropertyDrawer framework.
-    /// </summary>
     public class SpriteStateDrawer : PropertyDrawer
     {
         const string kHighlightedSprite = "m_HighlightedSprite";

@@ -14,9 +14,6 @@ namespace UnityEngine.EventSystems
             s_Raycasters.Add(baseRaycaster);
         }
 
-        /// <summary>
-        /// List of BaseRaycasters that has been registered.
-        /// </summary>
         public static List<BaseRaycaster> GetRaycasters()
         {
             return s_Raycasters;

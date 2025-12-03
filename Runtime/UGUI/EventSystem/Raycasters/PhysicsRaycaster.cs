@@ -3,32 +3,17 @@ using UnityEngine.UI;
 
 namespace UnityEngine.EventSystems
 {
-    /// <summary>
-    /// Simple event system using physics raycasts.
-    /// </summary>
     [AddComponentMenu("Event/Physics Raycaster")]
     [RequireComponent(typeof(Camera))]
-    /// <summary>
-    /// Raycaster for casting against 3D Physics components.
-    /// </summary>
     public class PhysicsRaycaster : BaseRaycaster
     {
-        /// <summary>
-        /// Const to use for clarity when no event mask is set
-        /// </summary>
         protected const int kNoEventMaskSet = -1;
 
         protected Camera m_EventCamera;
 
-        /// <summary>
-        /// Layer mask used to filter events. Always combined with the camera's culling mask if a camera is used.
-        /// </summary>
         [SerializeField]
         protected LayerMask m_EventMask = kNoEventMaskSet;
 
-        /// <summary>
-        /// The max number of intersections allowed. 0 = allocating version anything else is non alloc.
-        /// </summary>
         [SerializeField]
         protected int m_MaxRayIntersections = 0;
         protected int m_LastMaxRayIntersections = 0;
@@ -55,34 +40,22 @@ namespace UnityEngine.EventSystems
         }
 
 
-        /// <summary>
-        /// Depth used to determine the order of event processing.
-        /// </summary>
         public virtual int depth
         {
             get { return (eventCamera != null) ? (int)eventCamera.depth : 0xFFFFFF; }
         }
 
-        /// <summary>
-        /// Event mask used to determine which objects will receive events.
-        /// </summary>
         public int finalEventMask
         {
             get { return (eventCamera != null) ? eventCamera.cullingMask & m_EventMask : kNoEventMaskSet; }
         }
 
-        /// <summary>
-        /// Layer mask used to filter events. Always combined with the camera's culling mask if a camera is used.
-        /// </summary>
         public LayerMask eventMask
         {
             get { return m_EventMask; }
             set { m_EventMask = value; }
         }
 
-        /// <summary>
-        /// Max number of ray intersection allowed to be found.
-        /// </summary>
         /// <remarks>
         /// A value of zero will represent using the allocating version of the raycast function where as any other value will use the non allocating version.
         /// </remarks>
@@ -92,9 +65,6 @@ namespace UnityEngine.EventSystems
             set { m_MaxRayIntersections = value; }
         }
 
-        /// <summary>
-        /// Returns a ray going from camera through the event position and the distance between the near and far clipping planes along that ray.
-        /// </summary>
         /// <param name="eventData">The pointer event for which we will cast a ray.</param>
         /// <param name="ray">The ray to use.</param>
         /// <param name="eventDisplayIndex">The display index used.</param>

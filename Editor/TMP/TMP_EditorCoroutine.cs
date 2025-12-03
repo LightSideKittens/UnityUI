@@ -7,16 +7,10 @@ using UnityEngine;
 
 namespace TMPro.EditorUtilities
 {
-    /// <summary>
-    /// Simple implementation of coroutine working in the Unity Editor.
-    /// </summary>
     public class TMP_EditorCoroutine
     {
         readonly IEnumerator coroutine;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         /// <param name="routine"></param>
         TMP_EditorCoroutine(IEnumerator routine)
         {
@@ -24,9 +18,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Starts a new EditorCoroutine.
-        /// </summary>
         /// <param name="newCoroutine">Coroutine</param>
         /// <returns>new EditorCoroutine</returns>
         public static TMP_EditorCoroutine StartCoroutine(IEnumerator routine)
@@ -38,23 +29,14 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Clear delegate list 
-        /// </summary>
 
 
-        /// <summary>
-        /// Register callback for editor updates
-        /// </summary>
         void Start()
         {
             EditorApplication.update += EditorUpdate;
         }
 
 
-        /// <summary>
-        /// Unregister callback for editor updates.
-        /// </summary>
         public void Stop()
         {
             if (EditorApplication.update != null)
@@ -62,9 +44,6 @@ namespace TMPro.EditorUtilities
         }
  
 
-        /// <summary>
-        /// Delegate function called on editor updates.
-        /// </summary>
         void EditorUpdate()
         {
             if (coroutine.MoveNext() == false)

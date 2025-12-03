@@ -31,9 +31,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Create a Masking Material Instance for the given ID
-        /// </summary>
         /// <param name="baseMaterial"></param>
         /// <param name="stencilID"></param>
         /// <returns></returns>
@@ -92,9 +89,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to release the stencil material.
-        /// </summary>
         /// <param name="stencilMaterial"></param>
         public static void ReleaseStencilMaterial(Material stencilMaterial)
         {
@@ -136,9 +130,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to set the Material Stencil ID
-        /// </summary>
         /// <param name="material"></param>
         /// <param name="stencilID"></param>
         /// <returns></returns>
@@ -241,9 +232,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to get the Stencil ID
-        /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
         public static int GetStencilID(GameObject obj)
@@ -362,9 +350,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// This function returns a material instance using the material properties of a previous material but using the font atlas texture of the new font asset.
-        /// </summary>
         /// <param name="sourceMaterial">The material containing the source material properties to be copied to the new material.</param>
         /// <param name="targetMaterial">The font atlas texture that should be assigned to the new material.</param>
         /// <returns></returns>
@@ -431,9 +416,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="targetMaterial"></param>
         public static void AddFallbackMaterialReference(Material targetMaterial)
         {
@@ -451,9 +433,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="targetMaterial"></param>
         public static void RemoveFallbackMaterialReference(Material targetMaterial)
         {
@@ -474,9 +453,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public static void CleanupFallbackMaterials()
         {
             if (m_fallbackCleanupList.Count == 0) return;
@@ -499,9 +475,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to release the fallback material.
-        /// </summary>
         /// <param name="fallbackMaterial">Material to be released.</param>
         public static void ReleaseFallbackMaterial(Material fallbackMaterial)
         {
@@ -547,9 +520,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to copy the properties of a source material preset to another while preserving the unique font asset properties of the destination material.
-        /// </summary>
         /// <param name="source"></param>
         /// <param name="destination"></param>
         public static void CopyMaterialPresetProperties(Material source, Material destination)
@@ -580,9 +550,6 @@ namespace TMPro
 
 
         #if TMP_DEBUG_MODE
-        /// <summary>
-        ///
-        /// </summary>
         public static void ListMaterials()
         {
 
@@ -602,9 +569,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public static void ListFallbackMaterials()
         {
 

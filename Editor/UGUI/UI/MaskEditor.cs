@@ -4,10 +4,6 @@ namespace UnityEditor.UI
 {
     [CustomEditor(typeof(Mask), true)]
     [CanEditMultipleObjects]
-    /// <summary>
-    /// Custom Editor for the Mask component.
-    /// Extend this class to write a custom editor for a component derived from Mask.
-    /// </summary>
     public class MaskEditor : Editor
     {
         SerializedProperty m_ShowMaskGraphic;

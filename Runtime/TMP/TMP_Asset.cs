@@ -8,19 +8,12 @@ namespace TMPro
     [Serializable]
     public abstract class TMP_Asset : ScriptableObject
     {
-        /// <summary>
-        /// The version of the text asset class.
-        /// Version 1.1.0 introduces new data structure to be compatible with new font asset structure.
-        /// </summary>
         public string version
         {
             get { return m_Version; }
             internal set { m_Version = value; }
         }
 
-        /// <summary>
-        /// Instance ID of the TMP Asset
-        /// </summary>
         public int instanceID
         {
             get
@@ -32,9 +25,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// HashCode based on the name of the asset.
-        /// </summary>
         public int hashCode
         {
             get
@@ -47,27 +37,18 @@ namespace TMPro
             set => m_HashCode = value;
         }
 
-        /// <summary>
-        /// Information about the face of the asset.
-        /// </summary>
         public FaceInfo faceInfo
         {
             get { return m_FaceInfo; }
             set { m_FaceInfo = value; }
         }
 
-        /// <summary>
-        /// The material used by this asset.
-        /// </summary>
         public Material material
         {
             get => m_Material;
             set => m_Material = value;
         }
 
-        /// <summary>
-        /// HashCode based on the name of the material assigned to this asset.
-        /// </summary>
         public int materialHashCode
         {
             get

@@ -6,10 +6,6 @@ namespace UnityEditor.UI
 {
     [CustomEditor(typeof(Scrollbar), true)]
     [CanEditMultipleObjects]
-    /// <summary>
-    /// Custom Editor for the Scrollbar Component.
-    /// Extend this class to write a custom editor for a component derived from Scrollbar.
-    /// </summary>
     public class ScrollbarEditor : SelectableEditor
     {
         SerializedProperty m_HandleRect;

@@ -297,9 +297,6 @@ namespace TMPro.EditorUtilities
             DestroyImmediate(tex);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="command"></param>
         [MenuItem("CONTEXT/TMP_FontAsset/Update Atlas Texture...", false, 2000)]
         static void RegenerateFontAsset(MenuCommand command)
@@ -313,9 +310,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Clear Dynamic Font Asset data such as glyph, character and font features.
-        /// </summary>
         /// <param name="command"></param>
         [MenuItem("CONTEXT/TMP_FontAsset/Reset", true, 100)]
         static bool ClearFontAssetDataValidate(MenuCommand command)
@@ -341,9 +335,6 @@ namespace TMPro.EditorUtilities
             TMPro_EventManager.ON_FONT_PROPERTY_CHANGED(true, fontAsset);
         }
 
-        /// <summary>
-        /// Clear Character and Glyph data (only).
-        /// </summary>
         /// <param name="command"></param>
         [MenuItem("CONTEXT/TMP_FontAsset/Clear Dynamic Data", true, 2100)]
         static bool ClearFontCharacterDataValidate(MenuCommand command)
@@ -390,9 +381,6 @@ namespace TMPro.EditorUtilities
             AssetDatabase.Refresh();
         }
 
-        /// <summary>
-        /// Import all font features
-        /// </summary>
         /// <param name="command"></param>
         #if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
         [MenuItem("CONTEXT/TMP_FontAsset/Import Font Features", true, 2110)]
@@ -418,9 +406,6 @@ namespace TMPro.EditorUtilities
         }
         #endif
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="command"></param>
         [MenuItem("CONTEXT/TrueTypeFontImporter/Create TMP Font Asset...", false, 200)]
         static void CreateFontAsset(MenuCommand command)

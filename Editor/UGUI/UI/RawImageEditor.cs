@@ -5,10 +5,6 @@ namespace UnityEditor.UI
 {
     [CustomEditor(typeof(RawImage), true)]
     [CanEditMultipleObjects]
-    /// <summary>
-    /// Custom editor for RawImage.
-    /// Extend this class to write a custom editor for a component derived from RawImage.
-    /// </summary>
     public class RawImageEditor : GraphicEditor
     {
         SerializedProperty m_Texture;
@@ -61,9 +57,6 @@ namespace UnityEditor.UI
             return outer;
         }
 
-        /// <summary>
-        /// Allow the texture to be previewed.
-        /// </summary>
 
         public override bool HasPreviewGUI()
         {
@@ -75,9 +68,6 @@ namespace UnityEditor.UI
             return outer.width > 0 && outer.height > 0;
         }
 
-        /// <summary>
-        /// Draw the Image preview.
-        /// </summary>
 
         public override void OnPreviewGUI(Rect rect, GUIStyle background)
         {
@@ -91,9 +81,6 @@ namespace UnityEditor.UI
             SpriteDrawUtility.DrawSprite(tex, rect, outer, rawImage.uvRect, rawImage.canvasRenderer.GetColor());
         }
 
-        /// <summary>
-        /// Info String drawn at the bottom of the Preview
-        /// </summary>
 
         public override string GetInfoString()
         {

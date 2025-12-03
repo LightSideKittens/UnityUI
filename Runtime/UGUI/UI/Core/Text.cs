@@ -5,9 +5,6 @@ namespace UnityEngine.UI
 {
     [RequireComponent(typeof(CanvasRenderer))]
     [AddComponentMenu("UI/Legacy/Text", 100)]
-    /// <summary>
-    /// The default Graphic to draw font data to screen.
-    /// </summary>
     public class Text : MaskableGraphic, ILayoutElement
     {
         [SerializeField] private FontData m_FontData = FontData.defaultFontData;
@@ -27,26 +24,17 @@ namespace UnityEngine.UI
         // We use this flag instead of Unregistering/Registering the callback to avoid allocation.
         [NonSerialized] protected bool m_DisableFontTextureRebuiltCallback = false;
 
-        /// <summary>
-        /// The cached TextGenerator used when generating visible Text.
-        /// </summary>
 
         public TextGenerator cachedTextGenerator
         {
             get { return m_TextCache ?? (m_TextCache = (m_Text.Length != 0 ? new TextGenerator(m_Text.Length) : new TextGenerator())); }
         }
 
-        /// <summary>
-        /// The cached TextGenerator used when determine Layout
-        /// </summary>
         public TextGenerator cachedTextGeneratorForLayout
         {
             get { return m_TextCacheForLayout ?? (m_TextCacheForLayout = new TextGenerator()); }
         }
 
-        /// <summary>
-        /// Text's texture comes from the font.
-        /// </summary>
         public override Texture mainTexture
         {
             get
@@ -61,9 +49,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Called by the FontUpdateTracker when the texture associated with a font is modified.
-        /// </summary>
         public void FontTextureChanged()
         {
             // Only invoke if we are not destroyed.
@@ -90,9 +75,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// The Font used by the text.
-        /// </summary>
         /// <remarks>
         /// This is the font used by the Text component. Use it to alter or return the font from the Text. There are many free fonts available online.
         /// </remarks>
@@ -158,9 +140,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Text that's being displayed by the Text.
-        /// </summary>
         /// <remarks>
         /// This is the string value of a Text component. Use this to read or edit the message displayed in Text.
         /// </remarks>
@@ -216,9 +195,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Whether this Text will support rich text.
-        /// </summary>
 
         public bool supportRichText
         {
@@ -236,9 +212,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Should the text be allowed to auto resized.
-        /// </summary>
 
         public bool resizeTextForBestFit
         {
@@ -256,9 +229,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// The minimum size the text is allowed to be.
-        /// </summary>
         public int resizeTextMinSize
         {
             get
@@ -276,9 +246,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// The maximum size the text is allowed to be. 1 = infinitely large.
-        /// </summary>
         public int resizeTextMaxSize
         {
             get
@@ -296,9 +263,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// The positioning of the text reliative to its [[RectTransform]].
-        /// </summary>
         /// <remarks>
         /// This is the positioning of the Text relative to its RectTransform. You can alter this via script or in the Inspector of a Text component using the buttons in the Alignment section.
         /// </remarks>
@@ -358,9 +322,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Use the extents of glyph geometry to perform horizontal alignment rather than glyph metrics.
-        /// </summary>
         /// <remarks>
         /// This can result in better fitting left and right alignment, but may result in incorrect positioning when attempting to overlay multiple fonts (such as a specialized outline font) on top of each other.
         /// </remarks>
@@ -380,9 +341,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// The size that the Font should render at. Unit of measure is Points.
-        /// </summary>
         /// <remarks>
         /// This is the size of the Font of the Text. Use this to fetch or change the size of the Font. When changing the Font size, remember to take into account the RectTransform of the Text. Larger Font sizes or messages may not fit in certain rectangle sizes and do not show in the Scene.
         /// Note: Point size is not consistent from one font to another.
@@ -448,9 +406,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Horizontal overflow mode.
-        /// </summary>
         /// <remarks>
         /// When set to HorizontalWrapMode.Overflow, text can exceed the horizontal boundaries of the Text graphic. When set to HorizontalWrapMode.Wrap, text will be word-wrapped to fit within the boundaries.
         /// </remarks>
@@ -471,9 +426,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Vertical overflow mode.
-        /// </summary>
         public VerticalWrapMode verticalOverflow
         {
             get
@@ -491,9 +443,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Line spacing, specified as a factor of font line height. A value of 1 will produce normal line spacing.
-        /// </summary>
         public float lineSpacing
         {
             get
@@ -511,9 +460,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Font style used by the Text's text.
-        /// </summary>
 
         public FontStyle fontStyle
         {
@@ -532,9 +478,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Provides information about how fonts are scale to the screen.
-        /// </summary>
         /// <remarks>
         /// For dynamic fonts, the value is equivalent to the scale factor of the canvas. For non-dynamic fonts, the value is calculated from the requested text size and the size from the font.
         /// </remarks>
@@ -594,9 +537,6 @@ namespace UnityEngine.UI
                 font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         }
 
-        /// <summary>
-        /// Convenience function to populate the generation setting for the text.
-        /// </summary>
         /// <param name="extents">The extents the text can draw in.</param>
         /// <returns>Generated settings.</returns>
         public TextGenerationSettings GetGenerationSettings(Vector2 extents)
@@ -629,9 +569,6 @@ namespace UnityEngine.UI
             return settings;
         }
 
-        /// <summary>
-        /// Convenience function to determine the vector offset of the anchor.
-        /// </summary>
         static public Vector2 GetTextAnchorPivot(TextAnchor anchor)
         {
             switch (anchor)

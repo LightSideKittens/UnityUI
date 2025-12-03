@@ -243,6 +243,142 @@ extern "C" {
         return has_rtl;
     }
 
+
+
+    //------------SheenBidi--------------
+
+
+    __declspec(dllexport)
+        SBAlgorithmRef __cdecl sheenbidi_unity_create_algorithm_utf32(
+            const uint32_t* logical,
+            int             length)
+    {
+        if (!logical || length <= 0)
+            return NULL;
+
+        SBCodepointSequence seq = {
+            SBStringEncodingUTF32,
+            (void*)logical,
+            (SBUInteger)length
+        };
+
+        return SBAlgorithmCreate(&seq);
+    }
+
+    __declspec(dllexport)
+        void __cdecl sheenbidi_unity_release_algorithm(SBAlgorithmRef algorithm)
+    {
+        if (algorithm)
+            SBAlgorithmRelease(algorithm);
+    }
+
+    __declspec(dllexport)
+        SBParagraphRef __cdecl sheenbidi_unity_create_paragraph(
+            SBAlgorithmRef algorithm,
+            int            start,
+            int            length,
+            int            baseDirCode)
+    {
+        if (!algorithm || length <= 0)
+            return NULL;
+
+        SBLevel baseLevel =
+            (baseDirCode == 2) ? SBLevelDefaultRTL : SBLevelDefaultLTR;
+
+        return SBAlgorithmCreateParagraph(
+            algorithm,
+            (SBUInteger)start,
+            (SBUInteger)length,
+            baseLevel);
+    }
+
+    __declspec(dllexport)
+        void __cdecl sheenbidi_unity_release_paragraph(SBParagraphRef paragraph)
+    {
+        if (paragraph)
+            SBParagraphRelease(paragraph);
+    }
+
+    __declspec(dllexport)
+        SBLineRef __cdecl sheenbidi_unity_create_line(
+            SBParagraphRef paragraph,
+            int            start,
+            int            length)
+    {
+        if (!paragraph || length <= 0)
+            return NULL;
+
+        return SBParagraphCreateLine(
+            paragraph,
+            (SBUInteger)start,
+            (SBUInteger)length);
+    }
+
+    __declspec(dllexport)
+        void __cdecl sheenbidi_unity_release_line(SBLineRef line)
+    {
+        if (line)
+            SBLineRelease(line);
+    }
+
+    __declspec(dllexport)
+        int __cdecl sheenbidi_unity_line_get_run_count(SBLineRef line)
+    {
+        if (!line)
+            return 0;
+
+        return (int)SBLineGetRunCount(line);
+    }
+
+    __declspec(dllexport)
+        const SBRun* __cdecl sheenbidi_unity_line_get_runs(SBLineRef line)
+    {
+        if (!line)
+            return NULL;
+
+        return SBLineGetRunsPtr(line);
+    }
+
+    __declspec(dllexport)
+        int __cdecl sheenbidi_unity_detect_base_direction_utf32(
+            const uint32_t* logical,
+            int             length)
+    {
+        if (!logical || length <= 0)
+            return 0; // 0 = LTR по умолчанию
+
+        SBCodepointSequence sequence = {
+            SBStringEncodingUTF32,
+            (void*)logical,
+            (SBUInteger)length
+        };
+
+        SBAlgorithmRef algorithm = SBAlgorithmCreate(&sequence);
+        if (!algorithm)
+            return 0;
+
+        SBParagraphRef paragraph =
+            SBAlgorithmCreateParagraph(
+                algorithm,
+                0,
+                (SBUInteger)length,
+                SBLevelDefaultLTR);
+
+        if (!paragraph)
+        {
+            SBAlgorithmRelease(algorithm);
+            return 0;
+        }
+
+        SBLevel baseLevel = SBParagraphGetBaseLevel(paragraph);
+
+        SBParagraphRelease(paragraph);
+        SBAlgorithmRelease(algorithm);
+
+        return (baseLevel & 1) ? 1 : 0; // 0 = LTR, 1 = RTL
+    }
+
+
 #ifdef __cplusplus
 }
 #endif

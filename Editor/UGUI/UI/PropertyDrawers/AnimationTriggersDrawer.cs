@@ -6,9 +6,6 @@ using UnityEngine.UIElements;
 namespace UnityEditor.UI
 {
     [CustomPropertyDrawer(typeof(AnimationTriggers), true)]
-    /// <summary>
-    /// This is a PropertyDrawer for AnimationTriggers. It is implemented using the standard Unity PropertyDrawer framework.
-    /// </summary>
     public class AnimationTriggersDrawer : PropertyDrawer
     {
         const string kNormalTrigger = "m_NormalTrigger";

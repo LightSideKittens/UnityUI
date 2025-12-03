@@ -4,9 +4,6 @@ using UnityEngine.Pool;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// A utility class that can aid in the generation of meshes for the UI.
-    /// </summary>
     /// <remarks>
     /// This class implements IDisposable to aid with memory management.
     /// </remarks>
@@ -96,9 +93,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Cleanup allocated memory.
-        /// </summary>
         public void Dispose()
         {
             if (m_ListsInitalized)
@@ -127,9 +121,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Clear all vertices from the stream.
-        /// </summary>
         public void Clear()
         {
             // Only clear if we have our lists created.
@@ -147,25 +138,16 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Current number of vertices in the buffer.
-        /// </summary>
         public int currentVertCount
         {
             get { return m_Positions != null ? m_Positions.Count : 0; }
         }
 
-        /// <summary>
-        /// Get the number of indices set on the VertexHelper.
-        /// </summary>
         public int currentIndexCount
         {
             get { return m_Indices != null ? m_Indices.Count : 0; }
         }
 
-        /// <summary>
-        /// Fill a UIVertex with data from index i of the stream.
-        /// </summary>
         /// <param name="vertex">Vertex to populate</param>
         /// <param name="i">Index to populate.</param>
         public void PopulateUIVertex(ref UIVertex vertex, int i)
@@ -182,9 +164,6 @@ namespace UnityEngine.UI
             vertex.tangent = m_Tangents[i];
         }
 
-        /// <summary>
-        /// Set a UIVertex at the given index.
-        /// </summary>
         /// <param name="vertex">The vertex to fill</param>
         /// <param name="i">the position in the current list to fill.</param>
         public void SetUIVertex(UIVertex vertex, int i)
@@ -201,9 +180,6 @@ namespace UnityEngine.UI
             m_Tangents[i] = vertex.tangent;
         }
 
-        /// <summary>
-        /// Fill the given mesh with the stream data.
-        /// </summary>
         public void FillMesh(Mesh mesh)
         {
             InitializeListIfRequired();
@@ -225,9 +201,6 @@ namespace UnityEngine.UI
             mesh.RecalculateBounds();
         }
 
-        /// <summary>
-        /// Add a single vertex to the stream.
-        /// </summary>
         /// <param name="position">Position of the vert</param>
         /// <param name="color">Color of the vert</param>
         /// <param name="uv0">UV of the vert</param>
@@ -250,9 +223,6 @@ namespace UnityEngine.UI
             m_Tangents.Add(tangent);
         }
 
-        /// <summary>
-        /// Add a single vertex to the stream.
-        /// </summary>
         /// <param name="position">Position of the vert</param>
         /// <param name="color">Color of the vert</param>
         /// <param name="uv0">UV of the vert</param>
@@ -264,9 +234,6 @@ namespace UnityEngine.UI
             AddVert(position, color, uv0, uv1, Vector4.zero, Vector4.zero, normal, tangent);
         }
 
-        /// <summary>
-        /// Add a single vertex to the stream.
-        /// </summary>
         /// <param name="position">Position of the vert</param>
         /// <param name="color">Color of the vert</param>
         /// <param name="uv0">UV of the vert</param>
@@ -275,18 +242,12 @@ namespace UnityEngine.UI
             AddVert(position, color, uv0, Vector4.zero, s_DefaultNormal, s_DefaultTangent);
         }
 
-        /// <summary>
-        /// Add a single vertex to the stream.
-        /// </summary>
         /// <param name="v">The vertex to add</param>
         public void AddVert(UIVertex v)
         {
             AddVert(v.position, v.color, v.uv0, v.uv1, v.uv2, v.uv3, v.normal, v.tangent);
         }
 
-        /// <summary>
-        /// Add a triangle to the buffer.
-        /// </summary>
         /// <param name="idx0">index 0</param>
         /// <param name="idx1">index 1</param>
         /// <param name="idx2">index 2</param>
@@ -299,9 +260,6 @@ namespace UnityEngine.UI
             m_Indices.Add(idx2);
         }
 
-        /// <summary>
-        /// Add a quad to the stream.
-        /// </summary>
         /// <param name="verts">4 Vertices representing the quad.</param>
         public void AddUIVertexQuad(UIVertex[] verts)
         {
@@ -314,9 +272,6 @@ namespace UnityEngine.UI
             AddTriangle(startIndex + 2, startIndex + 3, startIndex);
         }
 
-        /// <summary>
-        /// Add a stream of custom UIVertex and corresponding indices.
-        /// </summary>
         /// <param name="verts">The custom stream of verts to add to the helpers internal data.</param>
         /// <param name="indices">The custom stream of indices to add to the helpers internal data.</param>
         public void AddUIVertexStream(List<UIVertex> verts, List<int> indices)
@@ -334,9 +289,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Add a list of triangles to the stream.
-        /// </summary>
         /// <param name="verts">Vertices to add. Length should be divisible by 3.</param>
         public void AddUIVertexTriangleStream(List<UIVertex> verts)
         {
@@ -348,9 +300,6 @@ namespace UnityEngine.UI
             CanvasRenderer.SplitUIVertexStreams(verts, m_Positions, m_Colors, m_Uv0S, m_Uv1S, m_Uv2S, m_Uv3S, m_Normals, m_Tangents, m_Indices);
         }
 
-        /// <summary>
-        /// Create a stream of UI vertex (in triangles) from the stream.
-        /// </summary>
         public void GetUIVertexStream(List<UIVertex> stream)
         {
             if (stream == null)

@@ -6,9 +6,6 @@ namespace TMPro
 {
     public enum CaretPosition { None, Left, Right }
 
-    /// <summary>
-    /// Structure which contains the character index and position of caret relative to the character.
-    /// </summary>
     public struct CaretInfo
     {
         public int index;
@@ -26,18 +23,12 @@ namespace TMPro
         private static Vector3[] m_rectWorldCorners = new Vector3[4];
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="textComponent">A reference to the text object.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function returning the index of the character whose origin is closest to the cursor.
-        /// </summary>
         /// <param name="textComponent">A reference to the text object.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
@@ -65,9 +56,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the index of the character whose origin is closest to the cursor.
-        /// </summary>
         /// <param name="textComponent">A reference to the text object.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
@@ -75,9 +63,6 @@ namespace TMPro
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function returning the index of the character whose origin is closest to the cursor.
-        /// </summary>
         /// <param name="textComponent">A reference to the text object.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
@@ -125,9 +110,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the line nearest to the position.
-        /// </summary>
         /// <param name="textComponent"></param>
         /// <param name="position"></param>
         /// <param name="camera"></param>
@@ -168,9 +150,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the nearest character to position on a given line.
-        /// </summary>
         /// <param name="text"></param>
         /// <param name="position"></param>
         /// <param name="line"></param>
@@ -226,9 +205,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function used to determine if the position intersects with the RectTransform.
-        /// </summary>
         /// <param name="rectTransform">A reference to the RectTranform of the text object.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
@@ -248,10 +224,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the index of the character at the given position (if any).
-        /// Returns @@-1@@ if no character is found at the specified position.
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which is rendering the text or whichever one might be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
@@ -281,9 +253,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the index of the character at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The camera which is rendering the text object.</param>
@@ -291,9 +260,6 @@ namespace TMPro
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function to find the nearest character to position.
-        /// </summary>
         /// <param name="text">A reference to the TMP Text component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
@@ -341,9 +307,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to find the nearest character to position.
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
@@ -351,9 +314,6 @@ namespace TMPro
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function to find the nearest character to position.
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The camera which is rendering the text object.</param>
@@ -361,9 +321,6 @@ namespace TMPro
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function returning the index of the word at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TMP_Text component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
@@ -463,27 +420,18 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the index of the word at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function returning the index of the word at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The camera which is rendering the text object.</param>
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function returning the index of the word at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TMP_Text component.</param>
         /// <param name="position"></param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
@@ -606,27 +554,18 @@ namespace TMPro
             return closest;
         }
 
-        /// <summary>
-        /// Function returning the index of the word at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
         /// <param name="position"></param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function returning the index of the word at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The camera which is rendering the text object.</param>
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function returning the line intersecting the position.
-        /// </summary>
         /// <param name="textComponent"></param>
         /// <param name="position"></param>
         /// <param name="camera"></param>
@@ -656,9 +595,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the index of the Link at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TMP_Text component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
@@ -731,27 +667,18 @@ namespace TMPro
             return -1;
         }
 
-        /// <summary>
-        /// Function returning the index of the Link at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function returning the index of the Link at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The camera which is rendering the text object.</param>
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function returning the index of the word at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TMP_Text component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
@@ -875,27 +802,18 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the index of the word at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function returning the index of the word at the given position (if any).
-        /// </summary>
         /// <param name="text">A reference to the TextMeshPro component.</param>
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The camera which is rendering the text object.</param>
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Function to check if a Point is contained within a Rectangle.
-        /// </summary>
         /// <param name="m"></param>
         /// <param name="a"></param>
         /// <param name="b"></param>
@@ -920,9 +838,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method to convert ScreenPoint to WorldPoint aligned with Rectangle
-        /// </summary>
         /// <param name="transform"></param>
         /// <param name="screenPoint"></param>
         /// <param name="cam"></param>
@@ -955,9 +870,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the point of intersection between a line and a plane.
-        /// </summary>
         /// <param name="line"></param>
         /// <param name="point"></param>
         /// <param name="normal"></param>
@@ -990,9 +902,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the Square Distance from a Point to a Line.
-        /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <param name="point"></param>
@@ -1024,9 +933,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function returning the Square Distance from a Point to a Line and Direction.
-        /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
         /// <param name="point"></param>
@@ -1034,20 +940,11 @@ namespace TMPro
         /// <returns></returns>
 
 
-        /// <summary>
-        /// Table used to convert character to lowercase.
-        /// </summary>
         private const string k_lookupStringL = "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[-]^_`abcdefghijklmnopqrstuvwxyz{|}~-";
 
-        /// <summary>
-        /// Table used to convert character to uppercase.
-        /// </summary>
         private const string k_lookupStringU = "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[-]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~-";
 
 
-        /// <summary>
-        /// Get lowercase version of this ASCII character.
-        /// </summary>
         public static char ToLowerFast(char c)
         {
             if (c > k_lookupStringL.Length - 1)
@@ -1056,9 +953,6 @@ namespace TMPro
             return k_lookupStringL[c];
         }
 
-        /// <summary>
-        /// Get uppercase version of this ASCII character.
-        /// </summary>
         public static char ToUpperFast(char c)
         {
             if (c > k_lookupStringU.Length - 1)
@@ -1067,9 +961,6 @@ namespace TMPro
             return k_lookupStringU[c];
         }
 
-        /// <summary>
-        /// Get uppercase version of this ASCII character.
-        /// </summary>
         internal static uint ToUpperASCIIFast(uint c)
         {
             if (c > k_lookupStringU.Length - 1)
@@ -1078,9 +969,6 @@ namespace TMPro
             return k_lookupStringU[(int)c];
         }
 
-        /// <summary>
-        /// Returns the case insensitive hashcode for the given string.
-        /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
         public static int GetHashCode(string s)
@@ -1096,9 +984,6 @@ namespace TMPro
             return hashCode;
         }
 
-        /// <summary>
-        /// Function which returns a simple hashcode from a string.
-        /// </summary>
         /// <returns></returns>
         public static int GetSimpleHashCode(string s)
         {
@@ -1110,9 +995,6 @@ namespace TMPro
             return hashCode;
         }
 
-        /// <summary>
-        /// Function which returns a simple hashcode from a string converted to lowercase.
-        /// </summary>
         /// <returns></returns>
         public static uint GetSimpleHashCodeLowercase(string s)
         {
@@ -1124,9 +1006,6 @@ namespace TMPro
             return hashCode;
         }
 
-        /// <summary>
-        /// Function which returns a simple hash code from a string converted to uppercase.
-        /// </summary>
         /// <param name="s">The string from which to compute the hash code.</param>
         /// <returns>The computed hash code.</returns>
         public static uint GetHashCodeCaseInSensitive(string s)
@@ -1140,9 +1019,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to convert Hex to Int
-        /// </summary>
         /// <param name="hex"></param>
         /// <returns></returns>
         public static int HexToInt(char hex)
@@ -1176,9 +1052,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to convert a properly formatted string which contains an hex value to its decimal value.
-        /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
         public static int StringHexToInt(string s)

@@ -5,10 +5,6 @@ namespace UnityEditor.UI
 {
     [CustomEditor(typeof(Text), true)]
     [CanEditMultipleObjects]
-    /// <summary>
-    /// Custom Editor for the Text Component.
-    /// Extend this class to write a custom editor for a component derived from Text.
-    /// </summary>
     public class TextEditor : GraphicEditor
     {
         SerializedProperty m_Text;

@@ -28,8 +28,7 @@ namespace TMPro.EditorUtilities
             public static readonly GUIContent textMeshProUiLabel = new("TextMeshPro UI");
             public static readonly GUIContent enableRaycastTarget = new("Enable Raycast Target");
             public static readonly GUIContent autoSizeContainerLabel = new("Auto Size Text Container", "Set the size of the text container to match the text.");
-            public static readonly GUIContent isTextObjectScaleStaticLabel = new("Is Object Scale Static", "Disables calling InternalUpdate() when enabled. This can improve performance when text object scale is static.");
-
+            
             public static readonly GUIContent textComponentDefaultSettingsLabel = new("Text Component Default Settings");
             public static readonly GUIContent defaultFontSize = new("Default Font Size");
             public static readonly GUIContent autoSizeRatioLabel = new("Text Auto Size Ratios");
@@ -37,7 +36,6 @@ namespace TMPro.EditorUtilities
             public static readonly GUIContent maxLabel = new("Max");
 
             public static readonly GUIContent textWrappingModeLabel = new("Text Wrapping Mode");
-            public static readonly GUIContent kerningLabel = new("Kerning");
             public static readonly GUIContent fontFeaturesLabel = new("Font Features", "Font features that should be set by default on the text component.");
             public static readonly GUIContent extraPaddingLabel = new("Extra Padding");
             public static readonly GUIContent tintAllSpritesLabel = new("Tint All Sprites");
@@ -45,7 +43,6 @@ namespace TMPro.EditorUtilities
 
             public static readonly GUIContent dynamicFontSystemSettingsLabel = new("Dynamic Font System Settings");
             public static readonly GUIContent getFontFeaturesAtRuntime = new("Get Font Features at Runtime", "Determines if OpenType font features should be retrieved from source font files as new characters and glyphs are added to font assets.");
-            public static readonly GUIContent dynamicAtlasTextureGroup = new("Dynamic Atlas Texture Group");
 
             public static readonly GUIContent missingGlyphLabel = new("Missing Character Unicode", "The character to be displayed when the requested character is not found in any font asset or fallbacks.");
             public static readonly GUIContent clearDynamicDataOnBuildLabel = new("Clear Dynamic Data On Build", "Determines if the \"Clear Dynamic Data on Build\" property will be set to true or false on newly created dynamic font assets.");
@@ -75,7 +72,6 @@ namespace TMPro.EditorUtilities
         SerializedProperty m_PropDefaultTextMeshProUITextContainerSize;
         SerializedProperty m_PropAutoSizeTextContainer;
         SerializedProperty m_PropEnableRaycastTarget;
-        SerializedProperty m_PropIsTextObjectScaleStatic;
 
         SerializedProperty m_PropSpriteAsset;
         SerializedProperty m_PropMissingSpriteCharacterUnicode;
@@ -124,7 +120,6 @@ namespace TMPro.EditorUtilities
             m_PropDefaultTextMeshProUITextContainerSize = serializedObject.FindProperty("m_defaultTextMeshProUITextContainerSize");
             m_PropAutoSizeTextContainer = serializedObject.FindProperty("m_autoSizeTextContainer");
             m_PropEnableRaycastTarget = serializedObject.FindProperty("m_EnableRaycastTarget");
-            m_PropIsTextObjectScaleStatic = serializedObject.FindProperty("m_IsTextObjectScaleStatic");
 
             m_PropSpriteAsset = serializedObject.FindProperty("m_defaultSpriteAsset");
             m_PropMissingSpriteCharacterUnicode = serializedObject.FindProperty("m_MissingCharacterSpriteUnicode");
@@ -237,7 +232,6 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.PropertyField(m_PropDefaultTextMeshProUITextContainerSize, Styles.textMeshProUiLabel);
             EditorGUILayout.PropertyField(m_PropEnableRaycastTarget, Styles.enableRaycastTarget);
             EditorGUILayout.PropertyField(m_PropAutoSizeTextContainer, Styles.autoSizeContainerLabel);
-            EditorGUILayout.PropertyField(m_PropIsTextObjectScaleStatic, Styles.isTextObjectScaleStaticLabel);
             EditorGUI.indentLevel = 0;
 
             EditorGUILayout.Space();

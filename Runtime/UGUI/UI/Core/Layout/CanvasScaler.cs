@@ -8,9 +8,6 @@ namespace UnityEngine.UI
     [ExecuteAlways]
     [AddComponentMenu("Layout/Canvas Scaler", 101)]
     [DisallowMultipleComponent]
-    /// <summary>
-    ///   The Canvas Scaler component is used for controlling the overall scale and pixel density of UI elements in the Canvas. This scaling affects everything under the Canvas, including font sizes and image borders.
-    /// </summary>
     /// <remarks>
     /// For a Canvas set to 'Screen Space - Overlay' or 'Screen Space - Camera', the Canvas Scaler UI Scale Mode can be set to Constant Pixel Size, Scale With Screen Size, or Constant Physical Size.
     ///
@@ -24,40 +21,21 @@ namespace UnityEngine.UI
     /// </remarks>
     public class CanvasScaler : UIBehaviour
     {
-        /// <summary>
-        /// Determines how UI elements in the Canvas are scaled.
-        /// </summary>
         public enum ScaleMode
         {
-            /// <summary>
-            /// Using the Constant Pixel Size mode, positions and sizes of UI elements are specified in pixels on the screen.
-            /// </summary>
             ConstantPixelSize,
-            /// <summary>
-            /// Using the Scale With Screen Size mode, positions and sizes can be specified according to the pixels of a specified reference resolution.
-            /// If the current screen resolution is larger than the reference resolution, the Canvas will keep having only the resolution of the reference resolution, but will scale up in order to fit the screen. If the current screen resolution is smaller than the reference resolution, the Canvas will similarly be scaled down to fit.
-            /// </summary>
             ScaleWithScreenSize,
-            /// <summary>
-            /// Using the Constant Physical Size mode, positions and sizes of UI elements are specified in physical units, such as millimeters, points, or picas.
-            /// </summary>
             ConstantPhysicalSize
         }
 
         [Tooltip("Determines how UI elements in the Canvas are scaled.")]
         [SerializeField] private ScaleMode m_UiScaleMode = ScaleMode.ConstantPixelSize;
 
-        ///<summary>
-        ///Determines how UI elements in the Canvas are scaled.
-        ///</summary>
         public ScaleMode uiScaleMode { get { return m_UiScaleMode; } set { m_UiScaleMode = value; } }
 
         [Tooltip("If a sprite has this 'Pixels Per Unit' setting, then one pixel in the sprite will cover one unit in the UI.")]
         [SerializeField] protected float m_ReferencePixelsPerUnit = 100;
 
-        /// <summary>
-        /// If a sprite has this 'Pixels Per Unit' setting, then one pixel in the sprite will cover one unit in the UI.
-        /// </summary>
         public float referencePixelsPerUnit { get { return m_ReferencePixelsPerUnit; } set { m_ReferencePixelsPerUnit = value; } }
 
 
@@ -66,41 +44,20 @@ namespace UnityEngine.UI
         [Tooltip("Scales all UI elements in the Canvas by this factor.")]
         [SerializeField] protected float m_ScaleFactor = 1;
 
-        /// <summary>
-        /// Scales all UI elements in the Canvas by this factor.
-        /// </summary>
 
-        /// <summary>
-        /// Scales all UI elements in the Canvas by this factor.
-        /// </summary>
         public float scaleFactor { get { return m_ScaleFactor; } set { m_ScaleFactor = Mathf.Max(0.01f, value); } }
 
         /// Scale the canvas area with the width as reference, the height as reference, or something in between.
-        /// <summary>
-        /// Scale the canvas area with the width as reference, the height as reference, or something in between.
-        /// </summary>
         public enum ScreenMatchMode
         {
-            /// <summary>
-            /// Scale the canvas area with the width as reference, the height as reference, or something in between.
-            /// </summary>
             MatchWidthOrHeight = 0,
-            /// <summary>
-            /// Expand the canvas area either horizontally or vertically, so the size of the canvas will never be smaller than the reference.
-            /// </summary>
             Expand = 1,
-            /// <summary>
-            /// Crop the canvas area either horizontally or vertically, so the size of the canvas will never be larger than the reference.
-            /// </summary>
             Shrink = 2
         }
 
         [Tooltip("The resolution the UI layout is designed for. If the screen resolution is larger, the UI will be scaled up, and if it's smaller, the UI will be scaled down. This is done in accordance with the Screen Match Mode.")]
         [SerializeField] protected Vector2 m_ReferenceResolution = new Vector2(800, 600);
 
-        /// <summary>
-        /// The resolution the UI layout is designed for.
-        /// </summary>
         /// <remarks>
         /// If the screen resolution is larger, the UI will be scaled up, and if it's smaller, the UI will be scaled down. This is done in accordance with the Screen Match Mode.
         /// </remarks>
@@ -123,18 +80,12 @@ namespace UnityEngine.UI
 
         [Tooltip("A mode used to scale the canvas area if the aspect ratio of the current resolution doesn't fit the reference resolution.")]
         [SerializeField] protected ScreenMatchMode m_ScreenMatchMode = ScreenMatchMode.MatchWidthOrHeight;
-        /// <summary>
-        /// A mode used to scale the canvas area if the aspect ratio of the current resolution doesn't fit the reference resolution.
-        /// </summary>
         public ScreenMatchMode screenMatchMode { get { return m_ScreenMatchMode; } set { m_ScreenMatchMode = value; } }
 
         [Tooltip("Determines if the scaling is using the width or height as reference, or a mix in between.")]
         [Range(0, 1)]
         [SerializeField] protected float m_MatchWidthOrHeight = 0;
 
-        /// <summary>
-        /// Setting to scale the Canvas to match the width or height of the reference resolution, or a combination.
-        /// </summary>
         /// <remarks>
         /// If the setting is set to 0, the Canvas is scaled according to the difference between the current screen resolution width and the reference resolution width. If the setting is set to 1, the Canvas is scaled according to the difference between the current screen resolution height and the reference resolution height.
         ///
@@ -155,59 +106,28 @@ namespace UnityEngine.UI
         // The log base doesn't have any influence on the results whatsoever, as long as the same base is used everywhere.
         private const float kLogBase = 2;
 
-        /// <summary>
-        /// The possible physical unit types
-        /// </summary>
         public enum Unit
         {
-            /// <summary>
-            /// Use centimeters.
-            /// A centimeter is 1/100 of a meter
-            /// </summary>
             Centimeters,
-            /// <summary>
-            /// Use millimeters.
-            /// A millimeter is 1/10 of a centimeter, and 1/1000 of a meter.
-            /// </summary>
             Millimeters,
-            /// <summary>
-            /// Use inches.
-            /// </summary>
             Inches,
-            /// <summary>
-            /// Use points.
-            /// One point is 1/12 of a pica, and 1/72 of an inch.
-            /// </summary>
             Points,
-            /// <summary>
-            /// Use picas.
-            /// One pica is 1/6 of an inch.
-            /// </summary>
             Picas
         }
 
         [Tooltip("The physical unit to specify positions and sizes in.")]
         [SerializeField] protected Unit m_PhysicalUnit = Unit.Points;
 
-        /// <summary>
-        /// The physical unit to specify positions and sizes in.
-        /// </summary>
         public Unit physicalUnit { get { return m_PhysicalUnit; } set { m_PhysicalUnit = value; } }
 
         [Tooltip("The DPI to assume if the screen DPI is not known.")]
         [SerializeField] protected float m_FallbackScreenDPI = 96;
 
-        /// <summary>
-        /// The DPI to assume if the screen DPI is not known.
-        /// </summary>
         public float fallbackScreenDPI { get { return m_FallbackScreenDPI; } set { m_FallbackScreenDPI = value; } }
 
         [Tooltip("The pixels per inch to use for sprites that have a 'Pixels Per Unit' setting that matches the 'Reference Pixels Per Unit' setting.")]
         [SerializeField] protected float m_DefaultSpriteDPI = 96;
 
-        /// <summary>
-        /// The pixels per inch to use for sprites that have a 'Pixels Per Unit' setting that matches the 'Reference Pixels Per Unit' setting.
-        /// </summary>
         public float defaultSpriteDPI { get { return m_DefaultSpriteDPI; } set { m_DefaultSpriteDPI = Mathf.Max(1, value); } }
 
 
@@ -216,9 +136,6 @@ namespace UnityEngine.UI
         [Tooltip("The amount of pixels per unit to use for dynamically created bitmaps in the UI, such as Text.")]
         [SerializeField] protected float m_DynamicPixelsPerUnit = 1;
 
-        /// <summary>
-        /// The amount of pixels per unit to use for dynamically created bitmaps in the UI, such as Text.
-        /// </summary>
         public float dynamicPixelsPerUnit { get { return m_DynamicPixelsPerUnit; } set { m_DynamicPixelsPerUnit = value; } }
 
 
@@ -255,9 +172,6 @@ namespace UnityEngine.UI
             base.OnDisable();
         }
 
-        ///<summary>
-        ///Method that handles calculations of canvas scaling.
-        ///</summary>
         protected virtual void Handle()
         {
             if (m_Canvas == null || !m_Canvas.isRootCanvas)
@@ -277,27 +191,18 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Handles canvas scaling for world canvas.
-        /// </summary>
         protected virtual void HandleWorldCanvas()
         {
             SetScaleFactor(m_DynamicPixelsPerUnit);
             SetReferencePixelsPerUnit(m_ReferencePixelsPerUnit);
         }
 
-        /// <summary>
-        /// Handles canvas scaling for a constant pixel size.
-        /// </summary>
         protected virtual void HandleConstantPixelSize()
         {
             SetScaleFactor(m_ScaleFactor);
             SetReferencePixelsPerUnit(m_ReferencePixelsPerUnit);
         }
 
-        /// <summary>
-        /// Handles canvas scaling that scales with the screen size.
-        /// </summary>
         protected virtual void HandleScaleWithScreenSize()
         {
             Vector2 screenSize = m_Canvas.renderingDisplaySize;
@@ -346,9 +251,6 @@ namespace UnityEngine.UI
             SetReferencePixelsPerUnit(m_ReferencePixelsPerUnit);
         }
 
-        ///<summary>
-        ///Handles canvas scaling for a constant physical size.
-        ///</summary>
         protected virtual void HandleConstantPhysicalSize()
         {
             float currentDpi = Screen.dpi;
@@ -367,9 +269,6 @@ namespace UnityEngine.UI
             SetReferencePixelsPerUnit(m_ReferencePixelsPerUnit * targetDPI / m_DefaultSpriteDPI);
         }
 
-        /// <summary>
-        /// Sets the scale factor on the canvas.
-        /// </summary>
         /// <param name="scaleFactor">The scale factor to use.</param>
         protected void SetScaleFactor(float scaleFactor)
         {
@@ -380,9 +279,6 @@ namespace UnityEngine.UI
             m_PrevScaleFactor = scaleFactor;
         }
 
-        /// <summary>
-        /// Sets the referencePixelsPerUnit on the Canvas.
-        /// </summary>
         /// <param name="referencePixelsPerUnit">The new reference pixels per Unity value</param>
         protected void SetReferencePixelsPerUnit(float referencePixelsPerUnit)
         {

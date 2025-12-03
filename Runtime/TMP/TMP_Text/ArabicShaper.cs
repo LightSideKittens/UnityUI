@@ -460,10 +460,6 @@ public static class ArabicShaper
     }
 
 
-    /// <summary>
-    /// Определяем, образуют ли два соседних символа (prev, curr)
-    /// соединённую пару в логическом порядке.
-    /// </summary>
     private static bool IsJoinPair(JoiningType prev, JoiningType curr)
     {
         if (prev == JoiningType.U || curr == JoiningType.U)

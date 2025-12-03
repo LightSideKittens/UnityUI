@@ -2,39 +2,24 @@ using System.Collections.Generic;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// Abstract base class for HorizontalLayoutGroup and VerticalLayoutGroup to generalize common functionality.
-    /// </summary>
     ///
     [ExecuteAlways]
     public abstract class HorizontalOrVerticalLayoutGroup : LayoutGroup
     {
         [SerializeField] protected float m_Spacing = 0;
 
-        /// <summary>
-        /// The spacing to use between layout elements in the layout group.
-        /// </summary>
         public float spacing { get { return m_Spacing; } set { SetProperty(ref m_Spacing, value); } }
 
         [SerializeField] protected bool m_ChildForceExpandWidth = true;
 
-        /// <summary>
-        /// Whether to force the children to expand to fill additional available horizontal space.
-        /// </summary>
         public bool childForceExpandWidth { get { return m_ChildForceExpandWidth; } set { SetProperty(ref m_ChildForceExpandWidth, value); } }
 
         [SerializeField] protected bool m_ChildForceExpandHeight = true;
 
-        /// <summary>
-        /// Whether to force the children to expand to fill additional available vertical space.
-        /// </summary>
         public bool childForceExpandHeight { get { return m_ChildForceExpandHeight; } set { SetProperty(ref m_ChildForceExpandHeight, value); } }
 
         [SerializeField] protected bool m_ChildControlWidth = true;
 
-        /// <summary>
-        /// Returns true if the Layout Group controls the widths of its children. Returns false if children control their own widths.
-        /// </summary>
         /// <remarks>
         /// If set to false, the layout group will only affect the positions of the children while leaving the widths untouched. The widths of the children can be set via the respective RectTransforms in this case.
         ///
@@ -44,9 +29,6 @@ namespace UnityEngine.UI
 
         [SerializeField] protected bool m_ChildControlHeight = true;
 
-        /// <summary>
-        /// Returns true if the Layout Group controls the heights of its children. Returns false if children control their own heights.
-        /// </summary>
         /// <remarks>
         /// If set to false, the layout group will only affect the positions of the children while leaving the heights untouched. The heights of the children can be set via the respective RectTransforms in this case.
         ///
@@ -56,21 +38,12 @@ namespace UnityEngine.UI
 
         [SerializeField] protected bool m_ChildScaleWidth = false;
 
-        /// <summary>
-        /// Whether to use the x scale of each child when calculating its width.
-        /// </summary>
         public bool childScaleWidth { get { return m_ChildScaleWidth; } set { SetProperty(ref m_ChildScaleWidth, value); } }
 
         [SerializeField] protected bool m_ChildScaleHeight = false;
 
-        /// <summary>
-        /// Whether to use the y scale of each child when calculating its height.
-        /// </summary>
         public bool childScaleHeight { get { return m_ChildScaleHeight; } set { SetProperty(ref m_ChildScaleHeight, value); } }
 
-        /// <summary>
-        /// Whether the order of children objects should be sorted in reverse.
-        /// </summary>
         /// <remarks>
         /// If False the first child object will be positioned first.
         /// If True the last child object will be positioned first.
@@ -79,9 +52,6 @@ namespace UnityEngine.UI
 
         [SerializeField] protected bool m_ReverseArrangement = false;
 
-        /// <summary>
-        /// Calculate the layout element properties for this layout element along the given axis.
-        /// </summary>
         /// <param name="axis">The axis to calculate for. 0 is horizontal and 1 is vertical.</param>
         /// <param name="isVertical">Is this group a vertical group?</param>
         protected void CalcAlongAxis(int axis, bool isVertical)
@@ -136,9 +106,6 @@ namespace UnityEngine.UI
             SetLayoutInputForAxis(totalMin, totalPreferred, totalFlexible, axis);
         }
 
-        /// <summary>
-        /// Set the positions and sizes of the child layout elements for the given axis.
-        /// </summary>
         /// <param name="axis">The axis to handle. 0 is horizontal and 1 is vertical.</param>
         /// <param name="isVertical">Is this group a vertical group?</param>
         protected void SetChildrenAlongAxis(int axis, bool isVertical)

@@ -7,33 +7,18 @@ using UnityEngine.U2D;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// Image is a textured element in the UI hierarchy.
-    /// </summary>
 
     [RequireComponent(typeof(CanvasRenderer))]
     [AddComponentMenu("UI/Image", 11)]
-    /// <summary>
-    ///   Displays a Sprite inside the UI System.
-    /// </summary>
     public class Image : MaskableGraphic, ISerializationCallbackReceiver, ILayoutElement, ICanvasRaycastFilter
     {
-        /// <summary>
-        /// Image fill type controls how to display the image.
-        /// </summary>
         public enum Type
         {
-            /// <summary>
-            /// Displays the full Image
-            /// </summary>
             /// <remarks>
             /// This setting shows the entire image stretched across the Image's RectTransform
             /// </remarks>
             Simple,
 
-            /// <summary>
-            /// Displays the Image as a 9-sliced graphic.
-            /// </summary>
             /// <remarks>
             /// A 9-sliced image displays a central area stretched across the image surrounded by a border comprising of 4 corners and 4 stretched edges.
             ///
@@ -43,9 +28,6 @@ namespace UnityEngine.UI
             /// </remarks>
             Sliced,
 
-            /// <summary>
-            /// Displays a sliced Sprite with its resizable sections tiled instead of stretched.
-            /// </summary>
             /// <remarks>
             /// A Tiled image behaves similarly to a UI.Image.Type.Sliced|Sliced image, except that the resizable sections of the image are repeated instead of being stretched. This can be useful for detailed UI graphics that do not look good when stretched.
             ///
@@ -61,9 +43,6 @@ namespace UnityEngine.UI
             /// </remarks>
             Tiled,
 
-            /// <summary>
-            /// Displays only a portion of the Image.
-            /// </summary>
             /// <remarks>
             /// A Filled Image will display a section of the Sprite, with the rest of the RectTransform left transparent. The Image.fillAmount determines how much of the Image to show, and Image.fillMethod controls the shape in which the Image will be cut.
             ///
@@ -72,160 +51,79 @@ namespace UnityEngine.UI
             Filled
         }
 
-        /// <summary>
-        /// The possible fill method types for a Filled Image.
-        /// </summary>
         public enum FillMethod
         {
-            /// <summary>
-            /// The Image will be filled Horizontally.
-            /// </summary>
             /// <remarks>
             /// The Image will be Cropped at either left or right size depending on Image.fillOriging at the Image.fillAmount
             /// </remarks>
             Horizontal,
 
-            /// <summary>
-            /// The Image will be filled Vertically.
-            /// </summary>
             /// <remarks>
             /// The Image will be Cropped at either top or Bottom size depending on Image.fillOrigin at the Image.fillAmount
             /// </remarks>
             Vertical,
 
-            /// <summary>
-            /// The Image will be filled Radially with the radial center in one of the corners.
-            /// </summary>
             /// <remarks>
             /// For this method the Image.fillAmount represents an angle between 0 and 90 degrees. The Image will be cut by a line passing at the Image.fillOrigin at the specified angle.
             /// </remarks>
             Radial90,
 
-            /// <summary>
-            /// The Image will be filled Radially with the radial center in one of the edges.
-            /// </summary>
             /// <remarks>
             /// For this method the Image.fillAmount represents an angle between 0 and 180 degrees. The Image will be cut by a line passing at the Image.fillOrigin at the specified angle.
             /// </remarks>
             Radial180,
 
-            /// <summary>
-            /// The Image will be filled Radially with the radial center at the center.
-            /// </summary>
             /// <remarks>
             /// or this method the Image.fillAmount represents an angle between 0 and 360 degrees. The Arc defined by the center of the Image, the Image.fillOrigin and the angle will be cut from the Image.
             /// </remarks>
             Radial360,
         }
 
-        /// <summary>
-        /// Origin for the Image.FillMethod.Horizontal.
-        /// </summary>
         public enum OriginHorizontal
         {
-            /// <summary>
-            /// >Origin at the Left side.
-            /// </summary>
             Left,
 
-            /// <summary>
-            /// >Origin at the Right side.
-            /// </summary>
             Right,
         }
 
 
-        /// <summary>
-        /// Origin for the Image.FillMethod.Vertical.
-        /// </summary>
         public enum OriginVertical
         {
-            /// <summary>
-            /// >Origin at the Bottom Edge.
-            /// </summary>
             Bottom,
 
-            /// <summary>
-            /// >Origin at the Top Edge.
-            /// </summary>
             Top,
         }
 
-        /// <summary>
-        /// Origin for the Image.FillMethod.Radial90.
-        /// </summary>
         public enum Origin90
         {
-            /// <summary>
-            /// Radial starting at the Bottom Left corner.
-            /// </summary>
             BottomLeft,
 
-            /// <summary>
-            /// Radial starting at the Top Left corner.
-            /// </summary>
             TopLeft,
 
-            /// <summary>
-            /// Radial starting at the Top Right corner.
-            /// </summary>
             TopRight,
 
-            /// <summary>
-            /// Radial starting at the Bottom Right corner.
-            /// </summary>
             BottomRight,
         }
 
-        /// <summary>
-        /// Origin for the Image.FillMethod.Radial180.
-        /// </summary>
         public enum Origin180
         {
-            /// <summary>
-            /// Center of the radial at the center of the Bottom edge.
-            /// </summary>
             Bottom,
 
-            /// <summary>
-            /// Center of the radial at the center of the Left edge.
-            /// </summary>
             Left,
 
-            /// <summary>
-            /// Center of the radial at the center of the Top edge.
-            /// </summary>
             Top,
 
-            /// <summary>
-            /// Center of the radial at the center of the Right edge.
-            /// </summary>
             Right,
         }
 
-        /// <summary>
-        /// One of the points of the Arc for the Image.FillMethod.Radial360.
-        /// </summary>
         public enum Origin360
         {
-            /// <summary>
-            /// Arc starting at the center of the Bottom edge.
-            /// </summary>
             Bottom,
 
-            /// <summary>
-            /// Arc starting at the center of the Right edge.
-            /// </summary>
             Right,
 
-            /// <summary>
-            /// Arc starting at the center of the Top edge.
-            /// </summary>
             Top,
 
-            /// <summary>
-            /// Arc starting at the center of the Left edge.
-            /// </summary>
             Left,
         }
 
@@ -235,9 +133,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private Sprite m_Sprite;
 
-        /// <summary>
-        /// The sprite that is used to render this image.
-        /// </summary>
         /// <remarks>
         /// This returns the source Sprite of an Image. This Sprite can also be viewed and changed in the Inspector as part of an Image component. This can also be used to change the Sprite using a script.
         /// </remarks>
@@ -321,9 +216,6 @@ namespace UnityEngine.UI
         }
 
 
-        /// <summary>
-        /// Disable all automatic sprite optimizations.
-        /// </summary>
         /// <remarks>
         /// When a new Sprite is assigned update optimizations are automatically applied.
         /// </remarks>
@@ -337,9 +229,6 @@ namespace UnityEngine.UI
         [NonSerialized]
         private Sprite m_OverrideSprite;
 
-        /// <summary>
-        /// Set an override sprite to be used for rendering.
-        /// </summary>
         /// <remarks>
         /// The UI.Image-overrideSprite|overrideSprite variable allows a sprite to have the
         /// sprite changed.This change happens immediately.When the changed
@@ -409,9 +298,6 @@ namespace UnityEngine.UI
         /// How the Image is drawn.
         [SerializeField] private Type m_Type = Type.Simple;
 
-        /// <summary>
-        /// How to display the image.
-        /// </summary>
         /// <remarks>
         /// Unity can interpret an Image in various different ways depending on the intended purpose. This can be used to display:
         /// - Whole images stretched to fit the RectTransform of the Image.
@@ -423,16 +309,10 @@ namespace UnityEngine.UI
 
         [SerializeField] private bool m_PreserveAspect = false;
 
-        /// <summary>
-        /// Whether this image should preserve its Sprite aspect ratio.
-        /// </summary>
         public bool preserveAspect { get { return m_PreserveAspect; } set { if (SetPropertyUtility.SetStruct(ref m_PreserveAspect, value)) SetVerticesDirty(); } }
 
         [SerializeField] private bool m_FillCenter = true;
 
-        /// <summary>
-        /// Whether or not to render the center of a Tiled or Sliced image.
-        /// </summary>
         /// <remarks>
         /// This will only have any effect if the Image.sprite has borders.
         /// </remarks>
@@ -467,9 +347,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private float m_FillAmount = 1.0f;
 
-        /// <summary>
-        /// Amount of the Image shown when the Image.type is set to Image.Type.Filled.
-        /// </summary>
         /// <remarks>
         /// 0-1 range with 0 being nothing shown, and 1 being the full Image.
         /// </remarks>
@@ -504,9 +381,6 @@ namespace UnityEngine.UI
         /// Whether the Image should be filled clockwise (true) or counter-clockwise (false).
         [SerializeField] private bool m_FillClockwise = true;
 
-        /// <summary>
-        /// Whether the Image should be filled clockwise (true) or counter-clockwise (false).
-        /// </summary>
         /// <remarks>
         /// This will only have any effect if the Image.type is set to Image.Type.Filled and Image.fillMethod is set to any of the Radial methods.
         /// </remarks>
@@ -543,9 +417,6 @@ namespace UnityEngine.UI
         /// Controls the origin point of the Fill process. Value means different things with each fill method.
         [SerializeField] private int m_FillOrigin;
 
-        /// <summary>
-        /// Controls the origin point of the Fill process. Value means different things with each fill method.
-        /// </summary>
         /// <remarks>
         /// You should cast to the appropriate origin type: Image.OriginHorizontal, Image.OriginVertical, Image.Origin90, Image.Origin180 or Image.Origin360 depending on the Image.Fillmethod.
         /// Note: This will only have any effect if the Image.type is set to Image.Type.Filled.
@@ -599,9 +470,6 @@ namespace UnityEngine.UI
         // Whether this is being tracked for Atlas Binding.
         private bool m_Tracked = false;
         
-        /// <summary>
-        /// The alpha threshold specifies the minimum alpha a pixel must have for the event to considered a "hit" on the Image.
-        /// </summary>
         /// <remarks>
         /// Alpha values less than the threshold will cause raycast events to pass through the Image. An value of 1 would cause only fully opaque pixels to register raycast events on the Image. The alpha tested is retrieved from the image sprite only, while the alpha of the Image [[UI.Graphic.color]] is disregarded.
         ///
@@ -640,9 +508,6 @@ namespace UnityEngine.UI
         /// Controls whether or not to use the generated mesh from the sprite importer.
         [SerializeField] private bool m_UseSpriteMesh;
 
-        /// <summary>
-        /// Allows you to specify whether the UI Image should be displayed using the mesh generated by the TextureImporter, or by a simple quad mesh.
-        /// </summary>
         /// <remarks>
         /// When this property is set to false, the UI Image uses a simple quad. When set to true, the UI Image uses the sprite mesh generated by the [[TextureImporter]]. You should set this to true if you want to use a tightly fitted sprite mesh based on the alpha values in your image.
         /// Note: If the texture importer's SpriteMeshType property is set to SpriteMeshType.FullRect, it will only generate a quad, and not a tightly fitted sprite mesh, which means this UI image will be drawn using a quad regardless of the value of this property. Therefore, when enabling this property to use a tightly fitted sprite mesh, you must also ensure the texture importer's SpriteMeshType property is set to Tight.
@@ -650,9 +515,6 @@ namespace UnityEngine.UI
         public bool useSpriteMesh { get { return m_UseSpriteMesh; } set { if (SetPropertyUtility.SetStruct(ref m_UseSpriteMesh, value)) SetVerticesDirty(); } }
         
 
-        /// <summary>
-        /// Cache of the default Canvas Ericsson Texture Compression 1 (ETC1) and alpha Material.
-        /// </summary>
         /// <remarks>
         /// Stores the ETC1 supported Canvas Material that is returned from GetETC1SupportedCanvasMaterial().
         /// Note: Always specify the UI/DefaultETC1 Shader in the Always Included Shader list, to use the ETC1 and alpha Material.
@@ -667,9 +529,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Image's texture comes from the UnityEngine.Image.
-        /// </summary>
         public override Texture mainTexture
         {
             get
@@ -687,9 +546,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Whether the Sprite of the image has a border to work with.
-        /// </summary>
 
         public bool hasBorder
         {
@@ -708,9 +564,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private float m_PixelsPerUnitMultiplier = 1.0f;
 
-        /// <summary>
-        /// Pixel per unit modifier to change how sliced sprites are generated.
-        /// </summary>
         public float pixelsPerUnitMultiplier
         {
             get { return m_PixelsPerUnitMultiplier; }
@@ -744,9 +597,6 @@ namespace UnityEngine.UI
             get { return pixelsPerUnit * m_PixelsPerUnitMultiplier; }
         }
 
-        /// <summary>
-        /// The specified Material used by this Image. The default Material is used instead if one wasn't specified.
-        /// </summary>
         public override Material material
         {
             get
@@ -771,14 +621,8 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// See ISerializationCallbackReceiver.
-        /// </summary>
         public virtual void OnBeforeSerialize() {}
 
-        /// <summary>
-        /// See ISerializationCallbackReceiver.
-        /// </summary>
         public virtual void OnAfterDeserialize()
         {
             if (m_FillOrigin < 0)
@@ -845,9 +689,6 @@ namespace UnityEngine.UI
             return v;
         }
 
-        /// <summary>
-        /// Adjusts the image size to make it pixel-perfect.
-        /// </summary>
         /// <remarks>
         /// This means setting the Images RectTransform.sizeDelta to be equal to the Sprite dimensions.
         /// </remarks>
@@ -863,9 +704,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Update the UI renderer mesh.
-        /// </summary>
         protected override void OnPopulateMesh(VertexHelper toFill)
         {
             if (activeSprite == null)
@@ -1007,9 +845,6 @@ namespace UnityEngine.UI
             ClearArray(ref s_TempNewSecondaryTextures);
         }
 
-        /// <summary>
-        /// Update the renderer's material.
-        /// </summary>
 
         protected override void UpdateMaterial()
         {
@@ -1051,9 +886,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Generate vertices for a simple Image.
-        /// </summary>
         void GenerateSimpleSprite(VertexHelper vh, bool lPreserveAspect)
         {
             Vector4 v = GetDrawingDimensions(lPreserveAspect);
@@ -1110,9 +942,6 @@ namespace UnityEngine.UI
         static readonly Vector2[] s_VertScratch = new Vector2[4];
         static readonly Vector2[] s_UVScratch = new Vector2[4];
 
-        /// <summary>
-        /// Generate vertices for a 9-sliced Image.
-        /// </summary>
         private void GenerateSlicedSprite(VertexHelper toFill)
         {
             if (!hasBorder)
@@ -1190,9 +1019,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Generate vertices for a tiled Image.
-        /// </summary>
 
         void GenerateTiledSprite(VertexHelper toFill)
         {
@@ -1497,9 +1323,6 @@ namespace UnityEngine.UI
         static readonly Vector3[] s_Xy = new Vector3[4];
         static readonly Vector3[] s_Uv = new Vector3[4];
 
-        /// <summary>
-        /// Generate vertices for a filled Image.
-        /// </summary>
         void GenerateFilledSprite(VertexHelper toFill, bool preserveAspect)
         {
             toFill.Clear();
@@ -1700,9 +1523,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Adjust the specified quad, making it be radially filled instead.
-        /// </summary>
 
         static bool RadialCut(Vector3[] xy, Vector3[] uv, float fill, bool invert, int corner)
         {
@@ -1729,9 +1549,6 @@ namespace UnityEngine.UI
             return true;
         }
 
-        /// <summary>
-        /// Adjust the specified quad, making it be radially filled instead.
-        /// </summary>
 
         static void RadialCut(Vector3[] xy, float cos, float sin, bool invert, int corner)
         {
@@ -1808,25 +1625,12 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// See ILayoutElement.CalculateLayoutInputHorizontal.
-        /// </summary>
         public virtual void CalculateLayoutInputHorizontal() {}
 
-        /// <summary>
-        /// See ILayoutElement.CalculateLayoutInputVertical.
-        /// </summary>
         public virtual void CalculateLayoutInputVertical() {}
 
-        /// <summary>
-        /// See ILayoutElement.minWidth.
-        /// </summary>
         public virtual float minWidth { get { return 0; } }
 
-        /// <summary>
-        /// If there is a sprite being rendered returns the size of that sprite.
-        /// In the case of a slided or tiled sprite will return the calculated minimum size possible
-        /// </summary>
         public virtual float preferredWidth
         {
             get
@@ -1839,20 +1643,10 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// See ILayoutElement.flexibleWidth.
-        /// </summary>
         public virtual float flexibleWidth { get { return -1; } }
 
-        /// <summary>
-        /// See ILayoutElement.minHeight.
-        /// </summary>
         public virtual float minHeight { get { return 0; } }
 
-        /// <summary>
-        /// If there is a sprite being rendered returns the size of that sprite.
-        /// In the case of a slided or tiled sprite will return the calculated minimum size possible
-        /// </summary>
         public virtual float preferredHeight
         {
             get
@@ -1865,19 +1659,10 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// See ILayoutElement.flexibleHeight.
-        /// </summary>
         public virtual float flexibleHeight { get { return -1; } }
 
-        /// <summary>
-        /// See ILayoutElement.layoutPriority.
-        /// </summary>
         public virtual int layoutPriority { get { return 0; } }
 
-        /// <summary>
-        /// Calculate if the ray location for this image is a valid hit location. Takes into account a Alpha test threshold.
-        /// </summary>
         /// <param name="screenPoint">The screen point to check against</param>
         /// <param name="eventCamera">The camera in which to use to calculate the coordinating position</param>
         /// <returns>If the location is a valid hit or not.</returns>

@@ -11,16 +11,9 @@ using UnityEngine.Pool;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// Base class for all UI components that should be derived from when creating new Graphic types.
-    /// </summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
     [ExecuteAlways]
-    /// <summary>
-    ///   Base class for all visual UI Component.
-    ///   When creating visual UI components you should inherit from this class.
-    /// </summary>
     /// <example>
     /// Below is a simple example that draws a colored quad inside the Rect Transform area.
     /// <code>
@@ -85,9 +78,6 @@ namespace UnityEngine.UI
         static protected Material s_DefaultUI = null;
         static protected Texture2D s_WhiteTexture = null;
 
-        /// <summary>
-        /// Default material used to draw UI elements if no explicit material was specified.
-        /// </summary>
 
         static public Material defaultGraphicMaterial
         {
@@ -108,9 +98,6 @@ namespace UnityEngine.UI
         [NonSerialized] protected bool m_SkipLayoutUpdate;
         [NonSerialized] protected bool m_SkipMaterialUpdate;
 
-        /// <summary>
-        /// Base color of the Graphic.
-        /// </summary>
         /// <remarks>
         /// The builtin UI Components use this as their vertex color. Use this to fetch or change the Color of visual UI elements, such as an Image.
         /// </remarks>
@@ -159,9 +146,6 @@ namespace UnityEngine.UI
 
         private bool m_RaycastTargetCache = true;
 
-        /// <summary>
-        /// Should this graphic be considered a target for raycasting?
-        /// </summary>
         public virtual bool raycastTarget
         {
             get
@@ -187,13 +171,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private Vector4 m_RaycastPadding = new Vector4();
 
-        /// <summary>
-        /// Padding to be applied to the masking
-        /// X = Left
-        /// Y = Bottom
-        /// Z = Right
-        /// W = Top
-        /// </summary>
         public Vector4 raycastPadding
         {
             get { return m_RaycastPadding; }
@@ -230,10 +207,6 @@ namespace UnityEngine.UI
             m_ColorTweenRunner.Init(this);
         }
 
-        /// <summary>
-        /// Set all properties of the Graphic dirty and needing rebuilt.
-        /// Dirties Layout, Vertices, and Materials.
-        /// </summary>
         public virtual void SetAllDirty()
         {
             // Optimization: Graphic layout doesn't need recalculation if
@@ -262,9 +235,6 @@ namespace UnityEngine.UI
             SetRaycastDirty();
         }
 
-        /// <summary>
-        /// Mark the layout as dirty and needing rebuilt.
-        /// </summary>
         /// <remarks>
         /// Send a OnDirtyLayoutCallback notification if any elements are registered. See RegisterDirtyLayoutCallback
         /// </remarks>
@@ -279,9 +249,6 @@ namespace UnityEngine.UI
                 m_OnDirtyLayoutCallback();
         }
 
-        /// <summary>
-        /// Mark the vertices as dirty and needing rebuilt.
-        /// </summary>
         /// <remarks>
         /// Send a OnDirtyVertsCallback notification if any elements are registered. See RegisterDirtyVerticesCallback
         /// </remarks>
@@ -297,9 +264,6 @@ namespace UnityEngine.UI
                 m_OnDirtyVertsCallback();
         }
 
-        /// <summary>
-        /// Mark the material as dirty and needing rebuilt.
-        /// </summary>
         /// <remarks>
         /// Send a OnDirtyMaterialCallback notification if any elements are registered. See RegisterDirtyMaterialCallback
         /// </remarks>
@@ -363,9 +327,6 @@ namespace UnityEngine.UI
             SetAllDirty();
         }
 
-        /// <summary>
-        /// Absolute depth of the graphic, used by rendering and events -- lowest to highest.
-        /// </summary>
         /// <example>
         /// The depth is relative to the first root canvas.
         ///
@@ -381,9 +342,6 @@ namespace UnityEngine.UI
         /// </example>
         public int depth { get { return canvasRenderer.absoluteDepth; } }
 
-        /// <summary>
-        /// The RectTransform component used by the Graphic. Cached for speed.
-        /// </summary>
         public RectTransform rectTransform
         {
             get
@@ -398,9 +356,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// A reference to the Canvas this Graphic is rendering to.
-        /// </summary>
         /// <remarks>
         /// In the situation where the Graphic is used in a hierarchy with multiple Canvases, the Canvas closest to the root will be used.
         /// </remarks>
@@ -442,9 +397,6 @@ namespace UnityEngine.UI
             ListPool<Canvas>.Release(list);
         }
 
-        /// <summary>
-        /// A reference to the CanvasRenderer populated by this Graphic.
-        /// </summary>
         public CanvasRenderer canvasRenderer
         {
             get
@@ -464,17 +416,11 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Returns the default material for the graphic.
-        /// </summary>
         public virtual Material defaultMaterial
         {
             get { return defaultGraphicMaterial; }
         }
 
-        /// <summary>
-        /// The Material set by the user
-        /// </summary>
         public virtual Material material
         {
             get
@@ -491,9 +437,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// The material that will be sent for Rendering (Read only).
-        /// </summary>
         /// <remarks>
         /// This is the material that actually gets sent to the CanvasRenderer. By default it's the same as [[Graphic.material]]. When extending Graphic you can override this to send a different material to the CanvasRenderer than the one set by Graphic.material. This is useful if you want to modify the user set material in a non destructive manner.
         /// </remarks>
@@ -512,9 +455,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// The graphic's texture. (Read Only).
-        /// </summary>
         /// <remarks>
         /// This is the Texture that gets passed to the CanvasRenderer, Material and then Shader _MainTex.
         ///
@@ -530,9 +470,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Mark the Graphic and the canvas as having been changed.
-        /// </summary>
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -548,9 +485,6 @@ namespace UnityEngine.UI
             SetAllDirty();
         }
 
-        /// <summary>
-        /// Clear references.
-        /// </summary>
         protected override void OnDisable()
         {
 #if UNITY_EDITOR
@@ -608,9 +542,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// This method must be called when <c>CanvasRenderer.cull</c> is modified.
-        /// </summary>
         /// <remarks>
         /// This can be used to perform operations that were previously skipped because the <c>Graphic</c> was culled.
         /// </remarks>
@@ -623,9 +554,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Rebuilds the graphic geometry and its material on the PreRender cycle.
-        /// </summary>
         /// <param name="update">The current step of the rendering CanvasUpdate cycle.</param>
         /// <remarks>
         /// See CanvasUpdateRegistry for more details on the canvas update cycle.
@@ -658,9 +586,6 @@ namespace UnityEngine.UI
         public virtual void GraphicUpdateComplete()
         {}
 
-        /// <summary>
-        /// Call to update the Material of the graphic onto the CanvasRenderer.
-        /// </summary>
         protected virtual void UpdateMaterial()
         {
             if (!IsActive())
@@ -671,9 +596,6 @@ namespace UnityEngine.UI
             canvasRenderer.SetTexture(mainTexture);
         }
 
-        /// <summary>
-        /// Call to update the geometry of the Graphic onto the CanvasRenderer.
-        /// </summary>
         protected virtual void UpdateGeometry()
         {
             DoMeshGeneration();
@@ -711,9 +633,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Callback function when a UI element needs to generate vertices. Fills the vertex buffer data.
-        /// </summary>
         /// <param name="vh">VertexHelper utility.</param>
         /// <remarks>
         /// Used by Text, UI.Image, and RawImage for example to generate vertices specific to their use case.
@@ -735,10 +654,6 @@ namespace UnityEngine.UI
         }
 
 #if UNITY_EDITOR
-        /// <summary>
-        /// Editor-only callback that is issued by Unity if a rebuild of the Graphic is required.
-        /// Currently sent when an asset is reimported.
-        /// </summary>
         public virtual void OnRebuildRequested()
         {
             // when rebuild is requested we need to rebuild all the graphics /
@@ -772,14 +687,8 @@ namespace UnityEngine.UI
             SetAllDirty();
         }
 
-        /// <summary>
-        /// Make the Graphic have the native size of its content.
-        /// </summary>
         public virtual void SetNativeSize() {}
 
-        /// <summary>
-        /// When a GraphicRaycaster is raycasting into the scene it does two things. First it filters the elements using their RectTransform rect. Then it uses this Raycast function to determine the elements hit by the raycast.
-        /// </summary>
         /// <param name="sp">Screen point being tested</param>
         /// <param name="eventCamera">Camera that is being used for the testing.</param>
         /// <returns>True if the provided point is a valid location for GraphicRaycaster raycasts.</returns>
@@ -850,9 +759,6 @@ namespace UnityEngine.UI
 
 #endif
 
-        ///<summary>
-        ///Adjusts the given pixel to be pixel perfect.
-        ///</summary>
         ///<param name="point">Local space point.</param>
         ///<returns>Pixel perfect adjusted point.</returns>
         ///<remarks>
@@ -868,9 +774,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Returns a pixel perfect Rect closest to the Graphic RectTransform.
-        /// </summary>
         /// <remarks>
         /// Note: This is only accurate if the Graphic root Canvas is in Screen Space.
         /// </remarks>
@@ -883,9 +786,6 @@ namespace UnityEngine.UI
                 return RectTransformUtility.PixelAdjustRect(rectTransform, canvas);
         }
 
-        ///<summary>
-        ///Tweens the CanvasRenderer color associated with this Graphic.
-        ///</summary>
         ///<param name="targetColor">Target color.</param>
         ///<param name="duration">Tween duration.</param>
         ///<param name="ignoreTimeScale">Should ignore Time.scale?</param>
@@ -895,9 +795,6 @@ namespace UnityEngine.UI
             CrossFadeColor(targetColor, duration, ignoreTimeScale, useAlpha, true);
         }
 
-        ///<summary>
-        ///Tweens the CanvasRenderer color associated with this Graphic.
-        ///</summary>
         ///<param name="targetColor">Target color.</param>
         ///<param name="duration">Tween duration.</param>
         ///<param name="ignoreTimeScale">Should ignore Time.scale?</param>
@@ -933,9 +830,6 @@ namespace UnityEngine.UI
             return alphaColor;
         }
 
-        ///<summary>
-        ///Tweens the alpha of the CanvasRenderer color associated with this Graphic.
-        ///</summary>
         ///<param name="alpha">Target alpha.</param>
         ///<param name="duration">Duration of the tween in seconds.</param>
         ///<param name="ignoreTimeScale">Should ignore [[Time.scale]]?</param>
@@ -944,54 +838,36 @@ namespace UnityEngine.UI
             CrossFadeColor(CreateColorFromAlpha(alpha), duration, ignoreTimeScale, true, false);
         }
 
-        /// <summary>
-        /// Add a listener to receive notification when the graphics layout is dirtied.
-        /// </summary>
         /// <param name="action">The method to call when invoked.</param>
         public void RegisterDirtyLayoutCallback(UnityAction action)
         {
             m_OnDirtyLayoutCallback += action;
         }
 
-        /// <summary>
-        /// Remove a listener from receiving notifications when the graphics layout are dirtied
-        /// </summary>
         /// <param name="action">The method to call when invoked.</param>
         public void UnregisterDirtyLayoutCallback(UnityAction action)
         {
             m_OnDirtyLayoutCallback -= action;
         }
 
-        /// <summary>
-        /// Add a listener to receive notification when the graphics vertices are dirtied.
-        /// </summary>
         /// <param name="action">The method to call when invoked.</param>
         public void RegisterDirtyVerticesCallback(UnityAction action)
         {
             m_OnDirtyVertsCallback += action;
         }
 
-        /// <summary>
-        /// Remove a listener from receiving notifications when the graphics vertices are dirtied
-        /// </summary>
         /// <param name="action">The method to call when invoked.</param>
         public void UnregisterDirtyVerticesCallback(UnityAction action)
         {
             m_OnDirtyVertsCallback -= action;
         }
 
-        /// <summary>
-        /// Add a listener to receive notification when the graphics material is dirtied.
-        /// </summary>
         /// <param name="action">The method to call when invoked.</param>
         public void RegisterDirtyMaterialCallback(UnityAction action)
         {
             m_OnDirtyMaterialCallback += action;
         }
 
-        /// <summary>
-        /// Remove a listener from receiving notifications when the graphics material are dirtied
-        /// </summary>
         /// <param name="action">The method to call when invoked.</param>
         public void UnregisterDirtyMaterialCallback(UnityAction action)
         {

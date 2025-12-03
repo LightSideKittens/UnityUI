@@ -4,9 +4,6 @@ using UnityEngine.UI;
 namespace UnityEditor.UI
 {
     [CustomPropertyDrawer(typeof(FontData), true)]
-    /// <summary>
-    /// This is a PropertyDrawer for FontData. It is implemented using the standard Unity PropertyDrawer framework
-    /// </summary>
     public class FontDataDrawer : PropertyDrawer
     {
         static private class Styles

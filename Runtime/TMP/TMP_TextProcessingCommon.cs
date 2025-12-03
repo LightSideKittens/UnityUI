@@ -31,36 +31,24 @@ namespace TMPro
 
     internal struct MarkupAttribute
     {
-        /// <summary>
-        /// The hash code of the name of the Markup attribute.
-        /// </summary>
         public int NameHashCode
         {
             get { return m_NameHashCode; }
             set { m_NameHashCode = value; }
         }
 
-        /// <summary>
-        /// The hash code of the value of the Markup attribute.
-        /// </summary>
         public int ValueHashCode
         {
             get { return m_ValueHashCode; }
             set { m_ValueHashCode = value; }
         }
 
-        /// <summary>
-        /// The index of the value of the Markup attribute in the text backing buffer.
-        /// </summary>
         public int ValueStartIndex
         {
             get { return m_ValueStartIndex; }
             set { m_ValueStartIndex = value; }
         }
 
-        /// <summary>
-        /// The length of the value of the Markup attribute in the text backing buffer.
-        /// </summary>
         public int ValueLength
         {
             get { return m_ValueLength; }
@@ -75,9 +63,6 @@ namespace TMPro
 
     internal struct MarkupElement
     {
-        /// <summary>
-        /// The hash code of the name of the markup element.
-        /// </summary>
         public int NameHashCode
         {
             get
@@ -93,45 +78,30 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// The hash code of the value of the markup element.
-        /// </summary>
         public int ValueHashCode
         {
             get { return m_Attributes == null ? 0 : m_Attributes[0].ValueHashCode; }
             set { m_Attributes[0].ValueHashCode = value; }
         }
 
-        /// <summary>
-        /// The index of the value of the markup element in the text backing buffer.
-        /// </summary>
         public int ValueStartIndex
         {
             get { return m_Attributes == null ? 0 : m_Attributes[0].ValueStartIndex; }
             set { m_Attributes[0].ValueStartIndex = value; }
         }
 
-        /// <summary>
-        /// The length of the value of the markup element in the text backing buffer.
-        /// </summary>
         public int ValueLength
         {
             get { return m_Attributes == null ? 0 : m_Attributes[0].ValueLength; }
             set { m_Attributes[0].ValueLength = value; }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         public MarkupAttribute[] Attributes
         {
             get { return m_Attributes; }
             set { m_Attributes = value; }
         }
 
-        /// <summary>
-        /// Constructor for a new Markup Element
-        /// </summary>
         /// <param name="nameHashCode"></param>
         public MarkupElement(int nameHashCode, int startIndex, int length)
         {

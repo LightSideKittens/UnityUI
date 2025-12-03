@@ -9,9 +9,6 @@ namespace UnityEngine.UI
     [ExecuteAlways]
     [SelectionBase]
     [DisallowMultipleComponent]
-    /// <summary>
-    /// Simple selectable object - derived from to create a selectable control.
-    /// </summary>
     public class Selectable
         :
         UIBehaviour,
@@ -24,9 +21,6 @@ namespace UnityEngine.UI
         protected static int s_SelectableCount = 0;
         private bool m_EnableCalled = false;
 
-        /// <summary>
-        /// Copy of the array of all the selectable objects currently active in the scene.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -58,17 +52,9 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// How many selectable elements are currently active.
-        /// </summary>
         public static int allSelectableCount { get { return s_SelectableCount; } }
 
 
-        /// <summary>
-        /// Non allocating version for getting the all selectables.
-        /// If selectables.Length is less then s_SelectableCount only selectables.Length elments will be copied which
-        /// could result in a incomplete list of elements.
-        /// </summary>
         /// <param name="selectables">The array to be filled with current selectable objects</param>
         /// <returns>The number of element copied.</returns>
         /// <example>
@@ -113,29 +99,14 @@ namespace UnityEngine.UI
         [SerializeField]
         private Navigation m_Navigation = Navigation.defaultNavigation;
 
-        /// <summary>
-        ///Transition mode for a Selectable.
-        /// </summary>
         public enum Transition
         {
-            /// <summary>
-            /// No Transition.
-            /// </summary>
             None,
 
-            /// <summary>
-            /// Use an color tint transition.
-            /// </summary>
             ColorTint,
 
-            /// <summary>
-            /// Use a sprite swap transition.
-            /// </summary>
             SpriteSwap,
 
-            /// <summary>
-            /// Use an animation transition.
-            /// </summary>
             Animation
         }
 
@@ -172,9 +143,6 @@ namespace UnityEngine.UI
         private bool m_GroupsAllowInteraction = true;
         protected int m_CurrentIndex = -1;
 
-        /// <summary>
-        /// The Navigation setting for this selectable object.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -197,9 +165,6 @@ namespace UnityEngine.UI
         /// </example>
         public Navigation        navigation        { get { return m_Navigation; } set { if (SetPropertyUtility.SetStruct(ref m_Navigation, value))        OnSetProperty(); } }
 
-        /// <summary>
-        /// The type of transition that will be applied to the targetGraphic when the state changes.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -222,9 +187,6 @@ namespace UnityEngine.UI
         /// </example>
         public Transition        transition        { get { return m_Transition; } set { if (SetPropertyUtility.SetStruct(ref m_Transition, value))        OnSetProperty(); } }
 
-        /// <summary>
-        /// The ColorBlock for this selectable object.
-        /// </summary>
         /// <remarks>
         /// Modifications will not be visible if  transition is not ColorTint.
         /// </remarks>
@@ -250,9 +212,6 @@ namespace UnityEngine.UI
         /// </example>
         public ColorBlock        colors            { get { return m_Colors; } set { if (SetPropertyUtility.SetStruct(ref m_Colors, value))            OnSetProperty(); } }
 
-        /// <summary>
-        /// The SpriteState for this selectable object.
-        /// </summary>
         /// <remarks>
         /// Modifications will not be visible if transition is not SpriteSwap.
         /// </remarks>
@@ -281,17 +240,11 @@ namespace UnityEngine.UI
         /// </example>
         public SpriteState       spriteState       { get { return m_SpriteState; } set { if (SetPropertyUtility.SetStruct(ref m_SpriteState, value))       OnSetProperty(); } }
 
-        /// <summary>
-        /// The AnimationTriggers for this selectable object.
-        /// </summary>
         /// <remarks>
         /// Modifications will not be visible if transition is not Animation.
         /// </remarks>
         public AnimationTriggers animationTriggers { get { return m_AnimationTriggers; } set { if (SetPropertyUtility.SetClass(ref m_AnimationTriggers, value)) OnSetProperty(); } }
 
-        /// <summary>
-        /// Graphic that will be transitioned upon.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -315,9 +268,6 @@ namespace UnityEngine.UI
         /// </example>
         public Graphic           targetGraphic     { get { return m_TargetGraphic; } set { if (SetPropertyUtility.SetClass(ref m_TargetGraphic, value))     OnSetProperty(); } }
 
-        /// <summary>
-        /// Is this object interactable.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -365,18 +315,12 @@ namespace UnityEngine.UI
         protected Selectable()
         {}
 
-        /// <summary>
-        /// Convenience function that converts the referenced Graphic to a Image, if possible.
-        /// </summary>
         public Image image
         {
             get { return m_TargetGraphic as Image; }
             set { m_TargetGraphic = value; }
         }
 
-        /// <summary>
-        /// Convenience function to get the Animator component on the GameObject.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -444,9 +388,6 @@ namespace UnityEngine.UI
             return true;
         }
 
-        /// <summary>
-        /// Is the object interactable.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -609,9 +550,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Clear any internal state from the Selectable (used when disabling).
-        /// </summary>
         protected virtual void InstantClearState()
         {
             string triggerName = m_AnimationTriggers.normalTrigger;
@@ -634,9 +572,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Transition the Selectable to the entered state.
-        /// </summary>
         /// <param name="state">State to transition to</param>
         /// <param name="instant">Should the transition occur instantly.</param>
         protected virtual void DoStateTransition(SelectionState state, bool instant)
@@ -696,42 +631,21 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// An enumeration of selected states of objects
-        /// </summary>
         protected enum SelectionState
         {
-            /// <summary>
-            /// The UI object can be selected.
-            /// </summary>
             Normal,
 
-            /// <summary>
-            /// The UI object is highlighted.
-            /// </summary>
             Highlighted,
 
-            /// <summary>
-            /// The UI object is pressed.
-            /// </summary>
             Pressed,
 
-            /// <summary>
-            /// The UI object is selected
-            /// </summary>
             Selected,
 
-            /// <summary>
-            /// The UI object cannot be selected.
-            /// </summary>
             Disabled,
         }
 
         // Selection logic
 
-        /// <summary>
-        /// Finds the selectable object next to this one.
-        /// </summary>
         /// <remarks>
         /// The direction is determined by a Vector3 variable.
         /// </remarks>
@@ -864,9 +778,6 @@ namespace UnityEngine.UI
                 eventData.selectedObject = sel.gameObject;
         }
 
-        /// <summary>
-        /// Find the selectable object to the left of this one.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -903,9 +814,6 @@ namespace UnityEngine.UI
             return null;
         }
 
-        /// <summary>
-        /// Find the selectable object to the right of this one.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -942,9 +850,6 @@ namespace UnityEngine.UI
             return null;
         }
 
-        /// <summary>
-        /// The Selectable object above current
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -981,9 +886,6 @@ namespace UnityEngine.UI
             return null;
         }
 
-        /// <summary>
-        /// Find the selectable object below this one.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -1020,9 +922,6 @@ namespace UnityEngine.UI
             return null;
         }
 
-        /// <summary>
-        /// Determine in which of the 4 move directions the next selectable object should be found.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -1101,9 +1000,6 @@ namespace UnityEngine.UI
 #endif
         }
 
-        /// <summary>
-        /// Returns whether the selectable is currently 'highlighted' or not.
-        /// </summary>
         /// <remarks>
         /// Use this to check if the selectable UI element is currently highlighted.
         /// </remarks>
@@ -1143,9 +1039,6 @@ namespace UnityEngine.UI
             return isPointerInside && !isPointerDown && !hasSelection;
         }
 
-        /// <summary>
-        /// Whether the current selectable is being pressed.
-        /// </summary>
         protected bool IsPressed()
         {
             if (!IsActive() || !IsInteractable())
@@ -1162,9 +1055,6 @@ namespace UnityEngine.UI
             DoStateTransition(currentSelectionState, false);
         }
 
-        /// <summary>
-        /// Evaluate current state and transition to pressed state.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -1197,9 +1087,6 @@ namespace UnityEngine.UI
             EvaluateAndTransitionToSelectionState();
         }
 
-        /// <summary>
-        /// Evaluate eventData and transition to appropriate state.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -1233,10 +1120,6 @@ namespace UnityEngine.UI
             EvaluateAndTransitionToSelectionState();
         }
 
-        /// <summary>
-        /// Evaluate current state and transition to appropriate state.
-        /// New state could be pressed or hover depending on pressed state.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -1262,9 +1145,6 @@ namespace UnityEngine.UI
             EvaluateAndTransitionToSelectionState();
         }
 
-        /// <summary>
-        /// Evaluate current state and transition to normal state.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -1290,9 +1170,6 @@ namespace UnityEngine.UI
             EvaluateAndTransitionToSelectionState();
         }
 
-        /// <summary>
-        /// Set selection and transition to appropriate state.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -1318,9 +1195,6 @@ namespace UnityEngine.UI
             EvaluateAndTransitionToSelectionState();
         }
 
-        /// <summary>
-        /// Unset selection and transition to appropriate state.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -1345,9 +1219,6 @@ namespace UnityEngine.UI
             EvaluateAndTransitionToSelectionState();
         }
 
-        /// <summary>
-        /// Selects this Selectable.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[

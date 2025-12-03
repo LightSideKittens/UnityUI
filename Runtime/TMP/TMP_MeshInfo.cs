@@ -10,9 +10,6 @@ namespace TMPro
 {
     public enum VertexSortingOrder { Normal, Reverse };
 
-    /// <summary>
-    /// Structure which contains the vertex attributes (geometry) of the text object.
-    /// </summary>
     public struct TMP_MeshInfo
     {
         private static readonly Color32 s_DefaultColor = new(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
@@ -27,17 +24,8 @@ namespace TMPro
         public Vector3[] normals;
         public Vector4[] tangents;
 
-        /// <summary>
-        /// UV0 contains the following information
-        /// X, Y are the UV coordinates of the glyph in the atlas texture.
-        /// Z is the texture index in the texture atlas array
-        /// W is the SDF Scale where a negative value represents bold text
-        /// </summary>
         public Vector4[] uvs0;
 
-        /// <summary>
-        ///
-        /// </summary>
         public Vector2[] uvs2;
 
         public Color32[] colors32;
@@ -46,9 +34,6 @@ namespace TMPro
         public Material material;
 
 
-        /// <summary>
-        /// Function to pre-allocate vertex attributes for a mesh of size X.
-        /// </summary>
         /// <param name="mesh"></param>
         /// <param name="size"></param>
         public TMP_MeshInfo(Mesh mesh, int size)
@@ -111,9 +96,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to pre-allocate vertex attributes for a mesh of size X.
-        /// </summary>
         /// <param name="mesh"></param>
         /// <param name="size"></param>
         /// <param name="isVolumetric"></param>
@@ -218,9 +200,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to resized the content of MeshData and re-assign normals, tangents and triangles.
-        /// </summary>
         /// <param name="meshData"></param>
         /// <param name="size"></param>
         public void ResizeMeshInfo(int size)
@@ -284,9 +263,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to resized the content of MeshData and re-assign normals, tangents and triangles.
-        /// </summary>
         /// <param name="size"></param>
         /// <param name="isVolumetric"></param>
         public void ResizeMeshInfo(int size, bool isVolumetric)
@@ -404,9 +380,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to clear the vertices while preserving the Triangles, Normals and Tangents.
-        /// </summary>
         public void Clear()
         {
             if (vertices == null) return;
@@ -419,9 +392,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to clear the vertices while preserving the Triangles, Normals and Tangents.
-        /// </summary>
         public void Clear(bool uploadChanges)
         {
             if (vertices == null) return;
@@ -437,9 +407,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to clear the vertices while preserving the Triangles, Normals and Tangents.
-        /// </summary>
         public void ClearUnusedVertices()
         {
             int length = vertices.Length - vertexCount;
@@ -449,9 +416,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function used to mark unused vertices as degenerate.
-        /// </summary>
         /// <param name="startIndex"></param>
         public void ClearUnusedVertices(int startIndex)
         {
@@ -462,9 +426,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function used to mark unused vertices as degenerate an upload resulting data to the mesh.
-        /// </summary>
         /// <param name="startIndex"></param>
         public void ClearUnusedVertices(int startIndex, bool updateMesh)
         {
@@ -500,9 +461,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to rearrange the quads of the text object to change their rendering order.
-        /// </summary>
         /// <param name="sortingOrder"></param>
         public void SortGeometry(IList<int> sortingOrder)
         {
@@ -527,9 +485,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method to swap the vertex attributes between src and dst quads.
-        /// </summary>
         /// <param name="src">Index of the first vertex attribute of the source character / quad.</param>
         /// <param name="dst">Index of the first vertex attribute of the destination character / quad.</param>
         public void SwapVertexData(int src, int dst)

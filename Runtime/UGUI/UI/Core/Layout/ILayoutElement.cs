@@ -3,9 +3,6 @@ using System.Collections;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    ///   A component is treated as a layout element by the auto layout system if it implements ILayoutElement.
-    /// </summary>
     /// <remarks>
     /// The layout system will invoke CalculateLayoutInputHorizontal before querying minWidth, preferredWidth, and flexibleWidth. It can potentially save performance if these properties are cached when CalculateLayoutInputHorizontal is invoked, so they don't need to be recalculated every time the properties are queried.
     ///
@@ -17,34 +14,17 @@ namespace UnityEngine.UI
     /// </remarks>
     public interface ILayoutElement
     {
-        /// <summary>
-        /// After this method is invoked, layout horizontal input properties should return up-to-date values.
-        ///  Children will already have up-to-date layout horizontal inputs when this methods is called.
-        /// </summary>
         void CalculateLayoutInputHorizontal();
 
-        /// <summary>
-        ///After this method is invoked, layout vertical input properties should return up-to-date values.
-        ///Children will already have up-to-date layout vertical inputs when this methods is called.
-        /// </summary>
         void CalculateLayoutInputVertical();
 
-        /// <summary>
-        /// The minimum width this layout element may be allocated.
-        /// </summary>
         float minWidth { get; }
 
-        /// <summary>
-        /// The preferred width this layout element should be allocated if there is sufficient space.
-        /// </summary>
         /// <remarks>
         /// PreferredWidth can be set to -1 to remove the size.
         /// </remarks>
         float preferredWidth { get; }
 
-        /// <summary>
-        /// The extra relative width this layout element should be allocated if there is additional available space.
-        /// </summary>
         /// <remarks>
         /// Setting preferredWidth to -1 removed the preferredWidth.
         /// </remarks>
@@ -78,22 +58,13 @@ namespace UnityEngine.UI
 
         float flexibleWidth { get; }
 
-        /// <summary>
-        /// The minimum height this layout element may be allocated.
-        /// </summary>
         float minHeight { get; }
 
-        /// <summary>
-        /// The preferred height this layout element should be allocated if there is sufficient space.
-        /// </summary>
         /// <remarks>
         /// PreferredHeight can be set to -1 to remove the size.
         /// </remarks>
         float preferredHeight { get; }
 
-        /// <summary>
-        /// The extra relative height this layout element should be allocated if there is additional available space.
-        /// </summary>
         ///<example>
         ///<code>
         ///<![CDATA[
@@ -123,18 +94,12 @@ namespace UnityEngine.UI
         ///</example>
         float flexibleHeight { get; }
 
-        /// <summary>
-        /// The layout priority of this component.
-        /// </summary>
         /// <remarks>
         /// If multiple components on the same GameObject implement the ILayoutElement interface, the values provided by components that return a higher priority value are given priority. However, values less than zero are ignored. This way a component can override only select properties by leaving the remaning values to be -1 or other values less than zero.
         /// </remarks>
         int layoutPriority { get; }
     }
 
-    /// <summary>
-    /// Base interface to be implemented by components that control the layout of RectTransforms.
-    /// </summary>
     /// <remarks>
     /// If a component is driving its own RectTransform it should implement the interface [[ILayoutSelfController]].
     /// If a component is driving the RectTransforms of its children, it should implement [[ILayoutGroup]].
@@ -148,20 +113,11 @@ namespace UnityEngine.UI
     /// </remarks>
     public interface ILayoutController
     {
-        /// <summary>
-        /// Callback invoked by the auto layout system which handles horizontal aspects of the layout.
-        /// </summary>
         void SetLayoutHorizontal();
 
-        /// <summary>
-        /// Callback invoked by the auto layout system which handles vertical aspects of the layout.
-        /// </summary>
         void SetLayoutVertical();
     }
 
-    /// <summary>
-    /// ILayoutGroup is an ILayoutController that should drive the RectTransforms of its children.
-    /// </summary>
     /// <remarks>
     /// ILayoutGroup derives from ILayoutController and requires the same members to be implemented.
     /// </remarks>
@@ -169,9 +125,6 @@ namespace UnityEngine.UI
     {
     }
 
-    /// <summary>
-    /// ILayoutSelfController is an ILayoutController that should drive its own RectTransform.
-    /// </summary>
     /// <remarks>
     /// The iLayoutSelfController derives from the base controller [[ILayoutController]] and controls the layout of a RectTransform.
     ///
@@ -249,17 +202,11 @@ namespace UnityEngine.UI
     {
     }
 
-    /// <summary>
-    /// A RectTransform will be ignored by the layout system if it has a component which implements ILayoutIgnorer.
-    /// </summary>
     /// <remarks>
     /// A components that implements ILayoutIgnorer can be used to make a parent layout group component not consider this RectTransform part of the group. The RectTransform can then be manually positioned despite being a child GameObject of a layout group.
     /// </remarks>
     public interface ILayoutIgnorer
     {
-        /// <summary>
-        /// Should this RectTransform be ignored bvy the layout system?
-        /// </summary>
         /// <remarks>
         /// Setting this property to true will make a parent layout group component not consider this RectTransform part of the group. The RectTransform can then be manually positioned despite being a child GameObject of a layout group.
         /// </remarks>

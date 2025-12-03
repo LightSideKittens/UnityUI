@@ -10,9 +10,6 @@ namespace TMPro.EditorUtilities
 {
     public static class TMP_EditorUtility
     {
-        /// <summary>
-        /// Returns the relative path of the package.
-        /// </summary>
         public static string packageRelativePath
         {
             get
@@ -26,9 +23,6 @@ namespace TMPro.EditorUtilities
         [SerializeField]
         private static string m_PackagePath;
 
-        /// <summary>
-        /// Returns the fully qualified path of the package.
-        /// </summary>
         public static string packageFullPath
         {
             get
@@ -68,9 +62,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Create and return a new asset in a smart location based on the current selection and then select it.
-        /// </summary>
         /// <param name="name">
         /// Name of the new asset. Do not include the .asset extension.
         /// </param>
@@ -193,9 +184,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Method to validate the location of the asset folder by making sure the GUISkins folder exists.
-        /// </summary>
         /// <param name="paths"></param>
         /// <returns></returns>
         private static string ValidateLocation(string[] paths, string projectPath)
@@ -214,9 +202,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Function which returns a string containing a sequence of Decimal character ranges.
-        /// </summary>
         /// <param name="characterSet"></param>
         /// <returns></returns>
         internal static string GetDecimalCharacterSequence(int[] characterSet)
@@ -256,9 +241,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Function which returns a string containing a sequence of Unicode (Hex) character ranges.
-        /// </summary>
         /// <param name="characterSet"></param>
         /// <returns></returns>
         internal static string GetUnicodeCharacterSequence(int[] characterSet)
@@ -298,9 +280,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="rect"></param>
         /// <param name="thickness"></param>
         /// <param name="color"></param>
@@ -313,9 +292,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <summary>
-        /// Function to return the horizontal alignment grid value.
-        /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         internal static int GetHorizontalAlignmentGridValue(int value)
@@ -336,9 +312,6 @@ namespace TMPro.EditorUtilities
             return 0;
         }
 
-        /// <summary>
-        /// Function to return the vertical alignment grid value.
-        /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         internal static int GetVerticalAlignmentGridValue(int value)

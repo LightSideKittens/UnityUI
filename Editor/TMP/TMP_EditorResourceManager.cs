@@ -52,9 +52,6 @@ namespace TMPro
         private readonly List<TMP_FontAsset> m_FontAssetDefinitionRefreshQueue = new();
         private HashSet<int> m_FontAssetDefinitionRefreshQueueLookup = new();
 
-        /// <summary>
-        /// Get a singleton instance of the manager.
-        /// </summary>
         internal static TMP_EditorResourceManager instance
         {
             get
@@ -66,9 +63,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Register to receive rendering callbacks.
-        /// </summary>
         private TMP_EditorResourceManager()
         {
             if (RenderPipelineManager.currentPipeline == null)
@@ -110,9 +104,6 @@ namespace TMPro
         }
         #endif
 
-        /// <summary>
-        /// Register resource for re-import.
-        /// </summary>
         /// <param name="obj"></param>
         internal static void RegisterResourceForReimport(Object obj)
         {
@@ -133,9 +124,6 @@ namespace TMPro
             m_ObjectReImportQueue.Add(obj);
         }
 
-        /// <summary>
-        /// Register resource to be updated.
-        /// </summary>
         /// <param name="obj"></param>
         internal static void RegisterResourceForUpdate(Object obj)
         {
@@ -156,9 +144,6 @@ namespace TMPro
             m_ObjectUpdateQueue.Add(obj);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="fontAsset"></param>
         internal static void RegisterFontAssetForDefinitionRefresh(TMP_FontAsset fontAsset)
         {
@@ -176,9 +161,6 @@ namespace TMPro
             m_FontAssetDefinitionRefreshQueue.Add(fontAsset);
         }
 
-        /// <summary>
-        /// Add texture as sub asset to the referenced object.
-        /// </summary>
         /// <param name="tex">The texture to be added as sub object.</param>
         /// <param name="obj">The object to which this texture sub object will be added.</param>
         internal static void AddTextureToAsset(Texture tex, Object obj)
@@ -192,9 +174,6 @@ namespace TMPro
             RegisterResourceForReimport(obj);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
         internal static Font GetSourceFontRef(string guid)
@@ -203,9 +182,6 @@ namespace TMPro
             return AssetDatabase.LoadAssetAtPath<Font>(path);
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="font"></param>
         /// <returns></returns>
         internal static string SetSourceFontGUID(Font font)

@@ -10,9 +10,6 @@ using System.Linq;
 
 namespace TMPro
 {
-    /// <summary>
-    /// Class that contains the basic information about the font.
-    /// </summary>
     [Serializable]
     public class FaceInfo_Legacy
     {
@@ -50,9 +47,6 @@ namespace TMPro
     [Serializable]
     public class TMP_Glyph : TMP_TextElement_Legacy
     {
-        /// <summary>
-        /// Function to create a deep copy of a GlyphInfo.
-        /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
         public static TMP_Glyph Clone(TMP_Glyph source)
@@ -120,9 +114,6 @@ namespace TMPro
         }
     }
 
-    /// <summary>
-    /// Contains the font assets for the regular and italic styles associated with a given font weight.
-    /// </summary>
     [Serializable]
     public struct TMP_FontWeightPair
     {
@@ -145,9 +136,6 @@ namespace TMPro
         }
     }
 
-    /// <summary>
-    /// Positional adjustments of a glyph
-    /// </summary>
     [Serializable]
     public struct GlyphValueRecord_Legacy
     {
@@ -179,9 +167,6 @@ namespace TMPro
     [Serializable]
     public class KerningPair
     {
-        /// <summary>
-        /// The first glyph part of a kerning pair.
-        /// </summary>
         public uint firstGlyph
         {
             get { return m_FirstGlyph; }
@@ -191,9 +176,6 @@ namespace TMPro
         [SerializeField]
         private uint m_FirstGlyph;
 
-        /// <summary>
-        /// The positional adjustment of the first glyph.
-        /// </summary>
         public GlyphValueRecord_Legacy firstGlyphAdjustments
         {
             get { return m_FirstGlyphAdjustments; }
@@ -201,9 +183,6 @@ namespace TMPro
         [SerializeField]
         private GlyphValueRecord_Legacy m_FirstGlyphAdjustments;
 
-        /// <summary>
-        /// The second glyph part of a kerning pair.
-        /// </summary>
         public uint secondGlyph
         {
             get { return m_SecondGlyph; }
@@ -213,9 +192,6 @@ namespace TMPro
         [SerializeField]
         private uint m_SecondGlyph;
 
-        /// <summary>
-        /// The positional adjustment of the second glyph.
-        /// </summary>
         public GlyphValueRecord_Legacy secondGlyphAdjustments
         {
             get { return m_SecondGlyphAdjustments; }
@@ -228,10 +204,6 @@ namespace TMPro
 
         internal static KerningPair empty = new(0, new(), 0, new());
 
-        /// <summary>
-        /// Determines if the Character Spacing property of the text object will affect the kerning pair.
-        /// This is mostly relevant when using Diacritical marks to prevent Character Spacing from altering the spacing.
-        /// </summary>
         public bool ignoreSpacingAdjustments
         {
             get { return m_IgnoreSpacingAdjustments; }
@@ -298,9 +270,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Add Kerning Pair
-        /// </summary>
         /// <param name="first">First glyph</param>
         /// <param name="second">Second glyph</param>
         /// <param name="offset">xAdvance value</param>
@@ -318,9 +287,6 @@ namespace TMPro
             return -1;
         }
 
-        /// <summary>
-        /// Add Glyph pair adjustment record
-        /// </summary>
         /// <param name="firstGlyph">The first glyph</param>
         /// <param name="firstGlyphAdjustments">Adjustment record for the first glyph</param>
         /// <param name="secondGlyph">The second glyph</param>
@@ -366,9 +332,6 @@ namespace TMPro
     {
         private static List<int> k_searchedFontAssets;
 
-        /// <summary>
-        /// Search through the given font and its fallbacks for the specified character.
-        /// </summary>
         /// <param name="font">The font asset to search for the given character.</param>
         /// <param name="unicode">The character to find.</param>
         /// <param name="character">out parameter containing the glyph for the specified character (if found).</param>
@@ -384,9 +347,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Search through the given list of fonts and their possible fallbacks for the specified character.
-        /// </summary>
         /// <param name="fonts"></param>
         /// <param name="unicode"></param>
         /// <param name="character"></param>

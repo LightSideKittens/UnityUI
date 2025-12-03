@@ -8,23 +8,14 @@ namespace UnityEngine.UI
     [DisallowMultipleComponent]
     [ExecuteAlways]
     [RequireComponent(typeof(RectTransform))]
-    /// <summary>
-    /// Abstract base class to use for layout groups.
-    /// </summary>
     public abstract class LayoutGroup : UIBehaviour, ILayoutElement, ILayoutGroup
     {
         [SerializeField] protected RectOffset m_Padding = new RectOffset();
 
-        /// <summary>
-        /// The padding to add around the child layout elements.
-        /// </summary>
         public RectOffset padding { get { return m_Padding; } set { SetProperty(ref m_Padding, value); } }
 
         [SerializeField] protected TextAnchor m_ChildAlignment = TextAnchor.UpperLeft;
 
-        /// <summary>
-        /// The alignment to use for the child layout elements in the layout group.
-        /// </summary>
         /// <remarks>
         /// If a layout element does not specify a flexible width or height, its child elements many not use the available space within the layout group. In this case, use the alignment settings to specify how to align child elements within their layout group.
         /// </remarks>
@@ -83,39 +74,18 @@ namespace UnityEngine.UI
 
         public abstract void CalculateLayoutInputVertical();
 
-        /// <summary>
-        /// See LayoutElement.minWidth
-        /// </summary>
         public virtual float minWidth { get { return GetTotalMinSize(0); } }
 
-        /// <summary>
-        /// See LayoutElement.preferredWidth
-        /// </summary>
         public virtual float preferredWidth { get { return GetTotalPreferredSize(0); } }
 
-        /// <summary>
-        /// See LayoutElement.flexibleWidth
-        /// </summary>
         public virtual float flexibleWidth { get { return GetTotalFlexibleSize(0); } }
 
-        /// <summary>
-        /// See LayoutElement.minHeight
-        /// </summary>
         public virtual float minHeight { get { return GetTotalMinSize(1); } }
 
-        /// <summary>
-        /// See LayoutElement.preferredHeight
-        /// </summary>
         public virtual float preferredHeight { get { return GetTotalPreferredSize(1); } }
 
-        /// <summary>
-        /// See LayoutElement.flexibleHeight
-        /// </summary>
         public virtual float flexibleHeight { get { return GetTotalFlexibleSize(1); } }
 
-        /// <summary>
-        /// See LayoutElement.layoutPriority
-        /// </summary>
         public virtual int layoutPriority { get { return 0; } }
 
         // ILayoutController Interface
@@ -144,17 +114,11 @@ namespace UnityEngine.UI
             base.OnDisable();
         }
 
-        /// <summary>
-        /// Callback for when properties have been changed by animation.
-        /// </summary>
         protected override void OnDidApplyAnimationProperties()
         {
             SetDirty();
         }
 
-        /// <summary>
-        /// The min size for the layout group on the given axis.
-        /// </summary>
         /// <param name="axis">The axis index. 0 is horizontal and 1 is vertical.</param>
         /// <returns>The min size</returns>
         protected float GetTotalMinSize(int axis)
@@ -162,9 +126,6 @@ namespace UnityEngine.UI
             return m_TotalMinSize[axis];
         }
 
-        /// <summary>
-        /// The preferred size for the layout group on the given axis.
-        /// </summary>
         /// <param name="axis">The axis index. 0 is horizontal and 1 is vertical.</param>
         /// <returns>The preferred size.</returns>
         protected float GetTotalPreferredSize(int axis)
@@ -172,9 +133,6 @@ namespace UnityEngine.UI
             return m_TotalPreferredSize[axis];
         }
 
-        /// <summary>
-        /// The flexible size for the layout group on the given axis.
-        /// </summary>
         /// <param name="axis">The axis index. 0 is horizontal and 1 is vertical.</param>
         /// <returns>The flexible size</returns>
         protected float GetTotalFlexibleSize(int axis)
@@ -182,9 +140,6 @@ namespace UnityEngine.UI
             return m_TotalFlexibleSize[axis];
         }
 
-        /// <summary>
-        /// Returns the calculated position of the first child layout element along the given axis.
-        /// </summary>
         /// <param name="axis">The axis index. 0 is horizontal and 1 is vertical.</param>
         /// <param name="requiredSpaceWithoutPadding">The total space required on the given axis for all the layout elements including spacing and excluding padding.</param>
         /// <returns>The position of the first child along the given axis.</returns>
@@ -197,9 +152,6 @@ namespace UnityEngine.UI
             return (axis == 0 ? padding.left : padding.top) + surplusSpace * alignmentOnAxis;
         }
 
-        /// <summary>
-        /// Returns the alignment on the specified axis as a fraction where 0 is left/top, 0.5 is middle, and 1 is right/bottom.
-        /// </summary>
         /// <param name="axis">The axis to get alignment along. 0 is horizontal and 1 is vertical.</param>
         /// <returns>The alignment as a fraction where 0 is left/top, 0.5 is middle, and 1 is right/bottom.</returns>
         protected float GetAlignmentOnAxis(int axis)
@@ -210,9 +162,6 @@ namespace UnityEngine.UI
                 return ((int)childAlignment / 3) * 0.5f;
         }
 
-        /// <summary>
-        /// Used to set the calculated layout properties for the given axis.
-        /// </summary>
         /// <param name="totalMin">The min size for the layout group.</param>
         /// <param name="totalPreferred">The preferred size for the layout group.</param>
         /// <param name="totalFlexible">The flexible size for the layout group.</param>
@@ -224,9 +173,6 @@ namespace UnityEngine.UI
             m_TotalFlexibleSize[axis] = totalFlexible;
         }
 
-        /// <summary>
-        /// Set the position and size of a child layout element along the given axis.
-        /// </summary>
         /// <param name="rect">The RectTransform of the child layout element.</param>
         /// <param name="axis">The axis to set the position and size along. 0 is horizontal and 1 is vertical.</param>
         /// <param name="pos">The position from the left side or top.</param>
@@ -238,9 +184,6 @@ namespace UnityEngine.UI
             SetChildAlongAxisWithScale(rect, axis, pos, 1.0f);
         }
 
-        /// <summary>
-        /// Set the position and size of a child layout element along the given axis.
-        /// </summary>
         /// <param name="rect">The RectTransform of the child layout element.</param>
         /// <param name="axis">The axis to set the position and size along. 0 is horizontal and 1 is vertical.</param>
         /// <param name="pos">The position from the left side or top.</param>
@@ -264,9 +207,6 @@ namespace UnityEngine.UI
             rect.anchoredPosition = anchoredPosition;
         }
 
-        /// <summary>
-        /// Set the position and size of a child layout element along the given axis.
-        /// </summary>
         /// <param name="rect">The RectTransform of the child layout element.</param>
         /// <param name="axis">The axis to set the position and size along. 0 is horizontal and 1 is vertical.</param>
         /// <param name="pos">The position from the left side or top.</param>
@@ -279,9 +219,6 @@ namespace UnityEngine.UI
             SetChildAlongAxisWithScale(rect, axis, pos, size, 1.0f);
         }
 
-        /// <summary>
-        /// Set the position and size of a child layout element along the given axis.
-        /// </summary>
         /// <param name="rect">The RectTransform of the child layout element.</param>
         /// <param name="axis">The axis to set the position and size along. 0 is horizontal and 1 is vertical.</param>
         /// <param name="pos">The position from the left side or top.</param>
@@ -337,9 +274,6 @@ namespace UnityEngine.UI
             SetDirty();
         }
 
-        /// <summary>
-        /// Helper method used to set a given property if it has changed.
-        /// </summary>
         /// <param name="currentValue">A reference to the member value.</param>
         /// <param name="newValue">The new value.</param>
         protected void SetProperty<T>(ref T currentValue, T newValue)
@@ -350,9 +284,6 @@ namespace UnityEngine.UI
             SetDirty();
         }
 
-        /// <summary>
-        /// Mark the LayoutGroup as dirty.
-        /// </summary>
         protected void SetDirty()
         {
             if (!IsActive())

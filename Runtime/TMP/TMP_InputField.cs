@@ -13,9 +13,6 @@ using UnityEngine.Serialization;
 
 namespace TMPro
 {
-    /// <summary>
-    /// Editable text input field.
-    /// </summary>
     [AddComponentMenu("UI/TextMeshPro - Input Field", 11)]
         #if UNITY_2023_2_OR_NEWER
     [HelpURL("https://docs.unity3d.com/Packages/com.unity.ugui@2.0/manual/TextMeshPro/index.html")]
@@ -102,9 +99,6 @@ namespace TMPro
         static private bool s_IsQuestDevice;
 
         #region Exposed properties
-        /// <summary>
-        /// Text Text used to display the input's value.
-        /// </summary>
 
         protected RectTransform m_RectTransform;
 
@@ -135,128 +129,68 @@ namespace TMPro
 
         private IScrollHandler m_IScrollHandlerParent;
 
-        /// <summary>
-        /// Used to keep track of scroll position
-        /// </summary>
         private float m_ScrollPosition;
 
-        /// <summary>
-        ///
-        /// </summary>
         [SerializeField]
         protected float m_ScrollSensitivity = 1.0f;
 
         [SerializeField]
         private ContentType m_ContentType = ContentType.Standard;
 
-        /// <summary>
-        /// Type of data expected by the input field.
-        /// </summary>
         [SerializeField]
         private InputType m_InputType = InputType.Standard;
 
-        /// <summary>
-        /// The character used to hide text in password field.
-        /// </summary>
         [SerializeField]
         private char m_AsteriskChar = '*';
 
-        /// <summary>
-        /// Keyboard type applies to mobile keyboards that get shown.
-        /// </summary>
         [SerializeField]
         private TouchScreenKeyboardType m_KeyboardType = TouchScreenKeyboardType.Default;
 
         [SerializeField]
         private LineType m_LineType = LineType.SingleLine;
 
-        /// <summary>
-        /// Should hide mobile input field part of the virtual keyboard.
-        /// </summary>
         [SerializeField]
         private bool m_HideMobileInput;
 
-        /// <summary>
-        /// Should hide soft / virtual keyboard.
-        /// </summary>
         [SerializeField]
         private bool m_HideSoftKeyboard;
 
-        /// <summary>
-        /// What kind of validation to use with the input field's data.
-        /// </summary>
         [SerializeField]
         private CharacterValidation m_CharacterValidation = CharacterValidation.None;
 
-        /// <summary>
-        /// The Regex expression used for validating the text input.
-        /// </summary>
         [SerializeField]
         private string m_RegexValue = string.Empty;
 
-        /// <summary>
-        /// The point sized used by the placeholder and input text object.
-        /// </summary>
         [SerializeField]
         private float m_GlobalPointSize = 14;
 
-        /// <summary>
-        /// Maximum number of characters allowed before input no longer works.
-        /// </summary>
         [SerializeField]
         private int m_CharacterLimit;
 
-        /// <summary>
-        /// Event delegates triggered when the input field submits its data.
-        /// </summary>
         [SerializeField]
         private SubmitEvent m_OnEndEdit = new();
 
-        /// <summary>
-        /// Event delegates triggered when the input field submits its data.
-        /// </summary>
         [SerializeField]
         private SubmitEvent m_OnSubmit = new();
 
-        /// <summary>
-        /// Event delegates triggered when the input field is focused.
-        /// </summary>
         [SerializeField]
         private SelectionEvent m_OnSelect = new();
 
-        /// <summary>
-        /// Event delegates triggered when the input field focus is lost.
-        /// </summary>
         [SerializeField]
         private SelectionEvent m_OnDeselect = new();
 
-        /// <summary>
-        /// Event delegates triggered when the text is selected / highlighted.
-        /// </summary>
         [SerializeField]
         private TextSelectionEvent m_OnTextSelection = new();
 
-        /// <summary>
-        /// Event delegates triggered when text is no longer select / highlighted.
-        /// </summary>
         [SerializeField]
         private TextSelectionEvent m_OnEndTextSelection = new();
 
-        /// <summary>
-        /// Event delegates triggered when the input field changes its data.
-        /// </summary>
         [SerializeField]
         private OnChangeEvent m_OnValueChanged = new();
 
-        /// <summary>
-        /// Event delegates triggered when the status of the TouchScreenKeyboard changes.
-        /// </summary>
         [SerializeField]
         private TouchScreenKeyboardEvent m_OnTouchScreenKeyboardStatusChanged = new();
 
-        /// <summary>
-        /// Custom validation callback.
-        /// </summary>
         [SerializeField]
         private OnValidateInput m_OnValidateInput;
 
@@ -269,9 +203,6 @@ namespace TMPro
         [SerializeField]
         private Color m_SelectionColor = new(168f / 255f, 206f / 255f, 255f / 255f, 192f / 255f);
 
-        /// <summary>
-        /// Input field's value.
-        /// </summary>
 
         [SerializeField]
         [TextArea(5, 10)]
@@ -381,9 +312,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Should the inputfield be automatically activated upon selection.
-        /// </summary>
         public virtual bool shouldActivateOnSelect
         {
             set
@@ -396,9 +324,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Should the mobile keyboard input be hidden.
-        /// </summary>
         public bool shouldHideMobileInput
         {
             get
@@ -551,9 +476,6 @@ namespace TMPro
             return Application.platform == RuntimePlatform.WSAPlayerX86 || Application.platform == RuntimePlatform.WSAPlayerX64 || Application.platform == RuntimePlatform.WSAPlayerARM;
         }
 
-        /// <summary>
-        /// Input field's current text value. This is not necessarily the same as what is visible on screen.
-        /// </summary>
         /// <remarks>
         /// Note that null is invalid value  for InputField.text.
         /// </remarks>
@@ -586,9 +508,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Set Input field's current text value without invoke onValueChanged. This is not necessarily the same as what is visible on screen.
-        /// </summary>
         public void SetTextWithoutNotify(string input)
         {
             SetText(input, false);
@@ -726,9 +645,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Set the point size on both Placeholder and Input text object.
-        /// </summary>
         public float pointSize
         {
             get { return m_GlobalPointSize; }
@@ -742,9 +658,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Sets the Font Asset on both Placeholder and Input child objects.
-        /// </summary>
         public TMP_FontAsset fontAsset
         {
             get { return m_GlobalFontAsset; }
@@ -760,9 +673,6 @@ namespace TMPro
         [SerializeField]
         protected TMP_FontAsset m_GlobalFontAsset;
 
-        /// <summary>
-        /// Determines if the whole text will be selected when focused.
-        /// </summary>
         public bool onFocusSelectAll
         {
             get { return m_OnFocusSelectAll; }
@@ -772,9 +682,6 @@ namespace TMPro
         protected bool m_OnFocusSelectAll = true;
         protected bool m_isSelectAll;
 
-        /// <summary>
-        /// Determines if the text and caret position as well as selection will be reset when the input field is deactivated.
-        /// </summary>
         public bool resetOnDeActivation
         {
             get { return m_ResetOnDeActivation; }
@@ -788,9 +695,6 @@ namespace TMPro
 
         private GameObject m_PreviouslySelectedObject;
 
-        /// <summary>
-        /// Determines if the text selection will remain visible when the input field looses focus and is deactivated.
-        /// </summary>
         public bool keepTextSelectionVisible
         {
             get { return m_KeepTextSelectionVisible; }
@@ -800,9 +704,6 @@ namespace TMPro
         [SerializeField]
         private bool m_KeepTextSelectionVisible;
 
-        /// <summary>
-        /// Controls whether the original text is restored when pressing "ESC".
-        /// </summary>
         public bool restoreOriginalTextOnEscape
         {
             get { return m_RestoreOriginalTextOnEscape; }
@@ -811,9 +712,6 @@ namespace TMPro
         [SerializeField]
         private bool m_RestoreOriginalTextOnEscape = true;
 
-        /// <summary>
-        /// Is Rich Text editing allowed?
-        /// </summary>
         public bool isRichTextEditingAllowed
         {
             get { return m_isRichTextEditingAllowed; }
@@ -838,9 +736,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Limits the number of lines of text in the Input Field.
-        /// </summary>
         public int lineLimit
         {
             get { return m_LineLimit; }
@@ -856,19 +751,10 @@ namespace TMPro
         [SerializeField]
         protected int m_LineLimit;
 
-        /// <summary>
-        /// The type of input expected. See InputField.InputType.
-        /// </summary>
         public InputType inputType { get { return m_InputType; } set { if (SetPropertyUtility.SetStruct(ref m_InputType, value)) SetToCustom(); } }
 
-        /// <summary>
-        /// The TouchScreenKeyboard being used to edit the Input Field.
-        /// </summary>
         public TouchScreenKeyboard touchScreenKeyboard { get { return m_SoftKeyboard; } }
 
-        /// <summary>
-        /// They type of mobile keyboard that will be used.
-        /// </summary>
         public TouchScreenKeyboardType keyboardType
         {
             get { return m_KeyboardType; }
@@ -879,19 +765,10 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Determines if the keyboard is opened in alert mode.
-        /// </summary>
         public bool isAlert;
 
-        /// <summary>
-        /// The type of validation to perform on a character
-        /// </summary>
         public CharacterValidation characterValidation { get { return m_CharacterValidation; } set { if (SetPropertyUtility.SetStruct(ref m_CharacterValidation, value)) SetToCustom(); } }
 
-        /// <summary>
-        /// Sets the Input Validation to use a Custom Input Validation script.
-        /// </summary>
         public TMP_InputValidator inputValidator
         {
             get { return m_InputValidator; }
@@ -937,10 +814,6 @@ namespace TMPro
             return index;
         }
 
-        /// <summary>
-        /// Current position of the cursor.
-        /// Getters are public Setters are protected
-        /// </summary>
 
         protected int caretPositionInternal { get { return m_CaretPosition + compositionLength; } set { m_CaretPosition = value; ClampCaretPos(ref m_CaretPosition); } }
         protected int stringPositionInternal { get { return m_StringPosition + compositionLength; } set { m_StringPosition = value; ClampStringPos(ref m_StringPosition); } }
@@ -956,20 +829,12 @@ namespace TMPro
 
         private bool m_IsKeyboardBeingClosedInHoloLens;
 
-        /// <summary>
-        /// Get: Returns the focus position as thats the position that moves around even during selection.
-        /// Set: Set both the anchor and focus position such that a selection doesn't happen
-        /// </summary>
         public int caretPosition
         {
             get => caretSelectPositionInternal;
             set { selectionAnchorPosition = value; selectionFocusPosition = value; UpdateStringIndexFromCaretPosition(); }
         }
 
-        /// <summary>
-        /// Get: Returns the fixed position of selection
-        /// Set: If compositionString is 0 set the fixed position
-        /// </summary>
         public int selectionAnchorPosition
         {
             get
@@ -987,10 +852,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Get: Returns the variable position of selection
-        /// Set: If compositionString is 0 set the variable position
-        /// </summary>
         public int selectionFocusPosition
         {
             get
@@ -1008,9 +869,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         public int stringPosition
         {
             get => stringSelectPositionInternal;
@@ -1018,9 +876,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// The fixed position of the selection in the raw string which may contains rich text.
-        /// </summary>
         public int selectionStringAnchorPosition
         {
             get
@@ -1039,9 +894,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// The variable position of the selection in the raw string which may contains rich text.
-        /// </summary>
         public int selectionStringFocusPosition
         {
             get
@@ -1199,9 +1051,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method used to update the tracking of the caret position when the text object has been regenerated.
-        /// </summary>
         /// <param name="obj"></param>
         private void ON_TEXT_CHANGED(UnityEngine.Object obj)
         {
@@ -1285,9 +1134,6 @@ namespace TMPro
             stringSelectPositionInternal = 0;
         }
 
-        /// <summary>
-        /// Move to the end of the text.
-        /// </summary>
         /// <param name="shift"></param>
         public void MoveTextEnd(bool shift)
         {
@@ -1324,9 +1170,6 @@ namespace TMPro
             UpdateLabel();
         }
 
-        /// <summary>
-        /// Move to the start of the text.
-        /// </summary>
         /// <param name="shift"></param>
         public void MoveTextStart(bool shift)
         {
@@ -1364,9 +1207,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Move to the end of the current line of text.
-        /// </summary>
         /// <param name="shift"></param>
         public void MoveToEndOfLine(bool shift, bool ctrl)
         {
@@ -1393,9 +1233,6 @@ namespace TMPro
             UpdateLabel();
         }
 
-        /// <summary>
-        /// Move to the start of the current line of text.
-        /// </summary>
         /// <param name="shift"></param>
         public void MoveToStartOfLine(bool shift, bool ctrl)
         {
@@ -1519,9 +1356,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Update the text based on input.
-        /// </summary>
         protected virtual void LateUpdate()
         {
             if (m_ShouldActivateNextUpdate)
@@ -2171,9 +2005,6 @@ namespace TMPro
             return true;
         }
 
-        /// <summary>
-        /// Handle the specified event.
-        /// </summary>
         private Event m_ProcessingEvent = new();
 
         public void ProcessEvent(Event e)
@@ -2182,9 +2013,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="eventData"></param>
         public virtual void OnUpdateSelected(BaseEventData eventData)
         {
@@ -2249,9 +2077,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="eventData"></param>
         public virtual void OnScroll(PointerEventData eventData)
         {
@@ -2883,9 +2708,6 @@ namespace TMPro
             #endif
         }
 
-        /// <summary>
-        /// Handling of DEL key
-        /// </summary>
         private void DeleteKey()
         {
             if (m_ReadOnly)
@@ -2941,9 +2763,6 @@ namespace TMPro
             #endif
         }
 
-        /// <summary>
-        /// Handling of Backspace key
-        /// </summary>
         private void Backspace()
         {
             if (m_ReadOnly)
@@ -3016,9 +2835,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Append the specified text to the end of the current.
-        /// </summary>
         protected virtual void Append(string input)
         {
             if (m_ReadOnly)
@@ -3157,9 +2973,6 @@ namespace TMPro
                 onValueChanged.Invoke(text);
         }
 
-        /// <summary>
-        /// Submit the input field's text.
-        /// </summary>
 
         protected void SendOnEndEdit()
         {
@@ -3210,9 +3023,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Update the visual text Text.
-        /// </summary>
 
         protected void UpdateLabel()
         {
@@ -3304,9 +3114,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Function to update the vertical position of the text container when OnValueChanged event is received from the Scrollbar.
-        /// </summary>
         /// <param name="value"></param>
         private void OnScrollbarValueChange(float value)
         {
@@ -3321,9 +3128,6 @@ namespace TMPro
         {
         }
 
-        /// <summary>
-        /// Adjusts the relative position of the body of the text relative to the viewport.
-        /// </summary>
         /// <param name="relativePosition"></param>
         private void AdjustTextPositionRelativeToViewport (float relativePosition)
         {
@@ -3378,9 +3182,6 @@ namespace TMPro
             return count;
         }
 
-        /// <summary>
-        /// Returns / places the caret before the given character at the string index.
-        /// </summary>
         /// <param name="stringIndex"></param>
         /// <returns></returns>
         private int GetMinCaretPositionFromStringIndex(int stringIndex)
@@ -3396,9 +3197,6 @@ namespace TMPro
             return count;
         }
 
-        /// <summary>
-        /// Returns / places the caret after the given character at the string index.
-        /// </summary>
         /// <param name="stringIndex"></param>
         /// <returns></returns>
         private int GetMaxCaretPositionFromStringIndex(int stringIndex)
@@ -3486,9 +3284,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Method to keep the Caret RectTransform properties in sync with the text object's RectTransform
-        /// </summary>
         private void AssignPositioningIfNeeded()
         {
             if (m_TextComponent != null && caretRectTrans != null &&
@@ -3758,9 +3553,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="startPosition"></param>
         /// <param name="height"></param>
         /// <param name="isCharVisible"></param>
@@ -3847,9 +3639,6 @@ namespace TMPro
             m_forceRectTransformAdjustment = false;
         }
 
-        /// <summary>
-        /// Validate the specified input.
-        /// </summary>
         protected char Validate(string text, int pos, char ch)
         {
             if (characterValidation == CharacterValidation.None || !enabled)
@@ -4279,26 +4068,14 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// See ILayoutElement.CalculateLayoutInputHorizontal.
-        /// </summary>
         public virtual void CalculateLayoutInputHorizontal()
         { }
 
-        /// <summary>
-        /// See ILayoutElement.CalculateLayoutInputVertical.
-        /// </summary>
         public virtual void CalculateLayoutInputVertical()
         { }
 
-        /// <summary>
-        /// See ILayoutElement.minWidth.
-        /// </summary>
         public virtual float minWidth { get { return 0; } }
 
-        /// <summary>
-        /// Get the displayed with of all input characters.
-        /// </summary>
         public virtual float preferredWidth
         {
             get
@@ -4318,19 +4095,10 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// See ILayoutElement.flexibleWidth.
-        /// </summary>
         public virtual float flexibleWidth { get { return -1; } }
 
-        /// <summary>
-        /// See ILayoutElement.minHeight.
-        /// </summary>
         public virtual float minHeight { get { return 0; } }
 
-        /// <summary>
-        /// Get the height of all the text if constrained to the height of the RectTransform.
-        /// </summary>
         public virtual float preferredHeight
         {
             get
@@ -4350,20 +4118,11 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// See ILayoutElement.flexibleHeight.
-        /// </summary>
         public virtual float flexibleHeight { get { return -1; } }
 
-        /// <summary>
-        /// See ILayoutElement.layoutPriority.
-        /// </summary>
         public virtual int layoutPriority { get { return 1; } }
 
 
-        /// <summary>
-        /// Function to conveniently set the point size of both Placeholder and Input Field text object.
-        /// </summary>
         /// <param name="pointSize"></param>
         public void SetGlobalPointSize(float pointSize)
         {
@@ -4375,9 +4134,6 @@ namespace TMPro
             textComponent.fontSize = pointSize;
         }
 
-        /// <summary>
-        /// Function to conveniently set the Font Asset of both Placeholder and Input Field text object.
-        /// </summary>
         /// <param name="fontAsset"></param>
         public void SetGlobalFontAsset(TMP_FontAsset fontAsset)
         {

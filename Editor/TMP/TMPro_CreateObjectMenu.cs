@@ -13,9 +13,6 @@ namespace TMPro.EditorUtilities
 {
     public static class TMPro_CreateObjectMenu
     {
-        /// <summary>
-        /// Create a TextMeshPro object that works with the CanvasRenderer
-        /// </summary>
         /// <param name="command"></param>
         [MenuItem("GameObject/UI/Text - TextMeshPro", false, 2001)]
         static void CreateTextMeshProGuiObjectPerform(MenuCommand menuCommand)

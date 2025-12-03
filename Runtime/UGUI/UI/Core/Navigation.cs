@@ -4,9 +4,6 @@ using UnityEngine.Serialization;
 namespace UnityEngine.UI
 {
     [Serializable]
-    /// <summary>
-    /// Structure storing details related to navigation.
-    /// </summary>
     public struct Navigation : IEquatable<Navigation>
     {
         /*
@@ -15,9 +12,6 @@ namespace UnityEngine.UI
          * and verical mode combined
          */
         [Flags]
-        /// <summary>
-        /// Navigation mode enumeration.
-        /// </summary>
         /// <remarks>
         /// This looks like it's not flags, but it is flags, the reason is that Automatic is considered horizontal and vertical mode combined
         /// </remarks>
@@ -46,38 +40,23 @@ namespace UnityEngine.UI
         /// </example>
         public enum Mode
         {
-            /// <summary>
-            /// No navigation is allowed from this object.
-            /// </summary>
             None        = 0,
 
-            /// <summary>
-            /// Horizontal Navigation.
-            /// </summary>
             /// <remarks>
             /// Navigation should only be allowed when left / right move events happen.
             /// </remarks>
             Horizontal  = 1,
 
-            /// <summary>
-            /// Vertical navigation.
-            /// </summary>
             /// <remarks>
             /// Navigation should only be allowed when up / down move events happen.
             /// </remarks>
             Vertical    = 2,
 
-            /// <summary>
-            /// Automatic navigation.
-            /// </summary>
             /// <remarks>
             /// Attempt to find the 'best' next object to select. This should be based on a sensible heuristic.
             /// </remarks>
             Automatic   = 3,
 
-            /// <summary>
-            /// Explicit navigation.
-            /// </summary>
             /// <remarks>
             /// User should explicitly specify what is selected by each move event.
             /// </remarks>
@@ -108,23 +87,13 @@ namespace UnityEngine.UI
         [SerializeField]
         private Selectable m_SelectOnRight;
 
-        /// <summary>
-        /// Navigation mode.
-        /// </summary>
         public Mode       mode           { get { return m_Mode; } set { m_Mode = value; } }
 
-        /// <summary>
-        /// Enables navigation to wrap around from last to first or first to last element.
-        /// Will find the furthest element from the current element in the opposite direction of movement.
-        /// </summary>
         /// <example>
         /// Note: If you have a grid of elements and you are on the last element in a row it will not wrap over to the next row it will pick the furthest element in the opposite direction.
         /// </example>
         public bool wrapAround { get { return m_WrapAround; } set { m_WrapAround = value; } }
 
-        /// <summary>
-        /// Specify a Selectable UI GameObject to highlight when the Up arrow key is pressed.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -157,9 +126,6 @@ namespace UnityEngine.UI
         /// </example>
         public Selectable selectOnUp     { get { return m_SelectOnUp; } set { m_SelectOnUp = value; } }
 
-        /// <summary>
-        /// Specify a Selectable UI GameObject to highlight when the down arrow key is pressed.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -192,9 +158,6 @@ namespace UnityEngine.UI
         /// </example>
         public Selectable selectOnDown   { get { return m_SelectOnDown; } set { m_SelectOnDown = value; } }
 
-        /// <summary>
-        /// Specify a Selectable UI GameObject to highlight when the left arrow key is pressed.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -227,9 +190,6 @@ namespace UnityEngine.UI
         /// </example>
         public Selectable selectOnLeft   { get { return m_SelectOnLeft; } set { m_SelectOnLeft = value; } }
 
-        /// <summary>
-        /// Specify a Selectable UI GameObject to highlight when the right arrow key is pressed.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -262,9 +222,6 @@ namespace UnityEngine.UI
         /// </example>
         public Selectable selectOnRight  { get { return m_SelectOnRight; } set { m_SelectOnRight = value; } }
 
-        /// <summary>
-        /// Return a Navigation with sensible default values.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[

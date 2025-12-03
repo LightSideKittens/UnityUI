@@ -20,9 +20,6 @@ namespace TMPro
 {
 #pragma warning disable 0649
 
-    /// <summary>
-    /// Data structure containing the target and replacement fileIDs and GUIDs which will require remapping from previous version of TextMesh Pro to the new TextMesh Pro UPM package.
-    /// </summary>
     [System.Serializable]
     struct AssetConversionRecord
     {
@@ -32,10 +29,6 @@ namespace TMPro
     }
 
 
-    /// <summary>
-    /// Data structure containing a list of target and replacement fileID and GUID requiring remapping from previous versions of TextMesh Pro to the new TextMesh Pro UPM package.
-    /// This data structure is populated with the data contained in the PackageConversionData.json file included in the package.
-    /// </summary>
     [System.Serializable]
     class AssetConversionData
     {
@@ -52,9 +45,6 @@ namespace TMPro
             window.Focus();
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         struct AssetModificationRecord
         {
             public string assetFilePath;
@@ -228,9 +218,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Limits the minimum size of the editor window.
-        /// </summary>
         void SetEditorWindowSize()
         {
             EditorWindow editorWindow = this;
@@ -489,9 +476,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         private static void ResetScanProcess()
         {
             m_IsAlreadyScanningProject = false;
@@ -502,9 +486,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         private static void UpdateProjectFiles()
         {
             CheckProjectSerializationAndSourceControlModes();
@@ -526,9 +507,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Check project Asset Serialization and Source Control modes
-        /// </summary>
         private static bool CheckProjectSerializationAndSourceControlModes()
         {
             if (EditorSettings.serializationMode != SerializationMode.ForceText || VersionControlSettings.mode != "Visible Meta Files")
@@ -581,9 +559,6 @@ namespace TMPro
             typeof(UnityEngine.Video.VideoClip),
         };
 
-        /// <summary>
-        ///
-        /// </summary>
         struct AssetModificationRecord
         {
             public string assetFilePath;
@@ -714,9 +689,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Limits the minimum size of the editor window.
-        /// </summary>
         void SetEditorWindowSize()
         {
             EditorWindow editorWindow = this;
@@ -727,9 +699,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="filePath"></param>
         /// <returns></returns>
         private static bool ShouldIgnoreFile(string filePath)
@@ -886,9 +855,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         private static void ResetScanProcess()
         {
             m_IsAlreadyScanningProject = false;
@@ -899,9 +865,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         private static void UpdateProjectFiles()
         {
             CheckProjectSerializationAndSourceControlModes();
@@ -923,9 +886,6 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        /// Check project Asset Serialization and Source Control modes
-        /// </summary>
         private static bool CheckProjectSerializationAndSourceControlModes()
         {
             if (EditorSettings.serializationMode != SerializationMode.ForceText || VersionControlSettings.mode != "Visible Meta Files")
@@ -939,9 +899,6 @@ namespace TMPro
 
     public class TMP_PackageUtilities : Editor
     {
-        /// <summary>
-        ///
-        /// </summary>
         [MenuItem("Window/TextMeshPro/Import TMP Essential Resources", false, 2050)]
         public static void ImportProjectResourcesMenu()
         {
@@ -949,18 +906,12 @@ namespace TMPro
         }
 
 
-        /// <summary>
-        ///
-        /// </summary>
         [MenuItem("Window/TextMeshPro/Import TMP Examples and Extras", false, 2051)]
         public static void ImportExamplesContentMenu()
         {
             ImportExamplesAndExtras();
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         private static void ImportExamplesAndExtras()
         {
             string packageFullPath = TMP_EditorUtility.packageFullPath;
@@ -971,9 +922,6 @@ namespace TMPro
         private static string k_SettingsFilePath;
         private static byte[] k_SettingsBackup;
 
-        /// <summary>
-        ///
-        /// </summary>
         private static void ImportEssentialResources()
         {
             string[] settings = AssetDatabase.FindAssets("t:TMP_Settings");

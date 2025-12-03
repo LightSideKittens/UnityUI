@@ -9,9 +9,6 @@ namespace UnityEngine.UI
     [ExecuteAlways]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
-    /// <summary>
-    /// A 2D rectangular mask that allows for clipping / masking of areas outside the mask.
-    /// </summary>
     /// <remarks>
     /// The RectMask2D behaves in a similar way to a standard Mask component. It differs though in some of the restrictions that it has.
     /// A RectMask2D:
@@ -49,13 +46,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private Vector4 m_Padding = new Vector4();
 
-        /// <summary>
-        /// Padding to be applied to the masking
-        /// X = Left
-        /// Y = Bottom
-        /// Z = Right
-        /// W = Top
-        /// </summary>
         public Vector4 padding
         {
             get { return m_Padding; }
@@ -69,9 +59,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private Vector2Int m_Softness;
 
-        /// <summary>
-        /// The softness to apply to the horizontal and vertical axis.
-        /// </summary>
         public Vector2Int softness
         {
             get { return m_Softness;  }
@@ -106,9 +93,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Get the Rect for the mask in canvas space.
-        /// </summary>
         public Rect canvasRect
         {
             get
@@ -117,9 +101,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Helper function to get the RectTransform for the mask.
-        /// </summary>
         public RectTransform rectTransform
         {
             get { return m_RectTransform ?? (m_RectTransform = GetComponent<RectTransform>()); }
@@ -301,9 +282,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Add a IClippable to be tracked by the mask.
-        /// </summary>
         /// <param name="clippable">Add the clippable object for this mask</param>
         public void AddClippable(IClippable clippable)
         {
@@ -320,9 +298,6 @@ namespace UnityEngine.UI
             m_ForceClip = true;
         }
 
-        /// <summary>
-        /// Remove an IClippable from being tracked by the mask.
-        /// </summary>
         /// <param name="clippable">Remove the clippable object from this mask</param>
         public void RemoveClippable(IClippable clippable)
         {

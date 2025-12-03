@@ -17,9 +17,6 @@ namespace TMPro
         private static readonly TMP_Vertex k_Zero = new();
     }
 
-    /// <summary>
-    ///
-    /// </summary>
     public struct TMP_Offset
     {
         public float left { get { return m_Left; } set { m_Left = value; } }
@@ -34,9 +31,6 @@ namespace TMPro
 
         public float vertical { get { return m_Top; } set { m_Top = value; m_Bottom = value; } }
 
-        /// <summary>
-        ///
-        /// </summary>
         public static TMP_Offset zero { get { return k_ZeroOffset; } }
 
         private float m_Left;
@@ -46,9 +40,6 @@ namespace TMPro
 
         private static readonly TMP_Offset k_ZeroOffset = new(0F, 0F, 0F, 0F);
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="left"></param>
         /// <param name="right"></param>
         /// <param name="top"></param>
@@ -61,9 +52,6 @@ namespace TMPro
             m_Bottom = bottom;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         /// <param name="horizontal"></param>
         /// <param name="vertical"></param>
         public TMP_Offset(float horizontal, float vertical)
@@ -94,9 +82,6 @@ namespace TMPro
     }
 
 
-    /// <summary>
-    ///
-    /// </summary>
     public struct HighlightState
     {
         public Color32 color;
@@ -119,17 +104,11 @@ namespace TMPro
         }
     }
     
-    /// <summary>
-    /// Structure containing information about individual text elements (character or sprites).
-    /// </summary>
     [DebuggerDisplay("Unicode '{character}'  ({((uint)character).ToString(\"X\")})")]
     public struct TMP_CharacterInfo
     {
         public char character;
 
-        /// <summary>
-        /// Index of the character in the source text.
-        /// </summary>
         public int index;
         public int stringLength;
 

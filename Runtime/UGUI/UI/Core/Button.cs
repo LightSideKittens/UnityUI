@@ -6,16 +6,10 @@ using UnityEngine.Serialization;
 
 namespace UnityEngine.UI
 {
-    /// <summary>
-    /// A standard button that sends an event when clicked.
-    /// </summary>
     [AddComponentMenu("UI/Button", 30)]
     public class Button : Selectable, IPointerClickHandler, ISubmitHandler
     {
         [Serializable]
-        /// <summary>
-        /// Function definition for a button click event.
-        /// </summary>
         public class ButtonClickedEvent : UnityEvent {}
 
         // Event delegates triggered on click.
@@ -26,10 +20,6 @@ namespace UnityEngine.UI
         protected Button()
         {}
 
-        /// <summary>
-        /// UnityEvent that is triggered when the button is pressed.
-        /// Note: Triggered on MouseUp after MouseDown on the same object.
-        /// </summary>
         ///<example>
         ///<code>
         /// <![CDATA[
@@ -70,11 +60,6 @@ namespace UnityEngine.UI
             m_OnClick.Invoke();
         }
 
-        /// <summary>
-        /// Call all registered IPointerClickHandlers.
-        /// Register button presses using the IPointerClickHandler. You can also use it to tell what type of click happened (left, right etc.).
-        /// Make sure your Scene has an EventSystem.
-        /// </summary>
         /// <param name="eventData">Pointer Data associated with the event. Typically by the event system.</param>
         /// <example>
         /// <code>
@@ -114,9 +99,6 @@ namespace UnityEngine.UI
             Press();
         }
 
-        /// <summary>
-        /// Call all registered ISubmitHandler.
-        /// </summary>
         /// <param name="eventData">Associated data with the event. Typically by the event system.</param>
         /// <remarks>
         /// This detects when a Button has been selected via a "submit" key you specify (default is the return key).

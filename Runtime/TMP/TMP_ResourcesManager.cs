@@ -4,9 +4,6 @@ using UnityEngine;
 
 namespace TMPro
 {
-    /// <summary>
-    ///
-    /// </summary>
     public class TMP_ResourceManager
     {
         private static TMP_Settings s_TextSettings;
@@ -53,9 +50,6 @@ namespace TMPro
 
         private static readonly int k_RegularStyleHashCode = TMP_TextUtilities.GetHashCode("Regular");
 
-        /// <summary>
-        /// Add font asset to resource manager.
-        /// </summary>
         /// <param name="fontAsset">Font asset to be added to the resource manager.</param>
         public static void AddFontAsset(TMP_FontAsset fontAsset)
         {
@@ -105,9 +99,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Remove font asset from resource manager.
-        /// </summary>
         /// <param name="fontAsset">Font asset to be removed from the resource manager.</param>
         public static void RemoveFontAsset(TMP_FontAsset fontAsset)
         {
@@ -121,9 +112,6 @@ namespace TMPro
             }
         }
 
-        /// <summary>
-        /// Try getting a reference to the font asset using the hash code calculated from its file name.
-        /// </summary>
         /// <param name="nameHashcode"></param>
         /// <param name="fontAsset"></param>
         /// <returns></returns>
@@ -134,9 +122,6 @@ namespace TMPro
             return s_FontAssetNameReferenceLookup.TryGetValue(nameHashcode, out fontAsset);
         }
 
-        /// <summary>
-        /// Try getting a reference to the font asset using the hash code calculated from font's family and style name.
-        /// </summary>
         /// <param name="familyNameHashCode"></param>
         /// <param name="styleNameHashCode"></param>
         /// <param name="fontAsset"></param>
@@ -153,17 +138,11 @@ namespace TMPro
             return s_FontAssetFamilyNameAndStyleReferenceLookup.TryGetValue(familyAndStyleNameHashCode, out fontAsset);
         }
 
-        /// <summary>
-        /// Clear all font asset glyph lookup cache.
-        /// </summary>
         public static void ClearFontAssetGlyphCache()
         {
             RebuildFontAssetCache();
         }
 
-        /// <summary>
-        ///
-        /// </summary>
         internal static void RebuildFontAssetCache()
         {
             foreach (var pair in s_FontAssetReferences)

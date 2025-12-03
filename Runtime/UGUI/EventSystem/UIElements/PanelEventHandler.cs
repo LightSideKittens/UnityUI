@@ -7,9 +7,6 @@ namespace UnityEngine.UIElements
     // This code is disabled unless the com.unity.modules.uielements module is present.
     // The UIElements module is always present in the Editor but it can be stripped from a project build if unused.
 #if PACKAGE_UITOOLKIT
-    /// <summary>
-    /// Use this class to handle input and send events to UI Toolkit runtime panels.
-    /// </summary>
     [AddComponentMenu("UI Toolkit/Panel Event Handler (UI Toolkit)")]
     public class PanelEventHandler : UIBehaviour, IPointerMoveHandler, IPointerUpHandler, IPointerDownHandler,
         ISubmitHandler, ICancelHandler, IMoveHandler, IScrollHandler, ISelectHandler, IDeselectHandler,
@@ -17,10 +14,6 @@ namespace UnityEngine.UIElements
     {
         private BaseRuntimePanel m_Panel;
 
-        /// <summary>
-        /// The panel that this component relates to. If panel is null, this component will have no effect.
-        /// Will be set to null automatically if panel is Disposed from an external source.
-        /// </summary>
         public IPanel panel
         {
             get => m_Panel;
@@ -294,10 +287,6 @@ namespace UnityEngine.UIElements
             // See UGUIEventSystemTests.KeyDownStoppedDoesntPreventNavigationEvents for a test requires this.
         }
 
-        /// <summary>
-        /// This method is automatically called on every frame.
-        /// It can also be called manually to force some queued events to be processed.
-        /// </summary>
         public void Update()
         {
             if (isCurrentFocusedPanel)

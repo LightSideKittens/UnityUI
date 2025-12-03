@@ -8,9 +8,6 @@ namespace TMPro
     public static class TMPro_ExtensionMethods
     {
         
-        /// <summary>
-        /// Converts a string of 4 ascii characters to an int. 
-        /// </summary>
         /// <param name="s">String comprised of 4 ascii characters.</param>
         /// <returns>The integer value for the string.</returns>
         internal static int TagToInt(this string s)
@@ -204,17 +201,11 @@ namespace TMPro
             return x && y && z && w;
         }
 
-        /// <summary>
-        /// Insert item into array at index.
-        /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
         /// <param name="index"></param>
         /// <param name="item"></param>
 
-        /// <summary>
-        /// Insert item into array at index.
-        /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
         /// <param name="index"></param>

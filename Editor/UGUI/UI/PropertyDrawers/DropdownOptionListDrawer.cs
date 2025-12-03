@@ -9,9 +9,6 @@ using UnityEditor.UIElements;
 namespace UnityEditor.UI
 {
     [CustomPropertyDrawer(typeof(Dropdown.OptionDataList), true)]
-    /// <summary>
-    /// This is a PropertyDrawer for Dropdown.OptionDataList. It is implemented using the standard Unity PropertyDrawer framework.
-    /// </summary>
     class DropdownOptionListDrawer : PropertyDrawer
     {
         const string kOptionsPath = "m_Options";

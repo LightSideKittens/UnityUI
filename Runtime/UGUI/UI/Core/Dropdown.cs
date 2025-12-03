@@ -10,9 +10,6 @@ namespace UnityEngine.UI
 {
     [AddComponentMenu("UI/Legacy/Dropdown", 102)]
     [RequireComponent(typeof(RectTransform))]
-    /// <summary>
-    ///   A standard dropdown that presents a list of options when clicked, of which one can be chosen.
-    /// </summary>
     /// <remarks>
     /// The dropdown component is a Selectable. When an option is chosen, the label and/or image of the control changes to show the chosen option.
     ///
@@ -50,9 +47,6 @@ namespace UnityEngine.UI
         }
 
         [Serializable]
-        /// <summary>
-        /// Class to store the text and/or image of a single option in the dropdown list.
-        /// </summary>
         public class OptionData
         {
             [SerializeField]
@@ -60,14 +54,8 @@ namespace UnityEngine.UI
             [SerializeField]
             private Sprite m_Image;
 
-            /// <summary>
-            /// The text associated with the option.
-            /// </summary>
             public string text  { get { return m_Text; }  set { m_Text = value;  } }
 
-            /// <summary>
-            /// The image associated with the option.
-            /// </summary>
             public Sprite image { get { return m_Image; } set { m_Image = value; } }
 
             public OptionData()
@@ -84,9 +72,6 @@ namespace UnityEngine.UI
                 this.image = image;
             }
 
-            /// <summary>
-            /// Create an object representing a single option for the dropdown list.
-            /// </summary>
             /// <param name="text">Optional text for the option.</param>
             /// <param name="image">Optional image for the option.</param>
             public OptionData(string text, Sprite image)
@@ -97,9 +82,6 @@ namespace UnityEngine.UI
         }
 
         [Serializable]
-        /// <summary>
-        /// Class used internally to store the list of options for the dropdown list.
-        /// </summary>
         /// <remarks>
         /// The usage of this class is not exposed in the runtime API. It's only relevant for the PropertyDrawer drawing the list of options.
         /// </remarks>
@@ -108,9 +90,6 @@ namespace UnityEngine.UI
             [SerializeField]
             private List<OptionData> m_Options;
 
-            /// <summary>
-            /// The list of options for the dropdown list.
-            /// </summary>
             public List<OptionData> options { get { return m_Options; } set { m_Options = value; } }
 
 
@@ -121,35 +100,23 @@ namespace UnityEngine.UI
         }
 
         [Serializable]
-        /// <summary>
-        /// UnityEvent callback for when a dropdown current option is changed.
-        /// </summary>
         public class DropdownEvent : UnityEvent<int> {}
 
         // Template used to create the dropdown.
         [SerializeField]
         private RectTransform m_Template;
 
-        /// <summary>
-        /// The Rect Transform of the template for the dropdown list.
-        /// </summary>
         public RectTransform template { get { return m_Template; } set { m_Template = value; RefreshShownValue(); } }
 
         // Text to be used as a caption for the current value. It's not required, but it's kept here for convenience.
         [SerializeField]
         private Text m_CaptionText;
 
-        /// <summary>
-        /// The Text component to hold the text of the currently selected option.
-        /// </summary>
         public Text captionText { get { return m_CaptionText; } set { m_CaptionText = value; RefreshShownValue(); } }
 
         [SerializeField]
         private Image m_CaptionImage;
 
-        /// <summary>
-        /// The Image component to hold the image of the currently selected option.
-        /// </summary>
         public Image captionImage { get { return m_CaptionImage; } set { m_CaptionImage = value; RefreshShownValue(); } }
 
         [Space]
@@ -157,17 +124,11 @@ namespace UnityEngine.UI
         [SerializeField]
         private Text m_ItemText;
 
-        /// <summary>
-        /// The Text component to hold the text of the item.
-        /// </summary>
         public Text itemText { get { return m_ItemText; } set { m_ItemText = value; RefreshShownValue(); } }
 
         [SerializeField]
         private Image m_ItemImage;
 
-        /// <summary>
-        /// The Image component to hold the image of the item
-        /// </summary>
         public Image itemImage { get { return m_ItemImage; } set { m_ItemImage = value; RefreshShownValue(); } }
 
         [Space]
@@ -182,9 +143,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private OptionDataList m_Options = new OptionDataList();
 
-        /// <summary>
-        /// The list of possible options. A text string and an image can be specified for each option.
-        /// </summary>
         /// <remarks>
         /// This is the list of options within the Dropdown. Each option contains Text and/or image data that you can specify using UI.Dropdown.OptionData before adding to the Dropdown list.
         /// This also unlocks the ability to edit the Dropdown, including the insertion, removal, and finding of options, as well as other useful tools
@@ -286,9 +244,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private DropdownEvent m_OnValueChanged = new DropdownEvent();
 
-        /// <summary>
-        /// A UnityEvent that is invoked when when a user has clicked one of the options in the dropdown list.
-        /// </summary>
         /// <remarks>
         /// Use this to detect when a user selects one or more options in the Dropdown. Add a listener to perform an action when this UnityEvent detects a selection by the user. See https://unity3d.com/learn/tutorials/topics/scripting/delegates for more information on delegates.
         /// </remarks>
@@ -333,9 +288,6 @@ namespace UnityEngine.UI
         [SerializeField]
         private float m_AlphaFadeSpeed = 0.15f;
 
-        /// <summary>
-        /// The time interval at which a drop down will appear and disappear
-        /// </summary>
         public float alphaFadeSpeed  { get { return m_AlphaFadeSpeed; } set { m_AlphaFadeSpeed = value; } }
 
         private GameObject m_Dropdown;
@@ -347,9 +299,6 @@ namespace UnityEngine.UI
 
         private static OptionData s_NoOptionData = new OptionData();
 
-        /// <summary>
-        /// The Value is the index number of the current selection in the Dropdown. 0 is the first option in the Dropdown, 1 is the second, and so on.
-        /// </summary>
         /// <example>
         /// <code>
         /// <![CDATA[
@@ -402,9 +351,6 @@ namespace UnityEngine.UI
                 Set(value);
             }
         }
-        /// <summary>
-        /// Set index number of the current selection in the Dropdown without invoking onValueChanged callback.
-        /// </summary>
         /// <param name="input"> The new index for the current selection. </param>
         public void SetValueWithoutNotify(int input)
         {
@@ -477,9 +423,6 @@ namespace UnityEngine.UI
             base.OnDisable();
         }
 
-        /// <summary>
-        /// Refreshes the text and image (if available) of the currently selected option.
-        /// </summary>
         /// <remarks>
         /// If you have modified the list of options, you should call this method afterwards to ensure that the visual state of the dropdown corresponds to the updated options.
         /// </remarks>
@@ -508,9 +451,6 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <summary>
-        /// Add multiple options to the options of the Dropdown based on a list of OptionData objects.
-        /// </summary>
         /// <param name="options">The list of OptionData to add.</param>
         /// <remarks>
         /// <![CDATA[
@@ -523,9 +463,6 @@ namespace UnityEngine.UI
             RefreshShownValue();
         }
 
-        /// <summary>
-        /// Add multiple text-only options to the options of the Dropdown based on a list of strings.
-        /// </summary>
         /// <remarks>
         /// Add a List of string messages to the Dropdown. The Dropdown shows each member of the list as a separate option.
         /// </remarks>
@@ -567,9 +504,6 @@ namespace UnityEngine.UI
             RefreshShownValue();
         }
 
-        /// <summary>
-        /// Add multiple image-only options to the options of the Dropdown based on a list of Sprites.
-        /// </summary>
         /// <param name="options">The list of Sprites to add.</param>
         /// <remarks>
         /// <![CDATA[
@@ -584,9 +518,6 @@ namespace UnityEngine.UI
             RefreshShownValue();
         }
 
-        /// <summary>
-        /// Clear the list of options in the Dropdown.
-        /// </summary>
         public void ClearOptions()
         {
             options.Clear();
@@ -696,27 +627,18 @@ namespace UnityEngine.UI
             return comp;
         }
 
-        /// <summary>
-        /// Handling for when the dropdown is initially 'clicked'. Typically shows the dropdown
-        /// </summary>
         /// <param name="eventData">The asocciated event data.</param>
         public virtual void OnPointerClick(PointerEventData eventData)
         {
             Show();
         }
 
-        /// <summary>
-        /// Handling for when the dropdown is selected and a submit event is processed. Typically shows the dropdown
-        /// </summary>
         /// <param name="eventData">The asocciated event data.</param>
         public virtual void OnSubmit(BaseEventData eventData)
         {
             Show();
         }
 
-        /// <summary>
-        /// This will hide the dropdown list.
-        /// </summary>
         /// <remarks>
         /// Called by a BaseInputModule when a Cancel event occurs.
         /// </remarks>
@@ -726,16 +648,6 @@ namespace UnityEngine.UI
             Hide();
         }
 
-        /// <summary>
-        /// Show the dropdown.
-        ///
-        /// Plan for dropdown scrolling to ensure dropdown is contained within screen.
-        ///
-        /// We assume the Canvas is the screen that the dropdown must be kept inside.
-        /// This is always valid for screen space canvas modes.
-        /// For world space canvases we don't know how it's used, but it could be e.g. for an in-game monitor.
-        /// We consider it a fair constraint that the canvas must be big enough to contain dropdowns.
-        /// </summary>
         public void Show()
         {
             if (!IsActive() || !IsInteractable() || m_Dropdown != null)
@@ -890,9 +802,6 @@ namespace UnityEngine.UI
             m_Blocker = CreateBlocker(rootCanvas);
         }
 
-        /// <summary>
-        /// Create a blocker that blocks clicks to other controls while the dropdown list is open.
-        /// </summary>
         /// <remarks>
         /// Override this method to implement a different way to obtain a blocker GameObject.
         /// </remarks>
@@ -968,9 +877,6 @@ namespace UnityEngine.UI
             return blocker;
         }
 
-        /// <summary>
-        /// Convenience method to explicitly destroy the previously generated blocker object
-        /// </summary>
         /// <remarks>
         /// Override this method to implement a different way to dispose of a blocker GameObject that blocks clicks to other controls while the dropdown list is open.
         /// </remarks>
@@ -980,9 +886,6 @@ namespace UnityEngine.UI
             Destroy(blocker);
         }
 
-        /// <summary>
-        /// Create the dropdown list to be shown when the dropdown is clicked. The dropdown list should correspond to the provided template GameObject, equivalent to instantiating a copy of it.
-        /// </summary>
         /// <remarks>
         /// Override this method to implement a different way to obtain a dropdown list GameObject.
         /// </remarks>
@@ -993,9 +896,6 @@ namespace UnityEngine.UI
             return (GameObject)Instantiate(template);
         }
 
-        /// <summary>
-        /// Convenience method to explicitly destroy the previously generated dropdown list
-        /// </summary>
         /// <remarks>
         /// Override this method to implement a different way to dispose of a dropdown list GameObject.
         /// </remarks>
@@ -1005,9 +905,6 @@ namespace UnityEngine.UI
             Destroy(dropdownList);
         }
 
-        /// <summary>
-        /// Create a dropdown item based upon the item template.
-        /// </summary>
         /// <remarks>
         /// Override this method to implement a different way to obtain an option item.
         /// The option item should correspond to the provided template DropdownItem and its GameObject, equivalent to instantiating a copy of it.
@@ -1019,9 +916,6 @@ namespace UnityEngine.UI
             return (DropdownItem)Instantiate(itemTemplate);
         }
 
-        /// <summary>
-        ///  Convenience method to explicitly destroy the previously generated Items.
-        /// </summary>
         /// <remarks>
         /// Override this method to implement a different way to dispose of an option item.
         /// Likely no action needed since destroying the dropdown list destroys all contained items as well.
@@ -1083,9 +977,6 @@ namespace UnityEngine.UI
             group.alpha = alpha;
         }
 
-        /// <summary>
-        /// Hide the dropdown list. I.e. close it.
-        /// </summary>
         public void Hide()
         {
             if (m_Dropdown != null)
