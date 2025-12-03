@@ -10,7 +10,9 @@ public class UnicodeDataGeneratorWindow : EditorWindow
     [SerializeField] private TextAsset derivedBidiClassAsset;
     [SerializeField] private TextAsset derivedJoiningTypeAsset;
     [SerializeField] private TextAsset arabicShapingAsset;
-
+    [SerializeField] private TextAsset bidiBracketsAsset;   // BidiBrackets.txt
+    [SerializeField] private TextAsset bidiMirroringAsset;  // BidiMirroring.txt
+    
     // Папка в Assets, куда будет записан бинарь
     [SerializeField] private DefaultAsset outputFolder;
 
@@ -60,6 +62,20 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             typeof(TextAsset),
             false);
 
+// NEW:
+        bidiBracketsAsset = (TextAsset)EditorGUILayout.ObjectField(
+            "BidiBrackets.txt",
+            bidiBracketsAsset,
+            typeof(TextAsset),
+            false);
+
+        bidiMirroringAsset = (TextAsset)EditorGUILayout.ObjectField(
+            "BidiMirroring.txt",
+            bidiMirroringAsset,
+            typeof(TextAsset),
+            false);
+
+
         EditorGUILayout.Space();
 
         outputFolder = (DefaultAsset)EditorGUILayout.ObjectField(
@@ -79,7 +95,9 @@ public class UnicodeDataGeneratorWindow : EditorWindow
 
         GUI.enabled = derivedBidiClassAsset != null &&
                       derivedJoiningTypeAsset != null &&
-                      arabicShapingAsset != null;
+                      arabicShapingAsset != null &&
+                      bidiBracketsAsset != null &&
+                      bidiMirroringAsset != null;
 
         if (GUILayout.Button("Generate Unicode Binary", GUILayout.Height(30)))
         {
@@ -97,15 +115,22 @@ public class UnicodeDataGeneratorWindow : EditorWindow
 
             string derivedBidiClassPath = GetAbsolutePathFromTextAsset(derivedBidiClassAsset, projectRoot);
             string derivedJoiningTypePath = GetAbsolutePathFromTextAsset(derivedJoiningTypeAsset, projectRoot);
-            string arabicShapingPath = GetAbsolutePathFromTextAsset(arabicShapingAsset, projectRoot);
+            string arabicShapingPath     = GetAbsolutePathFromTextAsset(arabicShapingAsset, projectRoot);
 
-            if (string.IsNullOrEmpty(derivedBidiClassPath) ||
+// NEW:
+            string bidiBracketsPath  = GetAbsolutePathFromTextAsset(bidiBracketsAsset,  projectRoot);
+            string bidiMirroringPath = GetAbsolutePathFromTextAsset(bidiMirroringAsset, projectRoot);
+
+            if (string.IsNullOrEmpty(derivedBidiClassPath)  ||
                 string.IsNullOrEmpty(derivedJoiningTypePath) ||
-                string.IsNullOrEmpty(arabicShapingPath))
+                string.IsNullOrEmpty(arabicShapingPath)      ||
+                string.IsNullOrEmpty(bidiBracketsPath)       ||
+                string.IsNullOrEmpty(bidiMirroringPath))
             {
                 Debug.LogError("UnicodeDataGenerator: one or more TextAssets do not have valid asset paths.");
                 return;
             }
+
 
             string outputFolderAssetPath = GetOutputFolderAssetPath();
             if (string.IsNullOrEmpty(outputFolderAssetPath))
@@ -135,11 +160,11 @@ public class UnicodeDataGeneratorWindow : EditorWindow
 
             List<RangeEntry> ranges = builder.BuildRangeEntries();
 
-            // Пока зеркала и скобки не заполняем — добавим позже, когда подключим BidiMirroring/BidiBrackets
-            List<MirrorEntry> mirrors = new List<MirrorEntry>();
-            List<BracketEntry> brackets = new List<BracketEntry>();
+// NEW: читаем зеркала и скобки строго по формату Unicode 17.0.0
+            List<MirrorEntry> mirrors  = UnicodeDataBuilder.BuildMirrorEntries(bidiMirroringPath);
+            List<BracketEntry> brackets = UnicodeDataBuilder.BuildBracketEntries(bidiBracketsPath);
 
-            // Версию Unicode пока ставим 0, позже можно пробросить реально разобранную версию
+// Версию Unicode пока ставим 0, позже можно пробросить реально разобранную версию
             UnicodeBinaryWriter.WriteBinary(
                 outputPath,
                 ranges,

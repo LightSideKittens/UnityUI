@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 public readonly struct BidiParagraph
 {
-    public readonly int startIndex; // inclusive, index in logical text (code point index)
-    public readonly int endIndex; // inclusive
-    public readonly byte baseLevel; // 0 for LTR, 1 for RTL
+    public readonly int startIndex;
+    public readonly int endIndex;
+    public readonly byte baseLevel;
 
     public BidiParagraph(int startIndex, int endIndex, byte baseLevel)
     {
@@ -14,25 +14,12 @@ public readonly struct BidiParagraph
         this.baseLevel = baseLevel;
     }
 
-    public BidiDirection Direction
-    {
-        get { return (baseLevel & 1) == 0 ? BidiDirection.LeftToRight : BidiDirection.RightToLeft; }
-    }
+    public BidiDirection Direction => (baseLevel & 1) == 0 ? BidiDirection.LeftToRight : BidiDirection.RightToLeft;
 }
 
 public readonly struct BidiResult
 {
-    /// <summary>
-    /// Embedding level for each logical code point.
-    /// Length is equal to the input logical length.
-    /// On this step, levels reflect only paragraph base levels (P2/P3).
-    /// Later we will refine them with explicit embeddings, weak/neutral resolution, and implicit levels.
-    /// </summary>
     public readonly byte[] levels;
-
-    /// <summary>
-    /// Paragraph information: logical ranges and base embedding levels.
-    /// </summary>
     public readonly BidiParagraph[] paragraphs;
 
     public BidiResult(byte[] levels, BidiParagraph[] paragraphs)
@@ -47,7 +34,7 @@ public sealed class BidiEngine
     private struct EmbeddingState
     {
         public byte level;
-        public sbyte overrideStatus; // 0 = none, 1 = force L, 2 = force R
+        public sbyte overrideStatus;
         public bool isIsolate;
     }
 
@@ -59,7 +46,6 @@ public sealed class BidiEngine
 
     private readonly IUnicodeDataProvider unicodeData;
 
-    // Reused buffers to reduce allocations; they grow as needed.
     private BidiClass[] bidiClassesBuffer = Array.Empty<BidiClass>();
 
     public BidiEngine(IUnicodeDataProvider unicodeData)
@@ -79,13 +65,11 @@ public sealed class BidiEngine
         if (indexMap.Length < length)
             throw new ArgumentException("indexMap length is less than line length.", nameof(indexMap));
 
-        // Инициализируем отображение "визуальный индекс -> логический индекс"
         for (int i = 0; i < length; i++)
         {
             indexMap[i] = start + i;
         }
 
-        // Находим максимальный и минимальный нечётный уровень на этой строке.
         byte maxLevel = 0;
         byte minOddLevel = byte.MaxValue;
 
@@ -100,11 +84,9 @@ public sealed class BidiEngine
                 minOddLevel = level;
         }
 
-        // Если нечётных уровней нет — порядок логический == визуальный.
         if (minOddLevel == byte.MaxValue)
             return;
 
-        // Классический алгоритм reordering: от максимального уровня до минимального нечётного.
         for (byte level = maxLevel; level >= minOddLevel; level--)
         {
             int i = 0;
@@ -117,13 +99,11 @@ public sealed class BidiEngine
                     int runStart = i;
                     int runEnd = i + 1;
 
-                    // Находим непрерывный диапазон символов, у которых level >= текущему.
                     while (runEnd < length && levels[indexMap[runEnd]] >= level)
                     {
                         runEnd++;
                     }
 
-                    // Разворачиваем этот диапазон.
                     int left = runStart;
                     int right = runEnd - 1;
 
@@ -142,26 +122,16 @@ public sealed class BidiEngine
                 }
             }
 
-            // Защита от потенциального underflow, хотя при корректных данных level >= 1 здесь.
             if (level == 0)
                 break;
         }
     }
 
-
     public BidiResult Process(ReadOnlySpan<int> codePoints)
     {
-        // Старое поведение: базовый уровень определяется автоматически (P2/P3).
         return ProcessInternal(codePoints, forcedParagraphLevel: null);
     }
 
-    /// <summary>
-    /// Process with explicit paragraph direction override:
-    /// paragraphDirection:
-    ///   0 = force LTR (base level 0),
-    ///   1 = force RTL (base level 1),
-    ///   2 = auto (P2/P3, same as Process(codePoints)).
-    /// </summary>
     public BidiResult Process(ReadOnlySpan<int> codePoints, int paragraphDirection)
     {
         byte? forcedParagraphLevel;
@@ -169,13 +139,13 @@ public sealed class BidiEngine
         switch (paragraphDirection)
         {
             case 0:
-                forcedParagraphLevel = 0; // LTR
+                forcedParagraphLevel = 0;
                 break;
             case 1:
-                forcedParagraphLevel = 1; // RTL
+                forcedParagraphLevel = 1;
                 break;
             case 2:
-                forcedParagraphLevel = null; // auto (P2/P3)
+                forcedParagraphLevel = null;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(
@@ -196,7 +166,6 @@ public sealed class BidiEngine
 
         EnsureBidiClassesCapacity(length);
 
-        // 1) Классификация по Bidi_Class
         for (int i = 0; i < length; i++)
         {
             int cp = codePoints[i];
@@ -206,7 +175,6 @@ public sealed class BidiEngine
             bidiClassesBuffer[i] = unicodeData.GetBidiClass(cp);
         }
 
-        // 2) Параграфы и базовый уровень (P1–P3 или принудительный baseLevel)
         List<BidiParagraph> paragraphList;
         if (forcedParagraphLevel.HasValue)
         {
@@ -222,7 +190,6 @@ public sealed class BidiEngine
 
         byte[] levels = new byte[length];
 
-        // 3) Явные уровни + изоляции (X1–X8, FSI/LRI/RLI/PDI)
         for (int pIndex = 0; pIndex < paragraphList.Count; pIndex++)
         {
             BidiParagraph paragraph = paragraphList[pIndex];
@@ -235,7 +202,6 @@ public sealed class BidiEngine
                 levels);
         }
 
-        // 4) Слабые типы (W1–W7)
         for (int pIndex = 0; pIndex < paragraphList.Count; pIndex++)
         {
             BidiParagraph paragraph = paragraphList[pIndex];
@@ -248,7 +214,6 @@ public sealed class BidiEngine
                 levels);
         }
 
-        // 5) Парные скобки (N0)
         for (int pIndex = 0; pIndex < paragraphList.Count; pIndex++)
         {
             BidiParagraph paragraph = paragraphList[pIndex];
@@ -257,11 +222,11 @@ public sealed class BidiEngine
                 codePoints,
                 paragraph.startIndex,
                 paragraph.endIndex,
+                paragraph.baseLevel,
                 bidiClassesBuffer,
                 levels);
         }
 
-        // 6) Нейтрали (N1–N2)
         for (int pIndex = 0; pIndex < paragraphList.Count; pIndex++)
         {
             BidiParagraph paragraph = paragraphList[pIndex];
@@ -274,7 +239,6 @@ public sealed class BidiEngine
                 levels);
         }
 
-        // 7) Имплицитные уровни (I1–I2)
         for (int pIndex = 0; pIndex < paragraphList.Count; pIndex++)
         {
             BidiParagraph paragraph = paragraphList[pIndex];
@@ -286,73 +250,9 @@ public sealed class BidiEngine
                 levels);
         }
 
-        // 8) Коррекция уровней скобок после I1/I2 (если у тебя уже есть AdjustBracketLevelsForParagraph)
-        for (int pIndex = 0; pIndex < paragraphList.Count; pIndex++)
-        {
-            BidiParagraph paragraph = paragraphList[pIndex];
-
-            AdjustBracketLevelsForParagraph(
-                codePoints,
-                paragraph.startIndex,
-                paragraph.endIndex,
-                bidiClassesBuffer,
-                levels);
-        }
-
-        // 9) Пост-коррекция PDI (если ты оставил AdjustPdiLevelsForParagraph)
-        for (int pIndex = 0; pIndex < paragraphList.Count; pIndex++)
-        {
-            BidiParagraph paragraph = paragraphList[pIndex];
-
-            AdjustPdiLevelsForParagraph(
-                paragraph.startIndex,
-                paragraph.endIndex,
-                bidiClassesBuffer,
-                levels);
-        }
-
         BidiParagraph[] paragraphs = paragraphList.ToArray();
         return new BidiResult(levels, paragraphs);
     }
-
-    /// <summary>
-    /// Builds paragraphs when paragraph base level is explicitly specified (0 or 1)
-    /// instead of being inferred from text (P2/P3).
-    /// Paragraph segmentation (P1) остаётся той же: разделяем по B (ParagraphSeparator),
-    /// но baseLevel всех параграфов = givenBaseLevel.
-    /// </summary>
-    private static List<BidiParagraph> BuildParagraphsWithExplicitBaseLevel(
-        BidiClass[] bidiClasses,
-        int length,
-        byte givenBaseLevel)
-    {
-        var paragraphs = new List<BidiParagraph>();
-
-        int paraStart = 0;
-        for (int i = 0; i < length; i++)
-        {
-            if (bidiClasses[i] == BidiClass.ParagraphSeparator)
-            {
-                int paraEnd = i - 1;
-                if (paraEnd >= paraStart)
-                {
-                    paragraphs.Add(new BidiParagraph(paraStart, paraEnd, givenBaseLevel));
-                }
-
-                // Сам сепаратор параграфа не входит в параграф (P1).
-                paraStart = i + 1;
-            }
-        }
-
-        if (paraStart < length)
-        {
-            int paraEnd = length - 1;
-            paragraphs.Add(new BidiParagraph(paraStart, paraEnd, givenBaseLevel));
-        }
-
-        return paragraphs;
-    }
-
 
     private void ResolveNeutralTypesForParagraph(
         int start,
@@ -362,12 +262,11 @@ public sealed class BidiEngine
         byte[] levels)
     {
         if (start > end)
+        {
             return;
-
-        BidiClass paragraphBaseType = GetParagraphBaseType(paragraphBaseLevel);
+        }
 
         int i = start;
-
         while (i <= end)
         {
             if (!IsNeutralType(bidiClasses[i]))
@@ -376,119 +275,94 @@ public sealed class BidiEngine
                 continue;
             }
 
+            // Запоминаем уровень текущей серии нейтральных символов.
+            // Символы внутри изолятов будут иметь более высокий уровень и не должны смешиваться с этой группой.
+            byte runLevel = levels[i];
+
             int neutralStart = i;
             int neutralEnd = i;
 
-            // Найти максимально длинную последовательность нейтралей.
-            while (neutralEnd + 1 <= end && IsNeutralType(bidiClasses[neutralEnd + 1]))
+            // Группируем нейтральные символы, но ТОЛЬКО те, что находятся на том же уровне.
+            while (neutralEnd + 1 <= end && 
+                   IsNeutralType(bidiClasses[neutralEnd + 1]) &&
+                   levels[neutralEnd + 1] == runLevel)
             {
                 neutralEnd++;
             }
 
-            // s: ближайший сильный слева (L/R/AL), иначе базовый тип параграфа.
-            BidiClass s = paragraphBaseType;
-            bool hasLeft = false;
-
+            // 1. Ищем сильный тип СЛЕВА (sGroup)
+            BidiClass sGroup = BidiClass.OtherNeutral;
             for (int j = neutralStart - 1; j >= start; j--)
             {
+                // ПРОПУСКАЕМ символы с более высоким уровнем (содержимое изолятов)
+                if (levels[j] > runLevel) continue;
+
                 BidiClass t = bidiClasses[j];
+                if (t == BidiClass.BoundaryNeutral) continue;
 
-                if (t == BidiClass.BoundaryNeutral)
-                    continue;
-
-                if (IsStrongType(t))
+                BidiClass strong = MapToStrongTypeForNeutrals(t, levels[j]);
+                if (strong != BidiClass.OtherNeutral)
                 {
-                    s = t;
-                    hasLeft = true;
+                    sGroup = strong;
                     break;
                 }
             }
-
-            if (!hasLeft)
+            
+            // Fallback для sGroup: направление текущего уровня (SOS)
+            if (sGroup == BidiClass.OtherNeutral)
             {
-                s = paragraphBaseType;
+                sGroup = (runLevel & 1) == 0 ? BidiClass.LeftToRight : BidiClass.RightToLeft;
             }
 
-            // e: ближайший сильный справа (L/R/AL), иначе базовый тип параграфа.
-            BidiClass e = paragraphBaseType;
-            bool hasRight = false;
-
+            // 2. Ищем сильный тип СПРАВА (eGroup)
+            BidiClass eGroup = BidiClass.OtherNeutral;
             for (int j = neutralEnd + 1; j <= end; j++)
             {
+                // ПРОПУСКАЕМ символы с более высоким уровнем (содержимое изолятов)
+                if (levels[j] > runLevel) continue;
+
                 BidiClass t = bidiClasses[j];
+                if (t == BidiClass.BoundaryNeutral) continue;
 
-                if (t == BidiClass.BoundaryNeutral)
-                    continue;
-
-                if (IsStrongType(t))
+                BidiClass strong = MapToStrongTypeForNeutrals(t, levels[j]);
+                if (strong != BidiClass.OtherNeutral)
                 {
-                    e = t;
-                    hasRight = true;
+                    eGroup = strong;
                     break;
                 }
             }
 
-            if (!hasRight)
+            // Fallback для eGroup: направление текущего уровня (EOS)
+            if (eGroup == BidiClass.OtherNeutral)
             {
-                e = paragraphBaseType;
+                eGroup = (runLevel & 1) == 0 ? BidiClass.LeftToRight : BidiClass.RightToLeft;
             }
 
-            // N1/N2: если обе стороны в одной группе (L или R) → берём её,
-            // иначе нейтрали берут базовое направление параграфа.
-            BidiClass sGroup = GetDirectionalGroup(s);
-            BidiClass eGroup = GetDirectionalGroup(e);
-
-            BidiClass resolvedType;
-
-            if (sGroup != BidiClass.OtherNeutral && sGroup == eGroup)
+            // 3. Разрешение типов
+            BidiClass resolvedGroup;
+            if (sGroup == eGroup)
             {
-                resolvedType = sGroup;
+                resolvedGroup = sGroup;
             }
             else
             {
-                resolvedType = paragraphBaseType;
+                // Если типы разные, используем направление текущего уровня вложения (не параграфа!)
+                resolvedGroup = (runLevel & 1) == 0 ? BidiClass.LeftToRight : BidiClass.RightToLeft;
             }
+
+            BidiClass resolvedType = resolvedGroup == BidiClass.RightToLeft
+                ? BidiClass.RightToLeft
+                : BidiClass.LeftToRight;
 
             for (int j = neutralStart; j <= neutralEnd; j++)
             {
-                if (!IsNeutralType(bidiClasses[j]))
-                    continue;
-
-                BidiClass type = resolvedType;
-
-                // Специальный (но довольно общий) случай:
-                // пробел между числом и правым контекстом (R/AL/EN/AN) должен вести себя как R.
-                if (bidiClasses[j] == BidiClass.WhiteSpace)
-                {
-                    int prev = FindPreviousStrongOrNumberIndex(start, j, bidiClasses);
-                    int next = FindNextStrongOrNumberIndex(end, j, bidiClasses);
-
-                    if (prev >= 0 && next >= 0)
-                    {
-                        BidiClass prevType = bidiClasses[prev];
-                        BidiClass nextType = bidiClasses[next];
-
-                        bool prevIsNumber = prevType == BidiClass.EuropeanNumber || prevType == BidiClass.ArabicNumber;
-                        bool nextIsRightGroup =
-                            nextType == BidiClass.RightToLeft ||
-                            nextType == BidiClass.ArabicLetter ||
-                            nextType == BidiClass.EuropeanNumber ||
-                            nextType == BidiClass.ArabicNumber;
-
-                        if (prevIsNumber && nextIsRightGroup)
-                        {
-                            type = BidiClass.RightToLeft;
-                        }
-                    }
-                }
-
-                bidiClasses[j] = type;
+                // Присваиваем вычисленный тип (включая LRI/PDI, которые являются частью этой группы)
+                bidiClasses[j] = resolvedType; 
             }
 
             i = neutralEnd + 1;
         }
     }
-
 
     private sealed class BracketPair
     {
@@ -506,46 +380,38 @@ public sealed class BidiEngine
         ReadOnlySpan<int> codePoints,
         int start,
         int end,
+        byte paragraphBaseLevel,
         BidiClass[] bidiClasses,
         byte[] levels)
     {
         if (start > end)
             return;
 
-        List<int> openStack = new List<int>();
-        List<BracketPair> pairs = new List<BracketPair>();
+        var openStack = new List<int>();
+        var pairs = new List<BracketPair>();
 
-        // Собираем пары скобок по Bidi_Paired_Bracket / Bidi_Paired_Bracket_Type.
         for (int i = start; i <= end; i++)
         {
-            int cp = codePoints[i];
+            BidiClass bc = bidiClasses[i];
 
+            if (bc != BidiClass.OtherNeutral)
+                continue;
+
+            int cp = codePoints[i];
             BidiPairedBracketType bracketType = unicodeData.GetBidiPairedBracketType(cp);
 
-            // Fallback: если Unicode-данные не содержат пары для ASCII-скобок,
-            // явно считаем '(' открывающей, а ')' закрывающей.
             if (bracketType == BidiPairedBracketType.None)
-            {
-                if (cp == 0x0028) // '('
-                {
-                    bracketType = BidiPairedBracketType.Open;
-                }
-                else if (cp == 0x0029) // ')'
-                {
-                    bracketType = BidiPairedBracketType.Close;
-                }
-                else
-                {
-                    continue;
-                }
-            }
-
-            // Алгоритм N0 применяется только к скобкам, которые сейчас ON.
-            if (bidiClasses[i] != BidiClass.OtherNeutral)
                 continue;
 
             if (bracketType == BidiPairedBracketType.Open)
             {
+                if (openStack.Count >= 63)
+                {
+                    openStack.Clear();
+                    pairs.Clear();
+                    break;
+                }
+
                 openStack.Add(i);
             }
             else if (bracketType == BidiPairedBracketType.Close)
@@ -555,34 +421,20 @@ public sealed class BidiEngine
                     int openIndex = openStack[s];
                     int openCp = codePoints[openIndex];
 
-                    bool match;
-
-                    // Пытаемся использовать данные Unicode, если они есть.
-                    BidiPairedBracketType openType = unicodeData.GetBidiPairedBracketType(openCp);
-                    if (openType == BidiPairedBracketType.None)
-                    {
-                        // Fallback-пара для ASCII-скобок.
-                        match = (openCp == 0x0028 && cp == 0x0029);
-                    }
-                    else
-                    {
-                        int openPaired = unicodeData.GetBidiPairedBracket(openCp);
-                        match = (openPaired == cp);
-                    }
-
-                    if (match)
+                    if (BracketsMatch(openCp, cp))
                     {
                         pairs.Add(new BracketPair(openIndex, i));
-                        openStack.RemoveAt(s);
+                        openStack.RemoveRange(s, openStack.Count - s); 
                         break;
                     }
                 }
             }
         }
 
-
         if (pairs.Count == 0)
             return;
+
+        pairs.Sort(static (a, b) => a.openIndex.CompareTo(b.openIndex));
 
         foreach (BracketPair pair in pairs)
         {
@@ -592,70 +444,128 @@ public sealed class BidiEngine
             if (openIndex < start || closeIndex > end || openIndex >= closeIndex)
                 continue;
 
-            bool hasL = false;
-            bool hasR = false;
-            bool hasNumber = false;
-            bool hasOther = false;
+            BidiClass embeddingDir =
+                (levels[openIndex] & 1) == 0 ? BidiClass.LeftToRight : BidiClass.RightToLeft;
 
-            // Анализ содержимого между скобками.
+            bool hasAnyStrongInside = false;
+            bool hasStrongMatchingEmbedding = false;
+
             for (int k = openIndex + 1; k < closeIndex; k++)
             {
-                BidiClass t = bidiClasses[k];
-
-                if (t == BidiClass.BoundaryNeutral)
+                BidiClass strong = MapToStrongTypeForN0(bidiClasses[k]);
+                if (strong != BidiClass.LeftToRight && strong != BidiClass.RightToLeft)
                     continue;
 
-                switch (t)
-                {
-                    case BidiClass.LeftToRight:
-                        hasL = true;
-                        break;
-
-                    case BidiClass.RightToLeft:
-                    case BidiClass.ArabicLetter:
-                        hasR = true;
-                        break;
-
-                    case BidiClass.EuropeanNumber:
-                    case BidiClass.ArabicNumber:
-                        hasNumber = true;
-                        break;
-
-                    default:
-                        // Любой другой тип (включая PDI, ON-пунктуацию и т.п.)
-                        hasOther = true;
-                        break;
-                }
+                hasAnyStrongInside = true;
+                if (strong == embeddingDir)
+                    hasStrongMatchingEmbedding = true;
             }
 
-            // Если внутри есть "мусор" (не только числа/strong), и нет явного L/R,
-            // то скобки не переназначаем — остаются ON (важно для теста 279).
-            if ((hasL || hasR) == false && hasNumber && hasOther)
-            {
+            if (!hasAnyStrongInside)
                 continue;
+
+            BidiClass resolvedDir;
+
+            if (hasStrongMatchingEmbedding)
+            {
+                resolvedDir = embeddingDir;
+            }
+            else
+            {
+                BidiClass prevStrong = FindPreviousStrongForN0(
+                    codePoints,
+                    start,
+                    openIndex,
+                    paragraphBaseLevel,
+                    bidiClasses,
+                    levels);
+
+                if (prevStrong != BidiClass.LeftToRight && prevStrong != BidiClass.RightToLeft)
+                {
+                    // N0c: use embedding direction
+                    prevStrong = embeddingDir;
+                }
+
+                resolvedDir = (prevStrong != embeddingDir) ? prevStrong : embeddingDir;
             }
 
-            if (hasL && !hasR)
-            {
-                bidiClasses[openIndex] = BidiClass.LeftToRight;
-                bidiClasses[closeIndex] = BidiClass.LeftToRight;
-            }
-            else if (hasR && !hasL)
-            {
-                bidiClasses[openIndex] = BidiClass.RightToLeft;
-                bidiClasses[closeIndex] = BidiClass.RightToLeft;
-            }
-            else if (!hasL && !hasR && hasNumber && !hasOther)
-            {
-                // Только числа внутри (и BN) → скобки считаем "правой" группой (R).
-                // Это даёт уровень base+1, как требуют тесты 254, 255, 256, 257, 265, 266, 269.
-                bidiClasses[openIndex] = BidiClass.RightToLeft;
-                bidiClasses[closeIndex] = BidiClass.RightToLeft;
-            }
-            // Иначе оставляем скобки как ON.
+            bidiClasses[openIndex] = resolvedDir;
+            bidiClasses[closeIndex] = resolvedDir;
+
+            PropagateNsmAfterBracket(codePoints, end, openIndex, resolvedDir, bidiClasses);
+            PropagateNsmAfterBracket(codePoints, end, closeIndex, resolvedDir, bidiClasses);
         }
     }
 
+    private bool BracketsMatch(int openCp, int closeCp)
+    {
+        BidiPairedBracketType openType = unicodeData.GetBidiPairedBracketType(openCp);
+        if (openType != BidiPairedBracketType.None)
+        {
+            int paired = unicodeData.GetBidiPairedBracket(openCp);
+            if (paired == closeCp)
+                return true;
+
+            if (openCp == 0x2329 && (closeCp == 0x232A || closeCp == 0x3009))
+                return true;
+            if (openCp == 0x3008 && (closeCp == 0x232A || closeCp == 0x3009))
+                return true;
+
+            return false;
+        }
+
+        return openCp == 0x0028 && closeCp == 0x0029;
+    }
+
+    private BidiClass FindPreviousStrongForN0(
+        ReadOnlySpan<int> codePoints,
+        int start,
+        int openIndex,
+        byte paragraphBaseLevel,
+        BidiClass[] bidiClasses,
+        byte[] levels)
+    {
+        for (int i = openIndex - 1; i >= start; i--)
+        {
+            BidiClass strong = MapToStrongTypeForN0(bidiClasses[i]);
+            if (strong == BidiClass.LeftToRight || strong == BidiClass.RightToLeft)
+                return strong;
+        }
+
+        return BidiClass.OtherNeutral;
+    }
+
+    private void PropagateNsmAfterBracket(
+        ReadOnlySpan<int> codePoints,
+        int end,
+        int bracketIndex,
+        BidiClass resolvedDir,
+        BidiClass[] bidiClasses)
+    {
+        int i = bracketIndex + 1;
+
+        while (i <= end)
+        {
+            int cp = codePoints[i];
+
+            BidiClass original = unicodeData.GetBidiClass(cp);
+
+            if (original == BidiClass.NonspacingMark)
+            {
+                bidiClasses[i] = resolvedDir;
+                i++;
+                continue;
+            }
+
+            if (original == BidiClass.BoundaryNeutral)
+            {
+                i++;
+                continue;
+            }
+
+            break;
+        }
+    }
 
     private void ResolveWeakTypesForParagraph(
         int start,
@@ -667,10 +577,9 @@ public sealed class BidiEngine
         if (start > end)
             return;
 
-        // Тип параграфа для начала последовательности (sos-заменитель).
         BidiClass paragraphBaseType = GetParagraphBaseType(paragraphBaseLevel);
 
-        // ---- W1: NSM наследует тип предыдущего символа (с учётом isolate/PDI) ----
+        // W1
         {
             BidiClass prevType = paragraphBaseType;
 
@@ -685,7 +594,6 @@ public sealed class BidiEngine
                 {
                     if (IsIsolateInitiator(prevType) || prevType == BidiClass.PopDirectionalIsolate)
                     {
-                        // NSM после инициатора изолята / PDI → ON
                         bidiClasses[i] = BidiClass.OtherNeutral;
                     }
                     else
@@ -693,7 +601,6 @@ public sealed class BidiEngine
                         bidiClasses[i] = prevType;
                     }
 
-                    // prevType не меняем — NSM не влияет на последующие.
                     continue;
                 }
 
@@ -701,7 +608,7 @@ public sealed class BidiEngine
             }
         }
 
-        // ---- W2: EN после сильного AL → AN ----
+        // W2: EN -> AN if last strong was AL
         {
             for (int i = start; i <= end; i++)
             {
@@ -709,16 +616,10 @@ public sealed class BidiEngine
                     continue;
 
                 int j = i - 1;
-
                 while (j >= start)
                 {
                     BidiClass t = bidiClasses[j];
-
-                    if (t == BidiClass.BoundaryNeutral)
-                    {
-                        j--;
-                        continue;
-                    }
+                    if (t == BidiClass.BoundaryNeutral) { j--; continue; }
 
                     if (IsStrongType(t))
                     {
@@ -726,16 +627,14 @@ public sealed class BidiEngine
                         {
                             bidiClasses[i] = BidiClass.ArabicNumber;
                         }
-
                         break;
                     }
-
                     j--;
                 }
             }
         }
 
-        // ---- W3: AL → R ----
+        // W3: AL -> R
         {
             for (int i = start; i <= end; i++)
             {
@@ -746,7 +645,7 @@ public sealed class BidiEngine
             }
         }
 
-        // ---- W4: ES/CS между двумя числами ----
+        // W4: Separators
         {
             for (int i = start; i <= end; i++)
             {
@@ -760,7 +659,6 @@ public sealed class BidiEngine
 
                 if (prevIndex < 0 || nextIndex < 0)
                 {
-                    // Не окружён нужными числами.
                     bidiClasses[i] = BidiClass.OtherNeutral;
                     continue;
                 }
@@ -784,7 +682,7 @@ public sealed class BidiEngine
             }
         }
 
-        // ---- W5: ET вокруг EN → EN ----
+        // W5: ET
         {
             for (int i = start; i <= end; i++)
             {
@@ -804,7 +702,7 @@ public sealed class BidiEngine
             }
         }
 
-        // ---- W6: оставшиеся ES/ET/CS → ON ----
+        // W6: Separators/Terminators -> ON
         {
             for (int i = start; i <= end; i++)
             {
@@ -819,7 +717,7 @@ public sealed class BidiEngine
             }
         }
 
-        // ---- W7: EN после сильного L → L ----
+        // W7: EN -> L if strong is L
         {
             BidiClass lastStrong = paragraphBaseType;
 
@@ -841,7 +739,6 @@ public sealed class BidiEngine
         }
     }
 
-
     private void ResolveImplicitLevelsForParagraph(
         int start,
         int end,
@@ -856,7 +753,6 @@ public sealed class BidiEngine
             int runStart = i;
             int runEnd = i;
 
-            // Находим непрерывный отрезок с одинаковым embedding level
             while (runEnd + 1 <= end && levels[runEnd + 1] == runLevel)
             {
                 runEnd++;
@@ -866,7 +762,6 @@ public sealed class BidiEngine
 
             if (isEvenLevel)
             {
-                // Rule I1: even level
                 for (int j = runStart; j <= runEnd; j++)
                 {
                     BidiClass bc = bidiClasses[j];
@@ -874,7 +769,6 @@ public sealed class BidiEngine
                     switch (bc)
                     {
                         case BidiClass.LeftToRight:
-                            // no change
                             break;
 
                         case BidiClass.RightToLeft:
@@ -888,14 +782,12 @@ public sealed class BidiEngine
                             break;
 
                         default:
-                            // neutrals, BN, separators, etc. — остаются на runLevel
                             break;
                     }
                 }
             }
             else
             {
-                // Rule I2: odd level
                 for (int j = runStart; j <= runEnd; j++)
                 {
                     BidiClass bc = bidiClasses[j];
@@ -904,7 +796,6 @@ public sealed class BidiEngine
                     {
                         case BidiClass.RightToLeft:
                         case BidiClass.ArabicLetter:
-                            // no change
                             break;
 
                         case BidiClass.LeftToRight:
@@ -914,7 +805,6 @@ public sealed class BidiEngine
                             break;
 
                         default:
-                            // neutrals, BN, etc. — остаются на runLevel
                             break;
                     }
                 }
@@ -932,7 +822,6 @@ public sealed class BidiEngine
         BidiClass[] bidiClasses,
         byte[] levels)
     {
-        // Initialize stack with base paragraph level.
         int stackDepth = 1;
         embeddingStackBuffer[0].level = baseLevel;
         embeddingStackBuffer[0].overrideStatus = 0;
@@ -945,59 +834,56 @@ public sealed class BidiEngine
         {
             BidiClass bc = bidiClasses[i];
 
-            // By default, each character gets the current embedding level.
             levels[i] = currentLevel;
 
             switch (bc)
             {
-                case BidiClass.LeftToRightEmbedding: // LRE
+                case BidiClass.LeftToRightEmbedding:
                     PushEmbedding(ref stackDepth, ref currentLevel, ref overrideStatus, isRtl: false, overrideClass: 0);
-                    // LRE itself becomes BN for the rest of the algorithm (X9).
                     bidiClasses[i] = BidiClass.BoundaryNeutral;
                     break;
 
-                case BidiClass.RightToLeftEmbedding: // RLE
+                case BidiClass.RightToLeftEmbedding:
                     PushEmbedding(ref stackDepth, ref currentLevel, ref overrideStatus, isRtl: true, overrideClass: 0);
                     bidiClasses[i] = BidiClass.BoundaryNeutral;
                     break;
 
-                case BidiClass.LeftToRightOverride: // LRO
+                case BidiClass.LeftToRightOverride:
                     PushEmbedding(ref stackDepth, ref currentLevel, ref overrideStatus, isRtl: false, overrideClass: 1);
                     bidiClasses[i] = BidiClass.BoundaryNeutral;
                     break;
 
-                case BidiClass.RightToLeftOverride: // RLO
+                case BidiClass.RightToLeftOverride:
                     PushEmbedding(ref stackDepth, ref currentLevel, ref overrideStatus, isRtl: true, overrideClass: 2);
                     bidiClasses[i] = BidiClass.BoundaryNeutral;
                     break;
 
-                case BidiClass.PopDirectionalFormat: // PDF
+                case BidiClass.PopDirectionalFormat:
                     PopEmbedding(ref stackDepth, ref currentLevel, ref overrideStatus);
                     bidiClasses[i] = BidiClass.BoundaryNeutral;
                     break;
 
-                case BidiClass.LeftToRightIsolate: // LRI
+                case BidiClass.LeftToRightIsolate:
                     PushIsolate(ref stackDepth, ref currentLevel, ref overrideStatus, isRtl: false);
                     break;
 
-                case BidiClass.RightToLeftIsolate: // RLI
+                case BidiClass.RightToLeftIsolate:
                     PushIsolate(ref stackDepth, ref currentLevel, ref overrideStatus, isRtl: true);
                     break;
 
-                case BidiClass.FirstStrongIsolate: // FSI
+                case BidiClass.FirstStrongIsolate:
                 {
                     bool isRtl = ResolveFirstStrongIsolateDirection(i, start, end, bidiClasses, baseLevel);
                     PushIsolate(ref stackDepth, ref currentLevel, ref overrideStatus, isRtl);
                     break;
                 }
 
-                case BidiClass.PopDirectionalIsolate: // PDI
+                case BidiClass.PopDirectionalIsolate:
                     PopIsolate(ref stackDepth, ref currentLevel, ref overrideStatus);
                     levels[i] = currentLevel;
                     break;
 
                 default:
-                    // Apply directional override (LRO / RLO) to non-BN characters.
                     if (overrideStatus == 1)
                     {
                         if (bc != BidiClass.BoundaryNeutral)
@@ -1026,18 +912,15 @@ public sealed class BidiEngine
 
         if (isRtl)
         {
-            // Smallest odd > currentLevel
             newLevel = (byte)(((currentLevel + 1) | 1));
         }
         else
         {
-            // Smallest even > currentLevel
             newLevel = (byte)(((currentLevel + 2) & ~1));
         }
 
         if (newLevel > maxExplicitLevel)
         {
-            // Per UAX #9: if level exceeds max depth, treat this formatting code as BN.
             return;
         }
 
@@ -1061,13 +944,11 @@ public sealed class BidiEngine
         ref byte currentLevel,
         ref sbyte overrideStatus)
     {
-        // Do not pop the base paragraph level.
         if (stackDepth <= 1)
             return;
 
         int topIndex = stackDepth - 1;
 
-        // PDF has no effect if the last entry is an isolate (UAX #9).
         if (embeddingStackBuffer[topIndex].isIsolate)
             return;
 
@@ -1088,18 +969,15 @@ public sealed class BidiEngine
 
         if (isRtl)
         {
-            // Smallest odd > currentLevel
             newLevel = (byte)(((currentLevel + 1) | 1));
         }
         else
         {
-            // Smallest even > currentLevel
             newLevel = (byte)(((currentLevel + 2) & ~1));
         }
 
         if (newLevel > maxExplicitLevel)
         {
-            // Too deep: ignore this isolate initiator for explicit levels.
             return;
         }
 
@@ -1109,58 +987,73 @@ public sealed class BidiEngine
         }
 
         embeddingStackBuffer[stackDepth].level = newLevel;
-        embeddingStackBuffer[stackDepth].overrideStatus = 0; // isolates do not introduce overrides
+        embeddingStackBuffer[stackDepth].overrideStatus = 0;
         embeddingStackBuffer[stackDepth].isIsolate = true;
         stackDepth++;
 
         currentLevel = newLevel;
-        // Inside isolate, override is reset (no LRO/RLO effect leaks into isolate).
         overrideStatus = 0;
     }
 
-    private void PopIsolate(
-        ref int stackDepth,
-        ref byte currentLevel,
-        ref sbyte overrideStatus)
+    private void PopIsolate(ref int stackDepth, ref byte currentLevel, ref sbyte overrideStatus)
     {
-        // Pop entries up to and including the last isolate.
-        if (stackDepth <= 1)
-            return;
+        if (stackDepth <= 1) return;
 
-        // Check if there is any isolate on the stack at all.
-        bool hasIsolate = false;
-        for (int idx = stackDepth - 1; idx >= 1; idx--)
+        int isolateIndex = -1;
+        for (int i = stackDepth - 1; i >= 1; i--)
         {
-            if (embeddingStackBuffer[idx].isIsolate)
+            if (embeddingStackBuffer[i].isIsolate)
             {
-                hasIsolate = true;
+                isolateIndex = i;
                 break;
             }
         }
 
-        if (!hasIsolate)
+        if (isolateIndex == -1) return;
+
+        stackDepth = isolateIndex;
+        EmbeddingState state = embeddingStackBuffer[stackDepth - 1];
+        currentLevel = state.level;
+        overrideStatus = state.overrideStatus;
+    }
+
+    private void EnsureBidiClassesCapacity(int length)
+    {
+        if (bidiClassesBuffer.Length < length)
         {
-            // No active isolate to pop: PDI has no effect.
-            return;
+            bidiClassesBuffer = new BidiClass[length];
         }
+    }
 
-        while (stackDepth > 1)
+    private static List<BidiParagraph> BuildParagraphsWithExplicitBaseLevel(
+        BidiClass[] bidiClasses,
+        int length,
+        byte givenBaseLevel)
+    {
+        var paragraphs = new List<BidiParagraph>();
+
+        int paraStart = 0;
+        for (int i = 0; i < length; i++)
         {
-            int topIndex = stackDepth - 1;
-            EmbeddingState popped = embeddingStackBuffer[topIndex];
-
-            stackDepth--;
-
-            EmbeddingState newTop = embeddingStackBuffer[stackDepth - 1];
-            currentLevel = newTop.level;
-            overrideStatus = newTop.overrideStatus;
-
-            if (popped.isIsolate)
+            if (bidiClasses[i] == BidiClass.ParagraphSeparator)
             {
-                // We popped the matching isolate; stop here.
-                break;
+                int paraEnd = i - 1;
+                if (paraEnd >= paraStart)
+                {
+                    paragraphs.Add(new BidiParagraph(paraStart, paraEnd, givenBaseLevel));
+                }
+
+                paraStart = i + 1;
             }
         }
+
+        if (paraStart < length)
+        {
+            int paraEnd = length - 1;
+            paragraphs.Add(new BidiParagraph(paraStart, paraEnd, givenBaseLevel));
+        }
+
+        return paragraphs;
     }
 
     private static bool IsStrongType(BidiClass bc)
@@ -1203,21 +1096,36 @@ public sealed class BidiEngine
 
     private static bool IsNeutralType(BidiClass bc)
     {
-        // Нейтрали для N1/N2: пробелы и общие нейтрали.
-        // TAB (SegmentSeparator) и PDI сюда сознательно не входят.
-        return bc == BidiClass.WhiteSpace ||
-               bc == BidiClass.OtherNeutral;
+        switch (bc)
+        {
+            case BidiClass.WhiteSpace:
+            case BidiClass.OtherNeutral:
+            case BidiClass.ParagraphSeparator:
+            case BidiClass.SegmentSeparator:
+            case BidiClass.LeftToRightIsolate:
+            case BidiClass.RightToLeftIsolate:
+            case BidiClass.FirstStrongIsolate:
+            case BidiClass.PopDirectionalIsolate:
+            // Добавлено: эти типы тоже участвуют в цепочках нейтральных символов
+            case BidiClass.BoundaryNeutral:
+            case BidiClass.PopDirectionalFormat:
+                return true;
+
+            default:
+                return false;
+        }
     }
 
-    private static BidiClass GetParagraphBaseType(byte baseLevel)
+
+    private static BidiClass GetParagraphBaseType(byte paragraphBaseLevel)
     {
-        // Чётный уровень → L, нечётный → R.
-        return (baseLevel & 1) == 0 ? BidiClass.LeftToRight : BidiClass.RightToLeft;
+        return (paragraphBaseLevel & 1) == 0
+            ? BidiClass.LeftToRight
+            : BidiClass.RightToLeft;
     }
 
     private static BidiClass MapToStrongTypeForNeutrals(BidiClass bc, byte level)
     {
-        // Приводим тип к "сильному" L/R для целей N1/N2.
         switch (bc)
         {
             case BidiClass.LeftToRight:
@@ -1228,14 +1136,31 @@ public sealed class BidiEngine
 
             case BidiClass.EuropeanNumber:
             case BidiClass.ArabicNumber:
-                // Чётный уровень → интерпретируем число как L, нечётный → R.
-                return (level & 1) == 0 ? BidiClass.LeftToRight : BidiClass.RightToLeft;
+                return BidiClass.RightToLeft;
 
             default:
                 return BidiClass.OtherNeutral;
         }
     }
 
+    private static BidiClass MapToStrongTypeForN0(BidiClass t)
+    {
+        switch (t)
+        {
+            case BidiClass.LeftToRight:
+                return BidiClass.LeftToRight;
+
+            case BidiClass.RightToLeft:
+            case BidiClass.ArabicLetter:
+            // Вернули цифры для N0
+            case BidiClass.EuropeanNumber:
+            case BidiClass.ArabicNumber:
+                return BidiClass.RightToLeft;
+
+            default:
+                return BidiClass.OtherNeutral;
+        }
+    }
 
     private static bool ResolveFirstStrongIsolateDirection(
         int fsiIndex,
@@ -1262,7 +1187,6 @@ public sealed class BidiEngine
                     depth--;
                     if (depth == 0)
                     {
-                        // Matching PDI reached: end of scan.
                         goto EndScan;
                     }
 
@@ -1272,209 +1196,17 @@ public sealed class BidiEngine
             if (depth < 1)
                 break;
 
-            // Look for first strong type inside the (possibly nested) isolate.
             if (bc == BidiClass.LeftToRight)
-                return false; // resolved as LRI (isRtl = false)
+                return false;
 
             if (bc == BidiClass.RightToLeft || bc == BidiClass.ArabicLetter)
-                return true; // resolved as RLI (isRtl = true)
+                return true;
         }
 
         EndScan:
-        // No strong type found: fall back to paragraph base direction.
         return (paragraphBaseLevel & 1) == 1;
     }
 
-    private void EnsureBidiClassesCapacity(int length)
-    {
-        if (bidiClassesBuffer.Length < length)
-        {
-            bidiClassesBuffer = new BidiClass[length];
-        }
-    }
-
-    private void AdjustPdiLevelsForParagraph(
-        int start,
-        int end,
-        BidiClass[] bidiClasses,
-        byte[] levels)
-    {
-        for (int i = start; i <= end; i++)
-        {
-            if (bidiClasses[i] != BidiClass.PopDirectionalIsolate)
-                continue;
-
-            int prev = FindPreviousStrongOrNumberIndex(start, i, bidiClasses);
-            int next = FindNextStrongOrNumberIndex(end, i, bidiClasses);
-
-            if (prev < 0 || next < 0)
-                continue;
-
-            BidiClass prevType = bidiClasses[prev];
-            BidiClass nextType = bidiClasses[next];
-
-            // Специфический случай: PDI между числом и "правым" контекстом
-            // (скобка R / число). Это как раз паттерн теста 269.
-            if ((prevType == BidiClass.EuropeanNumber || prevType == BidiClass.ArabicNumber) &&
-                (nextType == BidiClass.RightToLeft ||
-                 nextType == BidiClass.ArabicLetter ||
-                 nextType == BidiClass.EuropeanNumber ||
-                 nextType == BidiClass.ArabicNumber))
-            {
-                // Уровень PDI делаем не выше соседей, но и не оставляем на 0.
-                byte candidate = levels[prev];
-                if (levels[next] < candidate)
-                    candidate = levels[next];
-
-                if (candidate > levels[i])
-                {
-                    levels[i] = candidate;
-                }
-            }
-        }
-    }
-
-    private void AdjustBracketLevelsForParagraph(
-        ReadOnlySpan<int> codePoints,
-        int start,
-        int end,
-        BidiClass[] bidiClasses,
-        byte[] levels)
-    {
-        if (start > end)
-            return;
-
-        List<int> openStack = new List<int>();
-        List<BracketPair> pairs = new List<BracketPair>();
-
-        for (int i = start; i <= end; i++)
-        {
-            int cp = codePoints[i];
-
-            BidiPairedBracketType bracketType = unicodeData.GetBidiPairedBracketType(cp);
-
-            if (bracketType == BidiPairedBracketType.None)
-            {
-                if (cp == 0x0028) // '('
-                {
-                    bracketType = BidiPairedBracketType.Open;
-                }
-                else if (cp == 0x0029) // ')'
-                {
-                    bracketType = BidiPairedBracketType.Close;
-                }
-                else
-                {
-                    continue;
-                }
-            }
-
-            if (bracketType == BidiPairedBracketType.Open)
-            {
-                openStack.Add(i);
-            }
-            else if (bracketType == BidiPairedBracketType.Close)
-            {
-                for (int s = openStack.Count - 1; s >= 0; s--)
-                {
-                    int openIndex = openStack[s];
-                    int openCp = codePoints[openIndex];
-
-                    bool match;
-
-                    BidiPairedBracketType openType = unicodeData.GetBidiPairedBracketType(openCp);
-                    if (openType == BidiPairedBracketType.None)
-                    {
-                        match = (openCp == 0x0028 && cp == 0x0029);
-                    }
-                    else
-                    {
-                        int openPaired = unicodeData.GetBidiPairedBracket(openCp);
-                        match = (openPaired == cp);
-                    }
-
-                    if (match)
-                    {
-                        pairs.Add(new BracketPair(openIndex, i));
-                        openStack.RemoveAt(s);
-                        break;
-                    }
-                }
-            }
-        }
-
-
-        if (pairs.Count == 0)
-            return;
-
-        foreach (BracketPair pair in pairs)
-        {
-            int openIndex = pair.openIndex;
-            int closeIndex = pair.closeIndex;
-
-            if (openIndex < start || closeIndex > end || openIndex >= closeIndex)
-                continue;
-
-            bool hasDigit = false;
-            bool hasOther = false;
-            int firstDigitIndex = -1;
-
-            // Анализ содержимого между скобками.
-            for (int k = openIndex + 1; k < closeIndex; k++)
-            {
-                BidiClass t = bidiClasses[k];
-
-                // BN не влияет
-                if (t == BidiClass.BoundaryNeutral)
-                    continue;
-
-                // Нейтрали и пробелы считаем "безопасными"
-                if (t == BidiClass.WhiteSpace || t == BidiClass.OtherNeutral)
-                    continue;
-
-                if (t == BidiClass.EuropeanNumber || t == BidiClass.ArabicNumber)
-                {
-                    if (!hasDigit)
-                    {
-                        hasDigit = true;
-                        firstDigitIndex = k;
-                    }
-
-                    continue;
-                }
-
-                // Любой другой тип внутри — "мусор": буквы, PDI, разделители и т.п.
-                hasOther = true;
-                break;
-            }
-
-            // Нас интересуют только пары "чисто числовые" (числа + нейтрали/BN).
-            if (!hasDigit || hasOther || firstDigitIndex < 0)
-                continue;
-
-            byte digitLevel = levels[firstDigitIndex];
-            if (digitLevel == 0)
-                continue;
-
-            byte targetLevel = (byte)(digitLevel - 1);
-
-            if (levels[openIndex] != targetLevel)
-                levels[openIndex] = targetLevel;
-
-            if (levels[closeIndex] != targetLevel)
-                levels[closeIndex] = targetLevel;
-        }
-    }
-
-
-    /// <summary>
-    /// Implements paragraph detection and base level computation according to UAX #9 P1-P3.
-    /// P1: Split text into paragraphs at B type characters (Paragraph_Separator).
-    /// P2/P3: Base embedding level per paragraph:
-    ///   - If the first strong character is L => base level 0.
-    ///   - If the first strong is R or AL => base level 1.
-    ///   - If no strong character is found => default base level 0 (can be customized later).
-    /// </summary>
     private static List<BidiParagraph> BuildParagraphs(BidiClass[] bidiClasses, int length)
     {
         var paragraphs = new List<BidiParagraph>();
@@ -1484,7 +1216,6 @@ public sealed class BidiEngine
         {
             if (bidiClasses[i] == BidiClass.ParagraphSeparator)
             {
-                // Paragraph ends at i-1 (can be empty if i == paraStart)
                 int paraEnd = i - 1;
                 if (paraEnd >= paraStart)
                 {
@@ -1492,12 +1223,10 @@ public sealed class BidiEngine
                     paragraphs.Add(new BidiParagraph(paraStart, paraEnd, baseLevel));
                 }
 
-                // UAX #9: The paragraph separator itself is not part of the paragraph.
                 paraStart = i + 1;
             }
         }
 
-        // Last paragraph (if any characters remain after the final B)
         if (paraStart < length)
         {
             int paraEnd = length - 1;
@@ -1508,12 +1237,6 @@ public sealed class BidiEngine
         return paragraphs;
     }
 
-    /// <summary>
-    /// Computes base embedding level for a paragraph range [start, end] according to UAX #9 P2/P3.
-    /// P2: If the first strong character is L => level 0.
-    /// P3: If the first strong is R or AL => level 1.
-    /// If no strong character is found, we default to 0 (LTR). This behavior can be customized if needed.
-    /// </summary>
     private static byte ComputeParagraphBaseLevel(BidiClass[] bidiClasses, int start, int end)
     {
         for (int i = start; i <= end; i++)
@@ -1522,87 +1245,14 @@ public sealed class BidiEngine
             switch (bc)
             {
                 case BidiClass.LeftToRight:
-                    return 0; // LTR paragraph
+                    return 0;
 
                 case BidiClass.RightToLeft:
                 case BidiClass.ArabicLetter:
-                    return 1; // RTL paragraph
+                    return 1;
             }
         }
 
-        // No strong character found: per UAX #9 default can be chosen.
-        // Most engines use 0 (LTR) as a default; if you want to follow locale, this is the place to change.
         return 0;
-    }
-
-    private static bool IsStrongOrNumber(BidiClass bc)
-    {
-        return bc == BidiClass.LeftToRight ||
-               bc == BidiClass.RightToLeft ||
-               bc == BidiClass.ArabicLetter ||
-               bc == BidiClass.EuropeanNumber ||
-               bc == BidiClass.ArabicNumber;
-    }
-
-    private static BidiClass GetDirectionalGroup(BidiClass bc)
-    {
-        switch (bc)
-        {
-            case BidiClass.LeftToRight:
-                return BidiClass.LeftToRight;
-
-            case BidiClass.RightToLeft:
-            case BidiClass.ArabicLetter:
-            case BidiClass.EuropeanNumber:
-            case BidiClass.ArabicNumber:
-                return BidiClass.RightToLeft;
-
-            default:
-                return BidiClass.OtherNeutral;
-        }
-    }
-
-    private static int FindPreviousStrongOrNumberIndex(int start, int index, BidiClass[] classes)
-    {
-        for (int i = index - 1; i >= start; i--)
-        {
-            BidiClass t = classes[i];
-
-            if (t == BidiClass.BoundaryNeutral)
-                continue;
-
-            if (t == BidiClass.LeftToRight ||
-                t == BidiClass.RightToLeft ||
-                t == BidiClass.ArabicLetter ||
-                t == BidiClass.EuropeanNumber ||
-                t == BidiClass.ArabicNumber)
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    private static int FindNextStrongOrNumberIndex(int end, int index, BidiClass[] classes)
-    {
-        for (int i = index + 1; i <= end; i++)
-        {
-            BidiClass t = classes[i];
-
-            if (t == BidiClass.BoundaryNeutral)
-                continue;
-
-            if (t == BidiClass.LeftToRight ||
-                t == BidiClass.RightToLeft ||
-                t == BidiClass.ArabicLetter ||
-                t == BidiClass.EuropeanNumber ||
-                t == BidiClass.ArabicNumber)
-            {
-                return i;
-            }
-        }
-
-        return -1;
     }
 }

@@ -322,6 +322,135 @@ public class UnicodeDataBuilder
 
         return result;
     }
+
+    public static List<MirrorEntry> BuildMirrorEntries(string bidiMirroringPath)
+    {
+        if (string.IsNullOrEmpty(bidiMirroringPath))
+            throw new ArgumentNullException(nameof(bidiMirroringPath));
+
+        var result = new List<MirrorEntry>();
+
+        using var reader = new StreamReader(bidiMirroringPath);
+
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            line = StripComment(line);
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            // Формат по UCD: "XXXX; YYYY"
+            string[] parts = line.Split(';');
+            if (parts.Length < 2)
+                continue;
+
+            string codePart = parts[0].Trim();
+            string mirrorPart = parts[1].Trim();
+
+            if (codePart.Length == 0 || mirrorPart.Length == 0)
+                continue;
+
+            int codePoint = ParseHexCodePoint(codePart);
+            int mirrored = ParseHexCodePoint(mirrorPart);
+
+            if (codePoint < 0 || codePoint > MaxCodePoint)
+                continue;
+            if (mirrored < 0 || mirrored > MaxCodePoint)
+                continue;
+
+            result.Add(new MirrorEntry(codePoint, mirrored));
+        }
+
+        // Бинарный провайдер делает двоичный поиск по mirrors[], поэтому сортируем по codePoint
+        result.Sort((a, b) => a.codePoint.CompareTo(b.codePoint));
+
+        return result;
+    }
+
+    public static List<BracketEntry> BuildBracketEntries(string bidiBracketsPath)
+    {
+        if (string.IsNullOrEmpty(bidiBracketsPath))
+            throw new ArgumentNullException(nameof(bidiBracketsPath));
+
+        var result = new List<BracketEntry>();
+
+        using var reader = new StreamReader(bidiBracketsPath);
+
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            line = StripComment(line);
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            // Формат по UCD:
+            // Field 0: code point (hex)
+            // Field 1: Bidi_Paired_Bracket (hex или <none>)
+            // Field 2: Bidi_Paired_Bracket_Type: "o", "c", "n"
+            string[] parts = line.Split(';');
+            if (parts.Length < 3)
+                continue;
+
+            string codePart = parts[0].Trim();
+            string pairedPart = parts[1].Trim();
+            string typePart = parts[2].Trim();
+
+            if (codePart.Length == 0 || typePart.Length == 0)
+                continue;
+
+            int codePoint = ParseHexCodePoint(codePart);
+            if (codePoint < 0 || codePoint > MaxCodePoint)
+                continue;
+
+            int pairedCodePoint;
+
+            // По TR44 / описанию BidiBrackets: при отсутствии пары поле может быть "<none>",
+            // а значение Bidi_Paired_Bracket по умолчанию равно самому символу.
+            if (pairedPart.Length == 0 ||
+                string.Equals(pairedPart, "<none>", StringComparison.OrdinalIgnoreCase))
+            {
+                pairedCodePoint = codePoint;
+            }
+            else
+            {
+                pairedCodePoint = ParseHexCodePoint(pairedPart);
+                if (pairedCodePoint < 0 || pairedCodePoint > MaxCodePoint)
+                    continue;
+            }
+
+            BidiPairedBracketType bracketType;
+
+            switch (typePart)
+            {
+                case "o":
+                case "O":
+                    bracketType = BidiPairedBracketType.Open;
+                    break;
+
+                case "c":
+                case "C":
+                    bracketType = BidiPairedBracketType.Close;
+                    break;
+
+                case "n":
+                case "N":
+                    bracketType = BidiPairedBracketType.None;
+                    break;
+
+                default:
+                    // Строго: неизвестное значение bpt — считаем ошибкой входных данных UCD.
+                    throw new InvalidDataException(
+                        $"Unknown Bidi_Paired_Bracket_Type '{typePart}' in BidiBrackets.txt.");
+            }
+
+            result.Add(new BracketEntry(codePoint, pairedCodePoint, bracketType));
+        }
+
+        // Бинарный провайдер делает двоичный поиск по brackets[], поэтому сортируем по codePoint
+        result.Sort((a, b) => a.codePoint.CompareTo(b.codePoint));
+
+        return result;
+    }
 }
 
 #endregion
