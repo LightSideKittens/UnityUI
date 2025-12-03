@@ -1,6 +1,5 @@
 using System;
-using System.Linq;
-using System.Text;
+using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.TextCore;
@@ -8,72 +7,55 @@ using UnityEngine.TextCore.LowLevel;
 
 namespace TMPro
 {
-    public abstract partial class TMP_Text
+    public abstract partial class TMPText
     {
-        private static ProfilerMarker k_GenerateTextMarker = new("TMP.GenerateText");
-        private static ProfilerMarker k_GenerateTextPhaseIMarker = new("TMP GenerateText - Phase I");
-        private static ProfilerMarker k_ParseMarkupTextMarker = new("TMP Parse Markup Text");
-        private static ProfilerMarker k_CharacterLookupMarker = new("TMP Lookup Character & Glyph Data");
-        private static ProfilerMarker k_HandleGPOSFeaturesMarker = new("TMP Handle GPOS Features");
-        private static ProfilerMarker k_CalculateVerticesPositionMarker = new("TMP Calculate Vertices Position");
-        private static ProfilerMarker k_ComputeTextMetricsMarker = new("TMP Compute Text Metrics");
-        private static ProfilerMarker k_HandleVisibleCharacterMarker = new("TMP Handle Visible Character");
-        private static ProfilerMarker k_HandleWhiteSpacesMarker = new("TMP Handle White Space & Control Character");
-        private static ProfilerMarker k_HandleHorizontalLineBreakingMarker = new("TMP Handle Horizontal Line Breaking");
-        private static ProfilerMarker k_HandleVerticalLineBreakingMarker = new("TMP Handle Vertical Line Breaking");
-        private static ProfilerMarker k_SaveGlyphVertexDataMarker = new("TMP Save Glyph Vertex Data");
-        private static ProfilerMarker k_ComputeCharacterAdvanceMarker = new("TMP Compute Character Advance");
-        private static ProfilerMarker k_HandleCarriageReturnMarker = new("TMP Handle Carriage Return");
-        private static ProfilerMarker k_HandleLineTerminationMarker = new("TMP Handle Line Termination");
-        private static ProfilerMarker k_SaveTextExtentMarker = new("TMP Save Text Extent");
-        private static ProfilerMarker k_SaveProcessingStatesMarker = new("TMP Save Processing States");
-        private static ProfilerMarker k_GenerateTextPhaseIIMarker = new("TMP GenerateText - Phase II");
-        private static ProfilerMarker k_GenerateTextPhaseIIIMarker = new("TMP GenerateText - Phase III");
+        struct BidiParagraphInfo
+        {
+            public int firstIndex;
+            public int lastIndex;
+            public Bidi.Direction direction;
+        }
         
-        protected TMP_SubMeshUI[] m_subTextObjects = new TMP_SubMeshUI[8];
-
-        protected float m_previousLossyScaleY = -1;
-        protected Vector3[] m_RectTransformCorners = new Vector3[4];
-        protected CanvasRenderer m_canvasRenderer;
-        protected Canvas m_canvas;
-        protected float m_CanvasScaleFactor;
-        protected bool m_ShouldUpdateCulling;
+        private static ProfilerMarker kGenerateTextMarker = new("TMP.GenerateText");
+        private static ProfilerMarker kGenerateTextPhaseIMarker = new("TMP GenerateText - Phase I");
+        private static ProfilerMarker kParseMarkupTextMarker = new("TMP Parse Markup Text");
+        private static ProfilerMarker kCharacterLookupMarker = new("TMP Lookup Character & Glyph Data");
+        private static ProfilerMarker kHandleGposFeaturesMarker = new("TMP Handle GPOS Features");
+        private static ProfilerMarker kCalculateVerticesPositionMarker = new("TMP Calculate Vertices Position");
+        private static ProfilerMarker kComputeTextMetricsMarker = new("TMP Compute Text Metrics");
+        private static ProfilerMarker kHandleVisibleCharacterMarker = new("TMP Handle Visible Character");
+        private static ProfilerMarker kHandleWhiteSpacesMarker = new("TMP Handle White Space & Control Character");
+        private static ProfilerMarker kHandleHorizontalLineBreakingMarker = new("TMP Handle Horizontal Line Breaking");
+        private static ProfilerMarker kHandleVerticalLineBreakingMarker = new("TMP Handle Vertical Line Breaking");
+        private static ProfilerMarker kSaveGlyphVertexDataMarker = new("TMP Save Glyph Vertex Data");
+        private static ProfilerMarker kComputeCharacterAdvanceMarker = new("TMP Compute Character Advance");
+        private static ProfilerMarker kHandleCarriageReturnMarker = new("TMP Handle Carriage Return");
+        private static ProfilerMarker kHandleLineTerminationMarker = new("TMP Handle Line Termination");
+        private static ProfilerMarker kSaveTextExtentMarker = new("TMP Save Text Extent");
+        private static ProfilerMarker kSaveProcessingStatesMarker = new("TMP Save Processing States");
+        private static ProfilerMarker kGenerateTextPhaseIiMarker = new("TMP GenerateText - Phase II");
+        private static ProfilerMarker kGenerateTextPhaseIiiMarker = new("TMP GenerateText - Phase III");
+        private static ProfilerMarker k_SetArraySizesMarker = new("TMP.SetArraySizes");
         
-        private string preprocessedText = string.Empty;
-        private TextRenderFlags lastRenderMode;
-        protected bool isBidiProcessing;
-        protected Bidi.Direction[] directions;
+        protected TMP_SubMeshUI[] MSubTextObjects = new TMP_SubMeshUI[8];
         
-        public new CanvasRenderer canvasRenderer
+        protected Vector3[] MRectTransformCorners = new Vector3[4];
+        protected CanvasRenderer MCanvasRenderer;
+        protected Canvas MCanvas;
+        protected float MCanvasScaleFactor;
+        protected bool MShouldUpdateCulling;
+        
+        private BidiParagraphInfo[] bidiParagraphs;
+        private Dictionary<int, int> materialIndexPairs = new();
+        
+        public new CanvasRenderer CanvasRenderer
         {
             get
             {
-                if (m_canvasRenderer == null) m_canvasRenderer = GetComponent<CanvasRenderer>();
+                if (MCanvasRenderer == null) MCanvasRenderer = GetComponent<CanvasRenderer>();
 
-                return m_canvasRenderer;
+                return MCanvasRenderer;
             }
-        }
-        
-        protected void OnBeforeMeshRender()
-        {
-            if(isBidiProcessing) return;
-            lastRenderMode = m_renderMode;
-            m_renderMode = TextRenderFlags.DontRender;
-        }
-
-        protected void OnAfterMeshRender()
-        {
-            if(isBidiProcessing) return;
-            var input = Bidi.Do(this, out var logicalToVisualMap, out directions);
-            if (logicalToVisualMap != null)
-            { 
-                Debug.Log(string.Join(',', logicalToVisualMap.SelectMany(x => x)));
-            }
-            preprocessedText = input;
-            m_renderMode = lastRenderMode;
-            isBidiProcessing = true;
-            ForceMeshUpdate();
-            isBidiProcessing = false;
         }
         
         protected void OnPreRenderCanvas()
@@ -81,7 +63,7 @@ namespace TMPro
             if (!m_isAwake || (!IsActive() && !m_ignoreActiveState))
                 return;
 
-            if (m_canvas == null) { m_canvas = canvas; if (m_canvas == null) return; }
+            if (MCanvas == null) { MCanvas = canvas; if (MCanvas == null) return; }
 
 
             if (_havePropertiesChanged || m_isLayoutDirty)
@@ -91,8 +73,7 @@ namespace TMPro
                     Debug.LogWarning("Please assign a Font Asset to this " + transform.name + " gameobject.", this);
                     return;
                 }
-
-                OnBeforeMeshRender();
+                
                 if (checkPaddingRequired)
                     UpdateMeshPadding();
                 
@@ -121,82 +102,26 @@ namespace TMPro
                     GenerateTextMesh();
                     m_AutoSizeIterationCount += 1;
                 }
-                OnAfterMeshRender();
                 SetTextBounds();
             }
         }
         
-        private TextBackingContainer m_TextBackingArray = new(4);
+        private TextBackingContainer mTextBackingArray = new(4);
         
         protected void ParseInputText()
         {
-            Debug.Log($"{GetInstanceID()} ParseInputText Parsing...");
             k_ParseTextMarker.Begin();
 
             var input = m_text;
             
-            if (!isBidiProcessing)
+            if (m_TextPreprocessor != null)
             {
-                if (m_TextPreprocessor != null)
-                {
-                    input = m_TextPreprocessor.PreprocessText(input);
-                    PreprocessedText = input;
-                }
-
-                input = Normalize();
-                input = ArabicShaper.Do(input, out _);
-                preprocessedText = input;
-                PopulateTextArrays(input);
+                input = m_TextPreprocessor.PreprocessText(input);
+                PreprocessedText = input;
             }
-            else
-            {
-                PopulateTextArrays(preprocessedText);
-            }
-
-            k_ParseTextMarker.End();
             
-            string Normalize()
-            {
-                StringBuilder sb = null;
-
-                for (int i = 0; i < input.Length; i++)
-                {
-                    char c = input[i];
-
-                    if (c == '\r' ||
-                        (c == '<' &&
-                         i + 3 < input.Length &&
-                         input[i + 1] == 'b' &&
-                         input[i + 2] == 'r' &&
-                         input[i + 3] == '>'))
-                    {
-                        if (sb == null)
-                        {
-                            sb = new(input.Length);
-                            sb.Append(input, 0, i);
-                        }
-
-                        if (c == '\r')
-                        {
-                            if (i + 1 < input.Length && input[i + 1] == '\n')
-                                i++;
-
-                            sb.Append('\n');
-                        }
-                        else
-                        {
-                            sb.Append('\n');
-                            i += 3;
-                        }
-                    }
-                    else
-                    {
-                        sb?.Append(c);
-                    }
-                }
-
-                return sb?.ToString() ?? input;
-            }
+            PopulateTextArrays(input);
+            k_ParseTextMarker.End();
         }
 
         private void PopulateTextArrays(string input)
@@ -206,21 +131,13 @@ namespace TMPro
             SetArraySizes(m_TextProcessingArray);
         }
         
-        /// <param name="unicodeChars"></param>
-        /// <returns></returns>
-        internal virtual int SetArraySizes(TextProcessingElement[] unicodeChars) { return 0; }
-
-        /// <param name="sourceText">Source text to be converted</param>
         private void PopulateTextBackingArray(string sourceText)
         {
             int srcLength = sourceText?.Length ?? 0;
 
             PopulateTextBackingArray(sourceText, 0, srcLength);
-        }
-
-        /// <param name="sourceText">string containing the source text to be converted</param>
-        /// <param name="start">Index of the first element of the source array to be converted and copied to the internal text backing array.</param>
-        /// <param name="length">Number of elements in the array to be converted and copied to the internal text backing array.</param>
+        } 
+        
         private void PopulateTextBackingArray(string sourceText, int start, int length)
         {
             int readIndex;
@@ -237,26 +154,25 @@ namespace TMPro
                 length = Mathf.Clamp(length, 0, start + length < sourceText.Length ? length : sourceText.Length - start);
             }
 
-            if (length >= m_TextBackingArray.Capacity)
-                m_TextBackingArray.Resize((length));
+            if (length >= mTextBackingArray.Capacity)
+                mTextBackingArray.Resize((length));
 
             int end = readIndex + length;
             for (; readIndex < end; readIndex++)
             {
-                m_TextBackingArray[writeIndex] = sourceText[readIndex];
+                mTextBackingArray[writeIndex] = sourceText[readIndex];
                 writeIndex += 1;
             }
 
-            m_TextBackingArray[writeIndex] = 0;
-            m_TextBackingArray.Count = writeIndex;
+            mTextBackingArray[writeIndex] = 0;
+            mTextBackingArray.Count = writeIndex;
         }
         
-
         private void PopulateTextProcessingArray()
         {
             TMP_TextProcessingStack<int>.SetDefault(m_TextStyleStacks, 0);
 
-            int srcLength = m_TextBackingArray.Count;
+            int srcLength = mTextBackingArray.Count;
             int requiredCapacity = srcLength + (textStyle.styleOpeningDefinition?.Length ?? 0);
             if (m_TextProcessingArray.Length < requiredCapacity)
                 ResizeInternalArray(ref m_TextProcessingArray, requiredCapacity);
@@ -272,14 +188,14 @@ namespace TMPro
             int readIndex = 0;
             for (; readIndex < srcLength; readIndex++)
             {
-                uint c = m_TextBackingArray[readIndex];
+                uint c = mTextBackingArray[readIndex];
 
                 if (c == 0)
                     break;
 
                 if (c == '\\' && readIndex < srcLength - 1)
                 {
-                    switch (m_TextBackingArray[readIndex + 1])
+                    switch (mTextBackingArray[readIndex + 1])
                     {
                         case 92:
                             if (!m_parseCtrlCharacters) break;
@@ -315,18 +231,18 @@ namespace TMPro
                             writeIndex += 1;
                             continue;
                         case 117:
-                            if (srcLength > readIndex + 5 && IsValidUTF16(m_TextBackingArray, readIndex + 2))
+                            if (srcLength > readIndex + 5 && IsValidUTF16(mTextBackingArray, readIndex + 2))
                             {
-                                m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 6, unicode = GetUTF16(m_TextBackingArray, readIndex + 2) };
+                                m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 6, unicode = GetUTF16(mTextBackingArray, readIndex + 2) };
                                 readIndex += 5;
                                 writeIndex += 1;
                                 continue;
                             }
                             break;
                         case 85:
-                            if (srcLength > readIndex + 9 && IsValidUTF32(m_TextBackingArray, readIndex + 2))
+                            if (srcLength > readIndex + 9 && IsValidUTF32(mTextBackingArray, readIndex + 2))
                             {
-                                m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 10, unicode = GetUTF32(m_TextBackingArray, readIndex + 2) };
+                                m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 10, unicode = GetUTF32(mTextBackingArray, readIndex + 2) };
                                 readIndex += 9;
                                 writeIndex += 1;
                                 continue;
@@ -335,9 +251,9 @@ namespace TMPro
                     }
                 }
 
-                if (c >= CodePoint.HIGH_SURROGATE_START && c <= CodePoint.HIGH_SURROGATE_END && srcLength > readIndex + 1 && m_TextBackingArray[readIndex + 1] >= CodePoint.LOW_SURROGATE_START && m_TextBackingArray[readIndex + 1] <= CodePoint.LOW_SURROGATE_END)
+                if (c >= CodePoint.HIGH_SURROGATE_START && c <= CodePoint.HIGH_SURROGATE_END && srcLength > readIndex + 1 && mTextBackingArray[readIndex + 1] >= CodePoint.LOW_SURROGATE_START && mTextBackingArray[readIndex + 1] <= CodePoint.LOW_SURROGATE_END)
                 {
-                    m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 2, unicode = TMP_TextParsingUtilities.ConvertToUTF32(c, m_TextBackingArray[readIndex + 1]) };
+                    m_TextProcessingArray[writeIndex] = new() { elementType = TextProcessingElementType.TextCharacterElement, stringIndex = readIndex, length = 2, unicode = TMP_TextParsingUtilities.ConvertToUTF32(c, mTextBackingArray[readIndex + 1]) };
                     readIndex += 1;
                     writeIndex += 1;
                     continue;
@@ -345,7 +261,7 @@ namespace TMPro
 
                 if (c == '<' && m_isRichText)
                 {
-                    int hashCode = GetMarkupTagHashCode(m_TextBackingArray, readIndex + 1);
+                    int hashCode = GetMarkupTagHashCode(mTextBackingArray, readIndex + 1);
 
                     switch ((MarkupTag)hashCode)
                     {
@@ -404,14 +320,14 @@ namespace TMPro
                             readIndex += 4;
                             continue;
                         case MarkupTag.A:
-                            if (m_TextBackingArray.Count > readIndex + 4 && m_TextBackingArray[readIndex + 3] == 'h' && m_TextBackingArray[readIndex + 4] == 'r')
+                            if (mTextBackingArray.Count > readIndex + 4 && mTextBackingArray[readIndex + 3] == 'h' && mTextBackingArray[readIndex + 4] == 'r')
                                 InsertOpeningTextStyle(GetStyle((int)MarkupTag.A), ref m_TextProcessingArray, ref writeIndex);
                             break;
                         case MarkupTag.STYLE:
                             if (tag_NoParsing) break;
 
                             int openWriteIndex = writeIndex;
-                            if (ReplaceOpeningStyleTag(ref m_TextBackingArray, readIndex, out int srcOffset, ref m_TextProcessingArray, ref writeIndex))
+                            if (ReplaceOpeningStyleTag(ref mTextBackingArray, readIndex, out int srcOffset, ref m_TextProcessingArray, ref writeIndex))
                             {
                                 for (; openWriteIndex < writeIndex; openWriteIndex++)
                                 {
@@ -461,15 +377,15 @@ namespace TMPro
             m_InternalTextProcessingArraySize = writeIndex;
         }
         
-        protected virtual void GenerateTextMesh()
+        protected void GenerateTextMesh()
         {
-            k_GenerateTextMarker.Begin();
+            kGenerateTextMarker.Begin();
 
             if (m_fontAsset == null || m_fontAsset.characterLookupTable == null)
             {
                 Debug.LogWarning("Can't Generate Mesh! No Font Asset has been assigned to Object ID: " + GetInstanceID());
                 m_IsAutoSizePointSizeSet = true;
-                k_GenerateTextMarker.End();
+                kGenerateTextMarker.End();
                 return;
             }
 
@@ -482,7 +398,7 @@ namespace TMPro
                 
                 TMPro_EventManager.ON_TEXT_CHANGED(this);
                 m_IsAutoSizePointSizeSet = true;
-                k_GenerateTextMarker.End();
+                kGenerateTextMarker.End();
                 return;
             }
 
@@ -518,16 +434,16 @@ namespace TMPro
             m_baselineOffsetStack.Clear();
 
             bool beginUnderline = false;
-            Vector3 underline_start = Vector3.zero;
-            Vector3 underline_end = Vector3.zero;
+            Vector3 underlineStart = Vector3.zero;
+            Vector3 underlineEnd = Vector3.zero;
 
             bool beginStrikethrough = false;
-            Vector3 strikethrough_start = Vector3.zero;
-            Vector3 strikethrough_end = Vector3.zero;
+            Vector3 strikethroughStart = Vector3.zero;
+            Vector3 strikethroughEnd = Vector3.zero;
 
             bool beginHighlight = false;
-            Vector3 highlight_start = Vector3.zero;
-            Vector3 highlight_end = Vector3.zero;
+            Vector3 highlightStart = Vector3.zero;
+            Vector3 highlightEnd = Vector3.zero;
 
             m_fontColor32 = m_fontColor;
             m_htmlColor = m_fontColor32;
@@ -622,7 +538,7 @@ namespace TMPro
 
             int restoreCount = 0;
 
-            k_GenerateTextPhaseIMarker.Begin();
+            kGenerateTextPhaseIMarker.Begin();
 
             for (int i = 0; i < m_TextProcessingArray.Length && m_TextProcessingArray[i].unicode != 0; i++)
             {
@@ -643,17 +559,17 @@ namespace TMPro
                 ref var chInfo = ref m_textInfo.characterInfo[m_characterCount];
                 if (m_isRichText && charCode == '<')
                 {
-                    k_ParseMarkupTextMarker.Begin();
+                    kParseMarkupTextMarker.Begin();
 
                     m_isTextLayoutPhase = true;
 
                     if (ValidateHtmlTag(m_TextProcessingArray, i + 1, out var endTagIndex))
                     {
                         i = endTagIndex;
-                        k_ParseMarkupTextMarker.End();
+                        kParseMarkupTextMarker.End();
                         continue;
                     }
-                    k_ParseMarkupTextMarker.End();
+                    kParseMarkupTextMarker.End();
                 }
                 else
                 {
@@ -661,8 +577,7 @@ namespace TMPro
                     m_currentFontAsset = chInfo.fontAsset;
                 }
                 #endregion End Parse Rich Text Tag
-
-                int previousMaterialIndex = m_currentMaterialIndex;
+                
                 bool isUsingAltTypeface = chInfo.isUsingAlternateTypeface;
 
                 m_isTextLayoutPhase = false;
@@ -740,7 +655,7 @@ namespace TMPro
 
 
                 #region Look up Character Data
-                k_CharacterLookupMarker.Begin();
+                kCharacterLookupMarker.Begin();
 
                 float baselineOffset = 0;
                 float elementAscentLine = 0;
@@ -749,7 +664,7 @@ namespace TMPro
                     m_cached_TextElement = chInfo.textElement;
                     if (m_cached_TextElement == null)
                     {
-                        k_CharacterLookupMarker.End();
+                        kCharacterLookupMarker.End();
                         continue;
                     }
 
@@ -779,9 +694,9 @@ namespace TMPro
 
                     chInfo.scale = currentElementScale;
 
-                    padding = m_currentMaterialIndex == 0 ? m_padding : m_subTextObjects[m_currentMaterialIndex].padding;
+                    padding = m_currentMaterialIndex == 0 ? m_padding : MSubTextObjects[m_currentMaterialIndex].padding;
                 
-                k_CharacterLookupMarker.End();
+                kCharacterLookupMarker.End();
                 #endregion
 
 
@@ -809,7 +724,7 @@ namespace TMPro
                 float characterSpacingAdjustment = m_characterSpacing;
                 if (kerning)
                 {
-                    k_HandleGPOSFeaturesMarker.Begin();
+                    kHandleGposFeaturesMarker.Begin();
 
                     GlyphPairAdjustmentRecord adjustmentPair;
                     uint baseGlyphIndex = m_cached_TextElement.m_GlyphIndex;
@@ -838,7 +753,7 @@ namespace TMPro
                         }
                     }
 
-                    k_HandleGPOSFeaturesMarker.End();
+                    kHandleGposFeaturesMarker.End();
                 }
 
                 chInfo.adjustedHorizontalAdvance = glyphAdjustments.xAdvance;
@@ -942,19 +857,19 @@ namespace TMPro
 
                 #region Handle Style Padding
                 float boldSpacingAdjustment;
-                float style_padding;
+                float stylePadding;
                 if (!isUsingAltTypeface && ((m_FontStyleInternal & FontStyles.Bold) == FontStyles.Bold))
                 {
                     if (m_currentMaterial != null && m_currentMaterial.HasProperty(ShaderUtilities.ID_GradientScale))
                     {
                         float gradientScale = m_currentMaterial.GetFloat(ShaderUtilities.ID_GradientScale);
-                        style_padding = m_currentFontAsset.boldStyle / 4.0f * gradientScale * m_currentMaterial.GetFloat(ShaderUtilities.ID_ScaleRatio_A);
+                        stylePadding = m_currentFontAsset.boldStyle / 4.0f * gradientScale * m_currentMaterial.GetFloat(ShaderUtilities.ID_ScaleRatio_A);
 
-                        if (style_padding + padding > gradientScale)
-                            padding = gradientScale - style_padding;
+                        if (stylePadding + padding > gradientScale)
+                            padding = gradientScale - stylePadding;
                     }
                     else
-                        style_padding = 0;
+                        stylePadding = 0;
 
                     boldSpacingAdjustment = m_currentFontAsset.boldSpacing;
                 }
@@ -963,13 +878,13 @@ namespace TMPro
                     if (m_currentMaterial != null && m_currentMaterial.HasProperty(ShaderUtilities.ID_GradientScale) && m_currentMaterial.HasProperty(ShaderUtilities.ID_ScaleRatio_A))
                     {
                         float gradientScale = m_currentMaterial.GetFloat(ShaderUtilities.ID_GradientScale);
-                        style_padding = m_currentFontAsset.normalStyle / 4.0f * gradientScale * m_currentMaterial.GetFloat(ShaderUtilities.ID_ScaleRatio_A);
+                        stylePadding = m_currentFontAsset.normalStyle / 4.0f * gradientScale * m_currentMaterial.GetFloat(ShaderUtilities.ID_ScaleRatio_A);
 
-                        if (style_padding + padding > gradientScale)
-                            padding = gradientScale - style_padding;
+                        if (stylePadding + padding > gradientScale)
+                            padding = gradientScale - stylePadding;
                     }
                     else
-                        style_padding = 0;
+                        stylePadding = 0;
 
                     boldSpacingAdjustment = 0;
                 }
@@ -977,43 +892,43 @@ namespace TMPro
 
 
                 #region Calculate Vertices Position
-                k_CalculateVerticesPositionMarker.Begin();
-                Vector3 top_left;
-                top_left.x = m_xAdvance + ((currentGlyphMetrics.horizontalBearingX * m_FXScale.x - padding - style_padding + glyphAdjustments.xPlacement) * currentElementScale * (1 - m_charWidthAdjDelta));
-                top_left.y = baselineOffset + (currentGlyphMetrics.horizontalBearingY + padding + glyphAdjustments.yPlacement) * currentElementScale - m_lineOffset + m_baselineOffset;
-                top_left.z = 0;
+                kCalculateVerticesPositionMarker.Begin();
+                Vector3 topLeft;
+                topLeft.x = m_xAdvance + ((currentGlyphMetrics.horizontalBearingX * m_FXScale.x - padding - stylePadding + glyphAdjustments.xPlacement) * currentElementScale * (1 - m_charWidthAdjDelta));
+                topLeft.y = baselineOffset + (currentGlyphMetrics.horizontalBearingY + padding + glyphAdjustments.yPlacement) * currentElementScale - m_lineOffset + m_baselineOffset;
+                topLeft.z = 0;
 
-                Vector3 bottom_left;
-                bottom_left.x = top_left.x;
-                bottom_left.y = top_left.y - ((currentGlyphMetrics.height + padding * 2) * currentElementScale);
-                bottom_left.z = 0;
+                Vector3 bottomLeft;
+                bottomLeft.x = topLeft.x;
+                bottomLeft.y = topLeft.y - ((currentGlyphMetrics.height + padding * 2) * currentElementScale);
+                bottomLeft.z = 0;
 
-                Vector3 top_right;
-                top_right.x = bottom_left.x + ((currentGlyphMetrics.width * m_FXScale.x + padding * 2 + style_padding * 2) * currentElementScale * (1 - m_charWidthAdjDelta));
-                top_right.y = top_left.y;
-                top_right.z = 0;
+                Vector3 topRight;
+                topRight.x = bottomLeft.x + ((currentGlyphMetrics.width * m_FXScale.x + padding * 2 + stylePadding * 2) * currentElementScale * (1 - m_charWidthAdjDelta));
+                topRight.y = topLeft.y;
+                topRight.z = 0;
 
-                Vector3 bottom_right;
-                bottom_right.x = top_right.x;
-                bottom_right.y = bottom_left.y;
-                bottom_right.z = 0;
+                Vector3 bottomRight;
+                bottomRight.x = topRight.x;
+                bottomRight.y = bottomLeft.y;
+                bottomRight.z = 0;
 
-                k_CalculateVerticesPositionMarker.End();
+                kCalculateVerticesPositionMarker.End();
                 #endregion
 
 
                 #region Handle Italic & Shearing
                 if (!isUsingAltTypeface && ((m_FontStyleInternal & FontStyles.Italic) == FontStyles.Italic))
                 {
-                    float shear_value = m_ItalicAngle * 0.01f;
+                    float shearValue = m_ItalicAngle * 0.01f;
                     float midPoint = ((m_currentFontAsset.m_FaceInfo.capLine - (m_currentFontAsset.m_FaceInfo.baseline + m_baselineOffset)) / 2) * m_fontScaleMultiplier * m_currentFontAsset.m_FaceInfo.scale;
-                    Vector3 topShear = new(shear_value * ((currentGlyphMetrics.horizontalBearingY + padding + style_padding - midPoint) * currentElementScale), 0, 0);
-                    Vector3 bottomShear = new(shear_value * (((currentGlyphMetrics.horizontalBearingY - currentGlyphMetrics.height - padding - style_padding - midPoint)) * currentElementScale), 0, 0);
+                    Vector3 topShear = new(shearValue * ((currentGlyphMetrics.horizontalBearingY + padding + stylePadding - midPoint) * currentElementScale), 0, 0);
+                    Vector3 bottomShear = new(shearValue * (((currentGlyphMetrics.horizontalBearingY - currentGlyphMetrics.height - padding - stylePadding - midPoint)) * currentElementScale), 0, 0);
 
-                    top_left += topShear;
-                    bottom_left += bottomShear;
-                    top_right += topShear;
-                    bottom_right += bottomShear;
+                    topLeft += topShear;
+                    bottomLeft += bottomShear;
+                    topRight += topShear;
+                    bottomRight += bottomShear;
                 }
                 #endregion Handle Italics & Shearing
 
@@ -1022,27 +937,27 @@ namespace TMPro
                 if (m_FXRotation != Quaternion.identity)
                 {
                     Matrix4x4 rotationMatrix = Matrix4x4.Rotate(m_FXRotation);
-                    Vector3 positionOffset = (top_right + bottom_left) / 2;
+                    Vector3 positionOffset = (topRight + bottomLeft) / 2;
 
-                    top_left = rotationMatrix.MultiplyPoint3x4(top_left - positionOffset) + positionOffset;
-                    bottom_left = rotationMatrix.MultiplyPoint3x4(bottom_left - positionOffset) + positionOffset;
-                    top_right = rotationMatrix.MultiplyPoint3x4(top_right - positionOffset) + positionOffset;
-                    bottom_right = rotationMatrix.MultiplyPoint3x4(bottom_right - positionOffset) + positionOffset;
+                    topLeft = rotationMatrix.MultiplyPoint3x4(topLeft - positionOffset) + positionOffset;
+                    bottomLeft = rotationMatrix.MultiplyPoint3x4(bottomLeft - positionOffset) + positionOffset;
+                    topRight = rotationMatrix.MultiplyPoint3x4(topRight - positionOffset) + positionOffset;
+                    bottomRight = rotationMatrix.MultiplyPoint3x4(bottomRight - positionOffset) + positionOffset;
                 }
                 #endregion
 
 
-                chInfo.bottomLeft = bottom_left;
-                chInfo.topLeft = top_left;
-                chInfo.topRight = top_right;
-                chInfo.bottomRight = bottom_right;
+                chInfo.bottomLeft = bottomLeft;
+                chInfo.topLeft = topLeft;
+                chInfo.topRight = topRight;
+                chInfo.bottomRight = bottomRight;
                 
                 chInfo.origin = m_xAdvance + glyphAdjustments.xPlacement * currentElementScale;
                 chInfo.baseLine = (baselineOffset - m_lineOffset + m_baselineOffset) + glyphAdjustments.yPlacement * currentElementScale;
-                chInfo.aspectRatio = (top_right.x - bottom_left.x) / (top_left.y - bottom_left.y);
+                chInfo.aspectRatio = (topRight.x - bottomLeft.x) / (topLeft.y - bottomLeft.y);
 
                 #region Compute Ascender & Descender values
-                k_ComputeTextMetricsMarker.Begin();
+                kComputeTextMetricsMarker.Begin();
                 float elementAscender = elementAscentLine * currentElementScale / smallCapsMultiplier + m_baselineOffset;
                 float elementDescender = elementDescentLine * currentElementScale / smallCapsMultiplier + m_baselineOffset;
 
@@ -1088,7 +1003,7 @@ namespace TMPro
                     }
                 }
                 
-                k_ComputeTextMetricsMarker.End();
+                kComputeTextMetricsMarker.End();
                 #endregion
 
 
@@ -1106,7 +1021,7 @@ namespace TMPro
                     || (!isWhiteSpace && charCode != 0x200B && charCode != 0xAD && charCode != 0x03) 
                     || (charCode == 0xAD && !isSoftHyphenIgnored))
                 {
-                    k_HandleVisibleCharacterMarker.Begin();
+                    kHandleVisibleCharacterMarker.Begin();
 
                     chInfo.isVisible = true;
 
@@ -1129,7 +1044,7 @@ namespace TMPro
                     #region Current Line Vertical Bounds Check
                     if (textHeight > marginHeight + 0.0001f)
                     {
-                        k_HandleVerticalLineBreakingMarker.Begin();
+                        kHandleVerticalLineBreakingMarker.Begin();
 
                         if (m_firstOverflowCharacterIndex == -1)
                             m_firstOverflowCharacterIndex = m_characterCount;
@@ -1143,10 +1058,10 @@ namespace TMPro
 
                                 m_lineSpacingDelta = Mathf.Max(m_lineSpacingDelta + adjustmentDelta / baseScale, m_lineSpacingMax);
 
-                                k_HandleVerticalLineBreakingMarker.End();
-                                k_HandleVisibleCharacterMarker.End();
-                                k_GenerateTextPhaseIMarker.End();
-                                k_GenerateTextMarker.End();
+                                kHandleVerticalLineBreakingMarker.End();
+                                kHandleVisibleCharacterMarker.End();
+                                kGenerateTextPhaseIMarker.End();
+                                kGenerateTextMarker.End();
                                 return;
                             }
                             #endregion
@@ -1161,10 +1076,10 @@ namespace TMPro
                                 m_fontSize -= sizeDelta;
                                 m_fontSize = Mathf.Max((int)(m_fontSize * 20 + 0.5f) / 20f, m_fontSizeMin);
 
-                                k_HandleVerticalLineBreakingMarker.End();
-                                k_HandleVisibleCharacterMarker.End();
-                                k_GenerateTextPhaseIMarker.End();
-                                k_GenerateTextMarker.End();
+                                kHandleVerticalLineBreakingMarker.End();
+                                kHandleVisibleCharacterMarker.End();
+                                kGenerateTextPhaseIMarker.End();
+                                kGenerateTextMarker.End();
                                 return;
                             }
                             #endregion Text Auto-Sizing
@@ -1180,8 +1095,8 @@ namespace TMPro
 
                                 characterToSubstitute.index = testedCharacterCount;
                                 characterToSubstitute.unicode = 0x03;
-                                k_HandleVerticalLineBreakingMarker.End();
-                                k_HandleVisibleCharacterMarker.End();
+                                kHandleVerticalLineBreakingMarker.End();
+                                kHandleVisibleCharacterMarker.End();
                                 continue;
 
                             case TextOverflowModes.Ellipsis:
@@ -1192,8 +1107,8 @@ namespace TMPro
                                     characterToSubstitute.index = 0;
                                     characterToSubstitute.unicode = 0x03;
                                     m_firstCharacterOfLine = 0;
-                                    k_HandleVerticalLineBreakingMarker.End();
-                                    k_HandleVisibleCharacterMarker.End();
+                                    kHandleVerticalLineBreakingMarker.End();
+                                    kHandleVisibleCharacterMarker.End();
                                     continue;
                                 }
 
@@ -1206,12 +1121,12 @@ namespace TMPro
                                 characterToSubstitute.unicode = 0x2026;
 
                                 restoreCount += 1;
-                                k_HandleVerticalLineBreakingMarker.End();
-                                k_HandleVisibleCharacterMarker.End();
+                                kHandleVerticalLineBreakingMarker.End();
+                                kHandleVisibleCharacterMarker.End();
                                 continue;
                         }
 
-                        k_HandleVerticalLineBreakingMarker.End();
+                        kHandleVerticalLineBreakingMarker.End();
                     }
                     #endregion
 
@@ -1220,7 +1135,7 @@ namespace TMPro
 
                     if (isBaseGlyph && textWidth > widthOfTextArea * (isJustifiedOrFlush ? 1.05f : 1.0f))
                     {
-                        k_HandleHorizontalLineBreakingMarker.Begin();
+                        kHandleHorizontalLineBreakingMarker.Begin();
 
                         if (m_TextWrappingMode != TextWrappingModes.NoWrap && m_TextWrappingMode != TextWrappingModes.PreserveWhitespaceNoWrap && m_characterCount != m_firstCharacterOfLine)
                         {
@@ -1250,8 +1165,8 @@ namespace TMPro
 
                                     i -= 1;
                                     m_characterCount -= 1;
-                                    k_HandleHorizontalLineBreakingMarker.End();
-                                    k_HandleVisibleCharacterMarker.End();
+                                    kHandleHorizontalLineBreakingMarker.End();
+                                    kHandleVisibleCharacterMarker.End();
                                     continue;
                                 }
                             }
@@ -1261,8 +1176,8 @@ namespace TMPro
                             if (chInfo.character == 0xAD)
                             {
                                 isSoftHyphenIgnored = true;
-                                k_HandleHorizontalLineBreakingMarker.End();
-                                k_HandleVisibleCharacterMarker.End();
+                                kHandleHorizontalLineBreakingMarker.End();
+                                kHandleVisibleCharacterMarker.End();
                                 continue;
                             }
                             #endregion
@@ -1281,10 +1196,10 @@ namespace TMPro
                                     m_charWidthAdjDelta += adjustmentDelta / adjustedTextWidth;
                                     m_charWidthAdjDelta = Mathf.Min(m_charWidthAdjDelta, m_charWidthMaxAdj / 100);
 
-                                    k_HandleHorizontalLineBreakingMarker.End();
-                                    k_HandleVisibleCharacterMarker.End();
-                                    k_GenerateTextPhaseIMarker.End();
-                                    k_GenerateTextMarker.End();
+                                    kHandleHorizontalLineBreakingMarker.End();
+                                    kHandleVisibleCharacterMarker.End();
+                                    kGenerateTextPhaseIMarker.End();
+                                    kGenerateTextMarker.End();
                                     return;
                                 }
                                 #endregion
@@ -1298,10 +1213,10 @@ namespace TMPro
                                     m_fontSize -= sizeDelta;
                                     m_fontSize = Mathf.Max((int)(m_fontSize * 20 + 0.5f) / 20f, m_fontSizeMin);
 
-                                    k_HandleHorizontalLineBreakingMarker.End();
-                                    k_HandleVisibleCharacterMarker.End();
-                                    k_GenerateTextPhaseIMarker.End();
-                                    k_GenerateTextMarker.End();
+                                    kHandleHorizontalLineBreakingMarker.End();
+                                    kHandleVisibleCharacterMarker.End();
+                                    kGenerateTextPhaseIMarker.End();
+                                    kGenerateTextMarker.End();
                                     return;
                                 }
                                 #endregion Text Auto-Sizing
@@ -1323,8 +1238,8 @@ namespace TMPro
 
                                         i -= 1;
                                         m_characterCount -= 1;
-                                        k_HandleHorizontalLineBreakingMarker.End();
-                                        k_HandleVisibleCharacterMarker.End();
+                                        kHandleHorizontalLineBreakingMarker.End();
+                                        kHandleVisibleCharacterMarker.End();
                                         continue;
                                     }
                                 }
@@ -1332,7 +1247,7 @@ namespace TMPro
 
                             if (newTextHeight > marginHeight + 0.0001f)
                             {
-                                k_HandleVerticalLineBreakingMarker.Begin();
+                                kHandleVerticalLineBreakingMarker.Begin();
 
                                 if (m_firstOverflowCharacterIndex == -1)
                                     m_firstOverflowCharacterIndex = m_characterCount;
@@ -1346,11 +1261,11 @@ namespace TMPro
 
                                         m_lineSpacingDelta = Mathf.Max(m_lineSpacingDelta + adjustmentDelta / baseScale, m_lineSpacingMax);
 
-                                        k_HandleVerticalLineBreakingMarker.End();
-                                        k_HandleHorizontalLineBreakingMarker.End();
-                                        k_HandleVisibleCharacterMarker.End();
-                                        k_GenerateTextPhaseIMarker.End();
-                                        k_GenerateTextMarker.End();
+                                        kHandleVerticalLineBreakingMarker.End();
+                                        kHandleHorizontalLineBreakingMarker.End();
+                                        kHandleVisibleCharacterMarker.End();
+                                        kGenerateTextPhaseIMarker.End();
+                                        kGenerateTextMarker.End();
                                         return;
                                     }
                                     #endregion
@@ -1367,11 +1282,11 @@ namespace TMPro
                                         m_charWidthAdjDelta += adjustmentDelta / adjustedTextWidth;
                                         m_charWidthAdjDelta = Mathf.Min(m_charWidthAdjDelta, m_charWidthMaxAdj / 100);
 
-                                        k_HandleVerticalLineBreakingMarker.End();
-                                        k_HandleHorizontalLineBreakingMarker.End();
-                                        k_HandleVisibleCharacterMarker.End();
-                                        k_GenerateTextPhaseIMarker.End();
-                                        k_GenerateTextMarker.End();
+                                        kHandleVerticalLineBreakingMarker.End();
+                                        kHandleHorizontalLineBreakingMarker.End();
+                                        kHandleVisibleCharacterMarker.End();
+                                        kGenerateTextPhaseIMarker.End();
+                                        kGenerateTextMarker.End();
                                         return;
                                     }
                                     #endregion
@@ -1385,11 +1300,11 @@ namespace TMPro
                                         m_fontSize -= sizeDelta;
                                         m_fontSize = Mathf.Max((int)(m_fontSize * 20 + 0.5f) / 20f, m_fontSizeMin);
 
-                                        k_HandleVerticalLineBreakingMarker.End();
-                                        k_HandleHorizontalLineBreakingMarker.End();
-                                        k_HandleVisibleCharacterMarker.End();
-                                        k_GenerateTextPhaseIMarker.End();
-                                        k_GenerateTextMarker.End();
+                                        kHandleVerticalLineBreakingMarker.End();
+                                        kHandleHorizontalLineBreakingMarker.End();
+                                        kHandleVisibleCharacterMarker.End();
+                                        kGenerateTextPhaseIMarker.End();
+                                        kGenerateTextMarker.End();
                                         return;
                                     }
                                     #endregion Text Auto-Sizing
@@ -1401,9 +1316,9 @@ namespace TMPro
                                         InsertNewLine(i, baseScale, currentElementScale, currentEmScale, boldSpacingAdjustment, characterSpacingAdjustment, widthOfTextArea, lineGap, ref isMaxVisibleDescenderSet, ref maxVisibleDescender);
                                         isStartOfNewLine = true;
                                         isFirstWordOfLine = true;
-                                        k_HandleVerticalLineBreakingMarker.End();
-                                        k_HandleHorizontalLineBreakingMarker.End();
-                                        k_HandleVisibleCharacterMarker.End();
+                                        kHandleVerticalLineBreakingMarker.End();
+                                        kHandleHorizontalLineBreakingMarker.End();
+                                        kHandleVisibleCharacterMarker.End();
                                         continue;
                                     
                                     case TextOverflowModes.Truncate:
@@ -1411,9 +1326,9 @@ namespace TMPro
 
                                         characterToSubstitute.index = testedCharacterCount;
                                         characterToSubstitute.unicode = 0x03;
-                                        k_HandleVerticalLineBreakingMarker.End();
-                                        k_HandleHorizontalLineBreakingMarker.End();
-                                        k_HandleVisibleCharacterMarker.End();
+                                        kHandleVerticalLineBreakingMarker.End();
+                                        kHandleHorizontalLineBreakingMarker.End();
+                                        kHandleVisibleCharacterMarker.End();
                                         continue;
 
                                     case TextOverflowModes.Ellipsis:
@@ -1424,9 +1339,9 @@ namespace TMPro
                                             characterToSubstitute.index = 0;
                                             characterToSubstitute.unicode = 0x03;
                                             m_firstCharacterOfLine = 0;
-                                            k_HandleVerticalLineBreakingMarker.End();
-                                            k_HandleHorizontalLineBreakingMarker.End();
-                                            k_HandleVisibleCharacterMarker.End();
+                                            kHandleVerticalLineBreakingMarker.End();
+                                            kHandleHorizontalLineBreakingMarker.End();
+                                            kHandleVisibleCharacterMarker.End();
                                             continue;
                                         }
 
@@ -1439,9 +1354,9 @@ namespace TMPro
                                         characterToSubstitute.unicode = 0x2026;
 
                                         restoreCount += 1;
-                                        k_HandleVerticalLineBreakingMarker.End();
-                                        k_HandleHorizontalLineBreakingMarker.End();
-                                        k_HandleVisibleCharacterMarker.End();
+                                        kHandleVerticalLineBreakingMarker.End();
+                                        kHandleHorizontalLineBreakingMarker.End();
+                                        kHandleVisibleCharacterMarker.End();
                                         continue;
                                 }
                             }
@@ -1450,8 +1365,8 @@ namespace TMPro
                                 InsertNewLine(i, baseScale, currentElementScale, currentEmScale, boldSpacingAdjustment, characterSpacingAdjustment, widthOfTextArea, lineGap, ref isMaxVisibleDescenderSet, ref maxVisibleDescender);
                                 isStartOfNewLine = true;
                                 isFirstWordOfLine = true;
-                                k_HandleHorizontalLineBreakingMarker.End();
-                                k_HandleVisibleCharacterMarker.End();
+                                kHandleHorizontalLineBreakingMarker.End();
+                                kHandleVisibleCharacterMarker.End();
                                 continue;
                             }
                         }
@@ -1471,10 +1386,10 @@ namespace TMPro
                                     m_charWidthAdjDelta += adjustmentDelta / adjustedTextWidth;
                                     m_charWidthAdjDelta = Mathf.Min(m_charWidthAdjDelta, m_charWidthMaxAdj / 100);
 
-                                    k_HandleHorizontalLineBreakingMarker.End();
-                                    k_HandleVisibleCharacterMarker.End();
-                                    k_GenerateTextPhaseIMarker.End();
-                                    k_GenerateTextMarker.End();
+                                    kHandleHorizontalLineBreakingMarker.End();
+                                    kHandleVisibleCharacterMarker.End();
+                                    kGenerateTextPhaseIMarker.End();
+                                    kGenerateTextMarker.End();
                                     return;
                                 }
                                 #endregion
@@ -1488,10 +1403,10 @@ namespace TMPro
                                     m_fontSize -= sizeDelta;
                                     m_fontSize = Mathf.Max((int)(m_fontSize * 20 + 0.5f) / 20f, m_fontSizeMin);
 
-                                    k_HandleHorizontalLineBreakingMarker.End();
-                                    k_HandleVisibleCharacterMarker.End();
-                                    k_GenerateTextPhaseIMarker.End();
-                                    k_GenerateTextMarker.End();
+                                    kHandleHorizontalLineBreakingMarker.End();
+                                    kHandleVisibleCharacterMarker.End();
+                                    kGenerateTextPhaseIMarker.End();
+                                    kGenerateTextMarker.End();
                                     return;
                                 }
                                 #endregion
@@ -1508,8 +1423,8 @@ namespace TMPro
 
                                     characterToSubstitute.index = testedCharacterCount;
                                     characterToSubstitute.unicode = 0x03;
-                                    k_HandleHorizontalLineBreakingMarker.End();
-                                    k_HandleVisibleCharacterMarker.End();
+                                    kHandleHorizontalLineBreakingMarker.End();
+                                    kHandleVisibleCharacterMarker.End();
                                     continue;
 
                                 case TextOverflowModes.Ellipsis:
@@ -1520,8 +1435,8 @@ namespace TMPro
                                         characterToSubstitute.index = 0;
                                         characterToSubstitute.unicode = 0x03;
                                         m_firstCharacterOfLine = 0;
-                                        k_HandleHorizontalLineBreakingMarker.End();
-                                        k_HandleVisibleCharacterMarker.End();
+                                        kHandleHorizontalLineBreakingMarker.End();
+                                        kHandleVisibleCharacterMarker.End();
                                         continue;
                                     }
 
@@ -1534,15 +1449,15 @@ namespace TMPro
                                     characterToSubstitute.unicode = 0x2026;
 
                                     restoreCount += 1;
-                                    k_HandleHorizontalLineBreakingMarker.End();
-                                    k_HandleVisibleCharacterMarker.End();
+                                    kHandleHorizontalLineBreakingMarker.End();
+                                    kHandleVisibleCharacterMarker.End();
                                     continue;
                                 
                             }
 
                         }
 
-                        k_HandleHorizontalLineBreakingMarker.End();
+                        kHandleHorizontalLineBreakingMarker.End();
                     }
                     #endregion
 
@@ -1571,9 +1486,9 @@ namespace TMPro
                         else
                             vertexColor = m_htmlColor;
 
-                        k_SaveGlyphVertexDataMarker.Begin();
-                        SaveGlyphVertexInfo(padding, style_padding, vertexColor);
-                        k_SaveGlyphVertexDataMarker.End();
+                        kSaveGlyphVertexDataMarker.Begin();
+                        SaveGlyphVertexInfo(padding, stylePadding, vertexColor);
+                        kSaveGlyphVertexDataMarker.End();
 
                         if (isStartOfNewLine)
                         {
@@ -1587,11 +1502,11 @@ namespace TMPro
                         lineInfo.marginRight = marginRight;
                     }
 
-                    k_HandleVisibleCharacterMarker.End();
+                    kHandleVisibleCharacterMarker.End();
                 }
                 else
                 {
-                    k_HandleWhiteSpacesMarker.Begin();
+                    kHandleWhiteSpacesMarker.Begin();
 
                     if ((charCode == 10 || charCode == 11 || charCode == 0xA0 || charCode == 0x2007 || charCode == 0x2028 || charCode == 0x2029 || char.IsSeparator((char)charCode)) && charCode != 0xAD && charCode != 0x200B && charCode != 0x2060)
                     {
@@ -1602,7 +1517,7 @@ namespace TMPro
                     if (charCode == 0xA0)
                         lineInfo.controlCharacterCount += 1;
 
-                    k_HandleWhiteSpacesMarker.End();
+                    kHandleWhiteSpacesMarker.End();
                 }
                 #endregion Handle Visible Characters
 
@@ -1645,7 +1560,7 @@ namespace TMPro
 
 
                 #region XAdvance, Tabulation & Stops
-                k_ComputeCharacterAdvanceMarker.Begin();
+                kComputeCharacterAdvanceMarker.Begin();
                 if (charCode == 9)
                 {
                     float tabSize = m_currentFontAsset.m_FaceInfo.tabWidth * m_currentFontAsset.tabSize * currentElementScale;
@@ -1674,7 +1589,7 @@ namespace TMPro
                 }
 
                 chInfo.xAdvance = m_xAdvance;
-                k_ComputeCharacterAdvanceMarker.End();
+                kComputeCharacterAdvanceMarker.End();
                 #endregion Tabulation & Stops
                 
                 float glyphAdvance = m_xAdvance - xAdvanceBeforeChar;
@@ -1694,9 +1609,9 @@ namespace TMPro
                 #region Carriage Return
                 if (charCode == 13)
                 {
-                    k_HandleCarriageReturnMarker.Begin();
+                    kHandleCarriageReturnMarker.Begin();
                     m_xAdvance = 0 + tag_Indent;
-                    k_HandleCarriageReturnMarker.End();
+                    kHandleCarriageReturnMarker.End();
                 }
                 #endregion Carriage Return
 
@@ -1704,7 +1619,7 @@ namespace TMPro
                 #region Check for Line Feed and Last Character
                 if (charCode == 10 || charCode == 11 || charCode == 0x03 || charCode == 0x2028 || charCode == 0x2029 || (charCode == 0x2D && isInjectedCharacter) || m_characterCount == totalCharacterCount - 1)
                 {
-                    k_HandleLineTerminationMarker.Begin();
+                    kHandleLineTerminationMarker.Begin();
 
                     float baselineAdjustmentDelta = m_maxLineAscender - m_startOfLineAscender;
                     if (m_lineOffset > 0 && Math.Abs(baselineAdjustmentDelta) > 0.01f && !m_IsDrivenLineSpacing)
@@ -1800,7 +1715,7 @@ namespace TMPro
 
                         m_characterCount += 1;
 
-                        k_HandleLineTerminationMarker.End();
+                        kHandleLineTerminationMarker.End();
 
                         continue;
                     }
@@ -1808,13 +1723,13 @@ namespace TMPro
                     if (charCode == 0x03)
                         i = m_TextProcessingArray.Length;
 
-                    k_HandleLineTerminationMarker.End();
+                    kHandleLineTerminationMarker.End();
                 }
                 #endregion Check for Linefeed or Last Character
 
 
                 #region Track Text Extents
-                k_SaveTextExtentMarker.Begin();
+                kSaveTextExtentMarker.Begin();
                 if (chInfo.isVisible)
                 {
                     m_meshExtents.min.x = Mathf.Min(m_meshExtents.min.x, chInfo.bottomLeft.x);
@@ -1823,14 +1738,14 @@ namespace TMPro
                     m_meshExtents.max.x = Mathf.Max(m_meshExtents.max.x, chInfo.topRight.x);
                     m_meshExtents.max.y = Mathf.Max(m_meshExtents.max.y, chInfo.topRight.y);
                 }
-                k_SaveTextExtentMarker.End();
+                kSaveTextExtentMarker.End();
                 #endregion Track Text Extents
 
 
                 #region Save Word Wrapping State
                 if ((m_TextWrappingMode != TextWrappingModes.NoWrap && m_TextWrappingMode != TextWrappingModes.PreserveWhitespaceNoWrap) || m_overflowMode == TextOverflowModes.Truncate || m_overflowMode == TextOverflowModes.Ellipsis)
                 {
-                    k_SaveProcessingStatesMarker.Begin();
+                    kSaveProcessingStatesMarker.Begin();
 
                     bool shouldSaveHardLineBreak = false;
                     bool shouldSaveSoftLineBreak = false;
@@ -1895,7 +1810,7 @@ namespace TMPro
                     if (shouldSaveSoftLineBreak)
                         SaveWordWrappingState(ref m_SavedSoftLineBreakState, i, m_characterCount);
 
-                    k_SaveProcessingStatesMarker.End();
+                    kSaveProcessingStatesMarker.End();
                 }
                 #endregion Save Word Wrapping State
 
@@ -1917,8 +1832,8 @@ namespace TMPro
                 m_fontSize += sizeDelta;
                 m_fontSize = Mathf.Min((int)(m_fontSize * 20 + 0.5f) / 20f, m_fontSizeMax);
 
-                k_GenerateTextPhaseIMarker.End();
-                k_GenerateTextMarker.End();
+                kGenerateTextPhaseIMarker.End();
+                kGenerateTextMarker.End();
                 return;
             }
             #endregion End Auto-sizing Check
@@ -1933,21 +1848,21 @@ namespace TMPro
                 ClearMesh();
 
                 TMPro_EventManager.ON_TEXT_CHANGED(this);
-                k_GenerateTextPhaseIMarker.End();
-                k_GenerateTextMarker.End();
+                kGenerateTextPhaseIMarker.End();
+                kGenerateTextMarker.End();
                 return;
             }
 
-            k_GenerateTextPhaseIMarker.End();
+            kGenerateTextPhaseIMarker.End();
 
-            k_GenerateTextPhaseIIMarker.Begin();
-            int last_vert_index = m_materialReferences[m_Underline.materialIndex].referenceCount * 4;
+            kGenerateTextPhaseIiMarker.Begin();
+            int lastVertIndex = m_materialReferences[m_Underline.materialIndex].referenceCount * 4;
 
             m_textInfo.meshInfo[0].Clear(false);
 
             #region Text Vertical Alignment
             Vector3 anchorOffset = Vector3.zero;
-            Vector3[] corners = m_RectTransformCorners;
+            Vector3[] corners = MRectTransformCorners;
 
             switch (m_VerticalAlignment)
             {
@@ -1989,10 +1904,10 @@ namespace TMPro
             int wordFirstChar = 0;
             int wordLastChar = 0;
 
-            bool isCameraAssigned = m_canvas.worldCamera == null ? false : true;
-            float lossyScale = m_previousLossyScaleY = transform.lossyScale.y;
-            RenderMode canvasRenderMode = m_canvas.renderMode;
-            float canvasScaleFactor = m_canvas.scaleFactor;
+            bool isCameraAssigned = MCanvas.worldCamera == null ? false : true;
+            float lossyScale = transform.lossyScale.y;
+            RenderMode canvasRenderMode = MCanvas.renderMode;
+            float canvasScaleFactor = MCanvas.scaleFactor;
 
             Color32 underlineColor = Color.white;
             Color32 strikethroughColor = Color.white;
@@ -2011,15 +1926,14 @@ namespace TMPro
 
             TMP_CharacterInfo[] characterInfos = m_textInfo.characterInfo;
             #region Handle Line Justification & UV Mapping & Character Visibility & More
-
-            Debug.Log($"Count: {m_characterCount}");
+            
             for (int i = 0; i < m_characterCount; i++)
             {
                 ref var chInfo = ref characterInfos[i];
-                ref var BL = ref chInfo.vertex_BL;
-                ref var TL = ref chInfo.vertex_TL;
-                ref var TR = ref chInfo.vertex_TR;
-                ref var BR = ref chInfo.vertex_BR;
+                ref var bl = ref chInfo.vertex_BL;
+                ref var tl = ref chInfo.vertex_TL;
+                ref var tr = ref chInfo.vertex_TR;
+                ref var br = ref chInfo.vertex_BR;
                 TMP_FontAsset currentFontAsset = chInfo.fontAsset;
 
                 char unicode = chInfo.character;
@@ -2036,27 +1950,6 @@ namespace TMPro
                 {
                     lastLineNumber = currentLine;
                     HorizontalAlignmentOptions lineAlignment = lineInfo.alignment;
-
-                    if (directions != null)
-                    {
-                        if (autoHorizontalAlignment)
-                        {
-                            var dir = Bidi.Direction.LeftToRight;
-                            if (currentLine < directions.Length)
-                            {
-                                dir = directions[currentLine];
-                            }
-                            
-                            if (dir == Bidi.Direction.LeftToRight)
-                            {
-                                lineAlignment = HorizontalAlignmentOptions.Left;
-                            }
-                            else
-                            {
-                                lineAlignment = HorizontalAlignmentOptions.Right;
-                            }
-                        }
-                    }
 
                     switch (lineAlignment)
                     {
@@ -2153,50 +2046,48 @@ namespace TMPro
                     switch (m_horizontalMapping)
                     {
                         case TextureMappingOptions.Character:
-                            BL.uv2.x = 0;
-                            TL.uv2.x = 0;
-                            TR.uv2.x = 1;
-                            BR.uv2.x = 1;
+                            bl.uv2.x = 0;
+                            tl.uv2.x = 0;
+                            tr.uv2.x = 1;
+                            br.uv2.x = 1;
                             break;
 
                         case TextureMappingOptions.Line:
                             if (m_textAlignment != TextAlignmentOptions.Justified)
                             {
-                                BL.uv2.x =
-                                    (BL.position.x - lineExtents.min.x) / (lineExtents.max.x - lineExtents.min.x) +
+                                bl.uv2.x =
+                                    (bl.position.x - lineExtents.min.x) / (lineExtents.max.x - lineExtents.min.x) +
                                     uvOffset;
-                                TL.uv2.x =
-                                    (TL.position.x - lineExtents.min.x) / (lineExtents.max.x - lineExtents.min.x) +
+                                tl.uv2.x =
+                                    (tl.position.x - lineExtents.min.x) / (lineExtents.max.x - lineExtents.min.x) +
                                     uvOffset;
-                                TR.uv2.x =
-                                    (TR.position.x - lineExtents.min.x) / (lineExtents.max.x - lineExtents.min.x) +
+                                tr.uv2.x =
+                                    (tr.position.x - lineExtents.min.x) / (lineExtents.max.x - lineExtents.min.x) +
                                     uvOffset;
-                                BR.uv2.x =
-                                    (BR.position.x - lineExtents.min.x) / (lineExtents.max.x - lineExtents.min.x) +
+                                br.uv2.x =
+                                    (br.position.x - lineExtents.min.x) / (lineExtents.max.x - lineExtents.min.x) +
                                     uvOffset;
-                                break;
-                            }
-                            else
-                            {
-                                BL.uv2.x = (BL.position.x + justificationOffset.x - m_meshExtents.min.x) /
-                                    (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
-                                TL.uv2.x = (TL.position.x + justificationOffset.x - m_meshExtents.min.x) /
-                                    (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
-                                TR.uv2.x = (TR.position.x + justificationOffset.x - m_meshExtents.min.x) /
-                                    (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
-                                BR.uv2.x = (BR.position.x + justificationOffset.x - m_meshExtents.min.x) /
-                                    (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
                                 break;
                             }
 
+                            bl.uv2.x = (bl.position.x + justificationOffset.x - m_meshExtents.min.x) /
+                                (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
+                            tl.uv2.x = (tl.position.x + justificationOffset.x - m_meshExtents.min.x) /
+                                (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
+                            tr.uv2.x = (tr.position.x + justificationOffset.x - m_meshExtents.min.x) /
+                                (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
+                            br.uv2.x = (br.position.x + justificationOffset.x - m_meshExtents.min.x) /
+                                (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
+                            break;
+
                         case TextureMappingOptions.Paragraph:
-                            BL.uv2.x = (BL.position.x + justificationOffset.x - m_meshExtents.min.x) /
+                            bl.uv2.x = (bl.position.x + justificationOffset.x - m_meshExtents.min.x) /
                                 (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
-                            TL.uv2.x = (TL.position.x + justificationOffset.x - m_meshExtents.min.x) /
+                            tl.uv2.x = (tl.position.x + justificationOffset.x - m_meshExtents.min.x) /
                                 (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
-                            TR.uv2.x = (TR.position.x + justificationOffset.x - m_meshExtents.min.x) /
+                            tr.uv2.x = (tr.position.x + justificationOffset.x - m_meshExtents.min.x) /
                                 (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
-                            BR.uv2.x = (BR.position.x + justificationOffset.x - m_meshExtents.min.x) /
+                            br.uv2.x = (br.position.x + justificationOffset.x - m_meshExtents.min.x) /
                                 (m_meshExtents.max.x - m_meshExtents.min.x) + uvOffset;
                             break;
 
@@ -2205,28 +2096,28 @@ namespace TMPro
                             switch (m_verticalMapping)
                             {
                                 case TextureMappingOptions.Character:
-                                    BL.uv2.y = 0;
-                                    TL.uv2.y = 1;
-                                    TR.uv2.y = 0;
-                                    BR.uv2.y = 1;
+                                    bl.uv2.y = 0;
+                                    tl.uv2.y = 1;
+                                    tr.uv2.y = 0;
+                                    br.uv2.y = 1;
                                     break;
 
                                 case TextureMappingOptions.Line:
-                                    BL.uv2.y = (BL.position.y - lineExtents.min.y) /
+                                    bl.uv2.y = (bl.position.y - lineExtents.min.y) /
                                         (lineExtents.max.y - lineExtents.min.y) + uvOffset;
-                                    TL.uv2.y = (TL.position.y - lineExtents.min.y) /
+                                    tl.uv2.y = (tl.position.y - lineExtents.min.y) /
                                         (lineExtents.max.y - lineExtents.min.y) + uvOffset;
-                                    TR.uv2.y = BL.uv2.y;
-                                    BR.uv2.y = TL.uv2.y;
+                                    tr.uv2.y = bl.uv2.y;
+                                    br.uv2.y = tl.uv2.y;
                                     break;
 
                                 case TextureMappingOptions.Paragraph:
-                                    BL.uv2.y = (BL.position.y - m_meshExtents.min.y) /
+                                    bl.uv2.y = (bl.position.y - m_meshExtents.min.y) /
                                         (m_meshExtents.max.y - m_meshExtents.min.y) + uvOffset;
-                                    TL.uv2.y = (TL.position.y - m_meshExtents.min.y) /
+                                    tl.uv2.y = (tl.position.y - m_meshExtents.min.y) /
                                         (m_meshExtents.max.y - m_meshExtents.min.y) + uvOffset;
-                                    TR.uv2.y = BL.uv2.y;
-                                    BR.uv2.y = TL.uv2.y;
+                                    tr.uv2.y = bl.uv2.y;
+                                    br.uv2.y = tl.uv2.y;
                                     break;
 
                                 case TextureMappingOptions.MatchAspect:
@@ -2234,47 +2125,47 @@ namespace TMPro
                                     break;
                             }
 
-                            float xDelta = (1 - ((BL.uv2.y + TL.uv2.y) * chInfo.aspectRatio)) / 2;
+                            float xDelta = (1 - ((bl.uv2.y + tl.uv2.y) * chInfo.aspectRatio)) / 2;
 
-                            BL.uv2.x = (BL.uv2.y * chInfo.aspectRatio) + xDelta + uvOffset;
-                            TL.uv2.x = BL.uv2.x;
-                            TR.uv2.x = (TL.uv2.y * chInfo.aspectRatio) + xDelta + uvOffset;
-                            BR.uv2.x = TR.uv2.x;
+                            bl.uv2.x = (bl.uv2.y * chInfo.aspectRatio) + xDelta + uvOffset;
+                            tl.uv2.x = bl.uv2.x;
+                            tr.uv2.x = (tl.uv2.y * chInfo.aspectRatio) + xDelta + uvOffset;
+                            br.uv2.x = tr.uv2.x;
                             break;
                     }
 
                     switch (m_verticalMapping)
                     {
                         case TextureMappingOptions.Character:
-                            BL.uv2.y = 0;
-                            TL.uv2.y = 1;
-                            TR.uv2.y = 1;
-                            BR.uv2.y = 0;
+                            bl.uv2.y = 0;
+                            tl.uv2.y = 1;
+                            tr.uv2.y = 1;
+                            br.uv2.y = 0;
                             break;
 
                         case TextureMappingOptions.Line:
-                            BL.uv2.y = (BL.position.y - lineInfo.descender) / (lineInfo.ascender - lineInfo.descender);
-                            TL.uv2.y = (TL.position.y - lineInfo.descender) / (lineInfo.ascender - lineInfo.descender);
-                            TR.uv2.y = TL.uv2.y;
-                            BR.uv2.y = BL.uv2.y;
+                            bl.uv2.y = (bl.position.y - lineInfo.descender) / (lineInfo.ascender - lineInfo.descender);
+                            tl.uv2.y = (tl.position.y - lineInfo.descender) / (lineInfo.ascender - lineInfo.descender);
+                            tr.uv2.y = tl.uv2.y;
+                            br.uv2.y = bl.uv2.y;
                             break;
 
                         case TextureMappingOptions.Paragraph:
-                            BL.uv2.y = (BL.position.y - m_meshExtents.min.y) /
+                            bl.uv2.y = (bl.position.y - m_meshExtents.min.y) /
                                        (m_meshExtents.max.y - m_meshExtents.min.y);
-                            TL.uv2.y = (TL.position.y - m_meshExtents.min.y) /
+                            tl.uv2.y = (tl.position.y - m_meshExtents.min.y) /
                                        (m_meshExtents.max.y - m_meshExtents.min.y);
-                            TR.uv2.y = TL.uv2.y;
-                            BR.uv2.y = BL.uv2.y;
+                            tr.uv2.y = tl.uv2.y;
+                            br.uv2.y = bl.uv2.y;
                             break;
 
                         case TextureMappingOptions.MatchAspect:
-                            float yDelta = (1 - ((BL.uv2.x + TR.uv2.x) / chInfo.aspectRatio)) / 2;
+                            float yDelta = (1 - ((bl.uv2.x + tr.uv2.x) / chInfo.aspectRatio)) / 2;
 
-                            BL.uv2.y = yDelta + (BL.uv2.x / chInfo.aspectRatio);
-                            TL.uv2.y = yDelta + (TR.uv2.x / chInfo.aspectRatio);
-                            BR.uv2.y = BL.uv2.y;
-                            TR.uv2.y = TL.uv2.y;
+                            bl.uv2.y = yDelta + (bl.uv2.x / chInfo.aspectRatio);
+                            tl.uv2.y = yDelta + (tr.uv2.x / chInfo.aspectRatio);
+                            br.uv2.y = bl.uv2.y;
+                            tr.uv2.y = tl.uv2.y;
                             break;
                     }
 
@@ -2299,10 +2190,10 @@ namespace TMPro
                             break;
                     }
 
-                    BL.uv.w = xScale;
-                    TL.uv.w = xScale;
-                    TR.uv.w = xScale;
-                    BR.uv.w = xScale;
+                    bl.uv.w = xScale;
+                    tl.uv.w = xScale;
+                    tr.uv.w = xScale;
+                    br.uv.w = xScale;
 
                     #endregion
 
@@ -2310,17 +2201,17 @@ namespace TMPro
 
                     if (i < m_maxVisibleCharacters && wordCount < m_maxVisibleWords && currentLine < m_maxVisibleLines)
                     {
-                        BL.position += offset;
-                        TL.position += offset;
-                        TR.position += offset;
-                        BR.position += offset;
+                        bl.position += offset;
+                        tl.position += offset;
+                        tr.position += offset;
+                        br.position += offset;
                     }
                     else
                     {
-                        BL.position = Vector3.zero;
-                        TL.position = Vector3.zero;
-                        TR.position = Vector3.zero;
-                        BR.position = Vector3.zero;
+                        bl.position = Vector3.zero;
+                        tl.position = Vector3.zero;
+                        tr.position = Vector3.zero;
+                        br.position = Vector3.zero;
                         chInfo.isVisible = false;
                     }
 
@@ -2463,7 +2354,7 @@ namespace TMPro
                                 underlineMaxScale = underlineStartScale;
                                 xScaleMax = xScale;
                             }
-                            underline_start = new(m_textInfo.characterInfo[i].bottomLeft.x, underlineBaseLine, 0);
+                            underlineStart = new(m_textInfo.characterInfo[i].bottomLeft.x, underlineBaseLine, 0);
                             underlineColor = m_textInfo.characterInfo[i].underlineColor;
                         }
                     }
@@ -2471,10 +2362,10 @@ namespace TMPro
                     if (beginUnderline && m_characterCount == 1)
                     {
                         beginUnderline = false;
-                        underline_end = new(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
+                        underlineEnd = new(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
                         underlineEndScale = m_textInfo.characterInfo[i].scale;
 
-                        DrawUnderlineMesh(underline_start, underline_end, ref last_vert_index, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
+                        DrawUnderlineMesh(underlineStart, underlineEnd, ref lastVertIndex, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
                         underlineMaxScale = 0;
                         xScaleMax = 0;
                         underlineBaseLine = k_LargePositiveFloat;
@@ -2484,17 +2375,17 @@ namespace TMPro
                         if (isWhiteSpace || unicode == 0x200B)
                         {
                             int lastVisibleCharacterIndex = lineInfo.lastVisibleCharacterIndex;
-                            underline_end = new(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, underlineBaseLine, 0);
+                            underlineEnd = new(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, underlineBaseLine, 0);
                             underlineEndScale = m_textInfo.characterInfo[lastVisibleCharacterIndex].scale;
                         }
                         else
                         {
-                            underline_end = new(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
+                            underlineEnd = new(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
                             underlineEndScale = m_textInfo.characterInfo[i].scale;
                         }
 
                         beginUnderline = false;
-                        DrawUnderlineMesh(underline_start, underline_end, ref last_vert_index, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
+                        DrawUnderlineMesh(underlineStart, underlineEnd, ref lastVertIndex, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
                         underlineMaxScale = 0;
                         xScaleMax = 0;
                         underlineBaseLine = k_LargePositiveFloat;
@@ -2502,10 +2393,10 @@ namespace TMPro
                     else if (beginUnderline && !isUnderlineVisible)
                     {
                         beginUnderline = false;
-                        underline_end = new(m_textInfo.characterInfo[i - 1].topRight.x, underlineBaseLine, 0);
+                        underlineEnd = new(m_textInfo.characterInfo[i - 1].topRight.x, underlineBaseLine, 0);
                         underlineEndScale = m_textInfo.characterInfo[i - 1].scale;
 
-                        DrawUnderlineMesh(underline_start, underline_end, ref last_vert_index, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
+                        DrawUnderlineMesh(underlineStart, underlineEnd, ref lastVertIndex, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
                         underlineMaxScale = 0;
                         xScaleMax = 0;
                         underlineBaseLine = k_LargePositiveFloat;
@@ -2513,10 +2404,10 @@ namespace TMPro
                     else if (beginUnderline && i < m_characterCount - 1 && !underlineColor.Compare(m_textInfo.characterInfo[i + 1].underlineColor))
                     {
                         beginUnderline = false;
-                        underline_end = new(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
+                        underlineEnd = new(m_textInfo.characterInfo[i].topRight.x, underlineBaseLine, 0);
                         underlineEndScale = m_textInfo.characterInfo[i].scale;
 
-                        DrawUnderlineMesh(underline_start, underline_end, ref last_vert_index, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
+                        DrawUnderlineMesh(underlineStart, underlineEnd, ref lastVertIndex, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
                         underlineMaxScale = 0;
                         xScaleMax = 0;
                         underlineBaseLine = k_LargePositiveFloat;
@@ -2527,10 +2418,10 @@ namespace TMPro
                     if (beginUnderline)
                     {
                         beginUnderline = false;
-                        underline_end = new(m_textInfo.characterInfo[i - 1].topRight.x, underlineBaseLine, 0);
+                        underlineEnd = new(m_textInfo.characterInfo[i - 1].topRight.x, underlineBaseLine, 0);
                         underlineEndScale = m_textInfo.characterInfo[i - 1].scale;
 
-                        DrawUnderlineMesh(underline_start, underline_end, ref last_vert_index, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
+                        DrawUnderlineMesh(underlineStart, underlineEnd, ref lastVertIndex, underlineStartScale, underlineEndScale, underlineMaxScale, xScaleMax, underlineColor);
                         underlineMaxScale = 0;
                         xScaleMax = 0;
                         underlineBaseLine = k_LargePositiveFloat;
@@ -2557,7 +2448,7 @@ namespace TMPro
                             beginStrikethrough = true;
                             strikethroughPointSize = m_textInfo.characterInfo[i].pointSize;
                             strikethroughScale = m_textInfo.characterInfo[i].scale;
-                            strikethrough_start = new(m_textInfo.characterInfo[i].bottomLeft.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
+                            strikethroughStart = new(m_textInfo.characterInfo[i].bottomLeft.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
                             strikethroughColor = m_textInfo.characterInfo[i].strikethroughColor;
                             strikethroughBaseline = m_textInfo.characterInfo[i].baseLine;
                         }
@@ -2566,24 +2457,24 @@ namespace TMPro
                     if (beginStrikethrough && m_characterCount == 1)
                     {
                         beginStrikethrough = false;
-                        strikethrough_end = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
+                        strikethroughEnd = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
 
-                        DrawUnderlineMesh(strikethrough_start, strikethrough_end, ref last_vert_index, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
+                        DrawUnderlineMesh(strikethroughStart, strikethroughEnd, ref lastVertIndex, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
                     }
                     else if (beginStrikethrough && i == lineInfo.lastCharacterIndex)
                     {
                         if (isWhiteSpace || unicode == 0x200B)
                         {
                             int lastVisibleCharacterIndex = lineInfo.lastVisibleCharacterIndex;
-                            strikethrough_end = new(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, m_textInfo.characterInfo[lastVisibleCharacterIndex].baseLine + strikethroughOffset * strikethroughScale, 0);
+                            strikethroughEnd = new(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, m_textInfo.characterInfo[lastVisibleCharacterIndex].baseLine + strikethroughOffset * strikethroughScale, 0);
                         }
                         else
                         {
-                            strikethrough_end = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
+                            strikethroughEnd = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
                         }
 
                         beginStrikethrough = false;
-                        DrawUnderlineMesh(strikethrough_start, strikethrough_end, ref last_vert_index, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
+                        DrawUnderlineMesh(strikethroughStart, strikethroughEnd, ref lastVertIndex, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
                     }
                     else if (beginStrikethrough && i < m_characterCount && (m_textInfo.characterInfo[i + 1].pointSize != strikethroughPointSize || !TMP_Math.Approximately(m_textInfo.characterInfo[i + 1].baseLine + offset.y, strikethroughBaseline)))
                     {
@@ -2591,25 +2482,25 @@ namespace TMPro
 
                         int lastVisibleCharacterIndex = lineInfo.lastVisibleCharacterIndex;
                         if (i > lastVisibleCharacterIndex)
-                            strikethrough_end = new(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, m_textInfo.characterInfo[lastVisibleCharacterIndex].baseLine + strikethroughOffset * strikethroughScale, 0);
+                            strikethroughEnd = new(m_textInfo.characterInfo[lastVisibleCharacterIndex].topRight.x, m_textInfo.characterInfo[lastVisibleCharacterIndex].baseLine + strikethroughOffset * strikethroughScale, 0);
                         else
-                            strikethrough_end = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
+                            strikethroughEnd = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
 
-                        DrawUnderlineMesh(strikethrough_start, strikethrough_end, ref last_vert_index, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
+                        DrawUnderlineMesh(strikethroughStart, strikethroughEnd, ref lastVertIndex, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
                     }
                     else if (beginStrikethrough && i < m_characterCount && currentFontAsset.GetInstanceID() != characterInfos[i + 1].fontAsset.GetInstanceID())
                     {
                         beginStrikethrough = false;
-                        strikethrough_end = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
+                        strikethroughEnd = new(m_textInfo.characterInfo[i].topRight.x, m_textInfo.characterInfo[i].baseLine + strikethroughOffset * strikethroughScale, 0);
 
-                        DrawUnderlineMesh(strikethrough_start, strikethrough_end, ref last_vert_index, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
+                        DrawUnderlineMesh(strikethroughStart, strikethroughEnd, ref lastVertIndex, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
                     }
                     else if (beginStrikethrough && !isStrikeThroughVisible)
                     {
                         beginStrikethrough = false;
-                        strikethrough_end = new(m_textInfo.characterInfo[i - 1].topRight.x, m_textInfo.characterInfo[i - 1].baseLine + strikethroughOffset * strikethroughScale, 0);
+                        strikethroughEnd = new(m_textInfo.characterInfo[i - 1].topRight.x, m_textInfo.characterInfo[i - 1].baseLine + strikethroughOffset * strikethroughScale, 0);
 
-                        DrawUnderlineMesh(strikethrough_start, strikethrough_end, ref last_vert_index, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
+                        DrawUnderlineMesh(strikethroughStart, strikethroughEnd, ref lastVertIndex, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
                     }
                 }
                 else
@@ -2617,9 +2508,9 @@ namespace TMPro
                     if (beginStrikethrough)
                     {
                         beginStrikethrough = false;
-                        strikethrough_end = new(m_textInfo.characterInfo[i - 1].topRight.x, m_textInfo.characterInfo[i - 1].baseLine + strikethroughOffset * strikethroughScale, 0);
+                        strikethroughEnd = new(m_textInfo.characterInfo[i - 1].topRight.x, m_textInfo.characterInfo[i - 1].baseLine + strikethroughOffset * strikethroughScale, 0);
 
-                        DrawUnderlineMesh(strikethrough_start, strikethrough_end, ref last_vert_index, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
+                        DrawUnderlineMesh(strikethroughStart, strikethroughEnd, ref lastVertIndex, strikethroughScale, strikethroughScale, strikethroughScale, xScale, strikethroughColor);
                     }
                 }
                 #endregion
@@ -2638,8 +2529,8 @@ namespace TMPro
                         else
                         {
                             beginHighlight = true;
-                            highlight_start = k_LargePositiveVector2;
-                            highlight_end = k_LargeNegativeVector2;
+                            highlightStart = k_LargePositiveVector2;
+                            highlightEnd = k_LargeNegativeVector2;
                             highlightState = m_textInfo.characterInfo[i].highlightState;
                         }
                     }
@@ -2654,22 +2545,22 @@ namespace TMPro
                         if (highlightState != currentState)
                         {
                             if (isWhiteSpace)
-                                highlight_end.x = (highlight_end.x - highlightState.padding.right + currentCharacter.origin) / 2;
+                                highlightEnd.x = (highlightEnd.x - highlightState.padding.right + currentCharacter.origin) / 2;
                             else
-                                highlight_end.x = (highlight_end.x - highlightState.padding.right + currentCharacter.bottomLeft.x) / 2;
+                                highlightEnd.x = (highlightEnd.x - highlightState.padding.right + currentCharacter.bottomLeft.x) / 2;
 
-                            highlight_start.y = Mathf.Min(highlight_start.y, currentCharacter.descender);
-                            highlight_end.y = Mathf.Max(highlight_end.y, currentCharacter.ascender);
+                            highlightStart.y = Mathf.Min(highlightStart.y, currentCharacter.descender);
+                            highlightEnd.y = Mathf.Max(highlightEnd.y, currentCharacter.ascender);
 
-                            DrawTextHighlight(highlight_start, highlight_end, ref last_vert_index, highlightState.color);
+                            DrawTextHighlight(highlightStart, highlightEnd, ref lastVertIndex, highlightState.color);
 
                             beginHighlight = true;
-                            highlight_start = new Vector2(highlight_end.x, currentCharacter.descender - currentState.padding.bottom);
+                            highlightStart = new Vector2(highlightEnd.x, currentCharacter.descender - currentState.padding.bottom);
 
                             if (isWhiteSpace)
-                                highlight_end = new Vector2(currentCharacter.xAdvance + currentState.padding.right, currentCharacter.ascender + currentState.padding.top);
+                                highlightEnd = new Vector2(currentCharacter.xAdvance + currentState.padding.right, currentCharacter.ascender + currentState.padding.top);
                             else
-                                highlight_end = new Vector2(currentCharacter.topRight.x + currentState.padding.right, currentCharacter.ascender + currentState.padding.top);
+                                highlightEnd = new Vector2(currentCharacter.topRight.x + currentState.padding.right, currentCharacter.ascender + currentState.padding.top);
 
                             highlightState = currentState;
 
@@ -2680,17 +2571,17 @@ namespace TMPro
                         {
                             if (isWhiteSpace)
                             {
-                                highlight_start.x = Mathf.Min(highlight_start.x, currentCharacter.origin - highlightState.padding.left);
-                                highlight_end.x = Mathf.Max(highlight_end.x, currentCharacter.xAdvance + highlightState.padding.right);
+                                highlightStart.x = Mathf.Min(highlightStart.x, currentCharacter.origin - highlightState.padding.left);
+                                highlightEnd.x = Mathf.Max(highlightEnd.x, currentCharacter.xAdvance + highlightState.padding.right);
                             }
                             else
                             {
-                                highlight_start.x = Mathf.Min(highlight_start.x, currentCharacter.bottomLeft.x - highlightState.padding.left);
-                                highlight_end.x = Mathf.Max(highlight_end.x, currentCharacter.topRight.x + highlightState.padding.right);
+                                highlightStart.x = Mathf.Min(highlightStart.x, currentCharacter.bottomLeft.x - highlightState.padding.left);
+                                highlightEnd.x = Mathf.Max(highlightEnd.x, currentCharacter.topRight.x + highlightState.padding.right);
                             }
 
-                            highlight_start.y = Mathf.Min(highlight_start.y, currentCharacter.descender - highlightState.padding.bottom);
-                            highlight_end.y = Mathf.Max(highlight_end.y, currentCharacter.ascender + highlightState.padding.top);
+                            highlightStart.y = Mathf.Min(highlightStart.y, currentCharacter.descender - highlightState.padding.bottom);
+                            highlightEnd.y = Mathf.Max(highlightEnd.y, currentCharacter.ascender + highlightState.padding.top);
                         }
                     }
 
@@ -2698,17 +2589,17 @@ namespace TMPro
                     {
                         beginHighlight = false;
 
-                        DrawTextHighlight(highlight_start, highlight_end, ref last_vert_index, highlightState.color);
+                        DrawTextHighlight(highlightStart, highlightEnd, ref lastVertIndex, highlightState.color);
                     }
                     else if (beginHighlight && (i == lineInfo.lastCharacterIndex || i >= lineInfo.lastVisibleCharacterIndex))
                     {
                         beginHighlight = false;
-                        DrawTextHighlight(highlight_start, highlight_end, ref last_vert_index, highlightState.color);
+                        DrawTextHighlight(highlightStart, highlightEnd, ref lastVertIndex, highlightState.color);
                     }
                     else if (beginHighlight && !isHighlightVisible)
                     {
                         beginHighlight = false;
-                        DrawTextHighlight(highlight_start, highlight_end, ref last_vert_index, highlightState.color);
+                        DrawTextHighlight(highlightStart, highlightEnd, ref lastVertIndex, highlightState.color);
                     }
                 }
                 else
@@ -2716,7 +2607,7 @@ namespace TMPro
                     if (beginHighlight)
                     {
                         beginHighlight = false;
-                        DrawTextHighlight(highlight_start, highlight_end, ref last_vert_index, highlightState.color);
+                        DrawTextHighlight(highlightStart, highlightEnd, ref lastVertIndex, highlightState.color);
                     }
                 }
                 #endregion
@@ -2725,23 +2616,22 @@ namespace TMPro
             }
             #endregion
 
-            m_textInfo.meshInfo[m_Underline.materialIndex].vertexCount = last_vert_index;
+            m_textInfo.meshInfo[m_Underline.materialIndex].vertexCount = lastVertIndex;
 
             m_textInfo.characterCount = m_characterCount;
             m_textInfo.spriteCount = m_spriteCount;
             m_textInfo.lineCount = lineCount;
             m_textInfo.wordCount = wordCount != 0 && m_characterCount > 0 ? wordCount : 1;
 
-            k_GenerateTextPhaseIIMarker.End();
+            kGenerateTextPhaseIiMarker.End();
 
-            k_GenerateTextPhaseIIIMarker.Begin();
-            Debug.Log(m_textInfo.lineCount);
+            kGenerateTextPhaseIiiMarker.Begin();
             if (m_renderMode == TextRenderFlags.Render && IsActive())
             {
                 OnPreRenderText?.Invoke(m_textInfo);
 
-                if (m_canvas.additionalShaderChannels != (AdditionalCanvasShaderChannels)25)
-                    m_canvas.additionalShaderChannels |= (AdditionalCanvasShaderChannels)25;
+                if (MCanvas.additionalShaderChannels != (AdditionalCanvasShaderChannels)25)
+                    MCanvas.additionalShaderChannels |= (AdditionalCanvasShaderChannels)25;
 
                 if (m_geometrySortingOrder != VertexSortingOrder.Normal)
                     m_textInfo.meshInfo[0].SortGeometry(VertexSortingOrder.Reverse);
@@ -2754,45 +2644,1691 @@ namespace TMPro
 
                 m_mesh.RecalculateBounds();
 
-                m_canvasRenderer.SetMesh(m_mesh);
+                CanvasRenderer.SetMesh(m_mesh);
 
-                Color parentBaseColor = m_canvasRenderer.GetColor();
+                Color parentBaseColor = MCanvasRenderer.GetColor();
 
-                bool isCullTransparentMeshEnabled = m_canvasRenderer.cullTransparentMesh;
+                bool isCullTransparentMeshEnabled = MCanvasRenderer.cullTransparentMesh;
 
                 for (int i = 1; i < m_textInfo.materialCount; i++)
                 {
                     m_textInfo.meshInfo[i].ClearUnusedVertices();
 
-                    if (m_subTextObjects[i] == null) continue;
+                    if (MSubTextObjects[i] == null) continue;
 
                     if (m_geometrySortingOrder != VertexSortingOrder.Normal)
                         m_textInfo.meshInfo[i].SortGeometry(VertexSortingOrder.Reverse);
 
-                    m_subTextObjects[i].mesh.vertices = m_textInfo.meshInfo[i].vertices;
-                    m_subTextObjects[i].mesh.SetUVs(0, m_textInfo.meshInfo[i].uvs0);
-                    m_subTextObjects[i].mesh.uv2 = m_textInfo.meshInfo[i].uvs2;
-                    m_subTextObjects[i].mesh.colors32 = m_textInfo.meshInfo[i].colors32;
+                    MSubTextObjects[i].mesh.vertices = m_textInfo.meshInfo[i].vertices;
+                    MSubTextObjects[i].mesh.SetUVs(0, m_textInfo.meshInfo[i].uvs0);
+                    MSubTextObjects[i].mesh.uv2 = m_textInfo.meshInfo[i].uvs2;
+                    MSubTextObjects[i].mesh.colors32 = m_textInfo.meshInfo[i].colors32;
 
-                    m_subTextObjects[i].mesh.RecalculateBounds();
+                    MSubTextObjects[i].mesh.RecalculateBounds();
 
-                    m_subTextObjects[i].canvasRenderer.SetMesh(m_subTextObjects[i].mesh);
+                    MSubTextObjects[i].canvasRenderer.SetMesh(MSubTextObjects[i].mesh);
 
-                    m_subTextObjects[i].canvasRenderer.SetColor(parentBaseColor);
+                    MSubTextObjects[i].canvasRenderer.SetColor(parentBaseColor);
 
-                    m_subTextObjects[i].canvasRenderer.cullTransparentMesh = isCullTransparentMeshEnabled;
+                    MSubTextObjects[i].canvasRenderer.cullTransparentMesh = isCullTransparentMeshEnabled;
 
-                    m_subTextObjects[i].raycastTarget = raycastTarget;
+                    MSubTextObjects[i].raycastTarget = raycastTarget;
                 }
             }
 
-            if (m_ShouldUpdateCulling)
+            if (MShouldUpdateCulling)
                 UpdateCulling();
 
             TMPro_EventManager.ON_TEXT_CHANGED(this);
 
-            k_GenerateTextPhaseIIIMarker.End();
-            k_GenerateTextMarker.End();
+            kGenerateTextPhaseIiiMarker.End();
+            kGenerateTextMarker.End();
+        }
+        
+        internal bool ValidateHtmlTag(TextProcessingElement[] chars, int startIndex, out int endIndex)
+        {
+            int tagCharCount = 0;
+            byte attributeFlag = 0;
+
+            int attributeIndex = 0;
+            ClearMarkupTagAttributes();
+            TagValueType tagValueType = TagValueType.None;
+            TagUnitType tagUnitType = TagUnitType.Pixels;
+
+            endIndex = startIndex;
+            bool isTagSet = false;
+            bool isValidHtmlTag = false;
+
+            for (int i = startIndex; i < chars.Length && chars[i].unicode != 0 && tagCharCount < m_htmlTag.Length && chars[i].unicode != '<'; i++)
+            {
+                uint unicode = chars[i].unicode;
+
+                if (unicode == '>')
+                {
+                    isValidHtmlTag = true;
+                    endIndex = i;
+                    m_htmlTag[tagCharCount] = (char)0;
+                    break;
+                }
+
+                m_htmlTag[tagCharCount] = (char)unicode;
+                tagCharCount += 1;
+
+                if (attributeFlag == 1)
+                {
+                    if (tagValueType == TagValueType.None)
+                    {
+                        if (unicode == '+' || unicode == '-' || unicode == '.' || (unicode >= '0' && unicode <= '9'))
+                        {
+                            tagUnitType = TagUnitType.Pixels;
+                            tagValueType = m_xmlAttribute[attributeIndex].valueType = TagValueType.NumericalValue;
+                            m_xmlAttribute[attributeIndex].valueStartIndex = tagCharCount - 1;
+                            m_xmlAttribute[attributeIndex].valueLength += 1;
+                        }
+                        else if (unicode == '#')
+                        {
+                            tagUnitType = TagUnitType.Pixels;
+                            tagValueType = m_xmlAttribute[attributeIndex].valueType = TagValueType.ColorValue;
+                            m_xmlAttribute[attributeIndex].valueStartIndex = tagCharCount - 1;
+                            m_xmlAttribute[attributeIndex].valueLength += 1;
+                        }
+                        else if (unicode == '"')
+                        {
+                            tagUnitType = TagUnitType.Pixels;
+                            tagValueType = m_xmlAttribute[attributeIndex].valueType = TagValueType.StringValue;
+                            m_xmlAttribute[attributeIndex].valueStartIndex = tagCharCount;
+                        }
+                        else
+                        {
+                            tagUnitType = TagUnitType.Pixels;
+                            tagValueType = m_xmlAttribute[attributeIndex].valueType = TagValueType.StringValue;
+                            m_xmlAttribute[attributeIndex].valueStartIndex = tagCharCount - 1;
+                            
+                            m_xmlAttribute[attributeIndex].valueHashCode = (m_xmlAttribute[attributeIndex].valueHashCode << 5) + 
+                                m_xmlAttribute[attributeIndex].valueHashCode ^ TMP_TextUtilities.ToUpperFast((char)unicode);
+                            
+                            m_xmlAttribute[attributeIndex].valueLength += 1;
+                        }
+                    }
+                    else
+                    {
+                        if (tagValueType == TagValueType.NumericalValue)
+                        {
+                            if (unicode == 'p' || unicode == 'e' || unicode == '%' || unicode == ' ')
+                            {
+                                attributeFlag = 2;
+                                tagValueType = TagValueType.None;
+
+                                switch (unicode)
+                                {
+                                    case 'e':
+                                        m_xmlAttribute[attributeIndex].unitType = tagUnitType = TagUnitType.FontUnits;
+                                        break;
+                                    case '%':
+                                        m_xmlAttribute[attributeIndex].unitType = tagUnitType = TagUnitType.Percentage;
+                                        break;
+                                    default:
+                                        m_xmlAttribute[attributeIndex].unitType = tagUnitType = TagUnitType.Pixels;
+                                        break;
+                                }
+
+                                attributeIndex += 1;
+                                m_xmlAttribute[attributeIndex].nameHashCode = 0;
+                                m_xmlAttribute[attributeIndex].valueHashCode = 0;
+                                m_xmlAttribute[attributeIndex].valueType = TagValueType.None;
+                                m_xmlAttribute[attributeIndex].unitType = TagUnitType.Pixels;
+                                m_xmlAttribute[attributeIndex].valueStartIndex = 0;
+                                m_xmlAttribute[attributeIndex].valueLength = 0;
+
+                            }
+                            else
+                            {
+                                m_xmlAttribute[attributeIndex].valueLength += 1;
+                            }
+                        }
+                        else if (tagValueType == TagValueType.ColorValue)
+                        {
+                            if (unicode != ' ')
+                            {
+                                m_xmlAttribute[attributeIndex].valueLength += 1;
+                            }
+                            else
+                            {
+                                attributeFlag = 2;
+                                tagValueType = TagValueType.None;
+                                tagUnitType = TagUnitType.Pixels;
+                                attributeIndex += 1;
+                                m_xmlAttribute[attributeIndex].nameHashCode = 0;
+                                m_xmlAttribute[attributeIndex].valueType = TagValueType.None;
+                                m_xmlAttribute[attributeIndex].unitType = TagUnitType.Pixels;
+                                m_xmlAttribute[attributeIndex].valueHashCode = 0;
+                                m_xmlAttribute[attributeIndex].valueStartIndex = 0;
+                                m_xmlAttribute[attributeIndex].valueLength = 0;
+                            }
+                        }
+                        else if (tagValueType == TagValueType.StringValue)
+                        {
+                            if (unicode != '"')
+                            {
+                                m_xmlAttribute[attributeIndex].valueHashCode = (m_xmlAttribute[attributeIndex].valueHashCode << 5) + m_xmlAttribute[attributeIndex].valueHashCode ^ TMP_TextUtilities.ToUpperFast((char)unicode);
+                                m_xmlAttribute[attributeIndex].valueLength += 1;
+                            }
+                            else
+                            {
+                                attributeFlag = 2;
+                                tagValueType = TagValueType.None;
+                                tagUnitType = TagUnitType.Pixels;
+                                attributeIndex += 1;
+                                m_xmlAttribute[attributeIndex].nameHashCode = 0;
+                                m_xmlAttribute[attributeIndex].valueType = TagValueType.None;
+                                m_xmlAttribute[attributeIndex].unitType = TagUnitType.Pixels;
+                                m_xmlAttribute[attributeIndex].valueHashCode = 0;
+                                m_xmlAttribute[attributeIndex].valueStartIndex = 0;
+                                m_xmlAttribute[attributeIndex].valueLength = 0;
+                            }
+                        }
+                    }
+                }
+
+
+                if (unicode == '=') attributeFlag = 1;
+
+                if (attributeFlag == 0 && unicode == ' ')
+                {
+                    if (isTagSet) return false;
+
+                    isTagSet = true;
+                    attributeFlag = 2;
+
+                    tagValueType = TagValueType.None;
+                    tagUnitType = TagUnitType.Pixels;
+                    attributeIndex += 1;
+                    m_xmlAttribute[attributeIndex].nameHashCode = 0;
+                    m_xmlAttribute[attributeIndex].valueType = TagValueType.None;
+                    m_xmlAttribute[attributeIndex].unitType = TagUnitType.Pixels;
+                    m_xmlAttribute[attributeIndex].valueHashCode = 0;
+                    m_xmlAttribute[attributeIndex].valueStartIndex = 0;
+                    m_xmlAttribute[attributeIndex].valueLength = 0;
+                }
+
+                if (attributeFlag == 0)
+                    m_xmlAttribute[attributeIndex].nameHashCode = (m_xmlAttribute[attributeIndex].nameHashCode << 5) + m_xmlAttribute[attributeIndex].nameHashCode ^ TMP_TextUtilities.ToUpperFast((char)unicode);
+
+                if (attributeFlag == 2 && unicode == ' ')
+                    attributeFlag = 0;
+
+            }
+
+            if (!isValidHtmlTag)
+            {
+                return false;
+            }
+
+            #region Rich Text Tag Processing
+
+            if (tag_NoParsing && (m_xmlAttribute[0].nameHashCode != (int)MarkupTag.SLASH_NO_PARSE))
+                return false;
+
+            if (m_xmlAttribute[0].nameHashCode == (int)MarkupTag.SLASH_NO_PARSE)
+            {
+                tag_NoParsing = false;
+                return true;
+            }
+
+            if (m_htmlTag[0] == 35 && tagCharCount == 4)
+            {
+                m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
+                m_colorStack.Add(m_htmlColor);
+                return true;
+            }
+
+            if (m_htmlTag[0] == 35 && tagCharCount == 5)
+            {
+                m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
+                m_colorStack.Add(m_htmlColor);
+                return true;
+            }
+
+            if (m_htmlTag[0] == 35 && tagCharCount == 7)
+            {                                                                      
+                m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
+                m_colorStack.Add(m_htmlColor);
+                return true;
+            }
+
+            if (m_htmlTag[0] == 35 && tagCharCount == 9)
+            {
+                m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
+                m_colorStack.Add(m_htmlColor);
+                return true;
+            }
+
+            float value = 0;
+            float fontScale;
+
+            switch ((MarkupTag)m_xmlAttribute[0].nameHashCode)
+            {
+                case MarkupTag.BOLD:
+                    m_FontStyleInternal |= FontStyles.Bold;
+                    m_fontStyleStack.Add(FontStyles.Bold);
+
+                    m_FontWeightInternal = FontWeight.Bold;
+                    return true;
+                case MarkupTag.SLASH_BOLD:
+                    if ((m_fontStyle & FontStyles.Bold) != FontStyles.Bold)
+                    {
+                        if (m_fontStyleStack.Remove(FontStyles.Bold) == 0)
+                        {
+                            m_FontStyleInternal &= ~FontStyles.Bold;
+                            m_FontWeightInternal = m_FontWeightStack.Peek();
+                        }
+                    }
+                    return true;
+                case MarkupTag.ITALIC:
+                    m_FontStyleInternal |= FontStyles.Italic;
+                    m_fontStyleStack.Add(FontStyles.Italic);
+
+                    if (m_xmlAttribute[1].nameHashCode == (int)MarkupTag.ANGLE)
+                    {
+                        m_ItalicAngle = (int)ConvertToFloat(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength);
+
+                        if (m_ItalicAngle < -180 || m_ItalicAngle > 180) return false;
+                    }
+                    else
+                        m_ItalicAngle = m_currentFontAsset.italicStyle;
+
+                    m_ItalicAngleStack.Add(m_ItalicAngle);
+
+                    return true;
+                case MarkupTag.SLASH_ITALIC:
+                    if ((m_fontStyle & FontStyles.Italic) != FontStyles.Italic)
+                    {
+                        m_ItalicAngle = m_ItalicAngleStack.Remove();
+
+                        if (m_fontStyleStack.Remove(FontStyles.Italic) == 0)
+                            m_FontStyleInternal &= ~FontStyles.Italic;
+                    }
+                    return true;
+                case MarkupTag.STRIKETHROUGH:
+                    m_FontStyleInternal |= FontStyles.Strikethrough;
+                    m_fontStyleStack.Add(FontStyles.Strikethrough);
+
+                    if (m_xmlAttribute[1].nameHashCode == (int)MarkupTag.COLOR)
+                    {
+                        m_strikethroughColor = HexCharsToColor(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength);
+                        m_strikethroughColor.a = m_htmlColor.a < m_strikethroughColor.a ? (byte)(m_htmlColor.a) : (byte)(m_strikethroughColor .a);
+                    }
+                    else
+                        m_strikethroughColor = m_htmlColor;
+
+                    m_strikethroughColorStack.Add(m_strikethroughColor);
+
+                    return true;
+                case MarkupTag.SLASH_STRIKETHROUGH:
+                    if ((m_fontStyle & FontStyles.Strikethrough) != FontStyles.Strikethrough)
+                    {
+                        if (m_fontStyleStack.Remove(FontStyles.Strikethrough) == 0)
+                            m_FontStyleInternal &= ~FontStyles.Strikethrough;
+                    }
+
+                    m_strikethroughColor = m_strikethroughColorStack.Remove();
+                    return true;
+                case MarkupTag.UNDERLINE:
+                    m_FontStyleInternal |= FontStyles.Underline;
+                    m_fontStyleStack.Add(FontStyles.Underline);
+
+                    if (m_xmlAttribute[1].nameHashCode == (int)MarkupTag.COLOR)
+                    {
+                        m_underlineColor = HexCharsToColor(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength);
+                        m_underlineColor.a = m_htmlColor.a < m_underlineColor.a ? (m_htmlColor.a) : (m_underlineColor.a);
+                    }
+                    else
+                        m_underlineColor = m_htmlColor;
+
+                    m_underlineColorStack.Add(m_underlineColor);
+
+                    return true;
+                case MarkupTag.SLASH_UNDERLINE:
+                    if ((m_fontStyle & FontStyles.Underline) != FontStyles.Underline)
+                    {
+                        if (m_fontStyleStack.Remove(FontStyles.Underline) == 0)
+                            m_FontStyleInternal &= ~FontStyles.Underline;
+                    }
+
+                    m_underlineColor = m_underlineColorStack.Remove();
+                    return true;
+                case MarkupTag.MARK:
+                    m_FontStyleInternal |= FontStyles.Highlight;
+                    m_fontStyleStack.Add(FontStyles.Highlight);
+
+                    Color32 highlightColor = new(255, 255, 0, 64);
+                    TMP_Offset highlightPadding = TMP_Offset.zero;
+
+                    for (int i = 0; i < m_xmlAttribute.Length && m_xmlAttribute[i].nameHashCode != 0; i++)
+                    {
+                        switch ((MarkupTag)m_xmlAttribute[i].nameHashCode)
+                        {
+                            case MarkupTag.MARK:
+                                if (m_xmlAttribute[i].valueType == TagValueType.ColorValue)
+                                    highlightColor = HexCharsToColor(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+                                break;
+
+                            case MarkupTag.COLOR:
+                                highlightColor = HexCharsToColor(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength);
+                                break;
+
+                            case MarkupTag.PADDING:
+                                int paramCount = GetAttributeParameters(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength, ref m_attributeParameterValues);
+                                if (paramCount != 4) return false;
+
+                                highlightPadding = new(m_attributeParameterValues[0], m_attributeParameterValues[1], m_attributeParameterValues[2], m_attributeParameterValues[3]);
+                                highlightPadding *= m_fontSize * 0.01f * (m_isOrthographic ? 1 : 0.1f);
+                                break;
+                        }
+                    }
+
+                    highlightColor.a = m_htmlColor.a < highlightColor.a ? (byte)(m_htmlColor.a) : (byte)(highlightColor.a);
+
+                    m_HighlightState = new(highlightColor, highlightPadding);
+                    m_HighlightStateStack.Push(m_HighlightState);
+
+                    return true;
+                case MarkupTag.SLASH_MARK:
+                    if ((m_fontStyle & FontStyles.Highlight) != FontStyles.Highlight)
+                    {
+                        m_HighlightStateStack.Remove();
+                        m_HighlightState = m_HighlightStateStack.current;
+
+                        if (m_fontStyleStack.Remove(FontStyles.Highlight) == 0)
+                            m_FontStyleInternal &= ~FontStyles.Highlight;
+                    }
+                    return true;
+                case MarkupTag.SUBSCRIPT:
+                    m_fontScaleMultiplier *= m_currentFontAsset.faceInfo.subscriptSize > 0 ? m_currentFontAsset.faceInfo.subscriptSize : 1;
+                    m_baselineOffsetStack.Push(m_baselineOffset);
+                    m_materialReferenceStack.Push(m_materialReferences[m_currentMaterialIndex]);
+                    fontScale = (m_currentFontSize / m_currentFontAsset.faceInfo.pointSize * m_currentFontAsset.faceInfo.scale * (m_isOrthographic ? 1 : 0.1f));
+                    m_baselineOffset += m_currentFontAsset.faceInfo.subscriptOffset * fontScale * m_fontScaleMultiplier;
+
+                    m_fontStyleStack.Add(FontStyles.Subscript);
+                    m_FontStyleInternal |= FontStyles.Subscript;
+                    return true;
+                case MarkupTag.SLASH_SUBSCRIPT:
+                    if ((m_FontStyleInternal & FontStyles.Subscript) == FontStyles.Subscript)
+                    {
+                        var previousFontAsset = m_materialReferenceStack.Pop().fontAsset;
+                        if (m_fontScaleMultiplier < 1)
+                        {
+                            m_baselineOffset = m_baselineOffsetStack.Pop();
+                            m_fontScaleMultiplier /= previousFontAsset.faceInfo.subscriptSize > 0 ? previousFontAsset.faceInfo.subscriptSize : 1;
+                        }
+
+                        if (m_fontStyleStack.Remove(FontStyles.Subscript) == 0)
+                            m_FontStyleInternal &= ~FontStyles.Subscript;
+                    }
+                    return true;
+                case MarkupTag.SUPERSCRIPT:
+                    m_fontScaleMultiplier *= m_currentFontAsset.faceInfo.superscriptSize > 0 ? m_currentFontAsset.faceInfo.superscriptSize : 1;
+                    m_baselineOffsetStack.Push(m_baselineOffset);
+                    m_materialReferenceStack.Push(m_materialReferences[m_currentMaterialIndex]);
+                    fontScale = (m_currentFontSize / m_currentFontAsset.faceInfo.pointSize * m_currentFontAsset.faceInfo.scale * (m_isOrthographic ? 1 : 0.1f));
+                    m_baselineOffset += m_currentFontAsset.faceInfo.superscriptOffset * fontScale * m_fontScaleMultiplier;
+
+                    m_fontStyleStack.Add(FontStyles.Superscript);
+                    m_FontStyleInternal |= FontStyles.Superscript;
+                    return true;
+                case MarkupTag.SLASH_SUPERSCRIPT:
+                    if ((m_FontStyleInternal & FontStyles.Superscript) == FontStyles.Superscript)
+                    {
+                        var previousFontAsset = m_materialReferenceStack.Pop().fontAsset;
+                        if (m_fontScaleMultiplier < 1)
+                        {
+                            m_baselineOffset = m_baselineOffsetStack.Pop();
+                            m_fontScaleMultiplier /= previousFontAsset.faceInfo.superscriptSize > 0 ? previousFontAsset.faceInfo.superscriptSize : 1;
+                        }
+
+                        if (m_fontStyleStack.Remove(FontStyles.Superscript) == 0)
+                            m_FontStyleInternal &= ~FontStyles.Superscript;
+                    }
+                    return true;
+                case MarkupTag.FONT_WEIGHT:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch ((int)value)
+                    {
+                        case 100:
+                            m_FontWeightInternal = FontWeight.Thin;
+                            break;
+                        case 200:
+                            m_FontWeightInternal = FontWeight.ExtraLight;
+                            break;
+                        case 300:
+                            m_FontWeightInternal = FontWeight.Light;
+                            break;
+                        case 400:
+                            m_FontWeightInternal = FontWeight.Regular;
+                            break;
+                        case 500:
+                            m_FontWeightInternal = FontWeight.Medium;
+                            break;
+                        case 600:
+                            m_FontWeightInternal = FontWeight.SemiBold;
+                            break;
+                        case 700:
+                            m_FontWeightInternal = FontWeight.Bold;
+                            break;
+                        case 800:
+                            m_FontWeightInternal = FontWeight.Heavy;
+                            break;
+                        case 900:
+                            m_FontWeightInternal = FontWeight.Black;
+                            break;
+                    }
+
+                    m_FontWeightStack.Add(m_FontWeightInternal);
+
+                    return true;
+                case MarkupTag.SLASH_FONT_WEIGHT:
+                    m_FontWeightStack.Remove();
+
+                    if (m_FontStyleInternal == FontStyles.Bold)
+                        m_FontWeightInternal = FontWeight.Bold;
+                    else
+                        m_FontWeightInternal = m_FontWeightStack.Peek();
+
+                    return true;
+                case MarkupTag.POSITION:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (tagUnitType)
+                    {
+                        case TagUnitType.Pixels:
+                            m_xAdvance = value * (m_isOrthographic ? 1.0f : 0.1f);
+                            return true;
+                        case TagUnitType.FontUnits:
+                            m_xAdvance = value * m_currentFontSize * (m_isOrthographic ? 1.0f : 0.1f);
+                            return true;
+                        case TagUnitType.Percentage:
+                            m_xAdvance = m_marginWidth * value / 100;
+                            return true;
+                    }
+                    return false;
+                case MarkupTag.VERTICAL_OFFSET:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (tagUnitType)
+                    {
+                        case TagUnitType.Pixels:
+                            m_baselineOffset = value * (m_isOrthographic ? 1 : 0.1f);
+                            return true;
+                        case TagUnitType.FontUnits:
+                            m_baselineOffset = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                            return true;
+                        case TagUnitType.Percentage:
+                            return false;
+                    }
+                    return false;
+                case MarkupTag.SLASH_VERTICAL_OFFSET:
+                    m_baselineOffset = 0;
+                    return true;
+                case MarkupTag.NO_BREAK:
+                    m_isNonBreakingSpace = true;
+                    return true;
+                case MarkupTag.SLASH_NO_BREAK:
+                    m_isNonBreakingSpace = false;
+                    return true;
+                case MarkupTag.SIZE:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (tagUnitType)
+                    {
+                        case TagUnitType.Pixels:
+                            if (m_htmlTag[5] == 43)
+                            {
+                                m_currentFontSize = m_fontSize + value;
+                                m_sizeStack.Add(m_currentFontSize);
+                                return true;
+                            }
+
+                            if (m_htmlTag[5] == 45)
+                            {
+                                m_currentFontSize = m_fontSize + value;
+                                m_sizeStack.Add(m_currentFontSize);
+                                return true;
+                            }
+
+                            m_currentFontSize = value;
+                            m_sizeStack.Add(m_currentFontSize);
+                            return true;
+                        case TagUnitType.FontUnits:
+                            m_currentFontSize = m_fontSize * value;
+                            m_sizeStack.Add(m_currentFontSize);
+                            return true;
+                        case TagUnitType.Percentage:
+                            m_currentFontSize = m_fontSize * value / 100;
+                            m_sizeStack.Add(m_currentFontSize);
+                            return true;
+                    }
+                    return false;
+                case MarkupTag.SLASH_SIZE:
+                    m_currentFontSize = m_sizeStack.Remove();
+                    return true;
+                case MarkupTag.FONT:
+                    int fontHashCode = m_xmlAttribute[0].valueHashCode;
+                    int materialAttributeHashCode = m_xmlAttribute[1].nameHashCode;
+                    int materialHashCode = m_xmlAttribute[1].valueHashCode;
+
+                    if (fontHashCode == (int)MarkupTag.DEFAULT)
+                    {
+                        m_currentFontAsset = m_materialReferences[0].fontAsset;
+                        m_currentMaterial = m_materialReferences[0].material;
+                        m_currentMaterialIndex = 0;
+
+                        m_materialReferenceStack.Add(m_materialReferences[0]);
+
+                        return true;
+                    }
+
+                    Material tempMaterial;
+
+                    MaterialReferenceManager.TryGetFontAsset(fontHashCode, out var tempFont);
+
+                    if (tempFont == null)
+                    {
+                        tempFont = OnFontAssetRequest?.Invoke(fontHashCode, new(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength));
+
+                        if (tempFont == null)
+                        {
+                            tempFont = Resources.Load<TMP_FontAsset>(TMP_Settings.defaultFontAssetPath + new string(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength));
+                        }
+
+                        if (tempFont == null)
+                            return false;
+
+                        MaterialReferenceManager.AddFontAsset(tempFont);
+                    }
+
+                    if (materialAttributeHashCode == 0 && materialHashCode == 0)
+                    {
+                        m_currentMaterial = tempFont.material;
+
+                        m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, tempFont, ref m_materialReferences, m_materialReferenceIndexLookup);
+
+                        m_materialReferenceStack.Add(m_materialReferences[m_currentMaterialIndex]);
+                    }
+                    else if (materialAttributeHashCode == (int)MarkupTag.MATERIAL)
+                    {
+                        if (MaterialReferenceManager.TryGetMaterial(materialHashCode, out tempMaterial))
+                        {
+                            m_currentMaterial = tempMaterial;
+
+                            m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, tempFont, ref m_materialReferences, m_materialReferenceIndexLookup);
+
+                            m_materialReferenceStack.Add(m_materialReferences[m_currentMaterialIndex]);
+                        }
+                        else
+                        {
+                            tempMaterial = Resources.Load<Material>(TMP_Settings.defaultFontAssetPath + new string(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength));
+
+                            if (tempMaterial == null)
+                                return false;
+
+                            MaterialReferenceManager.AddFontMaterial(materialHashCode, tempMaterial);
+
+                            m_currentMaterial = tempMaterial;
+
+                            m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, tempFont, ref m_materialReferences, m_materialReferenceIndexLookup);
+
+                            m_materialReferenceStack.Add(m_materialReferences[m_currentMaterialIndex]);
+                        }
+                    }
+                    else
+                        return false;
+
+                    m_currentFontAsset = tempFont;
+
+                    return true;
+                case MarkupTag.SLASH_FONT:
+                {
+                    MaterialReference materialReference = m_materialReferenceStack.Remove();
+
+                    m_currentFontAsset = materialReference.fontAsset;
+                    m_currentMaterial = materialReference.material;
+                    m_currentMaterialIndex = materialReference.index;
+
+                    return true;
+                }
+                case MarkupTag.MATERIAL:
+                    materialHashCode = m_xmlAttribute[0].valueHashCode;
+
+                    if (materialHashCode == (int)MarkupTag.DEFAULT)
+                    {
+                        m_currentMaterial = m_materialReferences[0].material;
+                        m_currentMaterialIndex = 0;
+
+                        m_materialReferenceStack.Add(m_materialReferences[0]);
+
+                        return true;
+                    }
+
+
+                    if (MaterialReferenceManager.TryGetMaterial(materialHashCode, out tempMaterial))
+                    {
+                        m_currentMaterial = tempMaterial;
+
+                        m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
+
+                        m_materialReferenceStack.Add(m_materialReferences[m_currentMaterialIndex]);
+                    }
+                    else
+                    {
+                        tempMaterial = Resources.Load<Material>(TMP_Settings.defaultFontAssetPath + new string(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength));
+
+                        if (tempMaterial == null)
+                            return false;
+
+                        MaterialReferenceManager.AddFontMaterial(materialHashCode, tempMaterial);
+
+                        m_currentMaterial = tempMaterial;
+
+                        m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
+
+                        m_materialReferenceStack.Add(m_materialReferences[m_currentMaterialIndex]);
+                    }
+                    return true;
+                case MarkupTag.SLASH_MATERIAL:
+                {
+                    MaterialReference materialReference = m_materialReferenceStack.Remove();
+
+                    m_currentMaterial = materialReference.material;
+                    m_currentMaterialIndex = materialReference.index;
+
+                    return true;
+                }
+                case MarkupTag.SPACE:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (tagUnitType)
+                    {
+                        case TagUnitType.Pixels:
+                            m_xAdvance += value * (m_isOrthographic ? 1 : 0.1f);
+                            return true;
+                        case TagUnitType.FontUnits:
+                            m_xAdvance += value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                            return true;
+                        case TagUnitType.Percentage:
+                            return false;
+                    }
+                    return false;
+                case MarkupTag.ALPHA:
+                    if (m_xmlAttribute[0].valueLength != 3) return false;
+
+                    m_htmlColor.a = (byte)(HexToInt(m_htmlTag[7]) * 16 + HexToInt(m_htmlTag[8]));
+                    return true;
+
+                case MarkupTag.A:
+                    if (m_isTextLayoutPhase)
+                    {
+                        if (m_xmlAttribute[1].nameHashCode == (int)MarkupTag.HREF)
+                        {
+                            int index = m_textInfo.linkCount;
+
+                            if (index + 1 > m_textInfo.linkInfo.Length)
+                                TMP_TextInfo.Resize(ref m_textInfo.linkInfo, index + 1);
+
+                            m_textInfo.linkInfo[index].textComponent = this;
+                            m_textInfo.linkInfo[index].hashCode = (int)MarkupTag.HREF;
+                            m_textInfo.linkInfo[index].linkTextfirstCharacterIndex = m_characterCount;
+                            m_textInfo.linkInfo[index].SetLinkID(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength);
+                        }
+                    }
+                    return true;
+                case MarkupTag.SLASH_A:
+                    if (m_isTextLayoutPhase)
+                    {
+                        int index = m_textInfo.linkCount;
+
+                        m_textInfo.linkInfo[index].linkTextLength = m_characterCount - m_textInfo.linkInfo[index].linkTextfirstCharacterIndex;
+
+                        m_textInfo.linkCount += 1;
+                    }
+                    return true;
+                case MarkupTag.LINK:
+                    if (m_isTextLayoutPhase)
+                    {
+                        int index = m_textInfo.linkCount;
+
+                        if (index + 1 > m_textInfo.linkInfo.Length)
+                            TMP_TextInfo.Resize(ref m_textInfo.linkInfo, index + 1);
+
+                        m_textInfo.linkInfo[index].textComponent = this;
+                        m_textInfo.linkInfo[index].hashCode = m_xmlAttribute[0].valueHashCode;
+                        m_textInfo.linkInfo[index].linkTextfirstCharacterIndex = m_characterCount;
+
+                        m_textInfo.linkInfo[index].linkIdFirstCharacterIndex = startIndex + m_xmlAttribute[0].valueStartIndex;
+                        m_textInfo.linkInfo[index].linkIdLength = m_xmlAttribute[0].valueLength;
+                        m_textInfo.linkInfo[index].SetLinkID(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+                    }
+                    return true;
+                case MarkupTag.SLASH_LINK:
+                    if (m_isTextLayoutPhase)
+                    {
+                        if (m_textInfo.linkCount < m_textInfo.linkInfo.Length)
+                        {
+                            m_textInfo.linkInfo[m_textInfo.linkCount].linkTextLength = m_characterCount - m_textInfo.linkInfo[m_textInfo.linkCount].linkTextfirstCharacterIndex;
+
+                            m_textInfo.linkCount += 1;
+                        }
+                    }
+                    return true;
+                case MarkupTag.ALIGN:
+                    switch ((MarkupTag)m_xmlAttribute[0].valueHashCode)
+                    {
+                        case MarkupTag.LEFT:
+                            m_lineJustification = HorizontalAlignmentOptions.Left;
+                            m_lineJustificationStack.Add(m_lineJustification);
+                            return true;
+                        case MarkupTag.RIGHT:
+                            m_lineJustification = HorizontalAlignmentOptions.Right;
+                            m_lineJustificationStack.Add(m_lineJustification);
+                            return true;
+                        case MarkupTag.CENTER:
+                            m_lineJustification = HorizontalAlignmentOptions.Center;
+                            m_lineJustificationStack.Add(m_lineJustification);
+                            return true;
+                        case MarkupTag.JUSTIFIED:
+                            m_lineJustification = HorizontalAlignmentOptions.Justified;
+                            m_lineJustificationStack.Add(m_lineJustification);
+                            return true;
+                        case MarkupTag.FLUSH:
+                            m_lineJustification = HorizontalAlignmentOptions.Flush;
+                            m_lineJustificationStack.Add(m_lineJustification);
+                            return true;
+                    }
+                    return false;
+                case MarkupTag.SLASH_ALIGN:
+                    m_lineJustification = m_lineJustificationStack.Remove();
+                    return true;
+                case MarkupTag.WIDTH:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (tagUnitType)
+                    {
+                        case TagUnitType.Pixels:
+                            m_width = value * (m_isOrthographic ? 1 : 0.1f);
+                            break;
+                        case TagUnitType.FontUnits:
+                            return false;
+                        case TagUnitType.Percentage:
+                            m_width = m_marginWidth * value / 100;
+                            break;
+                    }
+                    return true;
+                case MarkupTag.SLASH_WIDTH:
+                    m_width = -1;
+                    return true;
+
+                case MarkupTag.COLOR:
+                    if (m_htmlTag[6] == 35 && tagCharCount == 10)
+                    {
+                        m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
+                        m_colorStack.Add(m_htmlColor);
+                        return true;
+                    }
+
+                    if (m_htmlTag[6] == 35 && tagCharCount == 11)
+                    {
+                        m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
+                        m_colorStack.Add(m_htmlColor);
+                        return true;
+                    }
+
+                    if (m_htmlTag[6] == 35 && tagCharCount == 13)
+                    {
+                        m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
+                        m_colorStack.Add(m_htmlColor);
+                        return true;
+                    }
+
+                    if (m_htmlTag[6] == 35 && tagCharCount == 15)
+                    {
+                        m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
+                        m_colorStack.Add(m_htmlColor);
+                        return true;
+                    }
+
+                    switch (m_xmlAttribute[0].valueHashCode)
+                    {
+                        case (int)MarkupTag.RED:
+                            m_htmlColor = Color.red;
+                            m_colorStack.Add(m_htmlColor);
+                            return true;
+                        case (int)MarkupTag.LIGHTBLUE:
+                            m_htmlColor = new(173, 216, 230, 255);
+                            m_colorStack.Add(m_htmlColor);
+                            return true;
+                        case (int)MarkupTag.BLUE:
+                            m_htmlColor = Color.blue;
+                            m_colorStack.Add(m_htmlColor);
+                            return true;
+                        case (int)MarkupTag.GREY:
+                            m_htmlColor = new(128, 128, 128, 255);
+                            m_colorStack.Add(m_htmlColor);
+                            return true;
+                        case (int)MarkupTag.BLACK:
+                            m_htmlColor = Color.black;
+                            m_colorStack.Add(m_htmlColor);
+                            return true;
+                        case (int)MarkupTag.GREEN:
+                            m_htmlColor = Color.green;
+                            m_colorStack.Add(m_htmlColor);
+                            return true;
+                        case (int)MarkupTag.WHITE:
+                            m_htmlColor = Color.white;
+                            m_colorStack.Add(m_htmlColor);
+                            return true;
+                        case (int)MarkupTag.ORANGE:
+                            m_htmlColor = new(255, 128, 0, 255);
+                            m_colorStack.Add(m_htmlColor);
+                            return true;
+                        case (int)MarkupTag.PURPLE:
+                            m_htmlColor = new(160, 32, 240, 255);
+                            m_colorStack.Add(m_htmlColor);
+                            return true;
+                        case (int)MarkupTag.YELLOW:
+                            m_htmlColor = Color.yellow;
+                            m_colorStack.Add(m_htmlColor);
+                            return true;
+                    }
+                    return false;
+
+                case MarkupTag.GRADIENT:
+                    int gradientPresetHashCode = m_xmlAttribute[0].valueHashCode;
+
+                    if (MaterialReferenceManager.TryGetColorGradientPreset(gradientPresetHashCode, out var tempColorGradientPreset))
+                    {
+                        m_colorGradientPreset = tempColorGradientPreset;
+                    }
+                    else
+                    {
+                        if (tempColorGradientPreset == null)
+                        {
+                            tempColorGradientPreset = Resources.Load<TMP_ColorGradient>(TMP_Settings.defaultColorGradientPresetsPath + new string(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength));
+                        }
+
+                        if (tempColorGradientPreset == null)
+                            return false;
+
+                        MaterialReferenceManager.AddColorGradientPreset(gradientPresetHashCode, tempColorGradientPreset);
+                        m_colorGradientPreset = tempColorGradientPreset;
+                    }
+
+                    m_colorGradientPresetIsTinted = false;
+
+                    for (int i = 1; i < m_xmlAttribute.Length && m_xmlAttribute[i].nameHashCode != 0; i++)
+                    {
+                        int nameHashCode = m_xmlAttribute[i].nameHashCode;
+
+                        switch ((MarkupTag)nameHashCode)
+                        {
+                            case MarkupTag.TINT:
+                                m_colorGradientPresetIsTinted = ConvertToFloat(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength) != 0;
+                                break;
+                        }
+                    }
+
+                    m_colorGradientStack.Add(m_colorGradientPreset);
+
+                    return true;
+
+                case MarkupTag.SLASH_GRADIENT:
+                    m_colorGradientPreset = m_colorGradientStack.Remove();
+                    return true;
+
+                case MarkupTag.CHARACTER_SPACE:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (tagUnitType)
+                    {
+                        case TagUnitType.Pixels:
+                            m_cSpacing = value * (m_isOrthographic ? 1 : 0.1f);
+                            break;
+                        case TagUnitType.FontUnits:
+                            m_cSpacing = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                            break;
+                        case TagUnitType.Percentage:
+                            return false;
+                    }
+                    return true;
+                case MarkupTag.SLASH_CHARACTER_SPACE:
+                    if (!m_isTextLayoutPhase) return true;
+
+                    if (m_characterCount > 0)
+                    {
+                        m_xAdvance -= m_cSpacing;
+                        m_textInfo.characterInfo[m_characterCount - 1].xAdvance = m_xAdvance;
+                    }
+                    m_cSpacing = 0;
+                    return true;
+                case MarkupTag.MONOSPACE:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (m_xmlAttribute[0].unitType)
+                    {
+                        case TagUnitType.Pixels:
+                            m_monoSpacing = value * (m_isOrthographic ? 1 : 0.1f);
+                            break;
+                        case TagUnitType.FontUnits:
+                            m_monoSpacing = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                            break;
+                        case TagUnitType.Percentage:
+                            return false;
+                    }
+
+                    if (m_xmlAttribute[1].nameHashCode == (int)MarkupTag.DUOSPACE)
+                        m_duoSpace = ConvertToFloat(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength) != 0;
+
+                    return true;
+                case MarkupTag.SLASH_MONOSPACE:
+                    m_monoSpacing = 0;
+                    m_duoSpace = false;
+                    return true;
+                case MarkupTag.CLASS:
+                    return false;
+                case MarkupTag.SLASH_COLOR:
+                    m_htmlColor = m_colorStack.Remove();
+                    return true;
+                case MarkupTag.INDENT:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (tagUnitType)
+                    {
+                        case TagUnitType.Pixels:
+                            tag_Indent = value * (m_isOrthographic ? 1 : 0.1f);
+                            break;
+                        case TagUnitType.FontUnits:
+                            tag_Indent = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                            break;
+                        case TagUnitType.Percentage:
+                            tag_Indent = m_marginWidth * value / 100;
+                            break;
+                    }
+                    m_indentStack.Add(tag_Indent);
+
+                    m_xAdvance = tag_Indent;
+                    return true;
+                case MarkupTag.SLASH_INDENT:
+                    tag_Indent = m_indentStack.Remove();
+                    return true;
+                case MarkupTag.LINE_INDENT:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (tagUnitType)
+                    {
+                        case TagUnitType.Pixels:
+                            tag_LineIndent = value * (m_isOrthographic ? 1 : 0.1f);
+                            break;
+                        case TagUnitType.FontUnits:
+                            tag_LineIndent = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                            break;
+                        case TagUnitType.Percentage:
+                            tag_LineIndent = m_marginWidth * value / 100;
+                            break;
+                    }
+
+                    m_xAdvance += tag_LineIndent;
+                    return true;
+                case MarkupTag.SLASH_LINE_INDENT:
+                    tag_LineIndent = 0;
+                    return true;
+                case MarkupTag.LOWERCASE:
+                    m_FontStyleInternal |= FontStyles.LowerCase;
+                    m_fontStyleStack.Add(FontStyles.LowerCase);
+                    return true;
+                case MarkupTag.SLASH_LOWERCASE:
+                    if ((m_fontStyle & FontStyles.LowerCase) != FontStyles.LowerCase)
+                    {
+                        if (m_fontStyleStack.Remove(FontStyles.LowerCase) == 0)
+                            m_FontStyleInternal &= ~FontStyles.LowerCase;
+                    }
+                    return true;
+                case MarkupTag.ALLCAPS:
+                case MarkupTag.UPPERCASE:
+                    m_FontStyleInternal |= FontStyles.UpperCase;
+                    m_fontStyleStack.Add(FontStyles.UpperCase);
+                    return true;
+                case MarkupTag.SLASH_ALLCAPS:
+                case MarkupTag.SLASH_UPPERCASE:
+                    if ((m_fontStyle & FontStyles.UpperCase) != FontStyles.UpperCase)
+                    {
+                        if (m_fontStyleStack.Remove(FontStyles.UpperCase) == 0)
+                            m_FontStyleInternal &= ~FontStyles.UpperCase;
+                    }
+                    return true;
+                case MarkupTag.SMALLCAPS:
+                    m_FontStyleInternal |= FontStyles.SmallCaps;
+                    m_fontStyleStack.Add(FontStyles.SmallCaps);
+                    return true;
+                case MarkupTag.SLASH_SMALLCAPS:
+                    if ((m_fontStyle & FontStyles.SmallCaps) != FontStyles.SmallCaps)
+                    {
+                        if (m_fontStyleStack.Remove(FontStyles.SmallCaps) == 0)
+                            m_FontStyleInternal &= ~FontStyles.SmallCaps;
+                    }
+                    return true;
+                case MarkupTag.MARGIN:
+                    switch (m_xmlAttribute[0].valueType)
+                    {
+                        case TagValueType.NumericalValue:
+                            value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                            if (value == Int16.MinValue) return false;
+
+                            switch (tagUnitType)
+                            {
+                                case TagUnitType.Pixels:
+                                    m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f);
+                                    break;
+                                case TagUnitType.FontUnits:
+                                    m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                                    break;
+                                case TagUnitType.Percentage:
+                                    m_marginLeft = (m_marginWidth - (m_width != -1 ? m_width : 0)) * value / 100;
+                                    break;
+                            }
+                            m_marginLeft = m_marginLeft >= 0 ? m_marginLeft : 0;
+                            m_marginRight = m_marginLeft;
+                            return true;
+
+                        case TagValueType.None:
+                            for (int i = 1; i < m_xmlAttribute.Length && m_xmlAttribute[i].nameHashCode != 0; i++)
+                            {
+                                int nameHashCode = m_xmlAttribute[i].nameHashCode;
+
+                                switch ((MarkupTag)nameHashCode)
+                                {
+                                    case MarkupTag.LEFT:
+                                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength);
+
+                                        if (value == Int16.MinValue) return false;
+
+                                        switch (m_xmlAttribute[i].unitType)
+                                        {
+                                            case TagUnitType.Pixels:
+                                                m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f);
+                                                break;
+                                            case TagUnitType.FontUnits:
+                                                m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                                                break;
+                                            case TagUnitType.Percentage:
+                                                m_marginLeft = (m_marginWidth - (m_width != -1 ? m_width : 0)) * value / 100;
+                                                break;
+                                        }
+                                        m_marginLeft = m_marginLeft >= 0 ? m_marginLeft : 0;
+                                        break;
+
+                                    case MarkupTag.RIGHT:
+                                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength);
+
+                                        if (value == Int16.MinValue) return false;
+
+                                        switch (m_xmlAttribute[i].unitType)
+                                        {
+                                            case TagUnitType.Pixels:
+                                                m_marginRight = value * (m_isOrthographic ? 1 : 0.1f);
+                                                break;
+                                            case TagUnitType.FontUnits:
+                                                m_marginRight = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                                                break;
+                                            case TagUnitType.Percentage:
+                                                m_marginRight = (m_marginWidth - (m_width != -1 ? m_width : 0)) * value / 100;
+                                                break;
+                                        }
+                                        m_marginRight = m_marginRight >= 0 ? m_marginRight : 0;
+                                        break;
+                                }
+                            }
+                            return true;
+                    }
+
+                    return false;
+                case MarkupTag.SLASH_MARGIN:
+                    m_marginLeft = 0;
+                    m_marginRight = 0;
+                    return true;
+                case MarkupTag.MARGIN_LEFT:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (tagUnitType)
+                    {
+                        case TagUnitType.Pixels:
+                            m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f);
+                            break;
+                        case TagUnitType.FontUnits:
+                            m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                            break;
+                        case TagUnitType.Percentage:
+                            m_marginLeft = (m_marginWidth - (m_width != -1 ? m_width : 0)) * value / 100;
+                            break;
+                    }
+                    m_marginLeft = m_marginLeft >= 0 ? m_marginLeft : 0;
+                    return true;
+                case MarkupTag.MARGIN_RIGHT:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (tagUnitType)
+                    {
+                        case TagUnitType.Pixels:
+                            m_marginRight = value * (m_isOrthographic ? 1 : 0.1f);
+                            break;
+                        case TagUnitType.FontUnits:
+                            m_marginRight = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                            break;
+                        case TagUnitType.Percentage:
+                            m_marginRight = (m_marginWidth - (m_width != -1 ? m_width : 0)) * value / 100;
+                            break;
+                    }
+                    m_marginRight = m_marginRight >= 0 ? m_marginRight : 0;
+                    return true;
+                case MarkupTag.LINE_HEIGHT:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    switch (tagUnitType)
+                    {
+                        case TagUnitType.Pixels:
+                            m_lineHeight = value * (m_isOrthographic ? 1 : 0.1f);
+                            break;
+                        case TagUnitType.FontUnits:
+                            m_lineHeight = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
+                            break;
+                        case TagUnitType.Percentage:
+                            fontScale = (m_currentFontSize / m_currentFontAsset.faceInfo.pointSize * m_currentFontAsset.faceInfo.scale * (m_isOrthographic ? 1 : 0.1f));
+                            m_lineHeight = m_fontAsset.faceInfo.lineHeight * value / 100 * fontScale;
+                            break;
+                    }
+                    return true;
+                case MarkupTag.SLASH_LINE_HEIGHT:
+                    m_lineHeight = TMP_Math.FLOAT_UNSET;
+                    return true;
+                case MarkupTag.NO_PARSE:
+                    tag_NoParsing = true;
+                    return true;
+                case MarkupTag.ACTION:
+                    int actionID = m_xmlAttribute[0].valueHashCode;
+
+                    if (m_isTextLayoutPhase)
+                    {
+                        m_actionStack.Add(actionID);
+
+                        Debug.Log("Action ID: [" + actionID + "] First character index: " + m_characterCount);
+
+
+                    }
+
+                    return true;
+                case MarkupTag.SLASH_ACTION:
+                    if (m_isTextLayoutPhase)
+                    {
+                        Debug.Log("Action ID: [" + m_actionStack.CurrentItem() + "] Last character index: " + (m_characterCount - 1));
+                    }
+
+                    m_actionStack.Remove();
+                    return true;
+                case MarkupTag.SCALE:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    m_FXScale = new(value, 1, 1);
+
+                    return true;
+                case MarkupTag.SLASH_SCALE:
+                    m_FXScale = Vector3.one;
+                    return true;
+                case MarkupTag.ROTATE:
+                    value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
+
+                    if (value == Int16.MinValue) return false;
+
+                    m_FXRotation = Quaternion.Euler(0, 0, value);
+
+                    return true;
+                case MarkupTag.SLASH_ROTATE:
+                    m_FXRotation = Quaternion.identity;
+                    return true;
+                case MarkupTag.TABLE:
+
+                    return false;
+                case MarkupTag.SLASH_TABLE:
+                    return false;
+                case MarkupTag.TR:
+                    return false;
+                case MarkupTag.SLASH_TR:
+                    return false;
+                case MarkupTag.TH:
+                    return false;
+                case MarkupTag.SLASH_TH:
+                    return false;
+                case MarkupTag.TD:
+
+                    return false;
+                case MarkupTag.SLASH_TD:
+                    return false;
+            }
+            #endregion
+
+            return false;
+        }
+                
+        internal int SetArraySizes(TextProcessingElement[] textProcessingArray)
+        {
+            k_SetArraySizesMarker.Begin();
+
+            int spriteCount = 0;
+
+            m_totalCharacterCount = 0;
+            m_isUsingBold = false;
+            m_isTextLayoutPhase = false;
+            tag_NoParsing = false;
+            m_FontStyleInternal = m_fontStyle;
+            m_fontStyleStack.Clear();
+
+            m_FontWeightInternal = (m_FontStyleInternal & FontStyles.Bold) == FontStyles.Bold ? FontWeight.Bold : m_fontWeight;
+            m_FontWeightStack.SetDefault(m_FontWeightInternal);
+
+            m_currentFontAsset = m_fontAsset;
+            m_currentMaterial = m_sharedMaterial;
+            m_currentMaterialIndex = 0;
+
+            m_materialReferenceStack.SetDefault(new(m_currentMaterialIndex, m_currentFontAsset, m_currentMaterial, m_padding));
+
+            m_materialReferenceIndexLookup.Clear();
+            MaterialReference.AddMaterialReference(m_currentMaterial, m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
+
+            if (m_textInfo == null)
+                m_textInfo = new(m_InternalTextProcessingArraySize);
+            else if (m_textInfo.characterInfo.Length < m_InternalTextProcessingArraySize)
+                TMP_TextInfo.Resize(ref m_textInfo.characterInfo, m_InternalTextProcessingArraySize, false);
+
+            #region Setup Ellipsis Special Character
+            if (m_overflowMode == TextOverflowModes.Ellipsis)
+            {
+                GetEllipsisSpecialCharacter(m_currentFontAsset);
+
+                if (m_Ellipsis.character != null)
+                {
+                    if (m_Ellipsis.fontAsset.GetInstanceID() != m_currentFontAsset.GetInstanceID())
+                    {
+                        if (TMP_Settings.matchMaterialPreset && m_currentMaterial.GetInstanceID() != m_Ellipsis.fontAsset.material.GetInstanceID())
+                            m_Ellipsis.material = TMP_MaterialManager.GetFallbackMaterial(m_currentMaterial, m_Ellipsis.fontAsset.material);
+                        else
+                            m_Ellipsis.material = m_Ellipsis.fontAsset.material;
+
+                        m_Ellipsis.materialIndex = MaterialReference.AddMaterialReference(m_Ellipsis.material, m_Ellipsis.fontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
+                        m_materialReferences[m_Ellipsis.materialIndex].referenceCount = 0;
+                    }
+                }
+                else
+                {
+                    m_overflowMode = TextOverflowModes.Truncate;
+
+                    if (!TMP_Settings.warningsDisabled)
+                        Debug.LogWarning("The character used for Ellipsis is not available in font asset [" + m_currentFontAsset.name + "] or any potential fallbacks. Switching Text Overflow mode to Truncate.", this);
+                }
+            }
+            #endregion
+
+            bool ligature = m_ActiveFontFeatures.Contains(OTL_FeatureTag.liga);
+
+            for (int i = 0; i < textProcessingArray.Length && textProcessingArray[i].unicode != 0; i++)
+            {
+                if (m_textInfo.characterInfo == null || m_totalCharacterCount >= m_textInfo.characterInfo.Length)
+                    TMP_TextInfo.Resize(ref m_textInfo.characterInfo, m_totalCharacterCount + 1, true);
+
+                uint unicode = textProcessingArray[i].unicode;
+
+                #region PARSE XML TAGS
+                if (m_isRichText && unicode == 60)
+                {
+                    int prev_MaterialIndex = m_currentMaterialIndex;
+
+                    if (ValidateHtmlTag(textProcessingArray, i + 1, out var endTagIndex))
+                    {
+                        int tagStartIndex = textProcessingArray[i].stringIndex;
+                        i = endTagIndex;
+
+                        if ((m_FontStyleInternal & FontStyles.Bold) == FontStyles.Bold)
+                            m_isUsingBold = true;
+
+                        continue;
+                    }
+                }
+                #endregion
+
+                bool isUsingAlternativeTypeface = false;
+                bool isUsingFallbackOrAlternativeTypeface = false;
+
+                TMP_FontAsset prev_fontAsset = m_currentFontAsset;
+                Material prev_material = m_currentMaterial;
+                int prev_materialIndex = m_currentMaterialIndex;
+
+                #region Handling of LowerCase, UpperCase and SmallCaps Font Styles
+                if ((m_FontStyleInternal & FontStyles.UpperCase) == FontStyles.UpperCase)
+                {
+                    if (char.IsLower((char)unicode))
+                        unicode = char.ToUpper((char)unicode);
+
+                }
+                else if ((m_FontStyleInternal & FontStyles.LowerCase) == FontStyles.LowerCase)
+                {
+                    if (char.IsUpper((char)unicode))
+                        unicode = char.ToLower((char)unicode);
+                }
+                else if ((m_FontStyleInternal & FontStyles.SmallCaps) == FontStyles.SmallCaps)
+                {
+                    if (char.IsLower((char)unicode))
+                        unicode = char.ToUpper((char)unicode);
+                }
+                #endregion
+
+                #region LOOKUP GLYPH
+                TMP_TextElement character = null;
+
+                uint nextCharacter = i + 1 < textProcessingArray.Length ? textProcessingArray[i + 1].unicode : 0;
+
+                if (character == null)
+                    character = GetTextElement(unicode, m_currentFontAsset, m_FontStyleInternal, m_FontWeightInternal, out isUsingAlternativeTypeface);
+
+                #region MISSING CHARACTER HANDLING
+
+                if (character == null)
+                {
+                    DoMissingGlyphCallback((int)unicode, textProcessingArray[i].stringIndex, m_currentFontAsset);
+
+                    uint srcGlyph = unicode;
+
+                    unicode = textProcessingArray[i].unicode = (uint)TMP_Settings.missingGlyphCharacter == 0 ? 9633 : (uint)TMP_Settings.missingGlyphCharacter;
+
+                    character = TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, m_currentFontAsset, true, FontStyles.Normal, FontWeight.Regular, out isUsingAlternativeTypeface);
+
+                    if (character == null)
+                    {
+                        if (TMP_Settings.fallbackFontAssets != null && TMP_Settings.fallbackFontAssets.Count > 0)
+                            character = TMP_FontAssetUtilities.GetCharacterFromFontAssets(unicode, m_currentFontAsset, TMP_Settings.fallbackFontAssets, true, FontStyles.Normal, FontWeight.Regular, out isUsingAlternativeTypeface);
+                    }
+
+                    if (character == null)
+                    {
+                        if (TMP_Settings.defaultFontAsset != null)
+                            character = TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, TMP_Settings.defaultFontAsset, true, FontStyles.Normal, FontWeight.Regular, out isUsingAlternativeTypeface);
+                    }
+
+                    if (character == null)
+                    {
+                        unicode = textProcessingArray[i].unicode = 32;
+                        character = TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, m_currentFontAsset, true, FontStyles.Normal, FontWeight.Regular, out isUsingAlternativeTypeface);
+                    }
+
+                    if (character == null)
+                    {
+                        unicode = textProcessingArray[i].unicode = 0x03;
+                        character = TMP_FontAssetUtilities.GetCharacterFromFontAsset(unicode, m_currentFontAsset, true, FontStyles.Normal, FontWeight.Regular, out isUsingAlternativeTypeface);
+                    }
+
+                    if (!TMP_Settings.warningsDisabled)
+                    {
+                        string formattedWarning = srcGlyph > 0xFFFF
+                            ? string.Format("The character with Unicode value \\U{0:X8} was not found in the [{1}] font asset or any potential fallbacks. It was replaced by Unicode character \\u{2:X4} in text object [{3}].", srcGlyph, m_fontAsset.name, character.unicode, name)
+                            : string.Format("The character with Unicode value \\u{0:X4} was not found in the [{1}] font asset or any potential fallbacks. It was replaced by Unicode character \\u{2:X4} in text object [{3}].", srcGlyph, m_fontAsset.name, character.unicode, name);
+
+                        Debug.LogWarning(formattedWarning, this);
+                    }
+                }
+                #endregion
+
+                ref var chInfo = ref m_textInfo.characterInfo[m_totalCharacterCount];
+                chInfo.alternativeGlyph = null;
+                if (character.textAsset.instanceID != m_currentFontAsset.instanceID)
+                {
+                    isUsingFallbackOrAlternativeTypeface = true;
+                    m_currentFontAsset = character.textAsset as TMP_FontAsset;
+                }
+
+                #region VARIATION SELECTOR
+                if (nextCharacter >= 0xFE00 && nextCharacter <= 0xFE0F || nextCharacter >= 0xE0100 && nextCharacter <= 0xE01EF)
+                {
+                    uint variantGlyphIndex = m_currentFontAsset.GetGlyphVariantIndex((uint)unicode, nextCharacter);
+
+                    if (variantGlyphIndex != 0)
+                    {
+                        if (m_currentFontAsset.TryAddGlyphInternal(variantGlyphIndex, out Glyph glyph))
+                        {
+                            chInfo.alternativeGlyph = glyph;
+                        }
+                    }
+
+                    textProcessingArray[i + 1].unicode = 0x1A;
+                    i += 1;
+                }
+                #endregion
+
+                #region LIGATURES
+                if (ligature && m_currentFontAsset.fontFeatureTable.m_LigatureSubstitutionRecordLookup.TryGetValue(character.glyphIndex, out List<LigatureSubstitutionRecord> records))
+                {
+                    if (records == null)
+                        break;
+
+                    for (int j = 0; j < records.Count; j++)
+                    {
+                        LigatureSubstitutionRecord record = records[j];
+
+                        int componentCount = record.componentGlyphIDs.Length;
+                        uint ligatureGlyphID = record.ligatureGlyphID;
+
+                        for (int k = 1; k < componentCount; k++)
+                        {
+                            uint componentUnicode = (uint)textProcessingArray[i + k].unicode;
+
+                            uint glyphIndex = m_currentFontAsset.GetGlyphIndex(componentUnicode);
+
+                            if (glyphIndex == record.componentGlyphIDs[k])
+                                continue;
+
+                            ligatureGlyphID = 0;
+                            break;
+                        }
+
+                        if (ligatureGlyphID != 0)
+                        {
+                            if (m_currentFontAsset.TryAddGlyphInternal(ligatureGlyphID, out Glyph glyph))
+                            {
+                                chInfo.alternativeGlyph = glyph;
+
+                                for (int c = 0; c < componentCount; c++)
+                                {
+                                    if (c == 0)
+                                    {
+                                        textProcessingArray[i + c].length = componentCount;
+                                        continue;
+                                    }
+
+                                    textProcessingArray[i + c].unicode = 0x1A;
+                                }
+
+                                i += componentCount - 1;
+                                break;
+                            }
+                        }
+                    }
+                }
+                #endregion
+                #endregion
+
+                chInfo.textElement = character;
+                chInfo.isUsingAlternateTypeface = isUsingAlternativeTypeface;
+                chInfo.character = (char)unicode;
+                chInfo.index = textProcessingArray[i].stringIndex;
+                chInfo.stringLength = textProcessingArray[i].length;
+                chInfo.fontAsset = m_currentFontAsset;
+
+                if (isUsingFallbackOrAlternativeTypeface && m_currentFontAsset.instanceID != m_fontAsset.instanceID)
+                {
+                    if (TMP_Settings.matchMaterialPreset)
+                        m_currentMaterial = TMP_MaterialManager.GetFallbackMaterial(m_currentMaterial, m_currentFontAsset.material);
+                    else
+                        m_currentMaterial = m_currentFontAsset.material;
+
+                    m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
+                }
+
+                if (character != null && character.glyph.atlasIndex > 0)
+                {
+                    m_currentMaterial = TMP_MaterialManager.GetFallbackMaterial(m_currentFontAsset, m_currentMaterial, character.glyph.atlasIndex);
+
+                    m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
+
+                    isUsingFallbackOrAlternativeTypeface = true;
+                }
+
+                if (!char.IsWhiteSpace((char)unicode) && unicode != 0x200B)
+                {
+                    if (m_materialReferences[m_currentMaterialIndex].referenceCount < 16383)
+                        m_materialReferences[m_currentMaterialIndex].referenceCount += 1;
+                    else if (isUsingFallbackOrAlternativeTypeface)
+                    {
+                        if (materialIndexPairs.TryGetValue(m_currentMaterialIndex, out int prev_fallbackMaterialIndex) && m_materialReferences[prev_fallbackMaterialIndex].referenceCount < 16383)
+                        {
+                            m_currentMaterialIndex = prev_fallbackMaterialIndex;
+                        }
+                        else
+                        {
+                            int fallbackMaterialIndex = MaterialReference.AddMaterialReference(new(m_currentMaterial), m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
+                            materialIndexPairs[m_currentMaterialIndex] = fallbackMaterialIndex;
+                            m_currentMaterialIndex = fallbackMaterialIndex;
+                        }
+
+                        m_materialReferences[m_currentMaterialIndex].referenceCount += 1;
+                    }
+                    else
+                    {
+                        m_currentMaterialIndex = MaterialReference.AddMaterialReference(new(m_currentMaterial), m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
+                        m_materialReferences[m_currentMaterialIndex].referenceCount += 1;
+                    }
+                }
+
+                chInfo.material = m_currentMaterial;
+                chInfo.materialReferenceIndex = m_currentMaterialIndex;
+                m_materialReferences[m_currentMaterialIndex].isFallbackMaterial = isUsingFallbackOrAlternativeTypeface;
+
+                if (isUsingFallbackOrAlternativeTypeface)
+                {
+                    m_materialReferences[m_currentMaterialIndex].fallbackMaterial = prev_material;
+                    m_currentFontAsset = prev_fontAsset;
+                    m_currentMaterial = prev_material;
+                    m_currentMaterialIndex = prev_materialIndex;
+                }
+
+                m_totalCharacterCount += 1;
+            }
+
+            m_textInfo.spriteCount = spriteCount;
+            int materialCount = m_textInfo.materialCount = m_materialReferenceIndexLookup.Count;
+
+            if (materialCount > m_textInfo.meshInfo.Length)
+                TMP_TextInfo.Resize(ref m_textInfo.meshInfo, materialCount, false);
+
+            if (materialCount > MSubTextObjects.Length)
+                TMP_TextInfo.Resize(ref MSubTextObjects, Mathf.NextPowerOfTwo(materialCount + 1));
+
+            if (m_VertexBufferAutoSizeReduction && m_textInfo.characterInfo.Length - m_totalCharacterCount > 256)
+                TMP_TextInfo.Resize(ref m_textInfo.characterInfo, Mathf.Max(m_totalCharacterCount + 1, 256), true);
+
+
+            for (int i = 0; i < materialCount; i++)
+            {
+                if (i > 0)
+                {
+                    if (MSubTextObjects[i] == null)
+                    {
+                        MSubTextObjects[i] = TMP_SubMeshUI.AddSubTextObject(this, m_materialReferences[i]);
+
+                        m_textInfo.meshInfo[i].vertices = null;
+                    }
+
+                    if (m_rectTransform.pivot != MSubTextObjects[i].rectTransform.pivot)
+                        MSubTextObjects[i].rectTransform.pivot = m_rectTransform.pivot;
+
+                    if (MSubTextObjects[i].sharedMaterial == null || MSubTextObjects[i].sharedMaterial.GetInstanceID() != m_materialReferences[i].material.GetInstanceID())
+                    {
+                        MSubTextObjects[i].sharedMaterial = m_materialReferences[i].material;
+                        MSubTextObjects[i].fontAsset = m_materialReferences[i].fontAsset;
+                    }
+
+                    if (m_materialReferences[i].isFallbackMaterial)
+                    {
+                        MSubTextObjects[i].fallbackMaterial = m_materialReferences[i].material;
+                        MSubTextObjects[i].fallbackSourceMaterial = m_materialReferences[i].fallbackMaterial;
+                    }
+                }
+
+                int referenceCount = m_materialReferences[i].referenceCount;
+
+                if (m_textInfo.meshInfo[i].vertices == null || m_textInfo.meshInfo[i].vertices.Length < referenceCount * 4)
+                {
+                    if (m_textInfo.meshInfo[i].vertices == null)
+                    {
+                        if (i == 0)
+                            m_textInfo.meshInfo[i] = new(m_mesh, referenceCount + 1);
+                        else
+                            m_textInfo.meshInfo[i] = new(MSubTextObjects[i].mesh, referenceCount + 1);
+                    }
+                    else
+                        m_textInfo.meshInfo[i].ResizeMeshInfo(referenceCount > 1024 ? referenceCount + 256 : Mathf.NextPowerOfTwo(referenceCount + 1));
+                }
+                else if (m_VertexBufferAutoSizeReduction && referenceCount > 0 && m_textInfo.meshInfo[i].vertices.Length / 4 - referenceCount > 256)
+                {
+                    m_textInfo.meshInfo[i].ResizeMeshInfo(referenceCount > 1024 ? referenceCount + 256 : Mathf.NextPowerOfTwo(referenceCount + 1));
+                }
+
+                m_textInfo.meshInfo[i].material = m_materialReferences[i].material;
+            }
+
+            for (int i = materialCount; i < MSubTextObjects.Length && MSubTextObjects[i] != null; i++)
+            {
+                if (i < m_textInfo.meshInfo.Length)
+                {
+                    MSubTextObjects[i].canvasRenderer.SetMesh(null);
+                }
+            }
+
+            k_SetArraySizesMarker.End();
+            return m_totalCharacterCount;
         }
     }
 }

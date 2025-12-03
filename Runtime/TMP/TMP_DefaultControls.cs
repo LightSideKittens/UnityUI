@@ -64,7 +64,7 @@ namespace TMPro
             return go;
         }
 
-        private static void SetDefaultTextValues(TMP_Text lbl)
+        private static void SetDefaultTextValues(TMPText lbl)
         {
             lbl.color = s_TextColor;
             lbl.fontSize = 14;
@@ -323,19 +323,6 @@ namespace TMPro
             backgroundImage.sprite = resources.standard;
             backgroundImage.color = s_DefaultSelectableColor;
             backgroundImage.type = Image.Type.Sliced;
-
-            TMP_Dropdown dropdown = AddComponent<TMP_Dropdown>(root);
-            dropdown.targetGraphic = backgroundImage;
-            SetDefaultColorTransitionValues(dropdown);
-            dropdown.template = template.GetComponent<RectTransform>();
-            dropdown.captionText = labelText;
-            dropdown.itemText = itemLabelText;
-
-            itemLabelText.text = "Option A";
-            dropdown.options.Add(new() {text = "Option A" });
-            dropdown.options.Add(new() {text = "Option B" });
-            dropdown.options.Add(new() {text = "Option C" });
-            dropdown.RefreshShownValue();
 
             RectTransform labelRT = label.GetComponent<RectTransform>();
             labelRT.anchorMin = Vector2.zero;

@@ -6,7 +6,7 @@ using UnityEngine.TextCore;
 
 namespace TMPro
 {
-    public abstract partial class TMP_Text
+    public abstract partial class TMPText
     {
         const string RtlLtrStressTest =
     "RTL/LTR mixed stress test (Unity TMP + BiDi + shaping):\n" +
@@ -832,14 +832,6 @@ namespace TMPro
         protected Vector2 m_PreviousRectTransformSize;
 
         protected Vector2 m_PreviousPivotPosition;
-
-
-        public virtual bool autoSizeTextContainer
-        {
-            get;
-            set;
-        }
-        protected bool m_autoSizeTextContainer;
 
 
         public virtual Mesh mesh => m_mesh;

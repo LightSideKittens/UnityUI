@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace TMPro
 {
-    public abstract partial class TMP_Text
+    public abstract partial class TMPText
     {
         public Bounds bounds
         {
@@ -27,7 +27,7 @@ namespace TMPro
         /// <param name="text">The source text that contains the missing character.</param>
         /// <param name="fontAsset">The font asset that is missing the requested characters.</param>
         /// <param name="textComponent">The text component where the requested character is missing.</param>
-        public delegate void MissingCharacterEventCallback(int unicode, int stringIndex, string text, TMP_FontAsset fontAsset, TMP_Text textComponent);
+        public delegate void MissingCharacterEventCallback(int unicode, int stringIndex, string text, TMP_FontAsset fontAsset, TMPText textComponent);
 
         public static event MissingCharacterEventCallback OnMissingCharacter;
 

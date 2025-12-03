@@ -15,8 +15,8 @@ namespace TMPro
     {
         public TMP_FontAsset fontAsset
         {
-            get { return m_fontAsset; }
-            set { m_fontAsset = value; }
+            get => m_fontAsset;
+            set => m_fontAsset = value;
         }
         [SerializeField]
         private TMP_FontAsset m_fontAsset;
@@ -36,7 +36,7 @@ namespace TMPro
 
         public override Material material
         {
-            get { return GetMaterial(m_sharedMaterial); }
+            get => GetMaterial(m_sharedMaterial);
 
             set
             {
@@ -57,8 +57,8 @@ namespace TMPro
 
         public Material sharedMaterial
         {
-            get { return m_sharedMaterial; }
-            set { SetSharedMaterial(value); }
+            get => m_sharedMaterial;
+            set => SetSharedMaterial(value);
         }
         [SerializeField]
         private Material m_sharedMaterial;
@@ -66,7 +66,7 @@ namespace TMPro
 
         public Material fallbackMaterial
         {
-            get { return m_fallbackMaterial; }
+            get => m_fallbackMaterial;
             set
             {
                 if (m_fallbackMaterial == value) return;
@@ -85,25 +85,19 @@ namespace TMPro
 
         public Material fallbackSourceMaterial
         {
-            get { return m_fallbackSourceMaterial; }
-            set { m_fallbackSourceMaterial = value; }
+            get => m_fallbackSourceMaterial;
+            set => m_fallbackSourceMaterial = value;
         }
         private Material m_fallbackSourceMaterial;
 
 
-        public override Material materialForRendering
-        {
-            get
-            {
-                return TMP_MaterialManager.GetMaterialForRendering(this, m_sharedMaterial);
-            }
-        }
+        public override Material materialForRendering => TMP_MaterialManager.GetMaterialForRendering(this, m_sharedMaterial);
 
 
         public bool isDefaultMaterial
         {
-            get { return m_isDefaultMaterial; }
-            set { m_isDefaultMaterial = value; }
+            get => m_isDefaultMaterial;
+            set => m_isDefaultMaterial = value;
         }
         [SerializeField]
         private bool m_isDefaultMaterial;
@@ -111,8 +105,8 @@ namespace TMPro
 
         public float padding
         {
-            get { return m_padding; }
-            set { m_padding = value; }
+            get => m_padding;
+            set => m_padding = value;
         }
         [SerializeField]
         private float m_padding;
@@ -130,12 +124,12 @@ namespace TMPro
 
                 return m_mesh;
             }
-            set { m_mesh = value; }
+            set => m_mesh = value;
         }
         private Mesh m_mesh;
 
 
-        public TMP_Text textComponent
+        public TMPText textComponent
         {
             get
             {
@@ -146,21 +140,17 @@ namespace TMPro
             }
         }
         [SerializeField]
-        private TextMeshProUGUI m_TextComponent;
+        private TMPText m_TextComponent;
 
 
         [System.NonSerialized]
         private bool m_isRegisteredForEvents;
         private bool m_materialDirty;
-        [SerializeField]
-        private int m_materialReferenceIndex;
-
-
 
         /// <param name="textComponent"></param>
         /// <param name="materialReference"></param>
         /// <returns></returns>
-        public static TMP_SubMeshUI AddSubTextObject(TextMeshProUGUI textComponent, MaterialReference materialReference)
+        public static TMP_SubMeshUI AddSubTextObject(TMPText textComponent, MaterialReference materialReference)
         {
             GameObject go = new();
             go.hideFlags = TMP_Settings.hideSubTextObjects ? HideFlags.HideAndDontSave : HideFlags.DontSave;
@@ -183,8 +173,6 @@ namespace TMPro
             layoutElement.ignoreLayout = true;
 
             TMP_SubMeshUI subMesh = go.AddComponent<TMP_SubMeshUI>();
-            subMesh.m_TextComponent = textComponent;
-            subMesh.m_materialReferenceIndex = materialReference.index;
             subMesh.m_fontAsset = materialReference.fontAsset;
             subMesh.m_isDefaultMaterial = materialReference.isDefaultMaterial;
             subMesh.maskable = textComponent.maskable;

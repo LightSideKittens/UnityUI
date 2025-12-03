@@ -6,31 +6,6 @@ using UnityEngine;
 namespace TMPro
 {
     [Serializable]
-    public struct SingleSubstitutionRecord
-    {
-    }
-
-    [Serializable]
-    public struct MultipleSubstitutionRecord
-    {
-        public uint targetGlyphID { get { return m_TargetGlyphID; } set { m_TargetGlyphID = value; } }
-
-        public uint[] substituteGlyphIDs { get { return m_SubstituteGlyphIDs; } set { m_SubstituteGlyphIDs = value; } }
-
-        [SerializeField]
-        private uint m_TargetGlyphID;
-
-        [SerializeField]
-        private uint[] m_SubstituteGlyphIDs;
-    }
-
-    [Serializable]
-    public struct AlternateSubstitutionRecord
-    {
-
-    }
-
-    [Serializable]
     public struct LigatureSubstitutionRecord
     {
         public uint[] componentGlyphIDs { get { return m_ComponentGlyphIDs; } set { m_ComponentGlyphIDs = value; } }

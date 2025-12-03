@@ -10,12 +10,6 @@ namespace TMPro
     [Serializable]
     public class TMP_FontFeatureTable
     {
-        public List<MultipleSubstitutionRecord> multipleSubstitutionRecords
-        {
-            get { return m_MultipleSubstitutionRecords; }
-            set { m_MultipleSubstitutionRecords = value; }
-        }
-
         public List<LigatureSubstitutionRecord> ligatureRecords
         {
             get { return m_LigatureSubstitutionRecords; }
@@ -39,9 +33,6 @@ namespace TMPro
             get { return m_MarkToMarkAdjustmentRecords; }
             set { m_MarkToMarkAdjustmentRecords = value; }
         }
-
-        [SerializeField]
-        internal List<MultipleSubstitutionRecord> m_MultipleSubstitutionRecords;
 
         [SerializeField]
         internal List<LigatureSubstitutionRecord> m_LigatureSubstitutionRecords;

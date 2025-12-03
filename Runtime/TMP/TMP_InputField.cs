@@ -105,24 +105,15 @@ namespace TMPro
         [SerializeField]
         protected RectTransform m_TextViewport;
 
-        protected RectMask2D m_TextComponentRectMask;
-
-        protected RectMask2D m_TextViewportRectMask;
-
         [SerializeField]
-        protected TMP_Text m_TextComponent;
-
-        protected RectTransform m_TextComponentRectTransform;
+        protected TMPText m_TextComponent;
 
         [SerializeField]
         protected Graphic m_Placeholder;
 
         [SerializeField]
         protected Scrollbar m_VerticalScrollbar;
-
-        [SerializeField]
-        protected TMP_ScrollbarEventHandler m_VerticalScrollbarEventHandler;
-
+        
         private bool m_IsDrivenByLayoutComponents;
         [SerializeField]
         private LayoutGroup m_LayoutGroup;
@@ -573,7 +564,7 @@ namespace TMPro
 
         public RectTransform textViewport { get { return m_TextViewport; } set { SetPropertyUtility.SetClass(ref m_TextViewport, value); } }
 
-        public TMP_Text textComponent
+        public TMPText textComponent
         {
             get { return m_TextComponent; }
             set
@@ -993,8 +984,6 @@ namespace TMPro
 
             if (m_TextViewport != null)
             {
-                m_TextViewportRectMask = m_TextViewport.GetComponent<RectMask2D>();
-
                 UpdateMaskRegions();
             }
 
@@ -4126,7 +4115,7 @@ namespace TMPro
         /// <param name="pointSize"></param>
         public void SetGlobalPointSize(float pointSize)
         {
-            TMP_Text placeholderTextComponent = m_Placeholder as TMP_Text;
+            TMPText placeholderTextComponent = m_Placeholder as TMPText;
 
             if (placeholderTextComponent != null)
                 placeholderTextComponent.fontSize = pointSize;
@@ -4137,7 +4126,7 @@ namespace TMPro
         /// <param name="fontAsset"></param>
         public void SetGlobalFontAsset(TMP_FontAsset fontAsset)
         {
-            TMP_Text placeholderTextComponent = m_Placeholder as TMP_Text;
+            TMPText placeholderTextComponent = m_Placeholder as TMPText;
 
             if (placeholderTextComponent != null)
                 placeholderTextComponent.font = fontAsset;

@@ -64,7 +64,7 @@ namespace TMPro.EditorUtilities
 
             for (int i = 0; i < selectedObjects.Length; i++)
             {
-                TMP_Text textObject = selectedObjects[i].GetComponent<TMP_Text>();
+                TMPText textObject = selectedObjects[i].GetComponent<TMPText>();
 
                 if (textObject != null)
                 {

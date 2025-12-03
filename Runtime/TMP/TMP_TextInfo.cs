@@ -12,7 +12,7 @@ namespace TMPro
         internal static Vector2 k_InfinityVectorPositive = new(32767, 32767);
         internal static Vector2 k_InfinityVectorNegative = new(-32767, -32767);
 
-        public TMP_Text textComponent;
+        public TMPText textComponent;
 
         public int characterCount;
         public int spriteCount;
@@ -51,7 +51,7 @@ namespace TMPro
             meshInfo = new TMP_MeshInfo[1];
         }
 
-        public TMP_TextInfo(TMP_Text textComponent)
+        public TMP_TextInfo(TMPText textComponent)
         {
             this.textComponent = textComponent;
 

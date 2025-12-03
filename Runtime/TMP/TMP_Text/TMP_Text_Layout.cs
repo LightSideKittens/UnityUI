@@ -3,40 +3,12 @@ using UnityEngine.UI;
 
 namespace TMPro
 {
-    public abstract partial class TMP_Text
+    public abstract partial class TMPText : ILayoutIgnorer
     {
-        public float flexibleHeight => m_flexibleHeight;
-        protected float m_flexibleHeight = -1f;
-        public float flexibleWidth => m_flexibleWidth;
-        protected float m_flexibleWidth = -1f;
-        public float minWidth => m_minWidth;
-        protected float m_minWidth;
-        public float minHeight => m_minHeight;
-        protected float m_minHeight;
-        public float maxWidth => m_maxWidth;
-        protected float m_maxWidth;
-        public float maxHeight => m_maxHeight;
-        protected float m_maxHeight;
-        
-        protected LayoutElement layoutElement
-        {
-            get
-            {
-                if (m_LayoutElement == null)
-                {
-                    m_LayoutElement = GetComponent<LayoutElement>();
-                }
-
-                return m_LayoutElement;
-            }
-        }
-        protected LayoutElement m_LayoutElement;
-
-        public virtual float preferredWidth => preferredSize.x;
-
-        public virtual float preferredHeight => preferredSize.y;
         protected Vector2 preferredSize;
-        
+        public virtual float preferredWidth => preferredSize.x;
+        public virtual float preferredHeight => preferredSize.y;
+
         /// <returns></returns>
         protected virtual Bounds GetCompoundBounds()
         {
@@ -139,5 +111,7 @@ namespace TMPro
         public virtual void ComputeMarginSize()
         {
         }
+
+        public bool ignoreLayout => true;
     }
 }

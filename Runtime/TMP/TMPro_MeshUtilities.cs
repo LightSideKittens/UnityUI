@@ -37,7 +37,7 @@ namespace TMPro
 
     public struct TMP_LinkInfo
     {
-        public TMP_Text textComponent;
+        public TMPText textComponent;
 
         public int hashCode;
 
@@ -92,7 +92,7 @@ namespace TMPro
 
     public struct TMP_WordInfo
     {
-        public TMP_Text textComponent;
+        public TMPText textComponent;
 
         public int firstCharacterIndex;
         public int lastCharacterIndex;

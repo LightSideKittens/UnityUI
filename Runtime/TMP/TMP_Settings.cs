@@ -155,13 +155,6 @@ namespace TMPro
         [SerializeField]
         private Vector2 m_defaultTextMeshProUITextContainerSize;
 
-        public static bool autoSizeTextContainer
-        {
-            get { return instance.m_autoSizeTextContainer; }
-        }
-        [SerializeField]
-        private bool m_autoSizeTextContainer;
-
         public static List<TMP_FontAsset> fallbackFontAssets
         {
             get { return instance.m_fallbackFontAssets; }

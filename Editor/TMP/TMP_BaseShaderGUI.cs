@@ -676,7 +676,7 @@ namespace TMPro.EditorUtilities
             {
                 if (requiredFontAsset)
                 {
-                    TMP_Text textComponent = o.GetComponent<TMP_Text>();
+                    TMPText textComponent = o.GetComponent<TMPText>();
                     if (textComponent)
                     {
                         Undo.RecordObject(textComponent, "Font Asset Change");

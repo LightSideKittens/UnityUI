@@ -56,7 +56,7 @@ namespace TMPro.EditorUtilities
             {
                 foreach (var obj in alignment.serializedObject.targetObjects)
                 {
-                    var text = obj as TMP_Text;
+                    var text = obj as TMPText;
                     if (text != null)
                     {
                         values[TMP_EditorUtility.GetHorizontalAlignmentGridValue((int)text.alignment)] = true;
@@ -92,7 +92,7 @@ namespace TMPro.EditorUtilities
             {
                 foreach (var obj in alignment.serializedObject.targetObjects)
                 {
-                    var text = obj as TMP_Text;
+                    var text = obj as TMPText;
                     if (text != null)
                     {
                         values[TMP_EditorUtility.GetVerticalAlignmentGridValue((int)text.alignment)] = true;
@@ -167,7 +167,7 @@ namespace TMPro.EditorUtilities
             {
                 foreach (var obj in alignment.serializedObject.targetObjects)
                 {
-                    var text = obj as TMP_Text;
+                    var text = obj as TMPText;
                     if (text != null)
                     {
                         values[TMP_EditorUtility.GetHorizontalAlignmentGridValue((int)text.horizontalAlignment)] = true;
@@ -244,7 +244,7 @@ namespace TMPro.EditorUtilities
             {
                 foreach (var obj in alignment.serializedObject.targetObjects)
                 {
-                    var text = obj as TMP_Text;
+                    var text = obj as TMPText;
                     if (text != null)
                     {
                         values[TMP_EditorUtility.GetVerticalAlignmentGridValue((int)text.verticalAlignment)] = true;

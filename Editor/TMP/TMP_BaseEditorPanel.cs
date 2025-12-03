@@ -148,7 +148,7 @@ namespace TMPro.EditorUtilities
 
         protected bool m_HavePropertiesChanged;
 
-        protected TMP_Text m_TextComponent;
+        protected TMPText m_TextComponent;
         protected RectTransform m_RectTransform;
 
         protected Material m_TargetMaterial;
@@ -219,7 +219,7 @@ namespace TMPro.EditorUtilities
 
             m_ColorModeProp = serializedObject.FindProperty("m_colorMode");
 
-            m_TextComponent = (TMP_Text)target;
+            m_TextComponent = (TMPText)target;
             m_RectTransform = m_TextComponent.rectTransform;
 
             m_TargetMaterial = m_TextComponent.fontSharedMaterial;

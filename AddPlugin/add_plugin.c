@@ -9,7 +9,47 @@ extern "C" {
 #endif
 
     __declspec(dllexport)
-        int __cdecl fribidi_unity_reorder_utf32(
+        int __cdecl fribidi_unity_has_rtl(
+            const uint32_t* logical,
+            int             length
+        )
+    {
+        if (!logical || length <= 0)
+            return 0;
+
+        FriBidiStrIndex len = (FriBidiStrIndex)length;
+
+        FriBidiCharType* bidi_types = (FriBidiCharType*)
+            malloc(len * sizeof(FriBidiCharType));
+
+        if (!bidi_types)
+            return 0;
+
+        fribidi_get_bidi_types((const FriBidiChar*)logical, len, bidi_types);
+
+        int has_rtl = 0;
+
+        for (FriBidiStrIndex i = 0; i < len; ++i)
+        {
+            FriBidiCharType t = bidi_types[i];
+
+            if (FRIBIDI_IS_RTL(t) || t == FRIBIDI_TYPE_AN)
+            {
+                has_rtl = 1;
+                break;
+            }
+        }
+
+        free(bidi_types);
+        return has_rtl;
+    }
+
+
+
+    //------------SheenBidi--------------
+
+    __declspec(dllexport)
+        int __cdecl sheenbidi_unity_reorder_utf32(
             const uint32_t* logical,
             int             length,
             int             baseDirCode,
@@ -152,7 +192,7 @@ extern "C" {
     }
 
     __declspec(dllexport)
-        int __cdecl fribidi_unity_detect_base_direction(
+        int __cdecl sheenbidi_unity_detect_base_direction(
             const uint32_t* logical,
             int             length
         )
@@ -206,46 +246,6 @@ extern "C" {
 
         return isRTL; /* 1 = RTL, 0 = LTR */
     }
-
-    __declspec(dllexport)
-        int __cdecl fribidi_unity_has_rtl(
-            const uint32_t* logical,
-            int             length
-        )
-    {
-        if (!logical || length <= 0)
-            return 0;
-
-        FriBidiStrIndex len = (FriBidiStrIndex)length;
-
-        FriBidiCharType* bidi_types = (FriBidiCharType*)
-            malloc(len * sizeof(FriBidiCharType));
-
-        if (!bidi_types)
-            return 0;
-
-        fribidi_get_bidi_types((const FriBidiChar*)logical, len, bidi_types);
-
-        int has_rtl = 0;
-
-        for (FriBidiStrIndex i = 0; i < len; ++i)
-        {
-            FriBidiCharType t = bidi_types[i];
-
-            if (FRIBIDI_IS_RTL(t) || t == FRIBIDI_TYPE_AN)
-            {
-                has_rtl = 1;
-                break;
-            }
-        }
-
-        free(bidi_types);
-        return has_rtl;
-    }
-
-
-
-    //------------SheenBidi--------------
 
 
     __declspec(dllexport)

@@ -33,7 +33,7 @@ namespace TMPro
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <returns></returns>
-        public static int GetCursorIndexFromPosition(TMP_Text textComponent, Vector3 position, Camera camera)
+        public static int GetCursorIndexFromPosition(TMPText textComponent, Vector3 position, Camera camera)
         {
             int index = FindNearestCharacter(textComponent, position, camera, false);
 
@@ -68,7 +68,7 @@ namespace TMPro
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <param name="cursor">The position of the cursor insertion position relative to the position.</param>
         /// <returns></returns>
-        public static int GetCursorIndexFromPosition(TMP_Text textComponent, Vector3 position, Camera camera, out CaretPosition cursor)
+        public static int GetCursorIndexFromPosition(TMPText textComponent, Vector3 position, Camera camera, out CaretPosition cursor)
         {
             int line = FindNearestLine(textComponent, position, camera);
 
@@ -114,7 +114,7 @@ namespace TMPro
         /// <param name="position"></param>
         /// <param name="camera"></param>
         /// <returns></returns>
-        public static int FindNearestLine(TMP_Text text, Vector3 position, Camera camera)
+        public static int FindNearestLine(TMPText text, Vector3 position, Camera camera)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -155,7 +155,7 @@ namespace TMPro
         /// <param name="line"></param>
         /// <param name="camera"></param>
         /// <returns></returns>
-        public static int FindNearestCharacterOnLine(TMP_Text text, Vector3 position, int line, Camera camera, bool visibleOnly)
+        public static int FindNearestCharacterOnLine(TMPText text, Vector3 position, int line, Camera camera, bool visibleOnly)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -229,7 +229,7 @@ namespace TMPro
         /// <param name="camera">The scene camera which is rendering the text or whichever one might be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <param name="visibleOnly">Only check for visible characters.</param>
         /// <returns></returns>
-        public static int FindIntersectingCharacter(TMP_Text text, Vector3 position, Camera camera, bool visibleOnly)
+        public static int FindIntersectingCharacter(TMPText text, Vector3 position, Camera camera, bool visibleOnly)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -265,7 +265,7 @@ namespace TMPro
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <param name="visibleOnly">Only check for visible characters.</param>
         /// <returns></returns>
-        public static int FindNearestCharacter(TMP_Text text, Vector3 position, Camera camera, bool visibleOnly)
+        public static int FindNearestCharacter(TMPText text, Vector3 position, Camera camera, bool visibleOnly)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -325,7 +325,7 @@ namespace TMPro
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <returns></returns>
-        public static int FindIntersectingWord(TMP_Text text, Vector3 position, Camera camera)
+        public static int FindIntersectingWord(TMPText text, Vector3 position, Camera camera)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -436,7 +436,7 @@ namespace TMPro
         /// <param name="position"></param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <returns></returns>
-        public static int FindNearestWord(TMP_Text text, Vector3 position, Camera camera)
+        public static int FindNearestWord(TMPText text, Vector3 position, Camera camera)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -570,7 +570,7 @@ namespace TMPro
         /// <param name="position"></param>
         /// <param name="camera"></param>
         /// <returns></returns>
-        public static int FindIntersectingLine(TMP_Text text, Vector3 position, Camera camera)
+        public static int FindIntersectingLine(TMPText text, Vector3 position, Camera camera)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -599,7 +599,7 @@ namespace TMPro
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <returns></returns>
-        public static int FindIntersectingLink(TMP_Text text, Vector3 position, Camera camera)
+        public static int FindIntersectingLink(TMPText text, Vector3 position, Camera camera)
         {
             Transform rectTransform = text.transform;
 
@@ -683,7 +683,7 @@ namespace TMPro
         /// <param name="position">Position to check for intersection.</param>
         /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
         /// <returns></returns>
-        public static int FindNearestLink(TMP_Text text, Vector3 position, Camera camera)
+        public static int FindNearestLink(TMPText text, Vector3 position, Camera camera)
         {
             RectTransform rectTransform = text.rectTransform;
 

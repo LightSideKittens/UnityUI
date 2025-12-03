@@ -1,8 +1,6 @@
 ﻿#define TMP_PRESENT
 
 using System;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.TextCore;
 using UnityEngine.TextCore.LowLevel;
@@ -74,8 +72,6 @@ namespace TMPro
         DontRender = 0x0,
         Render = 0xFF
     };
-    
-    public enum MaskingTypes { MaskOff = 0, MaskHard = 1, MaskSoft = 2 };
 
     public enum TextOverflowModes { Overflow = 0, Ellipsis = 1, Truncate = 3};
     public enum TextWrappingModes { NoWrap = 0, Normal = 1, PreserveWhitespace = 2, PreserveWhitespaceNoWrap = 3 };
@@ -85,7 +81,7 @@ namespace TMPro
     public enum FontStyles { Normal = 0x0, Bold = 0x1, Italic = 0x2, Underline = 0x4, LowerCase = 0x8, UpperCase = 0x10, SmallCaps = 0x20, Strikethrough = 0x40, Superscript = 0x80, Subscript = 0x100, Highlight = 0x200 };
     public enum FontWeight { Thin = 100, ExtraLight = 200, Light = 300, Regular = 400, Medium = 500, SemiBold = 600, Bold = 700, Heavy = 800, Black = 900 };
 
-    public abstract partial class TMP_Text : MaskableGraphic
+    public abstract partial class TMPText : MaskableGraphic
     {
         protected virtual void LoadFontAsset() { }
 
@@ -636,11 +632,11 @@ namespace TMPro
 
         private string InternalTextBackingArrayToString()
         {
-            char[] array = new char[m_TextBackingArray.Count];
+            char[] array = new char[mTextBackingArray.Count];
 
-            for (int i = 0; i < m_TextBackingArray.Capacity; i++)
+            for (int i = 0; i < mTextBackingArray.Capacity; i++)
             {
-                char c = (char)m_TextBackingArray[i];
+                char c = (char)mTextBackingArray[i];
 
                 if (c == 0)
                     break;
@@ -1293,15 +1289,8 @@ namespace TMPro
             {
                 m_rectTransform = rectTransform;
 
-                if (TMP_Settings.autoSizeTextContainer)
-                {
-                    autoSizeTextContainer = true;
-                }
-                else
-                {
-                    if (m_rectTransform.sizeDelta == new Vector2(100, 100))
-                        m_rectTransform.sizeDelta = TMP_Settings.defaultTextMeshProUITextContainerSize;
-                }
+                if (m_rectTransform.sizeDelta == new Vector2(100, 100))
+                    m_rectTransform.sizeDelta = TMP_Settings.defaultTextMeshProUITextContainerSize;
 
                 m_TextWrappingMode = TMP_Settings.textWrappingMode;
 
@@ -1481,23 +1470,8 @@ namespace TMPro
             OnMissingCharacter?.Invoke(unicode, stringIndex, m_text, fontAsset, this);
         }
 
-
         internal virtual void InternalUpdate() { }
-
-
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="scale"></param>
-        /// <returns></returns>
-
-
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <returns></returns>
-
-
-        /// <param name="hex"></param>
-        /// <returns></returns>
+        
         protected uint HexToInt(char hex)
         {
             switch (hex)
@@ -1614,7 +1588,8 @@ namespace TMPro
 
                 return new(r, g, b, 255);
             }
-            else if (tagCount == 5)
+
+            if (tagCount == 5)
             {
                 byte r = (byte)(HexToInt(hexChars[1]) * 16 + HexToInt(hexChars[1]));
                 byte g = (byte)(HexToInt(hexChars[2]) * 16 + HexToInt(hexChars[2]));
@@ -1623,7 +1598,8 @@ namespace TMPro
 
                 return new(r, g, b, a);
             }
-            else if (tagCount == 7)
+
+            if (tagCount == 7)
             {
                 byte r = (byte)(HexToInt(hexChars[1]) * 16 + HexToInt(hexChars[2]));
                 byte g = (byte)(HexToInt(hexChars[3]) * 16 + HexToInt(hexChars[4]));
@@ -1631,7 +1607,8 @@ namespace TMPro
 
                 return new(r, g, b, 255);
             }
-            else if (tagCount == 9)
+
+            if (tagCount == 9)
             {
                 byte r = (byte)(HexToInt(hexChars[1]) * 16 + HexToInt(hexChars[2]));
                 byte g = (byte)(HexToInt(hexChars[3]) * 16 + HexToInt(hexChars[4]));
@@ -1640,7 +1617,8 @@ namespace TMPro
 
                 return new(r, g, b, a);
             }
-            else if (tagCount == 10)
+
+            if (tagCount == 10)
             {
                 byte r = (byte)(HexToInt(hexChars[7]) * 16 + HexToInt(hexChars[7]));
                 byte g = (byte)(HexToInt(hexChars[8]) * 16 + HexToInt(hexChars[8]));
@@ -1648,7 +1626,8 @@ namespace TMPro
 
                 return new(r, g, b, 255);
             }
-            else if (tagCount == 11)
+
+            if (tagCount == 11)
             {
                 byte r = (byte)(HexToInt(hexChars[7]) * 16 + HexToInt(hexChars[7]));
                 byte g = (byte)(HexToInt(hexChars[8]) * 16 + HexToInt(hexChars[8]));
@@ -1657,7 +1636,8 @@ namespace TMPro
 
                 return new(r, g, b, a);
             }
-            else if (tagCount == 13)
+
+            if (tagCount == 13)
             {
                 byte r = (byte)(HexToInt(hexChars[7]) * 16 + HexToInt(hexChars[8]));
                 byte g = (byte)(HexToInt(hexChars[9]) * 16 + HexToInt(hexChars[10]));
@@ -1665,7 +1645,8 @@ namespace TMPro
 
                 return new(r, g, b, 255);
             }
-            else if (tagCount == 15)
+
+            if (tagCount == 15)
             {
                 byte r = (byte)(HexToInt(hexChars[7]) * 16 + HexToInt(hexChars[8]));
                 byte g = (byte)(HexToInt(hexChars[9]) * 16 + HexToInt(hexChars[10]));
@@ -1693,7 +1674,8 @@ namespace TMPro
 
                 return new(r, g, b, 255);
             }
-            else if (length == 9)
+
+            if (length == 9)
             {
                 byte r = (byte)(HexToInt(hexChars[startIndex + 1]) * 16 + HexToInt(hexChars[startIndex + 2]));
                 byte g = (byte)(HexToInt(hexChars[startIndex + 3]) * 16 + HexToInt(hexChars[startIndex + 4]));
@@ -1737,9 +1719,7 @@ namespace TMPro
         /// <returns></returns>
         protected float ConvertToFloat(char[] chars, int startIndex, int length)
         {
-            int lastIndex;
-
-            return ConvertToFloat(chars, startIndex, length, out lastIndex);
+            return ConvertToFloat(chars, startIndex, length, out _);
         }
 
 
@@ -1798,7 +1778,8 @@ namespace TMPro
 
                     continue;
                 }
-                else if (c == ',')
+
+                if (c == ',')
                 {
                     if (i + 1 < endIndex && chars[i + 1] == ' ')
                         lastIndex = i + 1;
@@ -1825,1269 +1806,6 @@ namespace TMPro
             int length = m_xmlAttribute.Length;
             for (int i = 0; i < length; i++)
                 m_xmlAttribute[i] = new();
-        }
-
-        /// <param name="chars"></param>
-        /// <param name="startIndex"></param>
-        /// <param name="endIndex"></param>
-        /// <returns></returns>
-        internal bool ValidateHtmlTag(TextProcessingElement[] chars, int startIndex, out int endIndex)
-        {
-            int tagCharCount = 0;
-            byte attributeFlag = 0;
-
-            int attributeIndex = 0;
-            ClearMarkupTagAttributes();
-            TagValueType tagValueType = TagValueType.None;
-            TagUnitType tagUnitType = TagUnitType.Pixels;
-
-            endIndex = startIndex;
-            bool isTagSet = false;
-            bool isValidHtmlTag = false;
-
-            for (int i = startIndex; i < chars.Length && chars[i].unicode != 0 && tagCharCount < m_htmlTag.Length && chars[i].unicode != '<'; i++)
-            {
-                uint unicode = chars[i].unicode;
-
-                if (unicode == '>')
-                {
-                    isValidHtmlTag = true;
-                    endIndex = i;
-                    m_htmlTag[tagCharCount] = (char)0;
-                    break;
-                }
-
-                m_htmlTag[tagCharCount] = (char)unicode;
-                tagCharCount += 1;
-
-                if (attributeFlag == 1)
-                {
-                    if (tagValueType == TagValueType.None)
-                    {
-                        if (unicode == '+' || unicode == '-' || unicode == '.' || (unicode >= '0' && unicode <= '9'))
-                        {
-                            tagUnitType = TagUnitType.Pixels;
-                            tagValueType = m_xmlAttribute[attributeIndex].valueType = TagValueType.NumericalValue;
-                            m_xmlAttribute[attributeIndex].valueStartIndex = tagCharCount - 1;
-                            m_xmlAttribute[attributeIndex].valueLength += 1;
-                        }
-                        else if (unicode == '#')
-                        {
-                            tagUnitType = TagUnitType.Pixels;
-                            tagValueType = m_xmlAttribute[attributeIndex].valueType = TagValueType.ColorValue;
-                            m_xmlAttribute[attributeIndex].valueStartIndex = tagCharCount - 1;
-                            m_xmlAttribute[attributeIndex].valueLength += 1;
-                        }
-                        else if (unicode == '"')
-                        {
-                            tagUnitType = TagUnitType.Pixels;
-                            tagValueType = m_xmlAttribute[attributeIndex].valueType = TagValueType.StringValue;
-                            m_xmlAttribute[attributeIndex].valueStartIndex = tagCharCount;
-                        }
-                        else
-                        {
-                            tagUnitType = TagUnitType.Pixels;
-                            tagValueType = m_xmlAttribute[attributeIndex].valueType = TagValueType.StringValue;
-                            m_xmlAttribute[attributeIndex].valueStartIndex = tagCharCount - 1;
-                            
-                            m_xmlAttribute[attributeIndex].valueHashCode = (m_xmlAttribute[attributeIndex].valueHashCode << 5) + 
-                                m_xmlAttribute[attributeIndex].valueHashCode ^ TMP_TextUtilities.ToUpperFast((char)unicode);
-                            
-                            m_xmlAttribute[attributeIndex].valueLength += 1;
-                        }
-                    }
-                    else
-                    {
-                        if (tagValueType == TagValueType.NumericalValue)
-                        {
-                            if (unicode == 'p' || unicode == 'e' || unicode == '%' || unicode == ' ')
-                            {
-                                attributeFlag = 2;
-                                tagValueType = TagValueType.None;
-
-                                switch (unicode)
-                                {
-                                    case 'e':
-                                        m_xmlAttribute[attributeIndex].unitType = tagUnitType = TagUnitType.FontUnits;
-                                        break;
-                                    case '%':
-                                        m_xmlAttribute[attributeIndex].unitType = tagUnitType = TagUnitType.Percentage;
-                                        break;
-                                    default:
-                                        m_xmlAttribute[attributeIndex].unitType = tagUnitType = TagUnitType.Pixels;
-                                        break;
-                                }
-
-                                attributeIndex += 1;
-                                m_xmlAttribute[attributeIndex].nameHashCode = 0;
-                                m_xmlAttribute[attributeIndex].valueHashCode = 0;
-                                m_xmlAttribute[attributeIndex].valueType = TagValueType.None;
-                                m_xmlAttribute[attributeIndex].unitType = TagUnitType.Pixels;
-                                m_xmlAttribute[attributeIndex].valueStartIndex = 0;
-                                m_xmlAttribute[attributeIndex].valueLength = 0;
-
-                            }
-                            else
-                            {
-                                m_xmlAttribute[attributeIndex].valueLength += 1;
-                            }
-                        }
-                        else if (tagValueType == TagValueType.ColorValue)
-                        {
-                            if (unicode != ' ')
-                            {
-                                m_xmlAttribute[attributeIndex].valueLength += 1;
-                            }
-                            else
-                            {
-                                attributeFlag = 2;
-                                tagValueType = TagValueType.None;
-                                tagUnitType = TagUnitType.Pixels;
-                                attributeIndex += 1;
-                                m_xmlAttribute[attributeIndex].nameHashCode = 0;
-                                m_xmlAttribute[attributeIndex].valueType = TagValueType.None;
-                                m_xmlAttribute[attributeIndex].unitType = TagUnitType.Pixels;
-                                m_xmlAttribute[attributeIndex].valueHashCode = 0;
-                                m_xmlAttribute[attributeIndex].valueStartIndex = 0;
-                                m_xmlAttribute[attributeIndex].valueLength = 0;
-                            }
-                        }
-                        else if (tagValueType == TagValueType.StringValue)
-                        {
-                            if (unicode != '"')
-                            {
-                                m_xmlAttribute[attributeIndex].valueHashCode = (m_xmlAttribute[attributeIndex].valueHashCode << 5) + m_xmlAttribute[attributeIndex].valueHashCode ^ TMP_TextUtilities.ToUpperFast((char)unicode);
-                                m_xmlAttribute[attributeIndex].valueLength += 1;
-                            }
-                            else
-                            {
-                                attributeFlag = 2;
-                                tagValueType = TagValueType.None;
-                                tagUnitType = TagUnitType.Pixels;
-                                attributeIndex += 1;
-                                m_xmlAttribute[attributeIndex].nameHashCode = 0;
-                                m_xmlAttribute[attributeIndex].valueType = TagValueType.None;
-                                m_xmlAttribute[attributeIndex].unitType = TagUnitType.Pixels;
-                                m_xmlAttribute[attributeIndex].valueHashCode = 0;
-                                m_xmlAttribute[attributeIndex].valueStartIndex = 0;
-                                m_xmlAttribute[attributeIndex].valueLength = 0;
-                            }
-                        }
-                    }
-                }
-
-
-                if (unicode == '=') attributeFlag = 1;
-
-                if (attributeFlag == 0 && unicode == ' ')
-                {
-                    if (isTagSet) return false;
-
-                    isTagSet = true;
-                    attributeFlag = 2;
-
-                    tagValueType = TagValueType.None;
-                    tagUnitType = TagUnitType.Pixels;
-                    attributeIndex += 1;
-                    m_xmlAttribute[attributeIndex].nameHashCode = 0;
-                    m_xmlAttribute[attributeIndex].valueType = TagValueType.None;
-                    m_xmlAttribute[attributeIndex].unitType = TagUnitType.Pixels;
-                    m_xmlAttribute[attributeIndex].valueHashCode = 0;
-                    m_xmlAttribute[attributeIndex].valueStartIndex = 0;
-                    m_xmlAttribute[attributeIndex].valueLength = 0;
-                }
-
-                if (attributeFlag == 0)
-                    m_xmlAttribute[attributeIndex].nameHashCode = (m_xmlAttribute[attributeIndex].nameHashCode << 5) + m_xmlAttribute[attributeIndex].nameHashCode ^ TMP_TextUtilities.ToUpperFast((char)unicode);
-
-                if (attributeFlag == 2 && unicode == ' ')
-                    attributeFlag = 0;
-
-            }
-
-            if (!isValidHtmlTag)
-            {
-                return false;
-            }
-
-            #region Rich Text Tag Processing
-
-            if (tag_NoParsing && (m_xmlAttribute[0].nameHashCode != (int)MarkupTag.SLASH_NO_PARSE))
-                return false;
-
-            if (m_xmlAttribute[0].nameHashCode == (int)MarkupTag.SLASH_NO_PARSE)
-            {
-                tag_NoParsing = false;
-                return true;
-            }
-
-            if (m_htmlTag[0] == 35 && tagCharCount == 4)
-            {
-                m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
-                m_colorStack.Add(m_htmlColor);
-                return true;
-            }
-            else if (m_htmlTag[0] == 35 && tagCharCount == 5)
-            {
-                m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
-                m_colorStack.Add(m_htmlColor);
-                return true;
-            }
-            else if (m_htmlTag[0] == 35 && tagCharCount == 7)
-            {                                                                      
-                m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
-                m_colorStack.Add(m_htmlColor);
-                return true;
-            }
-            else if (m_htmlTag[0] == 35 && tagCharCount == 9)
-            {
-                m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
-                m_colorStack.Add(m_htmlColor);
-                return true;
-            }
-            else
-            {
-                float value = 0;
-                float fontScale;
-
-                switch ((MarkupTag)m_xmlAttribute[0].nameHashCode)
-                {
-                    case MarkupTag.BOLD:
-                        m_FontStyleInternal |= FontStyles.Bold;
-                        m_fontStyleStack.Add(FontStyles.Bold);
-
-                        m_FontWeightInternal = FontWeight.Bold;
-                        return true;
-                    case MarkupTag.SLASH_BOLD:
-                        if ((m_fontStyle & FontStyles.Bold) != FontStyles.Bold)
-                        {
-                            if (m_fontStyleStack.Remove(FontStyles.Bold) == 0)
-                            {
-                                m_FontStyleInternal &= ~FontStyles.Bold;
-                                m_FontWeightInternal = m_FontWeightStack.Peek();
-                            }
-                        }
-                        return true;
-                    case MarkupTag.ITALIC:
-                        m_FontStyleInternal |= FontStyles.Italic;
-                        m_fontStyleStack.Add(FontStyles.Italic);
-
-                        if (m_xmlAttribute[1].nameHashCode == (int)MarkupTag.ANGLE)
-                        {
-                            m_ItalicAngle = (int)ConvertToFloat(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength);
-
-                            if (m_ItalicAngle < -180 || m_ItalicAngle > 180) return false;
-                        }
-                        else
-                            m_ItalicAngle = m_currentFontAsset.italicStyle;
-
-                        m_ItalicAngleStack.Add(m_ItalicAngle);
-
-                        return true;
-                    case MarkupTag.SLASH_ITALIC:
-                        if ((m_fontStyle & FontStyles.Italic) != FontStyles.Italic)
-                        {
-                            m_ItalicAngle = m_ItalicAngleStack.Remove();
-
-                            if (m_fontStyleStack.Remove(FontStyles.Italic) == 0)
-                                m_FontStyleInternal &= ~FontStyles.Italic;
-                        }
-                        return true;
-                    case MarkupTag.STRIKETHROUGH:
-                        m_FontStyleInternal |= FontStyles.Strikethrough;
-                        m_fontStyleStack.Add(FontStyles.Strikethrough);
-
-                        if (m_xmlAttribute[1].nameHashCode == (int)MarkupTag.COLOR)
-                        {
-                            m_strikethroughColor = HexCharsToColor(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength);
-                            m_strikethroughColor.a = m_htmlColor.a < m_strikethroughColor.a ? (byte)(m_htmlColor.a) : (byte)(m_strikethroughColor .a);
-                        }
-                        else
-                            m_strikethroughColor = m_htmlColor;
-
-                        m_strikethroughColorStack.Add(m_strikethroughColor);
-
-                        return true;
-                    case MarkupTag.SLASH_STRIKETHROUGH:
-                        if ((m_fontStyle & FontStyles.Strikethrough) != FontStyles.Strikethrough)
-                        {
-                            if (m_fontStyleStack.Remove(FontStyles.Strikethrough) == 0)
-                                m_FontStyleInternal &= ~FontStyles.Strikethrough;
-                        }
-
-                        m_strikethroughColor = m_strikethroughColorStack.Remove();
-                        return true;
-                    case MarkupTag.UNDERLINE:
-                        m_FontStyleInternal |= FontStyles.Underline;
-                        m_fontStyleStack.Add(FontStyles.Underline);
-
-                        if (m_xmlAttribute[1].nameHashCode == (int)MarkupTag.COLOR)
-                        {
-                            m_underlineColor = HexCharsToColor(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength);
-                            m_underlineColor.a = m_htmlColor.a < m_underlineColor.a ? (m_htmlColor.a) : (m_underlineColor.a);
-                        }
-                        else
-                            m_underlineColor = m_htmlColor;
-
-                        m_underlineColorStack.Add(m_underlineColor);
-
-                        return true;
-                    case MarkupTag.SLASH_UNDERLINE:
-                        if ((m_fontStyle & FontStyles.Underline) != FontStyles.Underline)
-                        {
-                            if (m_fontStyleStack.Remove(FontStyles.Underline) == 0)
-                                m_FontStyleInternal &= ~FontStyles.Underline;
-                        }
-
-                        m_underlineColor = m_underlineColorStack.Remove();
-                        return true;
-                    case MarkupTag.MARK:
-                        m_FontStyleInternal |= FontStyles.Highlight;
-                        m_fontStyleStack.Add(FontStyles.Highlight);
-
-                        Color32 highlightColor = new(255, 255, 0, 64);
-                        TMP_Offset highlightPadding = TMP_Offset.zero;
-
-                        for (int i = 0; i < m_xmlAttribute.Length && m_xmlAttribute[i].nameHashCode != 0; i++)
-                        {
-                            switch ((MarkupTag)m_xmlAttribute[i].nameHashCode)
-                            {
-                                case MarkupTag.MARK:
-                                    if (m_xmlAttribute[i].valueType == TagValueType.ColorValue)
-                                        highlightColor = HexCharsToColor(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-                                    break;
-
-                                case MarkupTag.COLOR:
-                                    highlightColor = HexCharsToColor(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength);
-                                    break;
-
-                                case MarkupTag.PADDING:
-                                    int paramCount = GetAttributeParameters(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength, ref m_attributeParameterValues);
-                                    if (paramCount != 4) return false;
-
-                                    highlightPadding = new(m_attributeParameterValues[0], m_attributeParameterValues[1], m_attributeParameterValues[2], m_attributeParameterValues[3]);
-                                    highlightPadding *= m_fontSize * 0.01f * (m_isOrthographic ? 1 : 0.1f);
-                                    break;
-                            }
-                        }
-
-                        highlightColor.a = m_htmlColor.a < highlightColor.a ? (byte)(m_htmlColor.a) : (byte)(highlightColor.a);
-
-                        m_HighlightState = new(highlightColor, highlightPadding);
-                        m_HighlightStateStack.Push(m_HighlightState);
-
-                        return true;
-                    case MarkupTag.SLASH_MARK:
-                        if ((m_fontStyle & FontStyles.Highlight) != FontStyles.Highlight)
-                        {
-                            m_HighlightStateStack.Remove();
-                            m_HighlightState = m_HighlightStateStack.current;
-
-                            if (m_fontStyleStack.Remove(FontStyles.Highlight) == 0)
-                                m_FontStyleInternal &= ~FontStyles.Highlight;
-                        }
-                        return true;
-                    case MarkupTag.SUBSCRIPT:
-                        m_fontScaleMultiplier *= m_currentFontAsset.faceInfo.subscriptSize > 0 ? m_currentFontAsset.faceInfo.subscriptSize : 1;
-                        m_baselineOffsetStack.Push(m_baselineOffset);
-                        m_materialReferenceStack.Push(m_materialReferences[m_currentMaterialIndex]);
-                        fontScale = (m_currentFontSize / m_currentFontAsset.faceInfo.pointSize * m_currentFontAsset.faceInfo.scale * (m_isOrthographic ? 1 : 0.1f));
-                        m_baselineOffset += m_currentFontAsset.faceInfo.subscriptOffset * fontScale * m_fontScaleMultiplier;
-
-                        m_fontStyleStack.Add(FontStyles.Subscript);
-                        m_FontStyleInternal |= FontStyles.Subscript;
-                        return true;
-                    case MarkupTag.SLASH_SUBSCRIPT:
-                        if ((m_FontStyleInternal & FontStyles.Subscript) == FontStyles.Subscript)
-                        {
-                            var previousFontAsset = m_materialReferenceStack.Pop().fontAsset;
-                            if (m_fontScaleMultiplier < 1)
-                            {
-                                m_baselineOffset = m_baselineOffsetStack.Pop();
-                                m_fontScaleMultiplier /= previousFontAsset.faceInfo.subscriptSize > 0 ? previousFontAsset.faceInfo.subscriptSize : 1;
-                            }
-
-                            if (m_fontStyleStack.Remove(FontStyles.Subscript) == 0)
-                                m_FontStyleInternal &= ~FontStyles.Subscript;
-                        }
-                        return true;
-                    case MarkupTag.SUPERSCRIPT:
-                        m_fontScaleMultiplier *= m_currentFontAsset.faceInfo.superscriptSize > 0 ? m_currentFontAsset.faceInfo.superscriptSize : 1;
-                        m_baselineOffsetStack.Push(m_baselineOffset);
-                        m_materialReferenceStack.Push(m_materialReferences[m_currentMaterialIndex]);
-                        fontScale = (m_currentFontSize / m_currentFontAsset.faceInfo.pointSize * m_currentFontAsset.faceInfo.scale * (m_isOrthographic ? 1 : 0.1f));
-                        m_baselineOffset += m_currentFontAsset.faceInfo.superscriptOffset * fontScale * m_fontScaleMultiplier;
-
-                        m_fontStyleStack.Add(FontStyles.Superscript);
-                        m_FontStyleInternal |= FontStyles.Superscript;
-                        return true;
-                    case MarkupTag.SLASH_SUPERSCRIPT:
-                        if ((m_FontStyleInternal & FontStyles.Superscript) == FontStyles.Superscript)
-                        {
-                            var previousFontAsset = m_materialReferenceStack.Pop().fontAsset;
-                            if (m_fontScaleMultiplier < 1)
-                            {
-                                m_baselineOffset = m_baselineOffsetStack.Pop();
-                                m_fontScaleMultiplier /= previousFontAsset.faceInfo.superscriptSize > 0 ? previousFontAsset.faceInfo.superscriptSize : 1;
-                            }
-
-                            if (m_fontStyleStack.Remove(FontStyles.Superscript) == 0)
-                                m_FontStyleInternal &= ~FontStyles.Superscript;
-                        }
-                        return true;
-                    case MarkupTag.FONT_WEIGHT:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch ((int)value)
-                        {
-                            case 100:
-                                m_FontWeightInternal = FontWeight.Thin;
-                                break;
-                            case 200:
-                                m_FontWeightInternal = FontWeight.ExtraLight;
-                                break;
-                            case 300:
-                                m_FontWeightInternal = FontWeight.Light;
-                                break;
-                            case 400:
-                                m_FontWeightInternal = FontWeight.Regular;
-                                break;
-                            case 500:
-                                m_FontWeightInternal = FontWeight.Medium;
-                                break;
-                            case 600:
-                                m_FontWeightInternal = FontWeight.SemiBold;
-                                break;
-                            case 700:
-                                m_FontWeightInternal = FontWeight.Bold;
-                                break;
-                            case 800:
-                                m_FontWeightInternal = FontWeight.Heavy;
-                                break;
-                            case 900:
-                                m_FontWeightInternal = FontWeight.Black;
-                                break;
-                        }
-
-                        m_FontWeightStack.Add(m_FontWeightInternal);
-
-                        return true;
-                    case MarkupTag.SLASH_FONT_WEIGHT:
-                        m_FontWeightStack.Remove();
-
-                        if (m_FontStyleInternal == FontStyles.Bold)
-                            m_FontWeightInternal = FontWeight.Bold;
-                        else
-                            m_FontWeightInternal = m_FontWeightStack.Peek();
-
-                        return true;
-                    case MarkupTag.POSITION:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (tagUnitType)
-                        {
-                            case TagUnitType.Pixels:
-                                m_xAdvance = value * (m_isOrthographic ? 1.0f : 0.1f);
-                                return true;
-                            case TagUnitType.FontUnits:
-                                m_xAdvance = value * m_currentFontSize * (m_isOrthographic ? 1.0f : 0.1f);
-                                return true;
-                            case TagUnitType.Percentage:
-                                m_xAdvance = m_marginWidth * value / 100;
-                                return true;
-                        }
-                        return false;
-                    case MarkupTag.VERTICAL_OFFSET:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (tagUnitType)
-                        {
-                            case TagUnitType.Pixels:
-                                m_baselineOffset = value * (m_isOrthographic ? 1 : 0.1f);
-                                return true;
-                            case TagUnitType.FontUnits:
-                                m_baselineOffset = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                return true;
-                            case TagUnitType.Percentage:
-                                return false;
-                        }
-                        return false;
-                    case MarkupTag.SLASH_VERTICAL_OFFSET:
-                        m_baselineOffset = 0;
-                        return true;
-                    case MarkupTag.NO_BREAK:
-                        m_isNonBreakingSpace = true;
-                        return true;
-                    case MarkupTag.SLASH_NO_BREAK:
-                        m_isNonBreakingSpace = false;
-                        return true;
-                    case MarkupTag.SIZE:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (tagUnitType)
-                        {
-                            case TagUnitType.Pixels:
-                                if (m_htmlTag[5] == 43)
-                                {
-                                    m_currentFontSize = m_fontSize + value;
-                                    m_sizeStack.Add(m_currentFontSize);
-                                    return true;
-                                }
-                                else if (m_htmlTag[5] == 45)
-                                {
-                                    m_currentFontSize = m_fontSize + value;
-                                    m_sizeStack.Add(m_currentFontSize);
-                                    return true;
-                                }
-                                else
-                                {
-                                    m_currentFontSize = value;
-                                    m_sizeStack.Add(m_currentFontSize);
-                                    return true;
-                                }
-                            case TagUnitType.FontUnits:
-                                m_currentFontSize = m_fontSize * value;
-                                m_sizeStack.Add(m_currentFontSize);
-                                return true;
-                            case TagUnitType.Percentage:
-                                m_currentFontSize = m_fontSize * value / 100;
-                                m_sizeStack.Add(m_currentFontSize);
-                                return true;
-                        }
-                        return false;
-                    case MarkupTag.SLASH_SIZE:
-                        m_currentFontSize = m_sizeStack.Remove();
-                        return true;
-                    case MarkupTag.FONT:
-                        int fontHashCode = m_xmlAttribute[0].valueHashCode;
-                        int materialAttributeHashCode = m_xmlAttribute[1].nameHashCode;
-                        int materialHashCode = m_xmlAttribute[1].valueHashCode;
-
-                        if (fontHashCode == (int)MarkupTag.DEFAULT)
-                        {
-                            m_currentFontAsset = m_materialReferences[0].fontAsset;
-                            m_currentMaterial = m_materialReferences[0].material;
-                            m_currentMaterialIndex = 0;
-
-                            m_materialReferenceStack.Add(m_materialReferences[0]);
-
-                            return true;
-                        }
-
-                        Material tempMaterial;
-
-                        MaterialReferenceManager.TryGetFontAsset(fontHashCode, out var tempFont);
-
-                        if (tempFont == null)
-                        {
-                            tempFont = OnFontAssetRequest?.Invoke(fontHashCode, new(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength));
-
-                            if (tempFont == null)
-                            {
-                                tempFont = Resources.Load<TMP_FontAsset>(TMP_Settings.defaultFontAssetPath + new string(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength));
-                            }
-
-                            if (tempFont == null)
-                                return false;
-
-                            MaterialReferenceManager.AddFontAsset(tempFont);
-                        }
-
-                        if (materialAttributeHashCode == 0 && materialHashCode == 0)
-                        {
-                            m_currentMaterial = tempFont.material;
-
-                            m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, tempFont, ref m_materialReferences, m_materialReferenceIndexLookup);
-
-                            m_materialReferenceStack.Add(m_materialReferences[m_currentMaterialIndex]);
-                        }
-                        else if (materialAttributeHashCode == (int)MarkupTag.MATERIAL)
-                        {
-                            if (MaterialReferenceManager.TryGetMaterial(materialHashCode, out tempMaterial))
-                            {
-                                m_currentMaterial = tempMaterial;
-
-                                m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, tempFont, ref m_materialReferences, m_materialReferenceIndexLookup);
-
-                                m_materialReferenceStack.Add(m_materialReferences[m_currentMaterialIndex]);
-                            }
-                            else
-                            {
-                                tempMaterial = Resources.Load<Material>(TMP_Settings.defaultFontAssetPath + new string(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength));
-
-                                if (tempMaterial == null)
-                                    return false;
-
-                                MaterialReferenceManager.AddFontMaterial(materialHashCode, tempMaterial);
-
-                                m_currentMaterial = tempMaterial;
-
-                                m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, tempFont, ref m_materialReferences, m_materialReferenceIndexLookup);
-
-                                m_materialReferenceStack.Add(m_materialReferences[m_currentMaterialIndex]);
-                            }
-                        }
-                        else
-                            return false;
-
-                        m_currentFontAsset = tempFont;
-
-                        return true;
-                    case MarkupTag.SLASH_FONT:
-                        {
-                            MaterialReference materialReference = m_materialReferenceStack.Remove();
-
-                            m_currentFontAsset = materialReference.fontAsset;
-                            m_currentMaterial = materialReference.material;
-                            m_currentMaterialIndex = materialReference.index;
-
-                            return true;
-                        }
-                    case MarkupTag.MATERIAL:
-                        materialHashCode = m_xmlAttribute[0].valueHashCode;
-
-                        if (materialHashCode == (int)MarkupTag.DEFAULT)
-                        {
-                            m_currentMaterial = m_materialReferences[0].material;
-                            m_currentMaterialIndex = 0;
-
-                            m_materialReferenceStack.Add(m_materialReferences[0]);
-
-                            return true;
-                        }
-
-
-                        if (MaterialReferenceManager.TryGetMaterial(materialHashCode, out tempMaterial))
-                        {
-                            m_currentMaterial = tempMaterial;
-
-                            m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
-
-                            m_materialReferenceStack.Add(m_materialReferences[m_currentMaterialIndex]);
-                        }
-                        else
-                        {
-                            tempMaterial = Resources.Load<Material>(TMP_Settings.defaultFontAssetPath + new string(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength));
-
-                            if (tempMaterial == null)
-                                return false;
-
-                            MaterialReferenceManager.AddFontMaterial(materialHashCode, tempMaterial);
-
-                            m_currentMaterial = tempMaterial;
-
-                            m_currentMaterialIndex = MaterialReference.AddMaterialReference(m_currentMaterial, m_currentFontAsset, ref m_materialReferences, m_materialReferenceIndexLookup);
-
-                            m_materialReferenceStack.Add(m_materialReferences[m_currentMaterialIndex]);
-                        }
-                        return true;
-                    case MarkupTag.SLASH_MATERIAL:
-                        {
-                            MaterialReference materialReference = m_materialReferenceStack.Remove();
-
-                            m_currentMaterial = materialReference.material;
-                            m_currentMaterialIndex = materialReference.index;
-
-                            return true;
-                        }
-                    case MarkupTag.SPACE:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (tagUnitType)
-                        {
-                            case TagUnitType.Pixels:
-                                m_xAdvance += value * (m_isOrthographic ? 1 : 0.1f);
-                                return true;
-                            case TagUnitType.FontUnits:
-                                m_xAdvance += value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                return true;
-                            case TagUnitType.Percentage:
-                                return false;
-                        }
-                        return false;
-                    case MarkupTag.ALPHA:
-                        if (m_xmlAttribute[0].valueLength != 3) return false;
-
-                        m_htmlColor.a = (byte)(HexToInt(m_htmlTag[7]) * 16 + HexToInt(m_htmlTag[8]));
-                        return true;
-
-                    case MarkupTag.A:
-                        if (m_isTextLayoutPhase)
-                        {
-                            if (m_xmlAttribute[1].nameHashCode == (int)MarkupTag.HREF)
-                            {
-                                int index = m_textInfo.linkCount;
-
-                                if (index + 1 > m_textInfo.linkInfo.Length)
-                                    TMP_TextInfo.Resize(ref m_textInfo.linkInfo, index + 1);
-
-                                m_textInfo.linkInfo[index].textComponent = this;
-                                m_textInfo.linkInfo[index].hashCode = (int)MarkupTag.HREF;
-                                m_textInfo.linkInfo[index].linkTextfirstCharacterIndex = m_characterCount;
-                                m_textInfo.linkInfo[index].SetLinkID(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength);
-                            }
-                        }
-                        return true;
-                    case MarkupTag.SLASH_A:
-                        if (m_isTextLayoutPhase)
-                        {
-                            int index = m_textInfo.linkCount;
-
-                            m_textInfo.linkInfo[index].linkTextLength = m_characterCount - m_textInfo.linkInfo[index].linkTextfirstCharacterIndex;
-
-                            m_textInfo.linkCount += 1;
-                        }
-                        return true;
-                    case MarkupTag.LINK:
-                        if (m_isTextLayoutPhase)
-                        {
-                            int index = m_textInfo.linkCount;
-
-                            if (index + 1 > m_textInfo.linkInfo.Length)
-                                TMP_TextInfo.Resize(ref m_textInfo.linkInfo, index + 1);
-
-                            m_textInfo.linkInfo[index].textComponent = this;
-                            m_textInfo.linkInfo[index].hashCode = m_xmlAttribute[0].valueHashCode;
-                            m_textInfo.linkInfo[index].linkTextfirstCharacterIndex = m_characterCount;
-
-                            m_textInfo.linkInfo[index].linkIdFirstCharacterIndex = startIndex + m_xmlAttribute[0].valueStartIndex;
-                            m_textInfo.linkInfo[index].linkIdLength = m_xmlAttribute[0].valueLength;
-                            m_textInfo.linkInfo[index].SetLinkID(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-                        }
-                        return true;
-                    case MarkupTag.SLASH_LINK:
-                        if (m_isTextLayoutPhase)
-                        {
-                            if (m_textInfo.linkCount < m_textInfo.linkInfo.Length)
-                            {
-                                m_textInfo.linkInfo[m_textInfo.linkCount].linkTextLength = m_characterCount - m_textInfo.linkInfo[m_textInfo.linkCount].linkTextfirstCharacterIndex;
-
-                                m_textInfo.linkCount += 1;
-                            }
-                        }
-                        return true;
-                    case MarkupTag.ALIGN:
-                        switch ((MarkupTag)m_xmlAttribute[0].valueHashCode)
-                        {
-                            case MarkupTag.LEFT:
-                                m_lineJustification = HorizontalAlignmentOptions.Left;
-                                m_lineJustificationStack.Add(m_lineJustification);
-                                return true;
-                            case MarkupTag.RIGHT:
-                                m_lineJustification = HorizontalAlignmentOptions.Right;
-                                m_lineJustificationStack.Add(m_lineJustification);
-                                return true;
-                            case MarkupTag.CENTER:
-                                m_lineJustification = HorizontalAlignmentOptions.Center;
-                                m_lineJustificationStack.Add(m_lineJustification);
-                                return true;
-                            case MarkupTag.JUSTIFIED:
-                                m_lineJustification = HorizontalAlignmentOptions.Justified;
-                                m_lineJustificationStack.Add(m_lineJustification);
-                                return true;
-                            case MarkupTag.FLUSH:
-                                m_lineJustification = HorizontalAlignmentOptions.Flush;
-                                m_lineJustificationStack.Add(m_lineJustification);
-                                return true;
-                        }
-                        return false;
-                    case MarkupTag.SLASH_ALIGN:
-                        m_lineJustification = m_lineJustificationStack.Remove();
-                        return true;
-                    case MarkupTag.WIDTH:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (tagUnitType)
-                        {
-                            case TagUnitType.Pixels:
-                                m_width = value * (m_isOrthographic ? 1 : 0.1f);
-                                break;
-                            case TagUnitType.FontUnits:
-                                return false;
-                            case TagUnitType.Percentage:
-                                m_width = m_marginWidth * value / 100;
-                                break;
-                        }
-                        return true;
-                    case MarkupTag.SLASH_WIDTH:
-                        m_width = -1;
-                        return true;
-
-                    case MarkupTag.COLOR:
-                        if (m_htmlTag[6] == 35 && tagCharCount == 10)
-                        {
-                            m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
-                            m_colorStack.Add(m_htmlColor);
-                            return true;
-                        }
-                        else if (m_htmlTag[6] == 35 && tagCharCount == 11)
-                        {
-                            m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
-                            m_colorStack.Add(m_htmlColor);
-                            return true;
-                        }
-
-                        if (m_htmlTag[6] == 35 && tagCharCount == 13)
-                        {
-                            m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
-                            m_colorStack.Add(m_htmlColor);
-                            return true;
-                        }
-                        else if (m_htmlTag[6] == 35 && tagCharCount == 15)
-                        {
-                            m_htmlColor = HexCharsToColor(m_htmlTag, tagCharCount);
-                            m_colorStack.Add(m_htmlColor);
-                            return true;
-                        }
-
-                        switch (m_xmlAttribute[0].valueHashCode)
-                        {
-                            case (int)MarkupTag.RED:
-                                m_htmlColor = Color.red;
-                                m_colorStack.Add(m_htmlColor);
-                                return true;
-                            case (int)MarkupTag.LIGHTBLUE:
-                                m_htmlColor = new(173, 216, 230, 255);
-                                m_colorStack.Add(m_htmlColor);
-                                return true;
-                            case (int)MarkupTag.BLUE:
-                                m_htmlColor = Color.blue;
-                                m_colorStack.Add(m_htmlColor);
-                                return true;
-                            case (int)MarkupTag.GREY:
-                                m_htmlColor = new(128, 128, 128, 255);
-                                m_colorStack.Add(m_htmlColor);
-                                return true;
-                            case (int)MarkupTag.BLACK:
-                                m_htmlColor = Color.black;
-                                m_colorStack.Add(m_htmlColor);
-                                return true;
-                            case (int)MarkupTag.GREEN:
-                                m_htmlColor = Color.green;
-                                m_colorStack.Add(m_htmlColor);
-                                return true;
-                            case (int)MarkupTag.WHITE:
-                                m_htmlColor = Color.white;
-                                m_colorStack.Add(m_htmlColor);
-                                return true;
-                            case (int)MarkupTag.ORANGE:
-                                m_htmlColor = new(255, 128, 0, 255);
-                                m_colorStack.Add(m_htmlColor);
-                                return true;
-                            case (int)MarkupTag.PURPLE:
-                                m_htmlColor = new(160, 32, 240, 255);
-                                m_colorStack.Add(m_htmlColor);
-                                return true;
-                            case (int)MarkupTag.YELLOW:
-                                m_htmlColor = Color.yellow;
-                                m_colorStack.Add(m_htmlColor);
-                                return true;
-                        }
-                        return false;
-
-                    case MarkupTag.GRADIENT:
-                        int gradientPresetHashCode = m_xmlAttribute[0].valueHashCode;
-
-                        if (MaterialReferenceManager.TryGetColorGradientPreset(gradientPresetHashCode, out var tempColorGradientPreset))
-                        {
-                            m_colorGradientPreset = tempColorGradientPreset;
-                        }
-                        else
-                        {
-                            if (tempColorGradientPreset == null)
-                            {
-                                tempColorGradientPreset = Resources.Load<TMP_ColorGradient>(TMP_Settings.defaultColorGradientPresetsPath + new string(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength));
-                            }
-
-                            if (tempColorGradientPreset == null)
-                                return false;
-
-                            MaterialReferenceManager.AddColorGradientPreset(gradientPresetHashCode, tempColorGradientPreset);
-                            m_colorGradientPreset = tempColorGradientPreset;
-                        }
-
-                        m_colorGradientPresetIsTinted = false;
-
-                        for (int i = 1; i < m_xmlAttribute.Length && m_xmlAttribute[i].nameHashCode != 0; i++)
-                        {
-                            int nameHashCode = m_xmlAttribute[i].nameHashCode;
-
-                            switch ((MarkupTag)nameHashCode)
-                            {
-                                case MarkupTag.TINT:
-                                    m_colorGradientPresetIsTinted = ConvertToFloat(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength) != 0;
-                                    break;
-                            }
-                        }
-
-                        m_colorGradientStack.Add(m_colorGradientPreset);
-
-                        return true;
-
-                    case MarkupTag.SLASH_GRADIENT:
-                        m_colorGradientPreset = m_colorGradientStack.Remove();
-                        return true;
-
-                    case MarkupTag.CHARACTER_SPACE:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (tagUnitType)
-                        {
-                            case TagUnitType.Pixels:
-                                m_cSpacing = value * (m_isOrthographic ? 1 : 0.1f);
-                                break;
-                            case TagUnitType.FontUnits:
-                                m_cSpacing = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                break;
-                            case TagUnitType.Percentage:
-                                return false;
-                        }
-                        return true;
-                    case MarkupTag.SLASH_CHARACTER_SPACE:
-                        if (!m_isTextLayoutPhase) return true;
-
-                        if (m_characterCount > 0)
-                        {
-                            m_xAdvance -= m_cSpacing;
-                            m_textInfo.characterInfo[m_characterCount - 1].xAdvance = m_xAdvance;
-                        }
-                        m_cSpacing = 0;
-                        return true;
-                    case MarkupTag.MONOSPACE:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (m_xmlAttribute[0].unitType)
-                        {
-                            case TagUnitType.Pixels:
-                                m_monoSpacing = value * (m_isOrthographic ? 1 : 0.1f);
-                                break;
-                            case TagUnitType.FontUnits:
-                                m_monoSpacing = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                break;
-                            case TagUnitType.Percentage:
-                                return false;
-                        }
-
-                        if (m_xmlAttribute[1].nameHashCode == (int)MarkupTag.DUOSPACE)
-                            m_duoSpace = ConvertToFloat(m_htmlTag, m_xmlAttribute[1].valueStartIndex, m_xmlAttribute[1].valueLength) != 0;
-
-                        return true;
-                    case MarkupTag.SLASH_MONOSPACE:
-                        m_monoSpacing = 0;
-                        m_duoSpace = false;
-                        return true;
-                    case MarkupTag.CLASS:
-                        return false;
-                    case MarkupTag.SLASH_COLOR:
-                        m_htmlColor = m_colorStack.Remove();
-                        return true;
-                    case MarkupTag.INDENT:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (tagUnitType)
-                        {
-                            case TagUnitType.Pixels:
-                                tag_Indent = value * (m_isOrthographic ? 1 : 0.1f);
-                                break;
-                            case TagUnitType.FontUnits:
-                                tag_Indent = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                break;
-                            case TagUnitType.Percentage:
-                                tag_Indent = m_marginWidth * value / 100;
-                                break;
-                        }
-                        m_indentStack.Add(tag_Indent);
-
-                        m_xAdvance = tag_Indent;
-                        return true;
-                    case MarkupTag.SLASH_INDENT:
-                        tag_Indent = m_indentStack.Remove();
-                        return true;
-                    case MarkupTag.LINE_INDENT:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (tagUnitType)
-                        {
-                            case TagUnitType.Pixels:
-                                tag_LineIndent = value * (m_isOrthographic ? 1 : 0.1f);
-                                break;
-                            case TagUnitType.FontUnits:
-                                tag_LineIndent = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                break;
-                            case TagUnitType.Percentage:
-                                tag_LineIndent = m_marginWidth * value / 100;
-                                break;
-                        }
-
-                        m_xAdvance += tag_LineIndent;
-                        return true;
-                    case MarkupTag.SLASH_LINE_INDENT:
-                        tag_LineIndent = 0;
-                        return true;
-                    case MarkupTag.LOWERCASE:
-                        m_FontStyleInternal |= FontStyles.LowerCase;
-                        m_fontStyleStack.Add(FontStyles.LowerCase);
-                        return true;
-                    case MarkupTag.SLASH_LOWERCASE:
-                        if ((m_fontStyle & FontStyles.LowerCase) != FontStyles.LowerCase)
-                        {
-                            if (m_fontStyleStack.Remove(FontStyles.LowerCase) == 0)
-                                m_FontStyleInternal &= ~FontStyles.LowerCase;
-                        }
-                        return true;
-                    case MarkupTag.ALLCAPS:
-                    case MarkupTag.UPPERCASE:
-                        m_FontStyleInternal |= FontStyles.UpperCase;
-                        m_fontStyleStack.Add(FontStyles.UpperCase);
-                        return true;
-                    case MarkupTag.SLASH_ALLCAPS:
-                    case MarkupTag.SLASH_UPPERCASE:
-                        if ((m_fontStyle & FontStyles.UpperCase) != FontStyles.UpperCase)
-                        {
-                            if (m_fontStyleStack.Remove(FontStyles.UpperCase) == 0)
-                                m_FontStyleInternal &= ~FontStyles.UpperCase;
-                        }
-                        return true;
-                    case MarkupTag.SMALLCAPS:
-                        m_FontStyleInternal |= FontStyles.SmallCaps;
-                        m_fontStyleStack.Add(FontStyles.SmallCaps);
-                        return true;
-                    case MarkupTag.SLASH_SMALLCAPS:
-                        if ((m_fontStyle & FontStyles.SmallCaps) != FontStyles.SmallCaps)
-                        {
-                            if (m_fontStyleStack.Remove(FontStyles.SmallCaps) == 0)
-                                m_FontStyleInternal &= ~FontStyles.SmallCaps;
-                        }
-                        return true;
-                    case MarkupTag.MARGIN:
-                        switch (m_xmlAttribute[0].valueType)
-                        {
-                            case TagValueType.NumericalValue:
-                                value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                                if (value == Int16.MinValue) return false;
-
-                                switch (tagUnitType)
-                                {
-                                    case TagUnitType.Pixels:
-                                        m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f);
-                                        break;
-                                    case TagUnitType.FontUnits:
-                                        m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                        break;
-                                    case TagUnitType.Percentage:
-                                        m_marginLeft = (m_marginWidth - (m_width != -1 ? m_width : 0)) * value / 100;
-                                        break;
-                                }
-                                m_marginLeft = m_marginLeft >= 0 ? m_marginLeft : 0;
-                                m_marginRight = m_marginLeft;
-                                return true;
-
-                            case TagValueType.None:
-                                for (int i = 1; i < m_xmlAttribute.Length && m_xmlAttribute[i].nameHashCode != 0; i++)
-                                {
-                                    int nameHashCode = m_xmlAttribute[i].nameHashCode;
-
-                                    switch ((MarkupTag)nameHashCode)
-                                    {
-                                        case MarkupTag.LEFT:
-                                            value = ConvertToFloat(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength);
-
-                                            if (value == Int16.MinValue) return false;
-
-                                            switch (m_xmlAttribute[i].unitType)
-                                            {
-                                                case TagUnitType.Pixels:
-                                                    m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f);
-                                                    break;
-                                                case TagUnitType.FontUnits:
-                                                    m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                                    break;
-                                                case TagUnitType.Percentage:
-                                                    m_marginLeft = (m_marginWidth - (m_width != -1 ? m_width : 0)) * value / 100;
-                                                    break;
-                                            }
-                                            m_marginLeft = m_marginLeft >= 0 ? m_marginLeft : 0;
-                                            break;
-
-                                        case MarkupTag.RIGHT:
-                                            value = ConvertToFloat(m_htmlTag, m_xmlAttribute[i].valueStartIndex, m_xmlAttribute[i].valueLength);
-
-                                            if (value == Int16.MinValue) return false;
-
-                                            switch (m_xmlAttribute[i].unitType)
-                                            {
-                                                case TagUnitType.Pixels:
-                                                    m_marginRight = value * (m_isOrthographic ? 1 : 0.1f);
-                                                    break;
-                                                case TagUnitType.FontUnits:
-                                                    m_marginRight = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                                    break;
-                                                case TagUnitType.Percentage:
-                                                    m_marginRight = (m_marginWidth - (m_width != -1 ? m_width : 0)) * value / 100;
-                                                    break;
-                                            }
-                                            m_marginRight = m_marginRight >= 0 ? m_marginRight : 0;
-                                            break;
-                                    }
-                                }
-                                return true;
-                        }
-
-                        return false;
-                    case MarkupTag.SLASH_MARGIN:
-                        m_marginLeft = 0;
-                        m_marginRight = 0;
-                        return true;
-                    case MarkupTag.MARGIN_LEFT:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (tagUnitType)
-                        {
-                            case TagUnitType.Pixels:
-                                m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f);
-                                break;
-                            case TagUnitType.FontUnits:
-                                m_marginLeft = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                break;
-                            case TagUnitType.Percentage:
-                                m_marginLeft = (m_marginWidth - (m_width != -1 ? m_width : 0)) * value / 100;
-                                break;
-                        }
-                        m_marginLeft = m_marginLeft >= 0 ? m_marginLeft : 0;
-                        return true;
-                    case MarkupTag.MARGIN_RIGHT:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (tagUnitType)
-                        {
-                            case TagUnitType.Pixels:
-                                m_marginRight = value * (m_isOrthographic ? 1 : 0.1f);
-                                break;
-                            case TagUnitType.FontUnits:
-                                m_marginRight = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                break;
-                            case TagUnitType.Percentage:
-                                m_marginRight = (m_marginWidth - (m_width != -1 ? m_width : 0)) * value / 100;
-                                break;
-                        }
-                        m_marginRight = m_marginRight >= 0 ? m_marginRight : 0;
-                        return true;
-                    case MarkupTag.LINE_HEIGHT:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        switch (tagUnitType)
-                        {
-                            case TagUnitType.Pixels:
-                                m_lineHeight = value * (m_isOrthographic ? 1 : 0.1f);
-                                break;
-                            case TagUnitType.FontUnits:
-                                m_lineHeight = value * (m_isOrthographic ? 1 : 0.1f) * m_currentFontSize;
-                                break;
-                            case TagUnitType.Percentage:
-                                fontScale = (m_currentFontSize / m_currentFontAsset.faceInfo.pointSize * m_currentFontAsset.faceInfo.scale * (m_isOrthographic ? 1 : 0.1f));
-                                m_lineHeight = m_fontAsset.faceInfo.lineHeight * value / 100 * fontScale;
-                                break;
-                        }
-                        return true;
-                    case MarkupTag.SLASH_LINE_HEIGHT:
-                        m_lineHeight = TMP_Math.FLOAT_UNSET;
-                        return true;
-                    case MarkupTag.NO_PARSE:
-                        tag_NoParsing = true;
-                        return true;
-                    case MarkupTag.ACTION:
-                        int actionID = m_xmlAttribute[0].valueHashCode;
-
-                        if (m_isTextLayoutPhase)
-                        {
-                            m_actionStack.Add(actionID);
-
-                            Debug.Log("Action ID: [" + actionID + "] First character index: " + m_characterCount);
-
-
-                        }
-
-                        return true;
-                    case MarkupTag.SLASH_ACTION:
-                        if (m_isTextLayoutPhase)
-                        {
-                            Debug.Log("Action ID: [" + m_actionStack.CurrentItem() + "] Last character index: " + (m_characterCount - 1));
-                        }
-
-                        m_actionStack.Remove();
-                        return true;
-                    case MarkupTag.SCALE:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        m_FXScale = new(value, 1, 1);
-
-                        return true;
-                    case MarkupTag.SLASH_SCALE:
-                        m_FXScale = Vector3.one;
-                        return true;
-                    case MarkupTag.ROTATE:
-                        value = ConvertToFloat(m_htmlTag, m_xmlAttribute[0].valueStartIndex, m_xmlAttribute[0].valueLength);
-
-                        if (value == Int16.MinValue) return false;
-
-                        m_FXRotation = Quaternion.Euler(0, 0, value);
-
-                        return true;
-                    case MarkupTag.SLASH_ROTATE:
-                        m_FXRotation = Quaternion.identity;
-                        return true;
-                    case MarkupTag.TABLE:
-
-                        return false;
-                    case MarkupTag.SLASH_TABLE:
-                        return false;
-                    case MarkupTag.TR:
-                        return false;
-                    case MarkupTag.SLASH_TR:
-                        return false;
-                    case MarkupTag.TH:
-                        return false;
-                    case MarkupTag.SLASH_TH:
-                        return false;
-                    case MarkupTag.TD:
-
-                        return false;
-                    case MarkupTag.SLASH_TD:
-                        return false;
-                }
-            }
-            #endregion
-
-            return false;
         }
     }
 }

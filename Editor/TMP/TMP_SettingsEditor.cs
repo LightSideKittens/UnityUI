@@ -67,7 +67,6 @@ namespace TMPro.EditorUtilities
         SerializedProperty m_PropDefaultAutoSizeMaxRatio;
         SerializedProperty m_PropDefaultTextMeshProTextContainerSize;
         SerializedProperty m_PropDefaultTextMeshProUITextContainerSize;
-        SerializedProperty m_PropAutoSizeTextContainer;
         SerializedProperty m_PropEnableRaycastTarget;
 
         SerializedProperty m_PropStyleSheet;
@@ -111,7 +110,6 @@ namespace TMPro.EditorUtilities
             m_PropDefaultAutoSizeMaxRatio = serializedObject.FindProperty("m_defaultAutoSizeMaxRatio");
             m_PropDefaultTextMeshProTextContainerSize = serializedObject.FindProperty("m_defaultTextMeshProTextContainerSize");
             m_PropDefaultTextMeshProUITextContainerSize = serializedObject.FindProperty("m_defaultTextMeshProUITextContainerSize");
-            m_PropAutoSizeTextContainer = serializedObject.FindProperty("m_autoSizeTextContainer");
             m_PropEnableRaycastTarget = serializedObject.FindProperty("m_EnableRaycastTarget");
 
             m_PropStyleSheet = serializedObject.FindProperty("m_defaultStyleSheet");
@@ -220,7 +218,6 @@ namespace TMPro.EditorUtilities
             EditorGUILayout.PropertyField(m_PropDefaultTextMeshProTextContainerSize, Styles.textMeshProLabel);
             EditorGUILayout.PropertyField(m_PropDefaultTextMeshProUITextContainerSize, Styles.textMeshProUiLabel);
             EditorGUILayout.PropertyField(m_PropEnableRaycastTarget, Styles.enableRaycastTarget);
-            EditorGUILayout.PropertyField(m_PropAutoSizeTextContainer, Styles.autoSizeContainerLabel);
             EditorGUI.indentLevel = 0;
 
             EditorGUILayout.Space();

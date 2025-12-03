@@ -49,7 +49,7 @@ namespace TMPro.EditorUtilities
         {
             GameObject go = TMP_DefaultControls.CreateButton(GetStandardResources());
 
-            TMP_Text textComponent = go.GetComponentInChildren<TMP_Text>();
+            TMPText textComponent = go.GetComponentInChildren<TMPText>();
             textComponent.fontSize = 24;
 
             PlaceUIElementRoot(go, menuCommand);

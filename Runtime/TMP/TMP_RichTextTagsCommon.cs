@@ -41,12 +41,9 @@ namespace TMPro
         NO_PARSE = -408011596,
         SLASH_NO_PARSE = -294095813,
         POSITION = 85420,
-        SLASH_POSITION = 1777699,
         VERTICAL_OFFSET = 1952379995,
         SLASH_VERTICAL_OFFSET = -11107948,
         SPACE = 100083556,
-        SLASH_SPACE = 1927873067,
-        SLASH_PAGE = 58683868,
         ALIGN = 75138797,
         SLASH_ALIGN = 1916026786,
         WIDTH = 105793766,
@@ -74,7 +71,6 @@ namespace TMPro
         SLASH_SCALE = 1928413879,
         ROTATE = -1000007783,
         SLASH_ROTATE = -764695562,
-
         TABLE = 226476955,
         SLASH_TABLE = -979118220,
         TH = 5862489,
@@ -83,7 +79,6 @@ namespace TMPro
         SLASH_TR = 193346060,
         TD = 5862485,
         SLASH_TD = 193346074,
-
         LOWERCASE = -1506899689,
         SLASH_LOWERCASE = -1451284584,
         ALLCAPS = 218273952,
@@ -92,23 +87,12 @@ namespace TMPro
         SLASH_UPPERCASE = -582368199,
         SMALLCAPS = -766062114,
         SLASH_SMALLCAPS = 199921873,
-
-        LIGA = 2655971,
-        SLASH_LIGA = 57686604,
-        FRAC = 2598518,
-        SLASH_FRAC = 57774681,
-
-        NAME = 2875623,
-        INDEX = 84268030,
         TINT = 2960519,
         MATERIAL = 825491659,
         HREF = 2535353,
         ANGLE = 75347905,
         PADDING = -2144568463,
-        FAMILYNAME = 704251153,
-        STYLENAME = -1207081936,
         DUOSPACE = 582810522,
-
         RED = 91635,
         GREEN = 87065851,
         BLUE = 2457214,
@@ -119,45 +103,19 @@ namespace TMPro
         PURPLE = -1250222130,
         GREY = 2638345,
         LIGHTBLUE= 341063360,
-
         BR = 2256,
         CR = 2289,
         ZWSP = 3288238,
         ZWJ = 99623,
         NBSP = 2869039,
         SHY = 92674,
-
         LEFT = 2660507,
         RIGHT = 99937376,
         CENTER = -1591113269,
         JUSTIFIED = 817091359,
         FLUSH = 85552164,
-
-        NONE = 2857034,
-        PLUS = 43,
-        MINUS = 45,
-        PX = 2568,
-        PLUS_PX = 49507,
-        MINUS_PX = 47461,
-        EM = 2216,
-        PLUS_EM = 49091,
-        MINUS_EM = 46789,
-        PCT = 85031,
-        PLUS_PCT = 1634348,
-        MINUS_PCT = 1567082,
-        PERCENTAGE = 37,
-        PLUS_PERCENTAGE = 1454,
-        MINUS_PERCENTAGE = 1512,
-
-        TRUE = 2932022,
-        FALSE = 85422813,
-
-        INVALID = 1585415185,
-        NOTDEF = 612146780,
-
         NORMAL = -1183493901,
         DEFAULT = -620974005,
-        REGULAR = 1291372090,
     }
 
     public enum TagValueType
@@ -177,22 +135,6 @@ namespace TMPro
 
     internal static class CodePoint
     {
-        public const uint SPACE = 0x20;
-        public const uint DOUBLE_QUOTE = 0x22;
-        public const uint NUMBER_SIGN = 0x23;
-        public const uint PERCENTAGE = 0x25;
-        public const uint PLUS = 0x2B;
-        public const uint MINUS = 0x2D;
-        public const uint PERIOD = 0x2E;
-
-        public const uint HYPHEN_MINUS = 0x2D;
-        public const uint SOFT_HYPHEN = 0xAD;
-        public const uint HYPHEN = 0x2010;
-        public const uint NON_BREAKING_HYPHEN = 0x2011;
-        public const uint ZERO_WIDTH_SPACE = 0x200B;
-        public const uint RIGHT_SINGLE_QUOTATION = 0x2019;
-        public const uint APOSTROPHE = 0x27;
-        public const uint WORD_JOINER = 0x2060;
         public const uint HIGH_SURROGATE_START = 0xD800;
         public const uint HIGH_SURROGATE_END = 0xDBFF;
         public const uint LOW_SURROGATE_START = 0xDC00;
