@@ -149,17 +149,44 @@ public sealed class BidiEngine
     }
 
 
-    /// <summary>
-    /// Processes a logical sequence of Unicode scalar values (code points)
-    /// and returns paragraph information and initial levels according to UAX #9 P1-P3.
-    /// This does NOT yet perform the full bidi algorithm; it only:
-    /// - determines paragraph boundaries (P1),
-    /// - determines base embedding level for each paragraph (P2-P3),
-    /// - assigns base level to each character in the paragraph.
-    /// </summary>
-    /// <param name="codePoints">Logical code points (not UTF-16 code units).</param>
-    /// <returns>BidiResult with base levels and paragraph info.</returns>
     public BidiResult Process(ReadOnlySpan<int> codePoints)
+    {
+        // Старое поведение: базовый уровень определяется автоматически (P2/P3).
+        return ProcessInternal(codePoints, forcedParagraphLevel: null);
+    }
+
+    /// <summary>
+    /// Process with explicit paragraph direction override:
+    /// paragraphDirection:
+    ///   0 = force LTR (base level 0),
+    ///   1 = force RTL (base level 1),
+    ///   2 = auto (P2/P3, same as Process(codePoints)).
+    /// </summary>
+    public BidiResult Process(ReadOnlySpan<int> codePoints, int paragraphDirection)
+    {
+        byte? forcedParagraphLevel;
+
+        switch (paragraphDirection)
+        {
+            case 0:
+                forcedParagraphLevel = 0; // LTR
+                break;
+            case 1:
+                forcedParagraphLevel = 1; // RTL
+                break;
+            case 2:
+                forcedParagraphLevel = null; // auto (P2/P3)
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(
+                    nameof(paragraphDirection),
+                    "Paragraph direction must be 0 (LTR), 1 (RTL), or 2 (auto).");
+        }
+
+        return ProcessInternal(codePoints, forcedParagraphLevel);
+    }
+
+    private BidiResult ProcessInternal(ReadOnlySpan<int> codePoints, byte? forcedParagraphLevel)
     {
         int length = codePoints.Length;
         if (length == 0)
@@ -179,8 +206,19 @@ public sealed class BidiEngine
             bidiClassesBuffer[i] = unicodeData.GetBidiClass(cp);
         }
 
-        // 2) Параграфы и базовый уровень (P1–P3)
-        List<BidiParagraph> paragraphList = BuildParagraphs(bidiClassesBuffer, length);
+        // 2) Параграфы и базовый уровень (P1–P3 или принудительный baseLevel)
+        List<BidiParagraph> paragraphList;
+        if (forcedParagraphLevel.HasValue)
+        {
+            paragraphList = BuildParagraphsWithExplicitBaseLevel(
+                bidiClassesBuffer,
+                length,
+                forcedParagraphLevel.Value);
+        }
+        else
+        {
+            paragraphList = BuildParagraphs(bidiClassesBuffer, length);
+        }
 
         byte[] levels = new byte[length];
 
@@ -248,7 +286,7 @@ public sealed class BidiEngine
                 levels);
         }
 
-// 8) Коррекция уровней скобок после I1/I2 (числа в скобках → скобки на уровень ниже чисел)
+        // 8) Коррекция уровней скобок после I1/I2 (если у тебя уже есть AdjustBracketLevelsForParagraph)
         for (int pIndex = 0; pIndex < paragraphList.Count; pIndex++)
         {
             BidiParagraph paragraph = paragraphList[pIndex];
@@ -261,7 +299,7 @@ public sealed class BidiEngine
                 levels);
         }
 
-// 9) Пост-коррекция PDI
+        // 9) Пост-коррекция PDI (если ты оставил AdjustPdiLevelsForParagraph)
         for (int pIndex = 0; pIndex < paragraphList.Count; pIndex++)
         {
             BidiParagraph paragraph = paragraphList[pIndex];
@@ -275,6 +313,44 @@ public sealed class BidiEngine
 
         BidiParagraph[] paragraphs = paragraphList.ToArray();
         return new BidiResult(levels, paragraphs);
+    }
+
+    /// <summary>
+    /// Builds paragraphs when paragraph base level is explicitly specified (0 or 1)
+    /// instead of being inferred from text (P2/P3).
+    /// Paragraph segmentation (P1) остаётся той же: разделяем по B (ParagraphSeparator),
+    /// но baseLevel всех параграфов = givenBaseLevel.
+    /// </summary>
+    private static List<BidiParagraph> BuildParagraphsWithExplicitBaseLevel(
+        BidiClass[] bidiClasses,
+        int length,
+        byte givenBaseLevel)
+    {
+        var paragraphs = new List<BidiParagraph>();
+
+        int paraStart = 0;
+        for (int i = 0; i < length; i++)
+        {
+            if (bidiClasses[i] == BidiClass.ParagraphSeparator)
+            {
+                int paraEnd = i - 1;
+                if (paraEnd >= paraStart)
+                {
+                    paragraphs.Add(new BidiParagraph(paraStart, paraEnd, givenBaseLevel));
+                }
+
+                // Сам сепаратор параграфа не входит в параграф (P1).
+                paraStart = i + 1;
+            }
+        }
+
+        if (paraStart < length)
+        {
+            int paraEnd = length - 1;
+            paragraphs.Add(new BidiParagraph(paraStart, paraEnd, givenBaseLevel));
+        }
+
+        return paragraphs;
     }
 
 
