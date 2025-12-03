@@ -242,4 +242,5 @@ public interface IUnicodeDataProvider
     /// must be treated as No_Joining_Group.
     /// </summary>
     JoiningGroup GetJoiningGroup(int codePoint);
+    
 }
