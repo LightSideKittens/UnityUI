@@ -78,27 +78,19 @@ public class UnicodeDataGeneratorWindow : EditorWindow
 
     [SerializeField] private string outputFileName = "UnicodeData.bytes";
 
-    [MenuItem("Tools/RTL/Unicode Data Generator")]
+    /*[MenuItem("Tools/RTL/Unicode Data Generator")]
     public static void ShowWindow()
     {
         UnicodeDataGeneratorWindow window = GetWindow<UnicodeDataGeneratorWindow>();
         window.titleContent = new GUIContent("Unicode Data Generator");
         window.minSize = new Vector2(450, 200);
-    }
+    }*/
     
     private void OnGUI()
     {
         EditorGUILayout.LabelField("Unicode Data Generator", EditorStyles.boldLabel);
         EditorGUILayout.Space();
-
-        EditorGUILayout.HelpBox(
-            "Укажи TextAsset'ы с официальными файлами Unicode:\n" +
-            "- DerivedBidiClass.txt\n" +
-            "- DerivedJoiningType.txt\n" +
-            "- ArabicShaping.txt\n" +
-            "и папку для выходного бинаря.",
-            MessageType.Info);
-
+        
         EditorGUILayout.Space();
 
         EditorGUI.BeginChangeCheck();

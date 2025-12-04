@@ -173,6 +173,7 @@ namespace TMPro
             layoutElement.ignoreLayout = true;
 
             TMP_SubMeshUI subMesh = go.AddComponent<TMP_SubMeshUI>();
+            subMesh.m_TextComponent = textComponent;
             subMesh.m_fontAsset = materialReference.fontAsset;
             subMesh.m_isDefaultMaterial = materialReference.isDefaultMaterial;
             subMesh.maskable = textComponent.maskable;

@@ -81,16 +81,6 @@ public static class ArabicShaper
             initialized = true;
         }
     }
-    
-    public static string Do(string input, out int[] indexMap)
-    {
-        if (input == null)
-            throw new ArgumentNullException(nameof(input));
-
-        var codepoints = Bidi.StringToCodepoints(input);
-        var shaped     = Do(codepoints, out indexMap);
-        return Bidi.CodepointsToString(shaped);
-    }
 
     public static int[] Do(int[] codepoints, out int[] indexMap)
     {

@@ -9,13 +9,6 @@ namespace TMPro
 {
     public abstract partial class TMPText
     {
-        struct BidiParagraphInfo
-        {
-            public int firstIndex;
-            public int lastIndex;
-            public Bidi.Direction direction;
-        }
-        
         private static ProfilerMarker kGenerateTextMarker = new("TMP.GenerateText");
         private static ProfilerMarker kGenerateTextPhaseIMarker = new("TMP GenerateText - Phase I");
         private static ProfilerMarker kParseMarkupTextMarker = new("TMP Parse Markup Text");
@@ -45,7 +38,6 @@ namespace TMPro
         protected float MCanvasScaleFactor;
         protected bool MShouldUpdateCulling;
         
-        private BidiParagraphInfo[] bidiParagraphs;
         private Dictionary<int, int> materialIndexPairs = new();
         
         public new CanvasRenderer CanvasRenderer
