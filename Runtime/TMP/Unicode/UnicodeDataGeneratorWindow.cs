@@ -7,15 +7,76 @@ using UnityEngine;
 
 public class UnicodeDataGeneratorWindow : EditorWindow
 {
+    [Serializable]
+    private class TestData
+    {
+        [SerializeField] private int maxFailuresToLog;
+        [SerializeField] private TextAsset unicodeDataAsset;
+        [SerializeField] private TextAsset bidiCharacterTestAsset;
+    
+        public void RunBidiCharacterTests()
+        {
+            if (unicodeDataAsset == null || bidiCharacterTestAsset == null)
+            {
+                Debug.LogError("Assign unicodeDataAsset and bidiCharacterTestAsset.");
+                return;
+            }
+
+            try
+            {
+                BinaryUnicodeDataProvider provider = new BinaryUnicodeDataProvider(unicodeDataAsset.bytes);
+                BidiEngine engine = new BidiEngine(provider);
+
+                BidiConformanceRunner runner = new BidiConformanceRunner(engine);
+                BidiConformanceSummary summary = runner.RunBidiCharacterTests(bidiCharacterTestAsset.text, maxFailuresToLog);
+
+                var log = $"BidiCharacterTest done. Passed={summary.passedTests}, " +
+                          $"Failed={summary.failedTests}, Skipped={summary.skippedTests}." +
+                          $"Sample Failures:\n{summary.sampleFailures}";
+                
+                Debug.Log(log);
+                File.WriteAllText(Path.Combine(Application.persistentDataPath, "UnicodeTestResults.txt"), log);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Exception while running BidiCharacterTest: {ex}");
+            }
+        }
+
+        public void OnGui()
+        {
+            maxFailuresToLog = EditorGUILayout.IntField("Max Failures To Log", maxFailuresToLog);
+            
+            unicodeDataAsset = (TextAsset)EditorGUILayout.ObjectField(
+                "UnicodeData.bytes",
+                unicodeDataAsset,
+                typeof(TextAsset),
+                false);
+            
+            bidiCharacterTestAsset = (TextAsset)EditorGUILayout.ObjectField(
+                "BidiCharacterTest.txt",
+                bidiCharacterTestAsset,
+                typeof(TextAsset),
+                false);
+
+            if (GUILayout.Button("Run Test"))
+            {
+                RunBidiCharacterTests();
+            }
+        }
+    }
+    
     [SerializeField] private TextAsset derivedBidiClassAsset;
     [SerializeField] private TextAsset derivedJoiningTypeAsset;
     [SerializeField] private TextAsset arabicShapingAsset;
     [SerializeField] private TextAsset bidiBracketsAsset;
     [SerializeField] private TextAsset bidiMirroringAsset;
+    
+    [SerializeField] private TestData testing;
 
     [SerializeField] private DefaultAsset outputFolder;
 
-    [SerializeField] private string outputFileName = "UnicodeData.bin";
+    [SerializeField] private string outputFileName = "UnicodeData.bytes";
 
     [MenuItem("Tools/RTL/Unicode Data Generator")]
     public static void ShowWindow()
@@ -24,7 +85,7 @@ public class UnicodeDataGeneratorWindow : EditorWindow
         window.titleContent = new GUIContent("Unicode Data Generator");
         window.minSize = new Vector2(450, 200);
     }
-
+    
     private void OnGUI()
     {
         EditorGUILayout.LabelField("Unicode Data Generator", EditorStyles.boldLabel);
@@ -88,6 +149,10 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             outputFileName = "UnicodeData.bin";
         }
 
+        EditorGUILayout.Space();
+        EditorGUILayout.BeginFoldoutHeaderGroup(true, "Testing");
+        testing.OnGui();
+        EditorGUILayout.EndFoldoutHeaderGroup();
         EditorGUILayout.Space();
 
         GUI.enabled = derivedBidiClassAsset != null &&
