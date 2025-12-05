@@ -12,6 +12,8 @@ public class UnicodeDataGeneratorWindow : EditorWindow
         [SerializeField] private int maxFailuresToLog = 10;
         [SerializeField] private TextAsset unicodeDataAsset;
         [SerializeField] private TextAsset bidiCharacterTestAsset;
+        [SerializeField] private TextAsset lineBreakTestAsset;
+        [SerializeField] private TextAsset scriptsAsset;
 
         public void RunBidiCharacterTests()
         {
@@ -23,19 +25,13 @@ public class UnicodeDataGeneratorWindow : EditorWindow
 
             try
             {
-                BinaryUnicodeDataProvider provider = new BinaryUnicodeDataProvider(unicodeDataAsset.bytes);
-                BidiEngine engine = new BidiEngine(provider);
+                var provider = new BinaryUnicodeDataProvider(unicodeDataAsset.bytes);
+                var engine = new BidiEngine(provider);
+                var runner = new BidiConformanceRunner(engine);
+                var summary = runner.RunBidiCharacterTests(bidiCharacterTestAsset.text, maxFailuresToLog);
 
-                BidiConformanceRunner runner = new BidiConformanceRunner(engine);
-                BidiConformanceSummary summary =
-                    runner.RunBidiCharacterTests(bidiCharacterTestAsset.text, maxFailuresToLog);
-
-                var log = $"BidiCharacterTest done. Passed={summary.passedTests}, " +
-                          $"Failed={summary.failedTests}, Skipped={summary.skippedTests}." +
-                          $"Sample Failures:\n{summary.sampleFailures}";
-
-                Debug.Log(log);
-                File.WriteAllText(Path.Combine(Application.persistentDataPath, "UnicodeTestResults.txt"), log);
+                LogSummary("BidiCharacterTest", summary.passedTests, summary.failedTests, 
+                    summary.skippedTests, summary.sampleFailures);
             }
             catch (Exception ex)
             {
@@ -43,9 +39,105 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             }
         }
 
+        public void RunLineBreakTests()
+        {
+            if (unicodeDataAsset == null || lineBreakTestAsset == null)
+            {
+                Debug.LogError("Assign unicodeDataAsset and lineBreakTestAsset.");
+                return;
+            }
+
+            try
+            {
+                var provider = new BinaryUnicodeDataProvider(unicodeDataAsset.bytes);
+                var runner = new LineBreakConformanceRunner(provider);
+                var summary = runner.RunTests(lineBreakTestAsset.text, maxFailuresToLog);
+
+                LogSummary("LineBreakTest", summary.passedTests, summary.failedTests,
+                    summary.skippedTests, summary.sampleFailures);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Exception while running LineBreakTest: {ex}");
+            }
+        }
+
+        public void RunScriptTests()
+        {
+            if (unicodeDataAsset == null || scriptsAsset == null)
+            {
+                Debug.LogError("Assign unicodeDataAsset and scriptsAsset.");
+                return;
+            }
+
+            try
+            {
+                var provider = new BinaryUnicodeDataProvider(unicodeDataAsset.bytes);
+                var runner = new ScriptConformanceRunner(provider);
+                var summary = runner.RunTests(scriptsAsset.text, maxFailuresToLog);
+
+                LogSummary("ScriptTest", summary.passedTests, summary.failedTests,
+                    summary.skippedTests, summary.sampleFailures);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Exception while running ScriptTest: {ex}");
+            }
+        }
+
+        public void RunAllTests()
+        {
+            if (unicodeDataAsset == null)
+            {
+                Debug.LogError("Assign unicodeDataAsset first.");
+                return;
+            }
+
+            Debug.Log("=== Running All Unicode Conformance Tests ===");
+
+            if (bidiCharacterTestAsset != null)
+                RunBidiCharacterTests();
+            else
+                Debug.LogWarning("Skipping BiDi tests: bidiCharacterTestAsset not assigned");
+
+            if (lineBreakTestAsset != null)
+                RunLineBreakTests();
+            else
+                Debug.LogWarning("Skipping LineBreak tests: lineBreakTestAsset not assigned");
+
+            if (scriptsAsset != null)
+                RunScriptTests();
+            else
+                Debug.LogWarning("Skipping Script tests: scriptsAsset not assigned");
+
+            Debug.Log("=== All Tests Complete ===");
+        }
+
+        private void LogSummary(string testName, int passed, int failed, int skipped, string? sampleFailures)
+        {
+            string log = $"{testName}: Passed={passed}, Failed={failed}, Skipped={skipped}";
+            
+            if (failed > 0 && !string.IsNullOrEmpty(sampleFailures))
+            {
+                log += $"\nSample Failures:\n{sampleFailures}";
+                Debug.LogWarning(log);
+            }
+            else
+            {
+                Debug.Log(log);
+            }
+
+            // Save to file
+            string filePath = Path.Combine(Application.persistentDataPath, $"{testName}Results.txt");
+            File.WriteAllText(filePath, log);
+        }
+
         public void OnGui()
         {
             maxFailuresToLog = EditorGUILayout.IntField("Max Failures To Log", maxFailuresToLog);
+
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Test Data Assets", EditorStyles.miniBoldLabel);
 
             unicodeDataAsset = (TextAsset)EditorGUILayout.ObjectField(
                 "UnicodeData.bytes",
@@ -59,10 +151,45 @@ public class UnicodeDataGeneratorWindow : EditorWindow
                 typeof(TextAsset),
                 false);
 
-            if (GUILayout.Button("Run Test"))
-            {
+            lineBreakTestAsset = (TextAsset)EditorGUILayout.ObjectField(
+                "LineBreakTest.txt",
+                lineBreakTestAsset,
+                typeof(TextAsset),
+                false);
+
+            scriptsAsset = (TextAsset)EditorGUILayout.ObjectField(
+                "Scripts.txt",
+                scriptsAsset,
+                typeof(TextAsset),
+                false);
+
+            EditorGUILayout.Space();
+
+            EditorGUILayout.BeginHorizontal();
+            
+            if (GUILayout.Button("Run All Tests"))
+                RunAllTests();
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+
+            EditorGUI.BeginDisabledGroup(unicodeDataAsset == null || bidiCharacterTestAsset == null);
+            if (GUILayout.Button("BiDi"))
                 RunBidiCharacterTests();
-            }
+            EditorGUI.EndDisabledGroup();
+
+            EditorGUI.BeginDisabledGroup(unicodeDataAsset == null || lineBreakTestAsset == null);
+            if (GUILayout.Button("LineBreak"))
+                RunLineBreakTests();
+            EditorGUI.EndDisabledGroup();
+
+            EditorGUI.BeginDisabledGroup(unicodeDataAsset == null || scriptsAsset == null);
+            if (GUILayout.Button("Script"))
+                RunScriptTests();
+            EditorGUI.EndDisabledGroup();
+
+            EditorGUILayout.EndHorizontal();
         }
     }
 
@@ -74,11 +201,14 @@ public class UnicodeDataGeneratorWindow : EditorWindow
     [SerializeField] private TextAsset bidiMirroringAsset;
     [SerializeField] private TextAsset scriptsAsset;
     [SerializeField] private TextAsset lineBreakAsset;
+    [SerializeField] private TextAsset emojiDataAsset;
+    [SerializeField] private TextAsset generalCategoryAsset;
+    [SerializeField] private TextAsset eastAsianWidthAsset;
 
     [Header("Output")]
     [SerializeField] private DefaultAsset outputFolder;
     [SerializeField] private string outputFileName = "UnicodeData.bytes";
-    [SerializeField] private bool useFormatV2 = true;
+    [SerializeField] private bool useFormatV4 = true;
 
     [Header("Testing")]
     [SerializeField] private TestData testing = new();
@@ -131,7 +261,7 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             false);
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Source Files (Format V2)", EditorStyles.boldLabel);
+        EditorGUILayout.LabelField("Source Files (Format V2+)", EditorStyles.boldLabel);
 
         scriptsAsset = (TextAsset)EditorGUILayout.ObjectField(
             "Scripts.txt",
@@ -146,6 +276,30 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             false);
 
         EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Source Files (Format V3+)", EditorStyles.boldLabel);
+
+        emojiDataAsset = (TextAsset)EditorGUILayout.ObjectField(
+            "emoji-data.txt",
+            emojiDataAsset,
+            typeof(TextAsset),
+            false);
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Source Files (Format V4)", EditorStyles.boldLabel);
+
+        generalCategoryAsset = (TextAsset)EditorGUILayout.ObjectField(
+            "DerivedGeneralCategory.txt",
+            generalCategoryAsset,
+            typeof(TextAsset),
+            false);
+
+        eastAsianWidthAsset = (TextAsset)EditorGUILayout.ObjectField(
+            "EastAsianWidth.txt",
+            eastAsianWidthAsset,
+            typeof(TextAsset),
+            false);
+
+        EditorGUILayout.Space();
         EditorGUILayout.LabelField("Output", EditorStyles.boldLabel);
 
         outputFolder = (DefaultAsset)EditorGUILayout.ObjectField(
@@ -155,7 +309,7 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             false);
 
         outputFileName = EditorGUILayout.TextField("Output File Name", outputFileName);
-        useFormatV2 = EditorGUILayout.Toggle("Use Format V2 (Script + LineBreak)", useFormatV2);
+        useFormatV4 = EditorGUILayout.Toggle("Use Format V4 (Full Unicode Properties)", useFormatV4);
 
         if (EditorGUI.EndChangeCheck())
         {
@@ -171,9 +325,10 @@ public class UnicodeDataGeneratorWindow : EditorWindow
                           bidiMirroringAsset != null &&
                           outputFolder != null;
 
-        if (useFormatV2)
+        if (useFormatV4)
         {
-            canGenerate = canGenerate && scriptsAsset != null && lineBreakAsset != null;
+            canGenerate = canGenerate && scriptsAsset != null && lineBreakAsset != null && 
+                         emojiDataAsset != null && generalCategoryAsset != null && eastAsianWidthAsset != null;
         }
 
         EditorGUI.BeginDisabledGroup(!canGenerate);
@@ -186,9 +341,9 @@ public class UnicodeDataGeneratorWindow : EditorWindow
         if (!canGenerate)
         {
             EditorGUILayout.HelpBox(
-                useFormatV2 
-                    ? "Assign all required source files and output folder to generate."
-                    : "Assign all required source files (excluding Scripts.txt and LineBreak.txt) and output folder.",
+                useFormatV4 
+                    ? "Assign all required source files including DerivedGeneralCategory.txt and EastAsianWidth.txt and output folder to generate."
+                    : "Assign all required source files (excluding Scripts.txt, LineBreak.txt, emoji-data.txt, etc.) and output folder.",
                 MessageType.Warning);
         }
 
@@ -227,23 +382,37 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             // Unicode version (17.0.0 = 0x110000)
             int unicodeVersion = 0x110000;
 
-            if (useFormatV2 && scriptsAsset != null && lineBreakAsset != null)
+            if (useFormatV4 && scriptsAsset != null && lineBreakAsset != null && 
+                emojiDataAsset != null && generalCategoryAsset != null && eastAsianWidthAsset != null)
             {
                 string scriptsPath = SaveTempFile(tempDir, "Scripts.txt", scriptsAsset);
                 string lineBreakPath = SaveTempFile(tempDir, "LineBreak.txt", lineBreakAsset);
+                string emojiDataPath = SaveTempFile(tempDir, "emoji-data.txt", emojiDataAsset);
+                string generalCategoryPath = SaveTempFile(tempDir, "DerivedGeneralCategory.txt", generalCategoryAsset);
+                string eastAsianWidthPath = SaveTempFile(tempDir, "EastAsianWidth.txt", eastAsianWidthAsset);
 
                 builder.LoadScripts(scriptsPath);
                 builder.LoadLineBreak(lineBreakPath);
+                builder.LoadEmojiData(emojiDataPath);
+                builder.LoadGeneralCategory(generalCategoryPath);
+                builder.LoadEastAsianWidth(eastAsianWidthPath);
 
                 var scripts = builder.BuildScriptRangeEntries();
                 var lineBreaks = builder.BuildLineBreakRangeEntries();
+                var extendedPictographics = builder.BuildExtendedPictographicRangeEntries();
+                var generalCategories = builder.BuildGeneralCategoryRangeEntries();
+                var eastAsianWidths = builder.BuildEastAsianWidthRangeEntries();
 
                 UnicodeBinaryWriter.WriteBinary(
-                    outputPath, ranges, mirrors, brackets, scripts, lineBreaks, unicodeVersion);
+                    outputPath, ranges, mirrors, brackets, scripts, lineBreaks, 
+                    extendedPictographics, generalCategories, eastAsianWidths, unicodeVersion);
 
-                Debug.Log($"Generated Unicode data (Format V2) with {ranges.Count} ranges, " +
+                Debug.Log($"Generated Unicode data (Format V4) with {ranges.Count} ranges, " +
                           $"{mirrors.Count} mirrors, {brackets.Count} brackets, " +
-                          $"{scripts.Count} script ranges, {lineBreaks.Count} line break ranges.");
+                          $"{scripts.Count} script ranges, {lineBreaks.Count} line break ranges, " +
+                          $"{extendedPictographics.Count} Extended_Pictographic ranges, " +
+                          $"{generalCategories.Count} GeneralCategory ranges, " +
+                          $"{eastAsianWidths.Count} EastAsianWidth ranges.");
             }
             else
             {

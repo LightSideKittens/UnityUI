@@ -89,17 +89,74 @@ public readonly struct LineBreakRangeEntry
 }
 
 
+/// <summary>
+/// Range entry for Extended_Pictographic property (from emoji-data.txt)
+/// </summary>
+public readonly struct ExtendedPictographicRangeEntry
+{
+    public readonly int startCodePoint;
+    public readonly int endCodePoint;
+
+    public ExtendedPictographicRangeEntry(int startCodePoint, int endCodePoint)
+    {
+        this.startCodePoint = startCodePoint;
+        this.endCodePoint = endCodePoint;
+    }
+}
+
+
+/// <summary>
+/// Range entry for General_Category property (from DerivedGeneralCategory.txt)
+/// </summary>
+public readonly struct GeneralCategoryRangeEntry
+{
+    public readonly int startCodePoint;
+    public readonly int endCodePoint;
+    public readonly GeneralCategory generalCategory;
+
+    public GeneralCategoryRangeEntry(int startCodePoint, int endCodePoint, GeneralCategory generalCategory)
+    {
+        this.startCodePoint = startCodePoint;
+        this.endCodePoint = endCodePoint;
+        this.generalCategory = generalCategory;
+    }
+}
+
+
+/// <summary>
+/// Range entry for East_Asian_Width property (from EastAsianWidth.txt)
+/// </summary>
+public readonly struct EastAsianWidthRangeEntry
+{
+    public readonly int startCodePoint;
+    public readonly int endCodePoint;
+    public readonly EastAsianWidth eastAsianWidth;
+
+    public EastAsianWidthRangeEntry(int startCodePoint, int endCodePoint, EastAsianWidth eastAsianWidth)
+    {
+        this.startCodePoint = startCodePoint;
+        this.endCodePoint = endCodePoint;
+        this.eastAsianWidth = eastAsianWidth;
+    }
+}
+
+
 public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
 {
     private const uint Magic = 0x554C5452; // "ULTR"
     private const ushort FormatVersion1 = 1;
     private const ushort FormatVersion2 = 2;
+    private const ushort FormatVersion3 = 3;
+    private const ushort FormatVersion4 = 4;
 
     private readonly RangeEntry[] ranges;
     private readonly MirrorEntry[] mirrors;
     private readonly BracketEntry[] brackets;
     private readonly ScriptRangeEntry[] scriptRanges;
     private readonly LineBreakRangeEntry[] lineBreakRanges;
+    private readonly ExtendedPictographicRangeEntry[] extendedPictographicRanges;
+    private readonly GeneralCategoryRangeEntry[] generalCategoryRanges;
+    private readonly EastAsianWidthRangeEntry[] eastAsianWidthRanges;
 
     public int UnicodeVersionRaw { get; }
     public ushort FormatVersion { get; }
@@ -117,7 +174,8 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
             throw new InvalidDataException("Invalid Unicode data blob: magic mismatch.");
 
         FormatVersion = reader.ReadUInt16();
-        if (FormatVersion != FormatVersion1 && FormatVersion != FormatVersion2)
+        if (FormatVersion != FormatVersion1 && FormatVersion != FormatVersion2 && 
+            FormatVersion != FormatVersion3 && FormatVersion != FormatVersion4)
             throw new InvalidDataException($"Unsupported Unicode data format version: {FormatVersion}.");
 
         reader.ReadUInt16(); // Reserved
@@ -143,6 +201,27 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
             scriptLength = reader.ReadUInt32();
             lineBreakOffset = reader.ReadUInt32();
             lineBreakLength = reader.ReadUInt32();
+        }
+
+        // Format v3 adds Extended_Pictographic section
+        uint extPictOffset = 0, extPictLength = 0;
+        
+        if (FormatVersion >= FormatVersion3)
+        {
+            extPictOffset = reader.ReadUInt32();
+            extPictLength = reader.ReadUInt32();
+        }
+
+        // Format v4 adds GeneralCategory and EastAsianWidth sections
+        uint gcOffset = 0, gcLength = 0;
+        uint eawOffset = 0, eawLength = 0;
+        
+        if (FormatVersion >= FormatVersion4)
+        {
+            gcOffset = reader.ReadUInt32();
+            gcLength = reader.ReadUInt32();
+            eawOffset = reader.ReadUInt32();
+            eawLength = reader.ReadUInt32();
         }
 
         // Read Range section
@@ -272,6 +351,82 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         {
             lineBreakRanges = Array.Empty<LineBreakRangeEntry>();
         }
+
+        // Read Extended_Pictographic section (format v3)
+        if (extPictOffset != 0 && extPictLength != 0)
+        {
+            stream.Position = extPictOffset;
+            uint extPictCount = reader.ReadUInt32();
+            extendedPictographicRanges = new ExtendedPictographicRangeEntry[extPictCount];
+
+            for (uint i = 0; i < extPictCount; i++)
+            {
+                uint start = reader.ReadUInt32();
+                uint end = reader.ReadUInt32();
+
+                extendedPictographicRanges[i] = new ExtendedPictographicRangeEntry(
+                    startCodePoint: unchecked((int)start),
+                    endCodePoint: unchecked((int)end));
+            }
+        }
+        else
+        {
+            extendedPictographicRanges = Array.Empty<ExtendedPictographicRangeEntry>();
+        }
+
+        // Read GeneralCategory section (format v4)
+        if (gcOffset != 0 && gcLength != 0)
+        {
+            stream.Position = gcOffset;
+            uint gcCount = reader.ReadUInt32();
+            generalCategoryRanges = new GeneralCategoryRangeEntry[gcCount];
+
+            for (uint i = 0; i < gcCount; i++)
+            {
+                uint start = reader.ReadUInt32();
+                uint end = reader.ReadUInt32();
+                byte gc = reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+
+                generalCategoryRanges[i] = new GeneralCategoryRangeEntry(
+                    startCodePoint: unchecked((int)start),
+                    endCodePoint: unchecked((int)end),
+                    generalCategory: (GeneralCategory)gc);
+            }
+        }
+        else
+        {
+            generalCategoryRanges = Array.Empty<GeneralCategoryRangeEntry>();
+        }
+
+        // Read EastAsianWidth section (format v4)
+        if (eawOffset != 0 && eawLength != 0)
+        {
+            stream.Position = eawOffset;
+            uint eawCount = reader.ReadUInt32();
+            eastAsianWidthRanges = new EastAsianWidthRangeEntry[eawCount];
+
+            for (uint i = 0; i < eawCount; i++)
+            {
+                uint start = reader.ReadUInt32();
+                uint end = reader.ReadUInt32();
+                byte eaw = reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+
+                eastAsianWidthRanges[i] = new EastAsianWidthRangeEntry(
+                    startCodePoint: unchecked((int)start),
+                    endCodePoint: unchecked((int)end),
+                    eastAsianWidth: (EastAsianWidth)eaw);
+            }
+        }
+        else
+        {
+            eastAsianWidthRanges = Array.Empty<EastAsianWidthRangeEntry>();
+        }
     }
 
     public BidiClass GetBidiClass(int codePoint)
@@ -325,6 +480,23 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
     {
         var entry = FindLineBreakRange(codePoint);
         return entry?.lineBreakClass ?? LineBreakClass.XX; // XX = Unknown
+    }
+
+    public bool IsExtendedPictographic(int codePoint)
+    {
+        return FindExtendedPictographicRange(codePoint) != null;
+    }
+
+    public GeneralCategory GetGeneralCategory(int codePoint)
+    {
+        var entry = FindGeneralCategoryRange(codePoint);
+        return entry?.generalCategory ?? GeneralCategory.Cn; // Cn = Not assigned
+    }
+
+    public EastAsianWidth GetEastAsianWidth(int codePoint)
+    {
+        var entry = FindEastAsianWidthRange(codePoint);
+        return entry?.eastAsianWidth ?? EastAsianWidth.N; // N = Neutral
     }
 
     private RangeEntry? FindRange(int codePoint)
@@ -420,6 +592,69 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         {
             int mid = (lo + hi) >> 1;
             var entry = lineBreakRanges[mid];
+
+            if (codePoint < entry.startCodePoint)
+                hi = mid - 1;
+            else if (codePoint > entry.endCodePoint)
+                lo = mid + 1;
+            else
+                return entry;
+        }
+
+        return null;
+    }
+
+    private ExtendedPictographicRangeEntry? FindExtendedPictographicRange(int codePoint)
+    {
+        int lo = 0;
+        int hi = extendedPictographicRanges.Length - 1;
+
+        while (lo <= hi)
+        {
+            int mid = (lo + hi) >> 1;
+            var entry = extendedPictographicRanges[mid];
+
+            if (codePoint < entry.startCodePoint)
+                hi = mid - 1;
+            else if (codePoint > entry.endCodePoint)
+                lo = mid + 1;
+            else
+                return entry;
+        }
+
+        return null;
+    }
+
+    private GeneralCategoryRangeEntry? FindGeneralCategoryRange(int codePoint)
+    {
+        int lo = 0;
+        int hi = generalCategoryRanges.Length - 1;
+
+        while (lo <= hi)
+        {
+            int mid = (lo + hi) >> 1;
+            var entry = generalCategoryRanges[mid];
+
+            if (codePoint < entry.startCodePoint)
+                hi = mid - 1;
+            else if (codePoint > entry.endCodePoint)
+                lo = mid + 1;
+            else
+                return entry;
+        }
+
+        return null;
+    }
+
+    private EastAsianWidthRangeEntry? FindEastAsianWidthRange(int codePoint)
+    {
+        int lo = 0;
+        int hi = eastAsianWidthRanges.Length - 1;
+
+        while (lo <= hi)
+        {
+            int mid = (lo + hi) >> 1;
+            var entry = eastAsianWidthRanges[mid];
 
             if (codePoint < entry.startCodePoint)
                 hi = mid - 1;

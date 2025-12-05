@@ -12,6 +12,9 @@ struct UnicodeProps
     public JoiningGroup joiningGroup;
     public UnicodeScript script;
     public LineBreakClass lineBreakClass;
+    public bool extendedPictographic;
+    public GeneralCategory generalCategory;
+    public EastAsianWidth eastAsianWidth;
 }
 
 public class UnicodeDataBuilder
@@ -36,6 +39,8 @@ public class UnicodeDataBuilder
             props[cp].joiningGroup = JoiningGroup.NoJoiningGroup;
             props[cp].script = UnicodeScript.Unknown;
             props[cp].lineBreakClass = LineBreakClass.XX;
+            props[cp].generalCategory = GeneralCategory.Cn; // Not assigned
+            props[cp].eastAsianWidth = EastAsianWidth.N;    // Neutral
         }
     }
 
@@ -180,6 +185,150 @@ public class UnicodeDataBuilder
 
             ParseRangeAndApply(codeRangePart, cp => props[cp].lineBreakClass = lbc);
         }
+    }
+
+    /// <summary>
+    /// Load emoji-data.txt to extract Extended_Pictographic property
+    /// </summary>
+    public void LoadEmojiData(string path)
+    {
+        using var reader = new StreamReader(path);
+
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            line = StripComment(line);
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            string[] semi = line.Split(';');
+            if (semi.Length < 2)
+                continue;
+
+            string codeRangePart = semi[0].Trim();
+            string propertyPart = semi[1].Trim();
+
+            if (codeRangePart.Length == 0 || propertyPart.Length == 0)
+                continue;
+
+            // Only interested in Extended_Pictographic property
+            if (propertyPart != "Extended_Pictographic")
+                continue;
+
+            ParseRangeAndApply(codeRangePart, cp => props[cp].extendedPictographic = true);
+        }
+    }
+
+    /// <summary>
+    /// Load DerivedGeneralCategory.txt to extract General_Category property
+    /// Format: 0000..001F    ; Cc # [32] <control-0000>..<control-001F>
+    /// </summary>
+    public void LoadGeneralCategory(string path)
+    {
+        using var reader = new StreamReader(path);
+
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            line = StripComment(line);
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            string[] semi = line.Split(';');
+            if (semi.Length < 2)
+                continue;
+
+            string codeRangePart = semi[0].Trim();
+            string gcPart = semi[1].Trim();
+
+            if (codeRangePart.Length == 0 || gcPart.Length == 0)
+                continue;
+
+            GeneralCategory gc = ParseGeneralCategory(gcPart);
+            ParseRangeAndApply(codeRangePart, cp => props[cp].generalCategory = gc);
+        }
+    }
+
+    /// <summary>
+    /// Load EastAsianWidth.txt to extract East_Asian_Width property
+    /// Format: 0000..001F;N  # Cc    [32] <control-0000>..<control-001F>
+    /// </summary>
+    public void LoadEastAsianWidth(string path)
+    {
+        using var reader = new StreamReader(path);
+
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            line = StripComment(line);
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            string[] semi = line.Split(';');
+            if (semi.Length < 2)
+                continue;
+
+            string codeRangePart = semi[0].Trim();
+            string eawPart = semi[1].Trim();
+
+            if (codeRangePart.Length == 0 || eawPart.Length == 0)
+                continue;
+
+            EastAsianWidth eaw = ParseEastAsianWidth(eawPart);
+            ParseRangeAndApply(codeRangePart, cp => props[cp].eastAsianWidth = eaw);
+        }
+    }
+
+    private static GeneralCategory ParseGeneralCategory(string value)
+    {
+        return value switch
+        {
+            "Lu" => GeneralCategory.Lu,
+            "Ll" => GeneralCategory.Ll,
+            "Lt" => GeneralCategory.Lt,
+            "Lm" => GeneralCategory.Lm,
+            "Lo" => GeneralCategory.Lo,
+            "Mn" => GeneralCategory.Mn,
+            "Mc" => GeneralCategory.Mc,
+            "Me" => GeneralCategory.Me,
+            "Nd" => GeneralCategory.Nd,
+            "Nl" => GeneralCategory.Nl,
+            "No" => GeneralCategory.No,
+            "Pc" => GeneralCategory.Pc,
+            "Pd" => GeneralCategory.Pd,
+            "Ps" => GeneralCategory.Ps,
+            "Pe" => GeneralCategory.Pe,
+            "Pi" => GeneralCategory.Pi,
+            "Pf" => GeneralCategory.Pf,
+            "Po" => GeneralCategory.Po,
+            "Sm" => GeneralCategory.Sm,
+            "Sc" => GeneralCategory.Sc,
+            "Sk" => GeneralCategory.Sk,
+            "So" => GeneralCategory.So,
+            "Zs" => GeneralCategory.Zs,
+            "Zl" => GeneralCategory.Zl,
+            "Zp" => GeneralCategory.Zp,
+            "Cc" => GeneralCategory.Cc,
+            "Cf" => GeneralCategory.Cf,
+            "Cs" => GeneralCategory.Cs,
+            "Co" => GeneralCategory.Co,
+            "Cn" => GeneralCategory.Cn,
+            _ => GeneralCategory.Cn
+        };
+    }
+
+    private static EastAsianWidth ParseEastAsianWidth(string value)
+    {
+        return value switch
+        {
+            "N" => EastAsianWidth.N,
+            "A" => EastAsianWidth.A,
+            "H" => EastAsianWidth.H,
+            "W" => EastAsianWidth.W,
+            "F" => EastAsianWidth.F,
+            "Na" => EastAsianWidth.Na,
+            _ => EastAsianWidth.N
+        };
     }
 
     private void ParseRangeAndApply(string codeRangePart, Action<int> apply)
@@ -416,6 +565,98 @@ public class UnicodeDataBuilder
         return result;
     }
 
+    /// <summary>
+    /// Build range entries for Extended_Pictographic property.
+    /// Only includes ranges where Extended_Pictographic=true.
+    /// </summary>
+    public List<ExtendedPictographicRangeEntry> BuildExtendedPictographicRangeEntries()
+    {
+        var result = new List<ExtendedPictographicRangeEntry>();
+
+        int currentStart = -1;
+        bool inRange = false;
+
+        for (int cp = 0; cp <= MaxCodePoint; cp++)
+        {
+            bool ep = props[cp].extendedPictographic;
+
+            if (ep && !inRange)
+            {
+                // Start a new range
+                currentStart = cp;
+                inRange = true;
+            }
+            else if (!ep && inRange)
+            {
+                // End current range
+                result.Add(new ExtendedPictographicRangeEntry(currentStart, cp - 1));
+                inRange = false;
+            }
+        }
+
+        // Don't forget the last range if it extends to MaxCodePoint
+        if (inRange)
+        {
+            result.Add(new ExtendedPictographicRangeEntry(currentStart, MaxCodePoint));
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Build range entries for General_Category property.
+    /// </summary>
+    public List<GeneralCategoryRangeEntry> BuildGeneralCategoryRangeEntries()
+    {
+        var result = new List<GeneralCategoryRangeEntry>();
+
+        int currentStart = 0;
+        var currentGc = props[0].generalCategory;
+
+        for (int cp = 1; cp <= MaxCodePoint; cp++)
+        {
+            var gc = props[cp].generalCategory;
+
+            if (gc != currentGc)
+            {
+                result.Add(new GeneralCategoryRangeEntry(currentStart, cp - 1, currentGc));
+                currentStart = cp;
+                currentGc = gc;
+            }
+        }
+
+        result.Add(new GeneralCategoryRangeEntry(currentStart, MaxCodePoint, currentGc));
+
+        return result;
+    }
+
+    /// <summary>
+    /// Build range entries for East_Asian_Width property.
+    /// </summary>
+    public List<EastAsianWidthRangeEntry> BuildEastAsianWidthRangeEntries()
+    {
+        var result = new List<EastAsianWidthRangeEntry>();
+
+        int currentStart = 0;
+        var currentEaw = props[0].eastAsianWidth;
+
+        for (int cp = 1; cp <= MaxCodePoint; cp++)
+        {
+            var eaw = props[cp].eastAsianWidth;
+
+            if (eaw != currentEaw)
+            {
+                result.Add(new EastAsianWidthRangeEntry(currentStart, cp - 1, currentEaw));
+                currentStart = cp;
+                currentEaw = eaw;
+            }
+        }
+
+        result.Add(new EastAsianWidthRangeEntry(currentStart, MaxCodePoint, currentEaw));
+
+        return result;
+    }
+
     public static List<MirrorEntry> BuildMirrorEntries(string bidiMirroringPath)
     {
         if (string.IsNullOrEmpty(bidiMirroringPath))
@@ -527,10 +768,10 @@ public class UnicodeDataBuilder
 public static class UnicodeBinaryWriter
 {
     const uint Magic = 0x554C5452; // "ULTR"
-    const ushort FormatVersion = 2;
+    const ushort FormatVersion4 = 4;
 
     /// <summary>
-    /// Write format version 2 (with Script and LineBreak)
+    /// Write format version 4 (with Script, LineBreak, Extended_Pictographic, GeneralCategory, EastAsianWidth)
     /// </summary>
     public static void WriteBinary(
         string outputPath,
@@ -539,6 +780,9 @@ public static class UnicodeBinaryWriter
         IReadOnlyList<BracketEntry> brackets,
         IReadOnlyList<ScriptRangeEntry> scripts,
         IReadOnlyList<LineBreakRangeEntry> lineBreaks,
+        IReadOnlyList<ExtendedPictographicRangeEntry> extendedPictographics,
+        IReadOnlyList<GeneralCategoryRangeEntry> generalCategories,
+        IReadOnlyList<EastAsianWidthRangeEntry> eastAsianWidths,
         int unicodeVersionRaw)
     {
         using var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -548,12 +792,12 @@ public static class UnicodeBinaryWriter
         long headerPosition = stream.Position;
 
         writer.Write(Magic);
-        writer.Write(FormatVersion);
+        writer.Write(FormatVersion4);
         writer.Write((ushort)0); // Reserved
         writer.Write((uint)unicodeVersionRaw);
 
-        // Section offsets placeholder (6 sections * 8 bytes)
-        for (int i = 0; i < 12; i++)
+        // Section offsets placeholder (9 sections * 8 bytes)
+        for (int i = 0; i < 18; i++)
             writer.Write((uint)0);
 
         // Write Range section
@@ -622,11 +866,49 @@ public static class UnicodeBinaryWriter
         }
         uint lineBreakLength = (uint)(stream.Position - lineBreakOffset);
 
+        // Write Extended_Pictographic section
+        long extPictOffset = stream.Position;
+        writer.Write((uint)extendedPictographics.Count);
+        foreach (var ep in extendedPictographics)
+        {
+            writer.Write((uint)ep.startCodePoint);
+            writer.Write((uint)ep.endCodePoint);
+        }
+        uint extPictLength = (uint)(stream.Position - extPictOffset);
+
+        // Write GeneralCategory section
+        long gcOffset = stream.Position;
+        writer.Write((uint)generalCategories.Count);
+        foreach (var gc in generalCategories)
+        {
+            writer.Write((uint)gc.startCodePoint);
+            writer.Write((uint)gc.endCodePoint);
+            writer.Write((byte)gc.generalCategory);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+        }
+        uint gcLength = (uint)(stream.Position - gcOffset);
+
+        // Write EastAsianWidth section
+        long eawOffset = stream.Position;
+        writer.Write((uint)eastAsianWidths.Count);
+        foreach (var eaw in eastAsianWidths)
+        {
+            writer.Write((uint)eaw.startCodePoint);
+            writer.Write((uint)eaw.endCodePoint);
+            writer.Write((byte)eaw.eastAsianWidth);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+        }
+        uint eawLength = (uint)(stream.Position - eawOffset);
+
         // Go back and write header with offsets
         stream.Position = headerPosition;
 
         writer.Write(Magic);
-        writer.Write(FormatVersion);
+        writer.Write(FormatVersion4);
         writer.Write((ushort)0);
         writer.Write((uint)unicodeVersionRaw);
 
@@ -640,6 +922,12 @@ public static class UnicodeBinaryWriter
         writer.Write(scriptLength);
         writer.Write((uint)lineBreakOffset);
         writer.Write(lineBreakLength);
+        writer.Write((uint)extPictOffset);
+        writer.Write(extPictLength);
+        writer.Write((uint)gcOffset);
+        writer.Write(gcLength);
+        writer.Write((uint)eawOffset);
+        writer.Write(eawLength);
 
         writer.Flush();
     }

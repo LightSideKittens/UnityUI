@@ -4,12 +4,12 @@ namespace Tekst
 {
     /// <summary>
     /// Line Breaker — разбивает текст на строки.
-    /// Реализует UAX #14 (Line Breaking Algorithm) + word wrapping.
-    /// Использует IUnicodeDataProvider из Unicode модуля.
+    /// Использует LineBreakAlgorithm (UAX #14) для определения break opportunities
+    /// и выполняет word wrapping.
     /// </summary>
     public sealed class LineBreaker : ILineBreaker
     {
-        private readonly IUnicodeDataProvider dataProvider;
+        private readonly LineBreakAlgorithm lineBreakAlgorithm;
         
         // Буферы
         private TextLine[] lines = new TextLine[16];
@@ -17,12 +17,20 @@ namespace Tekst
         private ShapedRun[] orderedRuns = new ShapedRun[32];
         private int orderedRunCount;
         
-        // Temporary: break opportunities
-        private BreakOpportunity[] breaks = new BreakOpportunity[256];
+        // Break opportunities (от LineBreakAlgorithm)
+        private bool[] breakOpportunities = new bool[257];
+        
+        public LineBreaker(LineBreakAlgorithm lineBreakAlgorithm)
+        {
+            this.lineBreakAlgorithm = lineBreakAlgorithm ?? throw new ArgumentNullException(nameof(lineBreakAlgorithm));
+        }
         
         public LineBreaker(IUnicodeDataProvider dataProvider)
         {
-            this.dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
+            if (dataProvider == null)
+                throw new ArgumentNullException(nameof(dataProvider));
+            
+            lineBreakAlgorithm = new LineBreakAlgorithm(dataProvider);
         }
         
         public void BreakLines(
@@ -41,8 +49,8 @@ namespace Tekst
                 return;
             }
             
-            // Шаг 1: Определяем break opportunities (UAX #14)
-            FindBreakOpportunities(codepoints);
+            // Шаг 1: Получаем break opportunities через LineBreakAlgorithm
+            GetBreakOpportunities(codepoints);
             
             // Шаг 2: Разбиваем на строки по ширине
             WrapLines(codepoints, runs, glyphs, maxWidth);
@@ -54,49 +62,48 @@ namespace Tekst
         }
         
         /// <summary>
-        /// Найти break opportunities по UAX #14
+        /// Получить break opportunities через LineBreakAlgorithm
         /// </summary>
-        private void FindBreakOpportunities(ReadOnlySpan<int> codepoints)
+        private void GetBreakOpportunities(ReadOnlySpan<int> codepoints)
         {
-            EnsureBreakCapacity(codepoints.Length);
-            
-            for (int i = 0; i < codepoints.Length; i++)
+            int requiredLength = codepoints.Length + 1;
+            if (breakOpportunities.Length < requiredLength)
             {
-                var breakClass = dataProvider.GetLineBreakClass(codepoints[i]);
-                breaks[i] = ClassifyBreakOpportunity(breakClass, i, codepoints);
+                breakOpportunities = new bool[Math.Max(requiredLength, breakOpportunities.Length * 2)];
             }
+            
+            lineBreakAlgorithm.GetBreakOpportunities(codepoints, breakOpportunities);
         }
         
         /// <summary>
-        /// Классификация break opportunity на основе Line Break Class
+        /// Можно ли разорвать ПОСЛЕ позиции index?
         /// </summary>
-        private BreakOpportunity ClassifyBreakOpportunity(LineBreakClass cls, int position, ReadOnlySpan<int> codepoints)
+        private bool CanBreakAfter(int index)
         {
-            // Упрощённая логика, полная реализация требует pair table
-            switch (cls)
-            {
-                case LineBreakClass.BK:  // Mandatory Break
-                case LineBreakClass.CR:  // Carriage Return
-                case LineBreakClass.LF:  // Line Feed
-                case LineBreakClass.NL:  // Next Line
-                    return BreakOpportunity.Mandatory;
-                    
-                case LineBreakClass.SP:  // Space
-                case LineBreakClass.ZW:  // Zero Width Space
-                    return BreakOpportunity.Allowed;
-                
-                case LineBreakClass.BA:  // Break After
-                case LineBreakClass.HY:  // Hyphen
-                    return BreakOpportunity.Allowed;
-                
-                case LineBreakClass.GL:  // Non-breaking (Glue)
-                case LineBreakClass.WJ:  // Word Joiner
-                    return BreakOpportunity.Prohibited;
-                    
-                default:
-                    // TODO: Полная реализация pair table из UAX #14
-                    return BreakOpportunity.Prohibited;
-            }
+            // breakOpportunities[i+1] = можно ли разорвать между codepoints[i] и codepoints[i+1]
+            int breakIndex = index + 1;
+            if (breakIndex < 0 || breakIndex >= breakOpportunities.Length)
+                return false;
+            return breakOpportunities[breakIndex];
+        }
+        
+        /// <summary>
+        /// Является ли позиция обязательным разрывом?
+        /// </summary>
+        private bool IsMandatoryBreak(ReadOnlySpan<int> codepoints, int index)
+        {
+            if (index < 0 || index >= codepoints.Length)
+                return false;
+            
+            int cp = codepoints[index];
+            // Mandatory breaks: LF, CR (if not followed by LF), FF, NEL, LS, PS
+            return cp == 0x000A ||  // LF
+                   cp == 0x000B ||  // VT
+                   cp == 0x000C ||  // FF
+                   cp == 0x000D ||  // CR
+                   cp == 0x0085 ||  // NEL
+                   cp == 0x2028 ||  // LS
+                   cp == 0x2029;    // PS
         }
         
         /// <summary>
@@ -108,10 +115,9 @@ namespace Tekst
             ReadOnlySpan<ShapedGlyph> glyphs,
             float maxWidth)
         {
-            int lineStart = 0;
             int runStartIndex = 0;
             float currentWidth = 0;
-            int lastBreakPoint = -1;
+            int lastBreakRun = -1;
             float widthAtLastBreak = 0;
             int runCountAtLastBreak = 0;
             
@@ -124,32 +130,32 @@ namespace Tekst
                 
                 // Проверяем break opportunity в конце run
                 int runEnd = run.range.End - 1;
-                if (runEnd >= 0 && runEnd < breaks.Length && breaks[runEnd] != BreakOpportunity.Prohibited)
+                if (runEnd >= 0 && CanBreakAfter(runEnd))
                 {
-                    lastBreakPoint = i;
+                    lastBreakRun = i;
                     widthAtLastBreak = currentWidth;
                     runCountAtLastBreak = i - runStartIndex + 1;
                 }
                 
                 // Превысили ширину?
-                if (currentWidth > maxWidth && lastBreakPoint >= 0)
+                if (currentWidth > maxWidth && lastBreakRun >= 0)
                 {
                     // Создаём строку до последней break opportunity
                     CreateLine(runs, runStartIndex, runCountAtLastBreak, codepoints, glyphs);
                     
                     // Начинаем новую строку
-                    runStartIndex = lastBreakPoint + 1;
+                    runStartIndex = lastBreakRun + 1;
                     currentWidth = currentWidth - widthAtLastBreak;
-                    lastBreakPoint = -1;
+                    lastBreakRun = -1;
                 }
                 
                 // Mandatory break?
-                if (runEnd >= 0 && runEnd < breaks.Length && breaks[runEnd] == BreakOpportunity.Mandatory)
+                if (runEnd >= 0 && IsMandatoryBreak(codepoints, runEnd))
                 {
                     CreateLine(runs, runStartIndex, i - runStartIndex + 1, codepoints, glyphs);
                     runStartIndex = i + 1;
                     currentWidth = 0;
-                    lastBreakPoint = -1;
+                    lastBreakRun = -1;
                 }
             }
             
@@ -273,12 +279,6 @@ namespace Tekst
             }
         }
         
-        private void EnsureBreakCapacity(int required)
-        {
-            if (breaks.Length >= required) return;
-            Array.Resize(ref breaks, Math.Max(required, breaks.Length * 2));
-        }
-        
         private void EnsureLineCapacity(int required)
         {
             if (lines.Length >= required) return;
@@ -291,18 +291,6 @@ namespace Tekst
             Array.Resize(ref orderedRuns, Math.Max(required, orderedRuns.Length * 2));
         }
     }
-    
-    /// <summary>
-    /// Break opportunity type
-    /// </summary>
-    public enum BreakOpportunity : byte
-    {
-        Prohibited,     // Нельзя разрывать
-        Allowed,        // Можно разрывать
-        Mandatory       // Обязательный разрыв
-    }
-    
-    // IUnicodeDataProvider из Unicode модуля предоставляет GetLineBreakClass()
     
     /// <summary>
     /// Буфер результатов Line Breaker

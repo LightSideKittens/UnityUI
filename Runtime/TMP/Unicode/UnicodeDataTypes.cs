@@ -48,6 +48,71 @@ public enum BidiPairedBracketType : byte
 }
 
 
+/// <summary>
+/// Unicode General Category (from UnicodeData.txt or DerivedGeneralCategory.txt)
+/// </summary>
+public enum GeneralCategory : byte
+{
+    // Letters
+    Lu, // Letter, uppercase
+    Ll, // Letter, lowercase
+    Lt, // Letter, titlecase
+    Lm, // Letter, modifier
+    Lo, // Letter, other
+    
+    // Marks
+    Mn, // Mark, nonspacing
+    Mc, // Mark, spacing combining
+    Me, // Mark, enclosing
+    
+    // Numbers
+    Nd, // Number, decimal digit
+    Nl, // Number, letter
+    No, // Number, other
+    
+    // Punctuation
+    Pc, // Punctuation, connector
+    Pd, // Punctuation, dash
+    Ps, // Punctuation, open
+    Pe, // Punctuation, close
+    Pi, // Punctuation, initial quote
+    Pf, // Punctuation, final quote
+    Po, // Punctuation, other
+    
+    // Symbols
+    Sm, // Symbol, math
+    Sc, // Symbol, currency
+    Sk, // Symbol, modifier
+    So, // Symbol, other
+    
+    // Separators
+    Zs, // Separator, space
+    Zl, // Separator, line
+    Zp, // Separator, paragraph
+    
+    // Other
+    Cc, // Other, control
+    Cf, // Other, format
+    Cs, // Other, surrogate
+    Co, // Other, private use
+    Cn  // Other, not assigned
+}
+
+
+/// <summary>
+/// East Asian Width property (from EastAsianWidth.txt)
+/// </summary>
+public enum EastAsianWidth : byte
+{
+    N,  // Neutral (not East Asian)
+    A,  // Ambiguous
+    H,  // Halfwidth
+    W,  // Wide
+    F,  // Fullwidth
+    Na  // Narrow
+}
+
+
 public enum JoiningType : byte
 {
     NonJoining,
@@ -451,4 +516,22 @@ public interface IUnicodeDataProvider
     /// Get Line Break Class (UAX #14)
     /// </summary>
     LineBreakClass GetLineBreakClass(int codePoint);
+    
+    /// <summary>
+    /// Check if codepoint has Extended_Pictographic property (from emoji-data.txt)
+    /// Used for LB30b: Extended_Pictographic × EM
+    /// </summary>
+    bool IsExtendedPictographic(int codePoint);
+    
+    /// <summary>
+    /// Get General Category (from DerivedGeneralCategory.txt)
+    /// Used for LB1 SA resolution and LB15a/LB15b QU_Pi/QU_Pf detection
+    /// </summary>
+    GeneralCategory GetGeneralCategory(int codePoint);
+    
+    /// <summary>
+    /// Get East Asian Width (from EastAsianWidth.txt)
+    /// Used for LB30 to detect East Asian context
+    /// </summary>
+    EastAsianWidth GetEastAsianWidth(int codePoint);
 }
