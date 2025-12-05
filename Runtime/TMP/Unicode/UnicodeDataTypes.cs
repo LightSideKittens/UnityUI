@@ -487,7 +487,10 @@ public enum LineBreakClass : byte
     AP,     // Aksara Pre-Base
     AS,     // Aksara Start
     VF,     // Virama Final
-    VI      // Virama
+    VI,     // Virama
+    
+    // Additional classes
+    HH      // Unambiguous Hyphen (HYPHEN, EN DASH, MAQAF, etc.)
 }
 
 
