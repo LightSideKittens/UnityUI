@@ -499,6 +499,64 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         return entry?.eastAsianWidth ?? EastAsianWidth.N; // N = Neutral
     }
 
+    /// <summary>
+    /// Check if codepoint is an Unambiguous Hyphen (HH class per UAX #14).
+    /// These characters provide break opportunity after, except word-initially.
+    /// 
+    /// Per UAX #14 Table 1 (Unicode 17.0.0), HH class includes:
+    /// ARMENIAN HYPHEN, HEBREW MAQAF, CANADIAN SYLLABICS HYPHEN,
+    /// HYPHEN, FIGURE DASH, EN DASH, DOUBLE OBLIQUE HYPHEN, DOUBLE HYPHEN,
+    /// OBLIQUE HYPHEN, GARAY HYPHEN, YEZIDI HYPHENATION MARK.
+    /// 
+    /// All these codepoints are correctly marked as HH in LineBreak.txt (Unicode 17.0.0).
+    /// See: https://www.unicode.org/Public/17.0.0/ucd/LineBreak.txt
+    /// </summary>
+    public bool IsUnambiguousHyphen(int codePoint)
+    {
+        return GetLineBreakClass(codePoint) == LineBreakClass.HH;
+    }
+    
+    /// <summary>
+    /// U+25CC DOTTED CIRCLE - placeholder character for displaying combining marks in isolation.
+    /// This is a stable Unicode codepoint that will not change.
+    /// Used for LB28a Brahmic script rules per UAX #14.
+    /// </summary>
+    private const int DottedCircle = 0x25CC;
+
+    /// <summary>
+    /// Check if codepoint is U+25CC DOTTED CIRCLE.
+    /// This is a placeholder character used to display combining marks in isolation.
+    /// </summary>
+    public bool IsDottedCircle(int codePoint)
+    {
+        return codePoint == DottedCircle;
+    }
+    
+    /// <summary>
+    /// Check if codepoint belongs to a Brahmic script for LB28a rules.
+    /// Per UAX #14, $Brahmic = [\p{sc=Bali}\p{sc=Batk}\p{sc=Bugi}\p{sc=Java}\p{sc=Kali}\p{sc=Maka}
+    ///                         \p{sc=Mand}\p{sc=Modi}\p{sc=Nag}\p{sc=Sund}\p{sc=Tale}\p{sc=Talu}
+    ///                         \p{sc=Takr}\p{sc=Tibt}]
+    /// </summary>
+    public bool IsBrahmicForLB28a(int codePoint)
+    {
+        var script = GetScript(codePoint);
+        return script == UnicodeScript.Balinese ||
+               script == UnicodeScript.Batak ||
+               script == UnicodeScript.Buginese ||
+               script == UnicodeScript.Javanese ||
+               script == UnicodeScript.KayahLi ||
+               script == UnicodeScript.Makasar ||
+               script == UnicodeScript.Mandaic ||
+               script == UnicodeScript.Modi ||
+               script == UnicodeScript.Nandinagari ||
+               script == UnicodeScript.Sundanese ||
+               script == UnicodeScript.TaiLe ||
+               script == UnicodeScript.NewTaiLue ||
+               script == UnicodeScript.Takri ||
+               script == UnicodeScript.Tibetan;
+    }
+
     private RangeEntry? FindRange(int codePoint)
     {
         int lo = 0;

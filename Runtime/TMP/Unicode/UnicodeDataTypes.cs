@@ -537,4 +537,24 @@ public interface IUnicodeDataProvider
     /// Used for LB30 to detect East Asian context
     /// </summary>
     EastAsianWidth GetEastAsianWidth(int codePoint);
+    
+    /// <summary>
+    /// Check if codepoint is an Unambiguous Hyphen (HH class per UAX #14).
+    /// Some HH characters may be marked as BA in LineBreak.txt but should be treated as HH.
+    /// Used for LB20a, LB21, LB21a.
+    /// </summary>
+    bool IsUnambiguousHyphen(int codePoint);
+    
+    /// <summary>
+    /// Check if codepoint is U+25CC DOTTED CIRCLE (placeholder for combining marks).
+    /// Used for LB28a Brahmic script rules.
+    /// </summary>
+    bool IsDottedCircle(int codePoint);
+    
+    /// <summary>
+    /// Check if codepoint belongs to a Brahmic script for LB28a rules.
+    /// Per UAX #14, these are: Balinese, Batak, Buginese, Javanese, Kayah Li, Makasar,
+    /// Mandaic, Modi, Nandinagari, Sundanese, Tai Le, New Tai Lue, Takri, Tibetan.
+    /// </summary>
+    bool IsBrahmicForLB28a(int codePoint);
 }

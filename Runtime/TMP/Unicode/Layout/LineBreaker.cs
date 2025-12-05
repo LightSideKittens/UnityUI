@@ -11,6 +11,17 @@ namespace Tekst
     {
         private readonly LineBreakAlgorithm lineBreakAlgorithm;
         
+        // Mandatory line break characters (stable Unicode codepoints per UAX #14)
+        // These are control characters that will never change in Unicode.
+        // See: https://www.unicode.org/reports/tr14/#BK
+        private const int LineFeed = 0x000A;           // LF - Line Feed
+        private const int VerticalTab = 0x000B;        // VT - Vertical Tab (BK class)
+        private const int FormFeed = 0x000C;           // FF - Form Feed (BK class)
+        private const int CarriageReturn = 0x000D;     // CR - Carriage Return
+        private const int NextLine = 0x0085;           // NEL - Next Line
+        private const int LineSeparator = 0x2028;      // LS - Line Separator (BK class)
+        private const int ParagraphSeparator = 0x2029; // PS - Paragraph Separator (BK class)
+        
         // Буферы
         private TextLine[] lines = new TextLine[16];
         private int lineCount;
@@ -89,6 +100,7 @@ namespace Tekst
         
         /// <summary>
         /// Является ли позиция обязательным разрывом?
+        /// Per UAX #14, mandatory breaks occur at: BK, CR, LF, NL (with specific rules for CR×LF).
         /// </summary>
         private bool IsMandatoryBreak(ReadOnlySpan<int> codepoints, int index)
         {
@@ -96,14 +108,14 @@ namespace Tekst
                 return false;
             
             int cp = codepoints[index];
-            // Mandatory breaks: LF, CR (if not followed by LF), FF, NEL, LS, PS
-            return cp == 0x000A ||  // LF
-                   cp == 0x000B ||  // VT
-                   cp == 0x000C ||  // FF
-                   cp == 0x000D ||  // CR
-                   cp == 0x0085 ||  // NEL
-                   cp == 0x2028 ||  // LS
-                   cp == 0x2029;    // PS
+            // Mandatory breaks: LF, VT, FF, CR (if not followed by LF), NEL, LS, PS
+            return cp == LineFeed ||
+                   cp == VerticalTab ||
+                   cp == FormFeed ||
+                   cp == CarriageReturn ||
+                   cp == NextLine ||
+                   cp == LineSeparator ||
+                   cp == ParagraphSeparator;
         }
         
         /// <summary>

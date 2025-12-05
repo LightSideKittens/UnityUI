@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Implementation of UAX #14: Unicode Line Breaking Algorithm
@@ -15,10 +16,6 @@ public sealed class LineBreakAlgorithm
 
     /// <summary>
     /// Get break opportunities for a sequence of codepoints.
-    /// Returns array of length codepoints.Length + 1 where:
-    /// - breaks[0] = can break before first character (always false per LB2)
-    /// - breaks[i] = can break between codepoints[i-1] and codepoints[i]
-    /// - breaks[length] = can break after last character (always true per LB3)
     /// </summary>
     public void GetBreakOpportunities(ReadOnlySpan<int> codePoints, Span<bool> breaks)
     {
@@ -29,26 +26,17 @@ public sealed class LineBreakAlgorithm
 
         if (length == 0)
         {
-            breaks[0] = true; // Empty text: LB3
+            breaks[0] = true;
             return;
         }
 
-        // LB2: Never break at the start of text
-        breaks[0] = false;
+        breaks[0] = false;        // LB2
+        breaks[length] = true;    // LB3
 
-        // LB3: Always break at the end of text
-        breaks[length] = true;
-
-        // Check breaks between characters
         for (int i = 0; i < length - 1; i++)
-        {
             breaks[i + 1] = CanBreakBetween(codePoints, i);
-        }
     }
 
-    /// <summary>
-    /// Simplified version that allocates the result array
-    /// </summary>
     public bool[] GetBreakOpportunities(ReadOnlySpan<int> codePoints)
     {
         bool[] breaks = new bool[codePoints.Length + 1];
@@ -56,470 +44,229 @@ public sealed class LineBreakAlgorithm
         return breaks;
     }
 
-    /// <summary>
-    /// Check if break is allowed at a specific position (after codepoint at index)
-    /// </summary>
     public bool CanBreakAt(ReadOnlySpan<int> codePoints, int index)
     {
-        if (index < 0)
-            return false; // LB2
-        if (index >= codePoints.Length)
-            return true;  // LB3
-        if (index == 0)
-            return false; // LB2 - no break before first char
-
+        if (index <= 0) return false;
+        if (index >= codePoints.Length) return true;
         return CanBreakBetween(codePoints, index - 1);
     }
 
-    /// <summary>
-    /// Determine if break is allowed between codePoints[index] and codePoints[index+1]
-    /// </summary>
+    #region Inline Helpers
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsCM(LineBreakClass cls) => cls == LineBreakClass.CM || cls == LineBreakClass.ZWJ;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsLB9Exception(LineBreakClass cls) =>
+        cls == LineBreakClass.SP || cls == LineBreakClass.BK || cls == LineBreakClass.CR || 
+        cls == LineBreakClass.LF || cls == LineBreakClass.NL || cls == LineBreakClass.ZW || 
+        cls == LineBreakClass.ZWJ;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsAlphabetic(LineBreakClass cls) => cls == LineBreakClass.AL || cls == LineBreakClass.HL;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsAksara(LineBreakClass cls) => cls == LineBreakClass.AK || cls == LineBreakClass.AS;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsVirama(LineBreakClass cls) => cls == LineBreakClass.VF || cls == LineBreakClass.VI;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsNumericAffix(LineBreakClass cls) => cls == LineBreakClass.PO || cls == LineBreakClass.PR;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsKorean(LineBreakClass cls) =>
+        cls == LineBreakClass.JL || cls == LineBreakClass.JV || cls == LineBreakClass.JT || 
+        cls == LineBreakClass.H2 || cls == LineBreakClass.H3;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsEastAsianWide(EastAsianWidth eaw) => eaw == EastAsianWidth.W || eaw == EastAsianWidth.F;
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsEastAsianForLB19a(EastAsianWidth eaw) =>
+        eaw == EastAsianWidth.F || eaw == EastAsianWidth.W || eaw == EastAsianWidth.H;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static LineBreakClass ResolveClass(LineBreakClass cls) => cls switch
+    {
+        LineBreakClass.CM or LineBreakClass.ZWJ => LineBreakClass.AL,
+        LineBreakClass.AI or LineBreakClass.SG or LineBreakClass.XX or LineBreakClass.SA => LineBreakClass.AL,
+        LineBreakClass.CJ => LineBreakClass.NS,
+        _ => cls
+    };
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool IsEffectivelyCombining(LineBreakClass cls, int cp)
+    {
+        if (IsCM(cls)) return true;
+        if (cls == LineBreakClass.SA)
+        {
+            var gc = dataProvider.GetGeneralCategory(cp);
+            return gc == GeneralCategory.Mn || gc == GeneralCategory.Mc;
+        }
+        return false;
+    }
+    
+    #endregion
+
     private bool CanBreakBetween(ReadOnlySpan<int> codePoints, int index)
     {
-        var beforeRaw = dataProvider.GetLineBreakClass(codePoints[index]);
-        var afterRaw = dataProvider.GetLineBreakClass(codePoints[index + 1]);
-        int afterCp = codePoints[index + 1];
         int beforeCp = codePoints[index];
+        int afterCp = codePoints[index + 1];
+        var beforeRaw = dataProvider.GetLineBreakClass(beforeCp);
+        var afterRaw = dataProvider.GetLineBreakClass(afterCp);
 
-        // LB9: Do not break a combining character sequence
-        // EXCEPT: The SP, BK, CR, LF, NL, ZW, and ZWJ classes are excepted from LB9
-        // Note: SA with General_Category=Mn/Mc should be treated as CM per LB1
+        // LB9: Do not break combining character sequence
         var afterGc = dataProvider.GetGeneralCategory(afterCp);
-        bool afterIsCombining = afterRaw == LineBreakClass.CM || 
-                                afterRaw == LineBreakClass.ZWJ ||
-                                (afterRaw == LineBreakClass.SA && (afterGc == GeneralCategory.Mn || afterGc == GeneralCategory.Mc));
+        bool afterIsCombining = afterRaw == LineBreakClass.CM || afterRaw == LineBreakClass.ZWJ ||
+            (afterRaw == LineBreakClass.SA && (afterGc == GeneralCategory.Mn || afterGc == GeneralCategory.Mc));
         
-        if (afterIsCombining)
-        {
-            // LB9 exception: these classes allow break before combining marks
-            bool beforeIsException = beforeRaw == LineBreakClass.SP || 
-                                     beforeRaw == LineBreakClass.BK ||
-                                     beforeRaw == LineBreakClass.CR || 
-                                     beforeRaw == LineBreakClass.LF ||
-                                     beforeRaw == LineBreakClass.NL || 
-                                     beforeRaw == LineBreakClass.ZW ||
-                                     beforeRaw == LineBreakClass.ZWJ;
-            
-            if (!beforeIsException)
-            {
-                // × [CM | ZWJ | SA(combining)]
-                return false;
-            }
-            // After SP/BK/CR/LF/NL/ZW/ZWJ, combining marks are treated as AL (fall through to LB10)
-        }
+        if (afterIsCombining && !IsLB9Exception(beforeRaw))
+            return false;
 
-        // LB9 also says: Treat X (CM | ZWJ)* as if it were X
-        // So if beforeRaw is CM/ZWJ or SA(combining), we need to look back to find the effective class
-        // EXCEPTION: If we find SP, BK, CR, LF, NL, ZW, ZWJ - the CM/ZWJ is treated as AL
+        // Find effective base (LB9)
         var effectiveBeforeRaw = beforeRaw;
         int effectiveIndex = index;
         int effectiveCp = beforeCp;
         
-        // Helper: Check if class+codepoint is effectively combining
-        bool IsEffectivelyCombiningLocal(LineBreakClass cls, int cp)
-        {
-            if (cls == LineBreakClass.CM || cls == LineBreakClass.ZWJ)
-                return true;
-            if (cls == LineBreakClass.SA)
-            {
-                var gc = dataProvider.GetGeneralCategory(cp);
-                return gc == GeneralCategory.Mn || gc == GeneralCategory.Mc;
-            }
-            return false;
-        }
-        
-        while (effectiveIndex > 0 && IsEffectivelyCombiningLocal(effectiveBeforeRaw, effectiveCp))
+        while (effectiveIndex > 0 && IsEffectivelyCombining(effectiveBeforeRaw, effectiveCp))
         {
             effectiveIndex--;
             effectiveCp = codePoints[effectiveIndex];
             effectiveBeforeRaw = dataProvider.GetLineBreakClass(effectiveCp);
         }
         
-        // If we're still on a combining mark at the start, treat as AL (LB10)
-        if (IsEffectivelyCombiningLocal(effectiveBeforeRaw, effectiveCp))
+        if (IsEffectivelyCombining(effectiveBeforeRaw, effectiveCp))
             effectiveBeforeRaw = LineBreakClass.AL;
         
-        // If effectiveBefore is in the LB9 exception list, CM/ZWJ should be treated as AL, not inherit from base
-        bool baseIsLB9Exception = effectiveBeforeRaw == LineBreakClass.SP ||
-                                   effectiveBeforeRaw == LineBreakClass.BK ||
-                                   effectiveBeforeRaw == LineBreakClass.CR ||
-                                   effectiveBeforeRaw == LineBreakClass.LF ||
-                                   effectiveBeforeRaw == LineBreakClass.NL ||
-                                   effectiveBeforeRaw == LineBreakClass.ZW ||
-                                   effectiveBeforeRaw == LineBreakClass.ZWJ;
-        
-        if (baseIsLB9Exception && IsEffectivelyCombiningLocal(beforeRaw, beforeCp))
-        {
-            // CM/ZWJ after exception class is treated as AL, not inherited from base
+        if (IsLB9Exception(effectiveBeforeRaw) && IsEffectivelyCombining(beforeRaw, beforeCp))
             effectiveBeforeRaw = LineBreakClass.AL;
-        }
 
-        // LB8a: Do not break after a zero width joiner
-        // ZWJ × — must check RAW class before LB9/LB10 transforms ZWJ to AL!
+        // LB8a: ZWJ × (check RAW before transform)
         if (beforeRaw == LineBreakClass.ZWJ)
             return false;
 
-        // LB10: Treat any remaining combining mark or ZWJ as AL
         var before = ResolveClass(effectiveBeforeRaw);
         var after = ResolveClass(afterRaw);
 
-        // LB4: Always break after hard line breaks
-        // BK !
-        if (before == LineBreakClass.BK)
-            return true;
-
-        // LB5: Treat CR followed by LF, as well as CR, LF, and NL as hard line breaks
-        // CR × LF
-        if (before == LineBreakClass.CR && after == LineBreakClass.LF)
-            return false;
-        // CR !
-        // LF !
-        // NL !
-        if (before == LineBreakClass.CR || before == LineBreakClass.LF || before == LineBreakClass.NL)
-            return true;
-
-        // LB6: Do not break before hard line breaks
-        // × ( BK | CR | LF | NL )
+        // LB4-LB6: Hard breaks
+        if (before == LineBreakClass.BK) return true;
+        if (before == LineBreakClass.CR && after == LineBreakClass.LF) return false;
+        if (before == LineBreakClass.CR || before == LineBreakClass.LF || before == LineBreakClass.NL) return true;
         if (after == LineBreakClass.BK || after == LineBreakClass.CR || 
-            after == LineBreakClass.LF || after == LineBreakClass.NL)
-            return false;
+            after == LineBreakClass.LF || after == LineBreakClass.NL) return false;
 
-        // LB7: Do not break before spaces or zero width space
-        // × SP
-        // × ZW
-        if (after == LineBreakClass.SP || after == LineBreakClass.ZW)
-            return false;
+        // LB7: × SP, × ZW
+        if (after == LineBreakClass.SP || after == LineBreakClass.ZW) return false;
 
-        // LB8: Break before any character following a zero-width space, even if one or more spaces intervene
-        // ZW SP* ÷
-        if (before == LineBreakClass.ZW)
-            return true;
-        // Also check if we have ZW followed by spaces before current position
+        // LB8: ZW SP* ÷
+        if (before == LineBreakClass.ZW) return true;
         if (before == LineBreakClass.SP)
         {
-            // Look back for ZW SP* pattern
             for (int i = effectiveIndex - 1; i >= 0; i--)
             {
                 var cls = dataProvider.GetLineBreakClass(codePoints[i]);
-                if (cls == LineBreakClass.SP)
-                    continue; // Skip spaces
-                if (cls == LineBreakClass.ZW)
-                    return true; // Found ZW SP* ÷ pattern
-                break; // Something else, stop looking
+                if (cls == LineBreakClass.SP) continue;
+                if (cls == LineBreakClass.ZW) return true;
+                break;
             }
         }
 
-        // LB11: Do not break before or after Word joiner
-        // × WJ
-        // WJ ×
-        if (before == LineBreakClass.WJ || after == LineBreakClass.WJ)
+        // LB11: × WJ, WJ ×
+        if (before == LineBreakClass.WJ || after == LineBreakClass.WJ) return false;
+
+        // LB12: GL ×
+        if (before == LineBreakClass.GL) return false;
+
+        // LB12a: [^SP BA HH HY] × GL
+        if (after == LineBreakClass.GL && before != LineBreakClass.SP && before != LineBreakClass.BA && 
+            before != LineBreakClass.HH && before != LineBreakClass.HY &&
+            !dataProvider.IsUnambiguousHyphen(effectiveCp))
             return false;
 
-        // LB12: Do not break after NBSP and related characters
-        // GL ×
-        if (before == LineBreakClass.GL)
-            return false;
-
-        // LB12a: Do not break before NBSP and related characters,
-        // except after spaces and hyphens
-        // [^SP BA HH HY] × GL
-        // Note: Also check IsHHCodePoint because data may return BA for HH characters
-        if (after == LineBreakClass.GL)
-        {
-            if (before != LineBreakClass.SP && before != LineBreakClass.BA && 
-                before != LineBreakClass.HH && before != LineBreakClass.HY &&
-                !IsHHCodePoint(effectiveCp))
-                return false;
-        }
-
-        // LB13: Do not break before ']' or '!' or ';' or '/'
-        // × CL
-        // × CP
-        // × EX
-        // × IS
-        // × SY
+        // LB13: × CL, × CP, × EX, × SY
         if (after == LineBreakClass.CL || after == LineBreakClass.CP || 
-            after == LineBreakClass.EX || after == LineBreakClass.IS || after == LineBreakClass.SY)
+            after == LineBreakClass.EX || after == LineBreakClass.SY)
             return false;
 
-        // LB14: Do not break after '[', even after spaces
-        // OP SP* ×
-        if (before == LineBreakClass.OP)
-            return false;
-        // Handle OP SP* × by looking back (skip CM attached to base)
+        // LB14: OP SP* ×
+        if (before == LineBreakClass.OP) return false;
         if (before == LineBreakClass.SP)
         {
             for (int i = effectiveIndex - 1; i >= 0; i--)
             {
-                var rawCls = dataProvider.GetLineBreakClass(codePoints[i]);
-                // Skip combining marks
-                if (rawCls == LineBreakClass.CM || rawCls == LineBreakClass.ZWJ)
-                    continue;
-                var cls = ResolveClass(rawCls);
-                if (cls == LineBreakClass.OP)
-                    return false;
-                if (cls != LineBreakClass.SP)
-                    break;
+                var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+                if (IsCM(cls)) continue;
+                var resolved = ResolveClass(cls);
+                if (resolved == LineBreakClass.OP) return false;
+                if (resolved != LineBreakClass.SP) break;
             }
         }
 
-        // LB15: Do not break within '"[', even with intervening spaces
-        // QU_Pi SP* × OP (only for initial quotes, not final quotes)
-        // Note: In Unicode 16.0 this is superseded by LB15a, but we keep compatibility
-        if (after == LineBreakClass.OP)
+        // LB15: QU_Pi SP* × OP
+        if (after == LineBreakClass.OP && CheckLB15(codePoints, effectiveIndex, before))
+            return false;
+
+        // LB15c: SP ÷ IS NU
+        if (before == LineBreakClass.SP && after == LineBreakClass.IS)
         {
-            var prev = before;
-            int i = effectiveIndex;
-            int quPos = -1; // Track position of QU for General_Category check
-            while ((prev == LineBreakClass.SP || prev == LineBreakClass.AL) && i > 0)
-            {
-                i--;
-                var rawCls = dataProvider.GetLineBreakClass(codePoints[i]);
-                // Skip combining marks (they resolve to AL)
-                if (rawCls == LineBreakClass.CM || rawCls == LineBreakClass.ZWJ)
-                    continue;
-                prev = ResolveClass(rawCls);
-                if (prev == LineBreakClass.QU)
-                    quPos = i;
-                if (prev != LineBreakClass.SP)
-                    break;
-            }
-            // Only block break if QU is Pi (initial quote like « ' ")
-            if (prev == LineBreakClass.QU && quPos >= 0)
-            {
-                var gc = dataProvider.GetGeneralCategory(codePoints[quPos]);
-                if (gc == GeneralCategory.Pi)
-                    return false;
-            }
+            if (LookAheadGetClass(codePoints, index + 2) == LineBreakClass.NU)
+                return true;
         }
+        
+        // LB15d: × IS
+        if (after == LineBreakClass.IS) return false;
 
-        // LB16: Do not break between closing punctuation and a nonstarter
-        // (CL | CP) SP* × NS
-        if (after == LineBreakClass.NS)
-        {
-            var prev = before;
-            int i = effectiveIndex;
-            while ((prev == LineBreakClass.SP || prev == LineBreakClass.AL) && i > 0)
-            {
-                i--;
-                var rawCls = dataProvider.GetLineBreakClass(codePoints[i]);
-                if (rawCls == LineBreakClass.CM || rawCls == LineBreakClass.ZWJ)
-                    continue;
-                prev = ResolveClass(rawCls);
-                if (prev != LineBreakClass.SP)
-                    break;
-            }
-            if (prev == LineBreakClass.CL || prev == LineBreakClass.CP)
-                return false;
-        }
+        // LB16: (CL | CP) SP* × NS
+        if (after == LineBreakClass.NS && CheckClosingBeforeNS(codePoints, effectiveIndex, before))
+            return false;
 
-        // LB17: Do not break within '——', even with intervening spaces
-        // B2 SP* × B2
-        if (after == LineBreakClass.B2)
-        {
-            var prev = before;
-            int i = effectiveIndex;
-            while ((prev == LineBreakClass.SP || prev == LineBreakClass.AL) && i > 0)
-            {
-                i--;
-                var rawCls = dataProvider.GetLineBreakClass(codePoints[i]);
-                if (rawCls == LineBreakClass.CM || rawCls == LineBreakClass.ZWJ)
-                    continue;
-                prev = ResolveClass(rawCls);
-                if (prev != LineBreakClass.SP)
-                    break;
-            }
-            if (prev == LineBreakClass.B2)
-                return false;
-        }
+        // LB17: B2 SP* × B2
+        if (after == LineBreakClass.B2 && CheckB2Pattern(codePoints, effectiveIndex, before))
+            return false;
 
-        // LB18: Break after spaces
-        // SP ÷
-        // But with exceptions from LB15a and LB15b
+        // LB18: SP ÷ (with LB15a/LB15b)
         if (before == LineBreakClass.SP)
-        {
-            // LB15b: Don't break before QU_Pf (final quote like » ' ")
-            if (after == LineBreakClass.QU)
-            {
-                var gc = dataProvider.GetGeneralCategory(codePoints[index + 1]);
-                if (gc == GeneralCategory.Pf)
-                    return false;
-            }
-            
-            // LB15a: (sot | BK | CR | LF | NL | SP | ZW | CB | GL) (OP | QU_Pi) SP* ×
-            // In Unicode 16.0+, this is a strict rule: never break after OP/QU_Pi followed by spaces
-            // Don't break after spaces that follow OP or QU_Pi
-            int checkPos = index - 1; // Start from before current SP
-            
-            // Skip back through all SP
-            while (checkPos >= 0)
-            {
-                var cls = dataProvider.GetLineBreakClass(codePoints[checkPos]);
-                if (cls == LineBreakClass.SP)
-                {
-                    checkPos--;
-                    continue;
-                }
-                // Skip CM/ZWJ attached to base
-                if (cls == LineBreakClass.CM || cls == LineBreakClass.ZWJ)
-                {
-                    checkPos--;
-                    continue;
-                }
-                // Now check if it's OP or QU_Pi
-                if (cls == LineBreakClass.OP)
-                {
-                    return false; // No break per LB15a
-                }
-                else if (cls == LineBreakClass.QU)
-                {
-                    // Check if QU is Pi (initial quote)
-                    var gc = dataProvider.GetGeneralCategory(codePoints[checkPos]);
-                    if (gc == GeneralCategory.Pi)
-                        return false; // No break per LB15a
-                }
-                break;
-            }
-            
-            return true;
-        }
+            return HandleLB18(codePoints, index, after, afterCp);
 
-        // LB19: × QU and QU ×
-        // Do not break before or after quotation marks
-        if (after == LineBreakClass.QU)
+        // LB19/LB19a: QU handling
+        if (after == LineBreakClass.QU && !CanBreakBeforeQU(codePoints, index, afterCp, effectiveCp))
             return false;
-        if (before == LineBreakClass.QU)
+        if (before == LineBreakClass.QU && !CanBreakAfterQU(codePoints, effectiveIndex, effectiveCp, afterCp))
             return false;
 
-        // LB20: Break before and after unresolved CB
-        // ÷ CB
-        // CB ÷
-        if (before == LineBreakClass.CB || after == LineBreakClass.CB)
-            return true;
+        // LB20: ÷ CB, CB ÷
+        if (before == LineBreakClass.CB || after == LineBreakClass.CB) return true;
 
-        // LB20a: Do not break after a word-initial hyphen.
-        // (sot | BK | CR | LF | NL | SP | ZW | CB | GL) (HY | HH) ×
-        // 'before' is at position index, 'effectiveCp' is the base character after LB9 processing
-        // Check if 'before' is HY or HH and is word-initial
-        // Note: LineBreak.txt may have BA for some HH characters (like 05BE MAQAF),
-        // so we check by codepoint using IsHHCodePoint()
-        if (before == LineBreakClass.HY || IsHHCodePoint(effectiveCp))
-        {
-            // Check if word-initial (after sot, BK, CR, LF, NL, SP, ZW, CB, GL)
-            bool isWordInitial = false;
-            if (effectiveIndex == 0)
-            {
-                isWordInitial = true; // Hyphen is first character (after sot)
-            }
-            else
-            {
-                // Check what's before the hyphen (at effectiveIndex - 1)
-                int beforeHyphenPos = effectiveIndex - 1;
-                var prevRaw = dataProvider.GetLineBreakClass(codePoints[beforeHyphenPos]);
-                
-                // Skip CM/ZWJ per LB9
-                while (beforeHyphenPos > 0 && (prevRaw == LineBreakClass.CM || prevRaw == LineBreakClass.ZWJ))
-                {
-                    beforeHyphenPos--;
-                    prevRaw = dataProvider.GetLineBreakClass(codePoints[beforeHyphenPos]);
-                }
-                
-                var prevClass = ResolveClass(prevRaw);
-                
-                if (prevClass == LineBreakClass.BK || prevClass == LineBreakClass.CR ||
-                    prevClass == LineBreakClass.LF || prevClass == LineBreakClass.NL ||
-                    prevClass == LineBreakClass.SP || prevClass == LineBreakClass.ZW ||
-                    prevClass == LineBreakClass.CB || prevClass == LineBreakClass.GL)
-                {
-                    isWordInitial = true;
-                }
-            }
-            
-            if (isWordInitial)
-            {
-                // LB20a only prevents break before alphabetic characters (AL, HL)
-                // For other classes (B2, GL, ID, NU, OP, etc.), break is allowed by LB31
-                if (after == LineBreakClass.AL || after == LineBreakClass.HL)
-                {
-                    return false; // No break after word-initial HY/HH before AL/HL
-                }
-            }
-        }
+        // LB20a: Word-initial hyphen
+        if ((before == LineBreakClass.HY || dataProvider.IsUnambiguousHyphen(effectiveCp)) &&
+            IsWordInitialHyphen(codePoints, effectiveIndex) && IsAlphabetic(after))
+            return false;
 
-        // LB21: Do not break before hyphen-minus, other hyphens, etc.
-        // × BA
-        // × HY
-        // × HH
-        // × NS
-        // BB ×
-        // Note: Also check IsHHCodePoint for 'after' because data may return BA for HH characters
+        // LB21: × BA, × HY, × HH, × NS, BB ×
         if (after == LineBreakClass.BA || after == LineBreakClass.HY || 
             after == LineBreakClass.HH || after == LineBreakClass.NS ||
-            IsHHCodePoint(afterCp))
+            dataProvider.IsUnambiguousHyphen(afterCp))
             return false;
-        if (before == LineBreakClass.BB)
-            return false;
+        if (before == LineBreakClass.BB) return false;
         
-        // LB21a: HL (HY | BA | HH) × [^HL] — no break after HY/BA/HH when preceded by HL
-        // Exception: if the next character is also HL, break is allowed
-        // This handles Hebrew word boundaries where hyphen connects Hebrew to non-Hebrew
-        // Note: Also check IsHHCodePoint because data may return BA for HH characters
-        if (before == LineBreakClass.HY || before == LineBreakClass.BA || 
-            before == LineBreakClass.HH || IsHHCodePoint(effectiveCp))
-        {
-            // Exception: if after is HL, allow break (Hebrew-hyphen-Hebrew can break)
-            if (after == LineBreakClass.HL)
-            {
-                // Fall through to LB31 - break is allowed
-            }
-            else
-            {
-                // Check if what preceded BA/HY/HH was HL
-                // Note: 'before' is HY/BA/HH at position index (effectiveIndex after LB9)
-                // We need to check the character BEFORE the hyphen
-                bool isHLBefore = false;
-                if (effectiveIndex >= 1)
-                {
-                    int checkIdx = effectiveIndex - 1; // Character before the hyphen
-                    var prevRaw = dataProvider.GetLineBreakClass(codePoints[checkIdx]);
-                    
-                    // Skip CM/ZWJ per LB9
-                    while (checkIdx > 0 && (prevRaw == LineBreakClass.CM || prevRaw == LineBreakClass.ZWJ))
-                    {
-                        checkIdx--;
-                        prevRaw = dataProvider.GetLineBreakClass(codePoints[checkIdx]);
-                    }
-                    isHLBefore = (ResolveClass(prevRaw) == LineBreakClass.HL);
-                }
-                
-                // Prevent break if preceded by HL and not followed by HL
-                if (isHLBefore)
-                    return false;
-            }
-            // Otherwise, break is allowed after BA/HY (fall through to LB31)
-        }
-
-        // LB21b: Don't break between SY and HL
-        // SY × HL
-        if (before == LineBreakClass.SY && after == LineBreakClass.HL)
+        // LB21a: HL (HY | HH) × [^HL]
+        if ((before == LineBreakClass.HY || before == LineBreakClass.HH || 
+             dataProvider.IsUnambiguousHyphen(effectiveCp)) &&
+            after != LineBreakClass.HL && IsHLBeforeHyphen(codePoints, effectiveIndex))
             return false;
 
-        // LB22: Do not break before ellipsis
-        // × IN
-        if (after == LineBreakClass.IN)
-            return false;
+        // LB21b: SY × HL
+        if (before == LineBreakClass.SY && after == LineBreakClass.HL) return false;
 
-        // LB23: Do not break between digits and letters
-        // (AL | HL) × NU
-        // NU × (AL | HL)
-        if ((before == LineBreakClass.AL || before == LineBreakClass.HL) && after == LineBreakClass.NU)
-            return false;
-        if (before == LineBreakClass.NU && (after == LineBreakClass.AL || after == LineBreakClass.HL))
-            return false;
+        // LB22: × IN
+        if (after == LineBreakClass.IN) return false;
 
-        // LB23a: Do not break between numeric prefixes and ID, or ID and numeric postfixes
-        // PR × (ID | EB | EM)
-        // (ID | EB | EM) × PO
+        // LB23: (AL | HL) × NU, NU × (AL | HL)
+        if (IsAlphabetic(before) && after == LineBreakClass.NU) return false;
+        if (before == LineBreakClass.NU && IsAlphabetic(after)) return false;
+
+        // LB23a: PR × (ID | EB | EM), (ID | EB | EM) × PO
         if (before == LineBreakClass.PR && 
             (after == LineBreakClass.ID || after == LineBreakClass.EB || after == LineBreakClass.EM))
             return false;
@@ -527,264 +274,366 @@ public sealed class LineBreakAlgorithm
             after == LineBreakClass.PO)
             return false;
 
-        // LB24: Do not break between numeric prefix/postfix and letters
-        // (PR | PO) × (AL | HL)
-        // (AL | HL) × (PR | PO)
-        if ((before == LineBreakClass.PR || before == LineBreakClass.PO) && 
-            (after == LineBreakClass.AL || after == LineBreakClass.HL))
-            return false;
-        if ((before == LineBreakClass.AL || before == LineBreakClass.HL) && 
-            (after == LineBreakClass.PR || after == LineBreakClass.PO))
+        // LB24: (PR | PO) × (AL | HL), (AL | HL) × (PR | PO)
+        if (IsNumericAffix(before) && IsAlphabetic(after)) return false;
+        if (IsAlphabetic(before) && IsNumericAffix(after)) return false;
+
+        // LB25: Numeric expressions
+        if (!CheckLB25(codePoints, index, effectiveIndex, before, after))
             return false;
 
-        // LB25: Do not break between the following pairs of classes relevant to numbers
-        // Note: These rules apply primarily in numeric context
-        // NU × (PO | PR) - always applies when NU is before
-        if (before == LineBreakClass.NU && (after == LineBreakClass.PO || after == LineBreakClass.PR))
-            return false;
-        // (PO | PR) × NU - always applies when NU is after
-        if ((before == LineBreakClass.PO || before == LineBreakClass.PR) && after == LineBreakClass.NU)
-            return false;
-        // (HY | IS) × NU - numeric separators before number (SY removed in Unicode 16.0)
-        if ((before == LineBreakClass.HY || before == LineBreakClass.IS) &&
-            after == LineBreakClass.NU)
-            return false;
-        // NU × NU - consecutive digits
-        if (before == LineBreakClass.NU && after == LineBreakClass.NU)
-            return false;
-        // (CL | CP) × (PO | PR) - only in numeric context, check if NU is nearby
-        // Simplified: only apply if there's NU before CL/CP
-        // (PO | PR) × OP - only in numeric context
-        // Simplified: only apply if there's NU after OP
-        // These are complex rules that require lookahead/lookbehind for full compliance
-
-        // LB26: Do not break a Korean syllable
-        // JL × (JL | JV | H2 | H3)
+        // LB26: Korean syllables
         if (before == LineBreakClass.JL && 
             (after == LineBreakClass.JL || after == LineBreakClass.JV || 
              after == LineBreakClass.H2 || after == LineBreakClass.H3))
             return false;
-        // (JV | H2) × (JV | JT)
         if ((before == LineBreakClass.JV || before == LineBreakClass.H2) &&
             (after == LineBreakClass.JV || after == LineBreakClass.JT))
             return false;
-        // (JT | H3) × JT
-        if ((before == LineBreakClass.JT || before == LineBreakClass.H3) &&
-            after == LineBreakClass.JT)
+        if ((before == LineBreakClass.JT || before == LineBreakClass.H3) && after == LineBreakClass.JT)
             return false;
 
-        // LB27: Treat a Korean Syllable Block the same as ID
-        // (JL | JV | JT | H2 | H3) × PO
-        if ((before == LineBreakClass.JL || before == LineBreakClass.JV || before == LineBreakClass.JT ||
-             before == LineBreakClass.H2 || before == LineBreakClass.H3) && after == LineBreakClass.PO)
-            return false;
-        // PR × (JL | JV | JT | H2 | H3)
-        if (before == LineBreakClass.PR && 
-            (after == LineBreakClass.JL || after == LineBreakClass.JV || after == LineBreakClass.JT ||
-             after == LineBreakClass.H2 || after == LineBreakClass.H3))
+        // LB27: Korean × PO, PR × Korean
+        if (IsKorean(before) && after == LineBreakClass.PO) return false;
+        if (before == LineBreakClass.PR && IsKorean(after)) return false;
+
+        // LB28: (AL | HL) × (AL | HL)
+        if (IsAlphabetic(before) && IsAlphabetic(after)) return false;
+
+        // LB28a: Brahmic scripts
+        if (!CheckLB28a(codePoints, index, effectiveIndex, before, after, 
+                        beforeRaw, effectiveBeforeRaw, beforeCp, afterCp, effectiveCp))
             return false;
 
-        // LB28: Do not break between alphabetics
-        // (AL | HL) × (AL | HL)
-        if ((before == LineBreakClass.AL || before == LineBreakClass.HL) && 
-            (after == LineBreakClass.AL || after == LineBreakClass.HL))
+        // LB29: IS × (AL | HL)
+        if (before == LineBreakClass.IS && IsAlphabetic(after)) return false;
+
+        // LB30: (AL | HL | NU) × OP, CP × (AL | HL | NU)
+        if ((IsAlphabetic(before) || before == LineBreakClass.NU) && after == LineBreakClass.OP &&
+            !IsEastAsianWide(dataProvider.GetEastAsianWidth(afterCp)))
+            return false;
+        if (before == LineBreakClass.CP && (IsAlphabetic(after) || after == LineBreakClass.NU))
             return false;
 
-        // LB28a: Do not break inside orthographic syllables of Brahmic scripts
-        // Per UAX #14 and LineBreakTest.txt:
-        // AP × (AK | AS) [28.1]
-        if (before == LineBreakClass.AP && (after == LineBreakClass.AK || after == LineBreakClass.AS))
-            return false;
-        // (AK | AS) × (VF | VI) [28.2]
-        if ((before == LineBreakClass.AK || before == LineBreakClass.AS) &&
-            (after == LineBreakClass.VF || after == LineBreakClass.VI))
-            return false;
-        // VI × (AK | AS) [28.3]
-        if (before == LineBreakClass.VI && (after == LineBreakClass.AK || after == LineBreakClass.AS))
-            return false;
-        // AP × ◌ (dotted circle after aksara prefix - no break) [28.11]
-        // Note: AK ÷ 25CC is ALLOWED (break), only AP × 25CC is forbidden
-        if (before == LineBreakClass.AP && afterCp == 0x25CC)
-            return false;
-        // ◌ (U+25CC) × (VF | VI) — dotted circle followed by virama
-        // Use effectiveCp to handle CM sequences like ◌ + CM + VF
-        if (effectiveCp == 0x25CC && (after == LineBreakClass.VF || after == LineBreakClass.VI))
-            return false;
-        // LB28b: (AK | 25CC | AS) VI × — no break after VI if preceded by AK/25CC/AS
-        // Look back past the current VI to check what preceded it
-        if (beforeRaw == LineBreakClass.VI)
-        {
-            // Check what's before the VI (skipping combining marks)
-            for (int i = index - 1; i >= 0; i--)
-            {
-                var prevRaw = dataProvider.GetLineBreakClass(codePoints[i]);
-                if (prevRaw == LineBreakClass.CM || prevRaw == LineBreakClass.ZWJ)
-                    continue;
-                // Check if it's AK, AS, or 25CC
-                if (prevRaw == LineBreakClass.AK || prevRaw == LineBreakClass.AS)
-                    return false;
-                if (codePoints[i] == 0x25CC)
-                    return false;
-                break;
-            }
-        }
-
-        // LB29: Do not break between numeric punctuation and alphabetics
-        // IS × (AL | HL)
-        if (before == LineBreakClass.IS && (after == LineBreakClass.AL || after == LineBreakClass.HL))
-            return false;
-
-        // LB30: Do not break between letters, numbers, or ordinary symbols and
-        // opening or closing parentheses
-        // (AL | HL | NU) × OP
-        // But break before OP with East_Asian_Width=F/W (fullwidth/wide)
-        if ((before == LineBreakClass.AL || before == LineBreakClass.HL || before == LineBreakClass.NU) &&
-            after == LineBreakClass.OP)
-        {
-            // Allow break before East Asian Wide/Fullwidth OP characters
-            int nextCp = codePoints[index + 1];
-            var eaw = dataProvider.GetEastAsianWidth(nextCp);
-            if (IsEastAsianWide(eaw))
-            {
-                // Allow break (fall through to LB31)
-            }
-            else
-            {
-                return false;
-            }
-        }
-        // CP × (AL | HL | NU)
-        if (before == LineBreakClass.CP &&
-            (after == LineBreakClass.AL || after == LineBreakClass.HL || after == LineBreakClass.NU))
-            return false;
-
-        // LB30a: Break between two regional indicator symbols if and only if
-        // there are an even number of regional indicators preceding the position
-        // sot (RI RI)* RI × RI
-        // [^RI] (RI RI)* RI × RI
-        // Note: Use effectiveBeforeRaw to handle CM sequences (RI × CM × RI)
+        // LB30a: RI × RI (paired)
         if ((effectiveBeforeRaw == LineBreakClass.RI || before == LineBreakClass.RI) && 
             after == LineBreakClass.RI)
         {
-            // Count consecutive RI characters before and including current position
-            // Skip CM/ZWJ when counting
-            int riCount = 1; // current 'before' is RI (or effective RI)
+            int riCount = 1;
             for (int i = effectiveIndex - 1; i >= 0; i--)
             {
                 var cls = dataProvider.GetLineBreakClass(codePoints[i]);
-                if (cls == LineBreakClass.CM || cls == LineBreakClass.ZWJ)
-                    continue; // Skip combining marks
-                if (cls == LineBreakClass.RI)
-                    riCount++;
-                else
-                    break;
+                if (IsCM(cls)) continue;
+                if (cls == LineBreakClass.RI) riCount++;
+                else break;
             }
-            // Break only if odd number of RI before (so total becomes even)
-            return (riCount % 2) == 0;
+            if ((riCount & 1) == 1) return false;
         }
 
-        // LB30b: Do not break between an emoji base and an emoji modifier
-        // EB × EM
-        // [\p{Extended_Pictographic}&\p{Cn}] × EM — only UNASSIGNED Extended_Pictographic!
-        if (after == LineBreakClass.EM)
-        {
-            if (before == LineBreakClass.EB)
-                return false;
-            // Check if before is Extended_Pictographic AND Cn (unassigned)
-            // This is for reserved emoji codepoints like 1FC00..1FFFD
-            if (dataProvider.IsExtendedPictographic(effectiveCp) &&
-                dataProvider.GetGeneralCategory(effectiveCp) == GeneralCategory.Cn)
-                return false;
-        }
+        // LB30b: EB × EM, ExtPict(Cn) × EM
+        if (before == LineBreakClass.EB && after == LineBreakClass.EM) return false;
+        if (after == LineBreakClass.EM && dataProvider.IsExtendedPictographic(effectiveCp) &&
+            dataProvider.GetGeneralCategory(effectiveCp) == GeneralCategory.Cn)
+            return false;
 
-        // LB31: Break everywhere else
-        // ALL ÷
-        // ÷ ALL
+        // LB31: ALL ÷ ALL
         return true;
     }
 
-    /// <summary>
-    /// LB1: Resolve some ambiguous classes
-    /// LB10: Treat any remaining combining mark or ZWJ as AL
-    /// </summary>
-    private static LineBreakClass ResolveClass(LineBreakClass cls)
+    #region Rule Handlers
+    
+    private LineBreakClass LookAheadGetClass(ReadOnlySpan<int> codePoints, int start)
     {
-        return cls switch
+        for (int i = start; i < codePoints.Length; i++)
         {
-            // LB10: Treat any remaining CM or ZWJ as AL
-            LineBreakClass.CM => LineBreakClass.AL,
-            LineBreakClass.ZWJ => LineBreakClass.AL,
+            var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+            if (!IsCM(cls)) return ResolveClass(cls);
+        }
+        return LineBreakClass.XX;
+    }
+    
+    private bool CheckLB15(ReadOnlySpan<int> codePoints, int effectiveIndex, LineBreakClass before)
+    {
+        var prev = before;
+        int i = effectiveIndex, quPos = -1;
+        
+        while (prev == LineBreakClass.SP && i > 0)
+        {
+            i--;
+            var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+            if (IsCM(cls)) continue;
+            prev = ResolveClass(cls);
+            if (prev == LineBreakClass.QU) quPos = i;
+        }
+        
+        if (prev != LineBreakClass.QU || quPos < 0 || 
+            dataProvider.GetGeneralCategory(codePoints[quPos]) != GeneralCategory.Pi)
+            return false;
             
-            // LB1: Resolve AI, SG, XX to AL
-            LineBreakClass.AI => LineBreakClass.AL,
-            LineBreakClass.SG => LineBreakClass.AL,
-            LineBreakClass.XX => LineBreakClass.AL,
+        if (quPos == 0) return true;
+        
+        for (int j = quPos - 1; j >= 0; j--)
+        {
+            var cls = dataProvider.GetLineBreakClass(codePoints[j]);
+            if (IsCM(cls)) continue;
+            return cls == LineBreakClass.BK || cls == LineBreakClass.CR ||
+                   cls == LineBreakClass.LF || cls == LineBreakClass.NL ||
+                   cls == LineBreakClass.SP || cls == LineBreakClass.ZW ||
+                   cls == LineBreakClass.CB || cls == LineBreakClass.GL;
+        }
+        return false;
+    }
+    
+    private bool CheckClosingBeforeNS(ReadOnlySpan<int> codePoints, int effectiveIndex, LineBreakClass before)
+    {
+        var prev = before;
+        for (int i = effectiveIndex; (prev == LineBreakClass.SP || prev == LineBreakClass.AL) && i > 0; )
+        {
+            i--;
+            var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+            if (IsCM(cls)) continue;
+            prev = ResolveClass(cls);
+            if (prev != LineBreakClass.SP) break;
+        }
+        return prev == LineBreakClass.CL || prev == LineBreakClass.CP;
+    }
+    
+    private bool CheckB2Pattern(ReadOnlySpan<int> codePoints, int effectiveIndex, LineBreakClass before)
+    {
+        var prev = before;
+        for (int i = effectiveIndex; (prev == LineBreakClass.SP || prev == LineBreakClass.AL) && i > 0; )
+        {
+            i--;
+            var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+            if (IsCM(cls)) continue;
+            prev = ResolveClass(cls);
+            if (prev != LineBreakClass.SP) break;
+        }
+        return prev == LineBreakClass.B2;
+    }
+    
+    private bool HandleLB18(ReadOnlySpan<int> codePoints, int index, LineBreakClass after, int afterCp)
+    {
+        // LB15b: × QU_Pf (allowed followers)
+        if (after == LineBreakClass.QU && dataProvider.GetGeneralCategory(afterCp) == GeneralCategory.Pf)
+        {
+            var nextCls = LookAheadGetClass(codePoints, index + 2);
+            bool eot = true;
+            for (int i = index + 2; i < codePoints.Length; i++)
+            {
+                var c = dataProvider.GetLineBreakClass(codePoints[i]);
+                if (!IsCM(c)) { eot = false; break; }
+            }
             
-            // LB1: Resolve SA to AL (simplified - full impl checks General_Category)
-            LineBreakClass.SA => LineBreakClass.AL,
+            if (eot || nextCls == LineBreakClass.SP || nextCls == LineBreakClass.GL ||
+                nextCls == LineBreakClass.WJ || nextCls == LineBreakClass.CL ||
+                nextCls == LineBreakClass.QU || nextCls == LineBreakClass.CP ||
+                nextCls == LineBreakClass.EX || nextCls == LineBreakClass.IS ||
+                nextCls == LineBreakClass.SY || nextCls == LineBreakClass.BK ||
+                nextCls == LineBreakClass.CR || nextCls == LineBreakClass.LF ||
+                nextCls == LineBreakClass.NL || nextCls == LineBreakClass.ZW)
+                return false;
+        }
+        
+        // LB15a: (context) (OP | QU_Pi) SP* ×
+        for (int i = index - 1; i >= 0; i--)
+        {
+            var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+            if (cls == LineBreakClass.SP || IsCM(cls)) continue;
             
-            // LB1: Resolve CJ to NS
-            LineBreakClass.CJ => LineBreakClass.NS,
+            bool isOpOrQuPi = cls == LineBreakClass.OP ||
+                (cls == LineBreakClass.QU && dataProvider.GetGeneralCategory(codePoints[i]) == GeneralCategory.Pi);
             
-            _ => cls
-        };
+            if (isOpOrQuPi)
+            {
+                if (i == 0) return false;
+                for (int j = i - 1; j >= 0; j--)
+                {
+                    var prevCls = dataProvider.GetLineBreakClass(codePoints[j]);
+                    if (IsCM(prevCls)) continue;
+                    return !(prevCls == LineBreakClass.BK || prevCls == LineBreakClass.CR ||
+                             prevCls == LineBreakClass.LF || prevCls == LineBreakClass.NL ||
+                             prevCls == LineBreakClass.OP || prevCls == LineBreakClass.QU ||
+                             prevCls == LineBreakClass.GL || prevCls == LineBreakClass.SP || 
+                             prevCls == LineBreakClass.ZW || prevCls == LineBreakClass.CB);
+                }
+            }
+            break;
+        }
+        return true;
     }
     
-    /// <summary>
-    /// Check if a class is a combining class (CM, ZWJ)
-    /// Note: SA is NOT automatically included - use IsSouthAsianCombining for SA codepoints
-    /// </summary>
-    private static bool IsCombiningClass(LineBreakClass cls)
+    private bool CanBreakBeforeQU(ReadOnlySpan<int> codePoints, int index, int afterCp, int effectiveCp)
     {
-        return cls == LineBreakClass.CM || 
-               cls == LineBreakClass.ZWJ;
+        if (dataProvider.GetGeneralCategory(afterCp) != GeneralCategory.Pi) return false;
+        if (!IsEastAsianForLB19a(dataProvider.GetEastAsianWidth(effectiveCp))) return false;
+        
+        for (int i = index + 2; i < codePoints.Length; i++)
+        {
+            var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+            if (IsCM(cls)) continue;
+            return IsEastAsianForLB19a(dataProvider.GetEastAsianWidth(codePoints[i]));
+        }
+        return false;
     }
     
-    /// <summary>
-    /// Check if General_Category indicates initial punctuation (Pi)
-    /// Used for LB15a: QU_Pi rules
-    /// </summary>
-    private static bool IsQuotePi(GeneralCategory gc)
+    private bool CanBreakAfterQU(ReadOnlySpan<int> codePoints, int effectiveIndex, int effectiveCp, int afterCp)
     {
-        return gc == GeneralCategory.Pi;
+        if (dataProvider.GetGeneralCategory(effectiveCp) != GeneralCategory.Pf) return false;
+        if (!IsEastAsianForLB19a(dataProvider.GetEastAsianWidth(afterCp))) return false;
+        
+        for (int i = effectiveIndex - 1; i >= 0; i--)
+        {
+            var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+            if (IsCM(cls)) continue;
+            return IsEastAsianForLB19a(dataProvider.GetEastAsianWidth(codePoints[i]));
+        }
+        return false;
     }
     
-    /// <summary>
-    /// Check if General_Category indicates final punctuation (Pf)
-    /// Used for LB15b: QU_Pf rules
-    /// </summary>
-    private static bool IsQuotePf(GeneralCategory gc)
+    private bool IsWordInitialHyphen(ReadOnlySpan<int> codePoints, int effectiveIndex)
     {
-        return gc == GeneralCategory.Pf;
+        if (effectiveIndex == 0) return true;
+        var prev = ResolveClass(dataProvider.GetLineBreakClass(codePoints[effectiveIndex - 1]));
+        return prev == LineBreakClass.BK || prev == LineBreakClass.CR ||
+               prev == LineBreakClass.LF || prev == LineBreakClass.NL ||
+               prev == LineBreakClass.SP || prev == LineBreakClass.ZW ||
+               prev == LineBreakClass.CB || prev == LineBreakClass.GL;
     }
     
-    /// <summary>
-    /// Check if East Asian Width indicates Wide or Fullwidth character
-    /// Used for LB30 to detect East Asian context
-    /// </summary>
-    private static bool IsEastAsianWide(EastAsianWidth eaw)
+    private bool IsHLBeforeHyphen(ReadOnlySpan<int> codePoints, int effectiveIndex)
     {
-        return eaw == EastAsianWidth.W || eaw == EastAsianWidth.F;
+        for (int i = effectiveIndex - 1; i >= 0; i--)
+        {
+            var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+            if (IsCM(cls)) continue;
+            return ResolveClass(cls) == LineBreakClass.HL;
+        }
+        return false;
     }
     
-    /// <summary>
-    /// Check if a code point is an Unambiguous Hyphen (HH class) by its value.
-    /// This is needed because LineBreak.txt may classify these as BA,
-    /// but LineBreakTest.txt expects HH behavior.
-    /// Unicode 16.0+ officially has class HH for these characters.
-    /// </summary>
-    private static bool IsHHCodePoint(int cp)
+    private bool CheckLB25(ReadOnlySpan<int> codePoints, int index, int effectiveIndex,
+                           LineBreakClass before, LineBreakClass after)
     {
-        return cp == 0x058A ||  // ARMENIAN HYPHEN
-               cp == 0x05BE ||  // HEBREW PUNCTUATION MAQAF
-               cp == 0x1400 ||  // CANADIAN SYLLABICS HYPHEN
-               cp == 0x2010 ||  // HYPHEN
-               cp == 0x2012 ||  // FIGURE DASH
-               cp == 0x2013 ||  // EN DASH
-               cp == 0x2E17 ||  // DOUBLE OBLIQUE HYPHEN
-               cp == 0x2E40 ||  // DOUBLE HYPHEN
-               cp == 0x2E5D ||  // OBLIQUE HYPHEN
-               cp == 0x10D6E || // GARAY HYPHEN
-               cp == 0x10EAD;   // YEZIDI HYPHENATION MARK
+        if (before == LineBreakClass.NU && IsNumericAffix(after)) return false;
+        if (IsNumericAffix(before) && after == LineBreakClass.NU) return false;
+        if ((before == LineBreakClass.HY || before == LineBreakClass.IS) && after == LineBreakClass.NU) return false;
+        if (before == LineBreakClass.NU && 
+            (after == LineBreakClass.NU || after == LineBreakClass.SY || after == LineBreakClass.IS))
+            return false;
+        
+        // SY × NU (fractions)
+        if (before == LineBreakClass.SY && after == LineBreakClass.NU)
+        {
+            for (int i = effectiveIndex - 1; i >= 0; i--)
+            {
+                var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+                if (IsCM(cls)) continue;
+                if (cls == LineBreakClass.NU) return false;
+                if (cls == LineBreakClass.SY || cls == LineBreakClass.IS) continue;
+                break;
+            }
+        }
+        
+        // NU context × (PO|PR)
+        if (IsNumericAffix(after))
+        {
+            for (int i = effectiveIndex; i >= 0; i--)
+            {
+                var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+                if (IsCM(cls)) continue;
+                if (cls == LineBreakClass.NU) return false;
+                if (cls == LineBreakClass.SY || cls == LineBreakClass.IS ||
+                    cls == LineBreakClass.CL || cls == LineBreakClass.CP) continue;
+                break;
+            }
+        }
+        
+        // (CL|CP) × (PO|PR)
+        if ((before == LineBreakClass.CL || before == LineBreakClass.CP) && IsNumericAffix(after))
+        {
+            for (int i = effectiveIndex - 1; i >= 0; i--)
+            {
+                var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+                if (cls == LineBreakClass.NU) return false;
+                if (cls == LineBreakClass.OP || cls == LineBreakClass.BK ||
+                    cls == LineBreakClass.CR || cls == LineBreakClass.LF ||
+                    cls == LineBreakClass.NL || cls == LineBreakClass.SP) break;
+            }
+        }
+        
+        // (PO|PR) × OP
+        if (IsNumericAffix(before) && after == LineBreakClass.OP)
+        {
+            for (int i = index + 2; i < codePoints.Length; i++)
+            {
+                var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+                if (cls == LineBreakClass.NU) return false;
+                if (cls == LineBreakClass.CL || cls == LineBreakClass.CP ||
+                    cls == LineBreakClass.BK || cls == LineBreakClass.CR ||
+                    cls == LineBreakClass.LF || cls == LineBreakClass.NL) break;
+            }
+        }
+        
+        return true;
     }
+    
+    private bool CheckLB28a(ReadOnlySpan<int> codePoints, int index, int effectiveIndex,
+                            LineBreakClass before, LineBreakClass after,
+                            LineBreakClass beforeRaw, LineBreakClass effectiveBeforeRaw,
+                            int beforeCp, int afterCp, int effectiveCp)
+    {
+        if (before == LineBreakClass.AP && IsAksara(after)) return false;
+        if (IsAksara(before) && IsVirama(after)) return false;
+        
+        // VI × (AK|AS) with valid predecessor
+        if (before == LineBreakClass.VI && IsAksara(after))
+        {
+            for (int i = effectiveIndex - 1; i >= 0; i--)
+            {
+                var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+                if (IsCM(cls)) continue;
+                if (IsAksara(cls) || cls == LineBreakClass.VI) return false;
+                break;
+            }
+        }
+        
+        // Brahmic conjunct: (AK|AS) CM × (AK|AS) (VF|VI)
+        if (beforeRaw == LineBreakClass.CM && IsAksara(after) && 
+            IsAksara(effectiveBeforeRaw) && dataProvider.IsBrahmicForLB28a(beforeCp))
+        {
+            var nextCls = LookAheadGetClass(codePoints, index + 2);
+            if (IsVirama(nextCls))
+            {
+                bool foundCM = false;
+                for (int i = effectiveIndex - 1; i >= 0; i--)
+                {
+                    var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+                    if (IsCM(cls)) { foundCM = true; continue; }
+                    if (IsVirama(cls) && foundCM) return true;
+                    break;
+                }
+                return false;
+            }
+        }
+        
+        if (before == LineBreakClass.AP && dataProvider.IsDottedCircle(afterCp)) return false;
+        if (dataProvider.IsDottedCircle(effectiveCp) && IsVirama(after)) return false;
+        
+        // (AK|25CC|AS) VI ×
+        if (beforeRaw == LineBreakClass.VI)
+        {
+            for (int i = index - 1; i >= 0; i--)
+            {
+                var cls = dataProvider.GetLineBreakClass(codePoints[i]);
+                if (IsCM(cls)) continue;
+                if (IsAksara(cls) || dataProvider.IsDottedCircle(codePoints[i])) return false;
+                break;
+            }
+        }
+        
+        return true;
+    }
+    
+    #endregion
 }
