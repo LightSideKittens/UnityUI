@@ -418,7 +418,13 @@ public enum UnicodeScript : byte
     OlOnal,
     Sunuwar,
     Todhri,
-    TuluTigalari
+    TuluTigalari,
+    
+    // Unicode 17.0
+    BeriaErfe,
+    Sidetic,
+    TaiYo,
+    TolongSiki
 }
 
 
@@ -494,6 +500,41 @@ public enum LineBreakClass : byte
 }
 
 
+/// <summary>
+/// Grapheme_Cluster_Break property values (UAX #29)
+/// </summary>
+public enum GraphemeClusterBreak : byte
+{
+    Other = 0,          // XX - Any other
+    CR,                 // CR - Carriage Return
+    LF,                 // LF - Line Feed
+    Control,            // Control, Cf (except ZWJ, ZWNJ, etc)
+    Extend,             // Grapheme_Extend = Yes
+    ZWJ,                // Zero Width Joiner
+    Regional_Indicator, // Regional Indicator
+    Prepend,            // Prepended_Concatenation_Mark = Yes
+    SpacingMark,        // Mc spacing combining marks
+    L,                  // Hangul Syllable Type L
+    V,                  // Hangul Syllable Type V
+    T,                  // Hangul Syllable Type T
+    LV,                 // Hangul Syllable Type LV
+    LVT                 // Hangul Syllable Type LVT
+}
+
+
+/// <summary>
+/// Indic_Conjunct_Break property values for GB9c rule (UAX #29).
+/// Loaded from DerivedCoreProperties.txt (InCB property).
+/// </summary>
+public enum IndicConjunctBreak : byte
+{
+    None = 0,    // Default value
+    Linker,      // Virama and similar joiners
+    Consonant,   // Consonants in conjunct-forming scripts
+    Extend       // Extending marks in conjunct context
+}
+
+
 public interface IUnicodeDataProvider
 {
     BidiClass GetBidiClass(int codePoint);
@@ -557,4 +598,27 @@ public interface IUnicodeDataProvider
     /// Mandaic, Modi, Nandinagari, Sundanese, Tai Le, New Tai Lue, Takri, Tibetan.
     /// </summary>
     bool IsBrahmicForLB28a(int codePoint);
+    
+    /// <summary>
+   /// Get Grapheme_Cluster_Break property (UAX #29)
+    /// </summary>
+    GraphemeClusterBreak GetGraphemeClusterBreak(int codePoint);
+    
+    /// <summary>
+    /// Get Indic_Conjunct_Break property for GB9c rule (UAX #29).
+    /// Loaded from DerivedCoreProperties.txt.
+    /// </summary>
+    IndicConjunctBreak GetIndicConjunctBreak(int codePoint);
+    
+    /// <summary>
+    /// Get Script_Extensions property (UAX #24).
+    /// Returns array of scripts that can use this character.
+    /// If character is not in ScriptExtensions.txt, returns array with single Script value.
+    /// </summary>
+    UnicodeScript[] GetScriptExtensions(int codePoint);
+    
+    /// <summary>
+    /// Check if character has specified script in its Script_Extensions.
+    /// </summary>
+    bool HasScriptExtension(int codePoint, UnicodeScript script);
 }

@@ -15,6 +15,25 @@ struct UnicodeProps
     public bool extendedPictographic;
     public GeneralCategory generalCategory;
     public EastAsianWidth eastAsianWidth;
+    public GraphemeClusterBreak graphemeClusterBreak;
+    public IndicConjunctBreak indicConjunctBreak;
+}
+
+/// <summary>
+/// Entry for Script_Extensions property
+/// </summary>
+public struct ScriptExtensionEntry
+{
+    public int startCodePoint;
+    public int endCodePoint;
+    public UnicodeScript[] scripts;
+
+    public ScriptExtensionEntry(int start, int end, UnicodeScript[] scripts)
+    {
+        this.startCodePoint = start;
+        this.endCodePoint = end;
+        this.scripts = scripts;
+    }
 }
 
 public class UnicodeDataBuilder
@@ -23,6 +42,7 @@ public class UnicodeDataBuilder
     const int ScalarCount = MaxCodePoint + 1;
 
     readonly UnicodeProps[] props;
+    readonly List<ScriptExtensionEntry> scriptExtensions = new();
 
     public UnicodeDataBuilder()
     {
@@ -41,6 +61,7 @@ public class UnicodeDataBuilder
             props[cp].lineBreakClass = LineBreakClass.XX;
             props[cp].generalCategory = GeneralCategory.Cn; // Not assigned
             props[cp].eastAsianWidth = EastAsianWidth.N;    // Neutral
+            props[cp].indicConjunctBreak = IndicConjunctBreak.None;
         }
     }
 
@@ -279,6 +300,161 @@ public class UnicodeDataBuilder
         }
     }
 
+    /// <summary>
+    /// Load GraphemeBreakProperty.txt to extract Grapheme_Cluster_Break property
+    /// Format: 0600..0605    ; Prepend # Cf   [6] ARABIC NUMBER SIGN..ARABIC NUMBER MARK ABOVE
+    /// </summary>
+    public void LoadGraphemeBreakProperty(string path)
+    {
+        using var reader = new StreamReader(path);
+
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            line = StripComment(line);
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            string[] semi = line.Split(';');
+            if (semi.Length < 2)
+                continue;
+
+            string codeRangePart = semi[0].Trim();
+            string gcbPart = semi[1].Trim();
+
+            if (codeRangePart.Length == 0 || gcbPart.Length == 0)
+                continue;
+
+            GraphemeClusterBreak gcb = ParseGraphemeClusterBreak(gcbPart);
+            ParseRangeAndApply(codeRangePart, cp => props[cp].graphemeClusterBreak = gcb);
+        }
+    }
+
+    /// <summary>
+    /// Load Indic_Conjunct_Break (InCB) from DerivedCoreProperties.txt.
+    /// Format: 094D          ; InCB; Linker # Mn       DEVANAGARI SIGN VIRAMA
+    /// Format: 0915..0939    ; InCB; Consonant # Lo  [37] ...
+    /// </summary>
+    public void LoadIndicConjunctBreak(string path)
+    {
+        using var reader = new StreamReader(path);
+
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            line = StripComment(line);
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            // Looking for lines with InCB property
+            if (!line.Contains("InCB"))
+                continue;
+
+            string[] semi = line.Split(';');
+            if (semi.Length < 3)
+                continue;
+
+            string codeRangePart = semi[0].Trim();
+            string propertyName = semi[1].Trim();
+            string valuePart = semi[2].Trim();
+
+            if (propertyName != "InCB")
+                continue;
+
+            if (codeRangePart.Length == 0 || valuePart.Length == 0)
+                continue;
+
+            IndicConjunctBreak incb = ParseIndicConjunctBreak(valuePart);
+            if (incb != IndicConjunctBreak.None)
+            {
+                ParseRangeAndApply(codeRangePart, cp => props[cp].indicConjunctBreak = incb);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Load Script_Extensions from ScriptExtensions.txt.
+    /// Format: 0640          ; Adlm Arab Mand Mani Ougr Phlp Rohg Sogd Syrc # Lm ARABIC TATWEEL
+    /// Format: 064B..0655    ; Arab Syrc # Mn [11] ARABIC FATHATAN..ARABIC HAMZA BELOW
+    /// </summary>
+    public void LoadScriptExtensions(string path)
+    {
+        scriptExtensions.Clear();
+        
+        using var reader = new StreamReader(path);
+
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            // Strip comment
+            int hashIdx = line.IndexOf('#');
+            if (hashIdx >= 0)
+                line = line.Substring(0, hashIdx);
+            
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            string[] semi = line.Split(';');
+            if (semi.Length < 2)
+                continue;
+
+            string codeRangePart = semi[0].Trim();
+            string scriptsPart = semi[1].Trim();
+
+            if (codeRangePart.Length == 0 || scriptsPart.Length == 0)
+                continue;
+
+            // Parse code range
+            int start, end;
+            if (codeRangePart.Contains(".."))
+            {
+                string[] rangeParts = codeRangePart.Split(new[] { ".." }, StringSplitOptions.None);
+                start = int.Parse(rangeParts[0], NumberStyles.HexNumber);
+                end = int.Parse(rangeParts[1], NumberStyles.HexNumber);
+            }
+            else
+            {
+                start = end = int.Parse(codeRangePart, NumberStyles.HexNumber);
+            }
+
+            // Parse scripts list
+            string[] scriptNames = scriptsPart.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var scripts = new List<UnicodeScript>();
+            
+            foreach (var name in scriptNames)
+            {
+                var script = ParseScriptShortName(name);
+                if (script != UnicodeScript.Unknown)
+                    scripts.Add(script);
+            }
+
+            if (scripts.Count > 0)
+            {
+                scriptExtensions.Add(new ScriptExtensionEntry(start, end, scripts.ToArray()));
+            }
+        }
+        
+        // Sort by start code point for binary search
+        scriptExtensions.Sort((a, b) => a.startCodePoint.CompareTo(b.startCodePoint));
+    }
+
+    /// <summary>
+    /// Get the loaded script extensions entries.
+    /// </summary>
+    public IReadOnlyList<ScriptExtensionEntry> GetScriptExtensionEntries() => scriptExtensions;
+
+    private static IndicConjunctBreak ParseIndicConjunctBreak(string value)
+    {
+        return value switch
+        {
+            "Linker" => IndicConjunctBreak.Linker,
+            "Consonant" => IndicConjunctBreak.Consonant,
+            "Extend" => IndicConjunctBreak.Extend,
+            "None" => IndicConjunctBreak.None,
+            _ => IndicConjunctBreak.None
+        };
+    }
+
     private static GeneralCategory ParseGeneralCategory(string value)
     {
         return value switch
@@ -328,6 +504,27 @@ public class UnicodeDataBuilder
             "F" => EastAsianWidth.F,
             "Na" => EastAsianWidth.Na,
             _ => EastAsianWidth.N
+        };
+    }
+
+    private static GraphemeClusterBreak ParseGraphemeClusterBreak(string value)
+    {
+        return value switch
+        {
+            "CR" => GraphemeClusterBreak.CR,
+            "LF" => GraphemeClusterBreak.LF,
+            "Control" => GraphemeClusterBreak.Control,
+            "Extend" => GraphemeClusterBreak.Extend,
+            "ZWJ" => GraphemeClusterBreak.ZWJ,
+            "Regional_Indicator" => GraphemeClusterBreak.Regional_Indicator,
+            "Prepend" => GraphemeClusterBreak.Prepend,
+            "SpacingMark" => GraphemeClusterBreak.SpacingMark,
+            "L" => GraphemeClusterBreak.L,
+            "V" => GraphemeClusterBreak.V,
+            "T" => GraphemeClusterBreak.T,
+            "LV" => GraphemeClusterBreak.LV,
+            "LVT" => GraphemeClusterBreak.LVT,
+            _ => GraphemeClusterBreak.Other
         };
     }
 
@@ -449,24 +646,195 @@ public class UnicodeDataBuilder
 
     static UnicodeScript ParseScript(string value)
     {
-        // Convert to PascalCase (e.g., "Old_Italic" -> "OldItalic")
-        string[] parts = value.Trim().Split(new[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
-        var sb = new System.Text.StringBuilder();
+        // Remove underscores: "Old_Italic" -> "OldItalic"
+        string enumName = value.Trim().Replace("_", "");
 
-        foreach (string part in parts)
-        {
-            if (part.Length == 0) continue;
-            sb.Append(char.ToUpperInvariant(part[0]));
-            if (part.Length > 1)
-                sb.Append(part.Substring(1).ToLowerInvariant());
-        }
-
-        string enumName = sb.ToString();
-
-        if (Enum.TryParse<UnicodeScript>(enumName, out var result))
+        if (Enum.TryParse<UnicodeScript>(enumName, ignoreCase: true, out var result))
             return result;
 
         return UnicodeScript.Unknown;
+    }
+
+    /// <summary>
+    /// Parse 4-letter script short name (from ScriptExtensions.txt) to UnicodeScript enum.
+    /// </summary>
+    static UnicodeScript ParseScriptShortName(string shortName)
+    {
+        return shortName.Trim() switch
+        {
+            "Adlm" => UnicodeScript.Adlam,
+            "Aghb" => UnicodeScript.CaucasianAlbanian,
+            "Ahom" => UnicodeScript.Ahom,
+            "Arab" => UnicodeScript.Arabic,
+            "Armi" => UnicodeScript.ImperialAramaic,
+            "Armn" => UnicodeScript.Armenian,
+            "Avst" => UnicodeScript.Avestan,
+            "Bali" => UnicodeScript.Balinese,
+            "Bamu" => UnicodeScript.Bamum,
+            "Bass" => UnicodeScript.BassaVah,
+            "Batk" => UnicodeScript.Batak,
+            "Beng" => UnicodeScript.Bengali,
+            "Bhks" => UnicodeScript.Bhaiksuki,
+            "Bopo" => UnicodeScript.Bopomofo,
+            "Brah" => UnicodeScript.Brahmi,
+            "Brai" => UnicodeScript.Braille,
+            "Bugi" => UnicodeScript.Buginese,
+            "Buhd" => UnicodeScript.Buhid,
+            "Cakm" => UnicodeScript.Chakma,
+            "Cans" => UnicodeScript.CanadianAboriginal,
+            "Cari" => UnicodeScript.Carian,
+            "Cham" => UnicodeScript.Cham,
+            "Cher" => UnicodeScript.Cherokee,
+            "Chrs" => UnicodeScript.Chorasmian,
+            "Copt" => UnicodeScript.Coptic,
+            "Cpmn" => UnicodeScript.CyproMinoan,
+            "Cprt" => UnicodeScript.Cypriot,
+            "Cyrl" => UnicodeScript.Cyrillic,
+            "Deva" => UnicodeScript.Devanagari,
+            "Diak" => UnicodeScript.DivesAkuru,
+            "Dogr" => UnicodeScript.Dogra,
+            "Dsrt" => UnicodeScript.Deseret,
+            "Dupl" => UnicodeScript.Duployan,
+            "Egyp" => UnicodeScript.EgyptianHieroglyphs,
+            "Elba" => UnicodeScript.Elbasan,
+            "Elym" => UnicodeScript.Elymaic,
+            "Ethi" => UnicodeScript.Ethiopic,
+            "Gara" => UnicodeScript.Garay,
+            "Geor" => UnicodeScript.Georgian,
+            "Glag" => UnicodeScript.Glagolitic,
+            "Gong" => UnicodeScript.GunjalaGondi,
+            "Gonm" => UnicodeScript.MasaramGondi,
+            "Goth" => UnicodeScript.Gothic,
+            "Gran" => UnicodeScript.Grantha,
+            "Grek" => UnicodeScript.Greek,
+            "Gujr" => UnicodeScript.Gujarati,
+            "Gukh" => UnicodeScript.GurungKhema,
+            "Guru" => UnicodeScript.Gurmukhi,
+            "Hang" => UnicodeScript.Hangul,
+            "Hani" => UnicodeScript.Han,
+            "Hano" => UnicodeScript.Hanunoo,
+            "Hatr" => UnicodeScript.Hatran,
+            "Hebr" => UnicodeScript.Hebrew,
+            "Hira" => UnicodeScript.Hiragana,
+            "Hluw" => UnicodeScript.AnatolianHieroglyphs,
+            "Hmng" => UnicodeScript.PahawhHmong,
+            "Hmnp" => UnicodeScript.NyiakengPuachueHmong,
+            "Hung" => UnicodeScript.OldHungarian,
+            "Ital" => UnicodeScript.OldItalic,
+            "Java" => UnicodeScript.Javanese,
+            "Kali" => UnicodeScript.KayahLi,
+            "Kana" => UnicodeScript.Katakana,
+            "Kawi" => UnicodeScript.Kawi,
+            "Khar" => UnicodeScript.Kharoshthi,
+            "Khmr" => UnicodeScript.Khmer,
+            "Khoj" => UnicodeScript.Khojki,
+            "Kits" => UnicodeScript.KhitanSmallScript,
+            "Knda" => UnicodeScript.Kannada,
+            "Krai" => UnicodeScript.KiratRai,
+            "Kthi" => UnicodeScript.Kaithi,
+            "Lana" => UnicodeScript.TaiTham,
+            "Laoo" => UnicodeScript.Lao,
+            "Latn" => UnicodeScript.Latin,
+            "Lepc" => UnicodeScript.Lepcha,
+            "Limb" => UnicodeScript.Limbu,
+            "Lina" => UnicodeScript.LinearA,
+            "Linb" => UnicodeScript.LinearB,
+            "Lisu" => UnicodeScript.Lisu,
+            "Lyci" => UnicodeScript.Lycian,
+            "Lydi" => UnicodeScript.Lydian,
+            "Mahj" => UnicodeScript.Mahajani,
+            "Maka" => UnicodeScript.Makasar,
+            "Mand" => UnicodeScript.Mandaic,
+            "Mani" => UnicodeScript.Manichaean,
+            "Marc" => UnicodeScript.Marchen,
+            "Medf" => UnicodeScript.Medefaidrin,
+            "Mend" => UnicodeScript.MendeKikakui,
+            "Merc" => UnicodeScript.MeroiticCursive,
+            "Mero" => UnicodeScript.MeroiticHieroglyphs,
+            "Mlym" => UnicodeScript.Malayalam,
+            "Modi" => UnicodeScript.Modi,
+            "Mong" => UnicodeScript.Mongolian,
+            "Mroo" => UnicodeScript.Mro,
+            "Mtei" => UnicodeScript.MeeteiMayek,
+            "Mult" => UnicodeScript.Multani,
+            "Mymr" => UnicodeScript.Myanmar,
+            "Nagm" => UnicodeScript.NagMundari,
+            "Nand" => UnicodeScript.Nandinagari,
+            "Narb" => UnicodeScript.OldNorthArabian,
+            "Nbat" => UnicodeScript.Nabataean,
+            "Newa" => UnicodeScript.Newa,
+            "Nkoo" => UnicodeScript.Nko,
+            "Nshu" => UnicodeScript.Nushu,
+            "Ogam" => UnicodeScript.Ogham,
+            "Olck" => UnicodeScript.OlChiki,
+            "Onao" => UnicodeScript.OlOnal,
+            "Orkh" => UnicodeScript.OldTurkic,
+            "Orya" => UnicodeScript.Oriya,
+            "Osge" => UnicodeScript.Osage,
+            "Osma" => UnicodeScript.Osmanya,
+            "Ougr" => UnicodeScript.OldUyghur,
+            "Palm" => UnicodeScript.Palmyrene,
+            "Pauc" => UnicodeScript.PauCinHau,
+            "Perm" => UnicodeScript.OldPermic,
+            "Phag" => UnicodeScript.PhagsPa,
+            "Phli" => UnicodeScript.InscriptionalPahlavi,
+            "Phlp" => UnicodeScript.PsalterPahlavi,
+            "Phnx" => UnicodeScript.Phoenician,
+            "Plrd" => UnicodeScript.Miao,
+            "Prti" => UnicodeScript.InscriptionalParthian,
+            "Rjng" => UnicodeScript.Rejang,
+            "Rohg" => UnicodeScript.HanifiRohingya,
+            "Runr" => UnicodeScript.Runic,
+            "Samr" => UnicodeScript.Samaritan,
+            "Sarb" => UnicodeScript.OldSouthArabian,
+            "Saur" => UnicodeScript.Saurashtra,
+            "Sgnw" => UnicodeScript.SignWriting,
+            "Shaw" => UnicodeScript.Shavian,
+            "Shrd" => UnicodeScript.Sharada,
+            "Sidd" => UnicodeScript.Siddham,
+            "Sind" => UnicodeScript.Khudawadi,
+            "Sinh" => UnicodeScript.Sinhala,
+            "Sogd" => UnicodeScript.Sogdian,
+            "Sogo" => UnicodeScript.OldSogdian,
+            "Sora" => UnicodeScript.SoraSompeng,
+            "Soyo" => UnicodeScript.Soyombo,
+            "Sund" => UnicodeScript.Sundanese,
+            "Sunu" => UnicodeScript.Sunuwar,
+            "Sylo" => UnicodeScript.SylotiNagri,
+            "Syrc" => UnicodeScript.Syriac,
+            "Tagb" => UnicodeScript.Tagbanwa,
+            "Takr" => UnicodeScript.Takri,
+            "Tale" => UnicodeScript.TaiLe,
+            "Talu" => UnicodeScript.NewTaiLue,
+            "Taml" => UnicodeScript.Tamil,
+            "Tang" => UnicodeScript.Tangut,
+            "Tavt" => UnicodeScript.TaiViet,
+            "Telu" => UnicodeScript.Telugu,
+            "Tfng" => UnicodeScript.Tifinagh,
+            "Tglg" => UnicodeScript.Tagalog,
+            "Thaa" => UnicodeScript.Thaana,
+            "Thai" => UnicodeScript.Thai,
+            "Tibt" => UnicodeScript.Tibetan,
+            "Tirh" => UnicodeScript.Tirhuta,
+            "Tnsa" => UnicodeScript.Tangsa,
+            "Todr" => UnicodeScript.Todhri,
+            "Toto" => UnicodeScript.Toto,
+            "Tutg" => UnicodeScript.TuluTigalari,
+            "Ugar" => UnicodeScript.Ugaritic,
+            "Vaii" => UnicodeScript.Vai,
+            "Vith" => UnicodeScript.Vithkuqi,
+            "Wara" => UnicodeScript.WarangCiti,
+            "Wcho" => UnicodeScript.Wancho,
+            "Xpeo" => UnicodeScript.OldPersian,
+            "Xsux" => UnicodeScript.Cuneiform,
+            "Yezi" => UnicodeScript.Yezidi,
+            "Yiii" => UnicodeScript.Yi,
+            "Zanb" => UnicodeScript.ZanabazarSquare,
+            "Zinh" => UnicodeScript.Inherited,
+            "Zyyy" => UnicodeScript.Common,
+            "Zzzz" => UnicodeScript.Unknown,
+            _ => UnicodeScript.Unknown
+        };
     }
 
     static LineBreakClass ParseLineBreakClass(string value)
@@ -657,6 +1025,68 @@ public class UnicodeDataBuilder
         return result;
     }
 
+    /// <summary>
+    /// Build range entries for Grapheme_Cluster_Break property.
+    /// </summary>
+    public List<GraphemeBreakRangeEntry> BuildGraphemeBreakRangeEntries()
+    {
+        var result = new List<GraphemeBreakRangeEntry>();
+
+        int currentStart = 0;
+        var currentGcb = props[0].graphemeClusterBreak;
+
+        for (int cp = 1; cp <= MaxCodePoint; cp++)
+        {
+            var gcb = props[cp].graphemeClusterBreak;
+
+            if (gcb != currentGcb)
+            {
+                // Only add non-Other entries to save space
+                if (currentGcb != GraphemeClusterBreak.Other)
+                    result.Add(new GraphemeBreakRangeEntry(currentStart, cp - 1, currentGcb));
+                currentStart = cp;
+                currentGcb = gcb;
+            }
+        }
+
+        // Add final range if not Other
+        if (currentGcb != GraphemeClusterBreak.Other)
+            result.Add(new GraphemeBreakRangeEntry(currentStart, MaxCodePoint, currentGcb));
+
+        return result;
+    }
+
+    /// <summary>
+    /// Build range entries for Indic_Conjunct_Break property.
+    /// </summary>
+    public List<IndicConjunctBreakRangeEntry> BuildIndicConjunctBreakRangeEntries()
+    {
+        var result = new List<IndicConjunctBreakRangeEntry>();
+
+        int currentStart = 0;
+        var currentIncb = props[0].indicConjunctBreak;
+
+        for (int cp = 1; cp <= MaxCodePoint; cp++)
+        {
+            var incb = props[cp].indicConjunctBreak;
+
+            if (incb != currentIncb)
+            {
+                // Only add non-None entries to save space
+                if (currentIncb != IndicConjunctBreak.None)
+                    result.Add(new IndicConjunctBreakRangeEntry(currentStart, cp - 1, currentIncb));
+                currentStart = cp;
+                currentIncb = incb;
+            }
+        }
+
+        // Add final range if not None
+        if (currentIncb != IndicConjunctBreak.None)
+            result.Add(new IndicConjunctBreakRangeEntry(currentStart, MaxCodePoint, currentIncb));
+
+        return result;
+    }
+
     public static List<MirrorEntry> BuildMirrorEntries(string bidiMirroringPath)
     {
         if (string.IsNullOrEmpty(bidiMirroringPath))
@@ -768,10 +1198,12 @@ public class UnicodeDataBuilder
 public static class UnicodeBinaryWriter
 {
     const uint Magic = 0x554C5452; // "ULTR"
-    const ushort FormatVersion4 = 4;
+    const ushort FormatVersion5 = 5;
+    const ushort FormatVersion6 = 6;
+    const ushort FormatVersion7 = 7;
 
     /// <summary>
-    /// Write format version 4 (with Script, LineBreak, Extended_Pictographic, GeneralCategory, EastAsianWidth)
+    /// Write format version 7 (with Script, LineBreak, Extended_Pictographic, GeneralCategory, EastAsianWidth, GraphemeBreak, InCB, ScriptExtensions)
     /// </summary>
     public static void WriteBinary(
         string outputPath,
@@ -783,6 +1215,9 @@ public static class UnicodeBinaryWriter
         IReadOnlyList<ExtendedPictographicRangeEntry> extendedPictographics,
         IReadOnlyList<GeneralCategoryRangeEntry> generalCategories,
         IReadOnlyList<EastAsianWidthRangeEntry> eastAsianWidths,
+        IReadOnlyList<GraphemeBreakRangeEntry> graphemeBreaks,
+        IReadOnlyList<IndicConjunctBreakRangeEntry> indicConjunctBreaks,
+        IReadOnlyList<ScriptExtensionEntry> scriptExtensions,
         int unicodeVersionRaw)
     {
         using var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -792,12 +1227,12 @@ public static class UnicodeBinaryWriter
         long headerPosition = stream.Position;
 
         writer.Write(Magic);
-        writer.Write(FormatVersion4);
+        writer.Write(FormatVersion7);
         writer.Write((ushort)0); // Reserved
         writer.Write((uint)unicodeVersionRaw);
 
-        // Section offsets placeholder (9 sections * 8 bytes)
-        for (int i = 0; i < 18; i++)
+        // Section offsets placeholder (12 sections * 8 bytes)
+        for (int i = 0; i < 24; i++)
             writer.Write((uint)0);
 
         // Write Range section
@@ -904,11 +1339,59 @@ public static class UnicodeBinaryWriter
         }
         uint eawLength = (uint)(stream.Position - eawOffset);
 
+        // Write Grapheme_Cluster_Break section
+        long gcbOffset = stream.Position;
+        writer.Write((uint)graphemeBreaks.Count);
+        foreach (var gcb in graphemeBreaks)
+        {
+            writer.Write((uint)gcb.startCodePoint);
+            writer.Write((uint)gcb.endCodePoint);
+            writer.Write((byte)gcb.graphemeBreak);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+        }
+        uint gcbLength = (uint)(stream.Position - gcbOffset);
+
+        // Write Indic_Conjunct_Break section
+        long incbOffset = stream.Position;
+        writer.Write((uint)indicConjunctBreaks.Count);
+        foreach (var incb in indicConjunctBreaks)
+        {
+            writer.Write((uint)incb.startCodePoint);
+            writer.Write((uint)incb.endCodePoint);
+            writer.Write((byte)incb.indicConjunctBreak);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+        }
+        uint incbLength = (uint)(stream.Position - incbOffset);
+
+        // Write Script_Extensions section
+        long scxOffset = stream.Position;
+        writer.Write((uint)scriptExtensions.Count);
+        foreach (var scx in scriptExtensions)
+        {
+            writer.Write((uint)scx.startCodePoint);
+            writer.Write((uint)scx.endCodePoint);
+            writer.Write((byte)scx.scripts.Length);
+            foreach (var script in scx.scripts)
+            {
+                writer.Write((byte)script);
+            }
+            // Padding to align to 4 bytes
+            int totalBytes = 8 + 1 + scx.scripts.Length; // start + end + count + scripts
+            int padding = (4 - (totalBytes % 4)) % 4;
+            for (int p = 0; p < padding; p++)
+                writer.Write((byte)0);
+        }
+        uint scxLength = (uint)(stream.Position - scxOffset);
+
         // Go back and write header with offsets
         stream.Position = headerPosition;
 
         writer.Write(Magic);
-        writer.Write(FormatVersion4);
+        writer.Write(FormatVersion7);
         writer.Write((ushort)0);
         writer.Write((uint)unicodeVersionRaw);
 
@@ -928,6 +1411,12 @@ public static class UnicodeBinaryWriter
         writer.Write(gcLength);
         writer.Write((uint)eawOffset);
         writer.Write(eawLength);
+        writer.Write((uint)gcbOffset);
+        writer.Write(gcbLength);
+        writer.Write((uint)incbOffset);
+        writer.Write(incbLength);
+        writer.Write((uint)scxOffset);
+        writer.Write(scxLength);
 
         writer.Flush();
     }

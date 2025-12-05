@@ -8,15 +8,15 @@ namespace Tekst
     /// </summary>
     public sealed class ScriptAnalyzer : IScriptAnalyzer
     {
-        private readonly IScriptDatabase database;
+        private readonly IUnicodeDataProvider dataProvider;
         
         // Буфер результатов
         private UnicodeScript[] scripts = new UnicodeScript[256];
         private int length;
         
-        public ScriptAnalyzer(IScriptDatabase database)
+        public ScriptAnalyzer(IUnicodeDataProvider dataProvider)
         {
-            this.database = database ?? throw new ArgumentNullException(nameof(database));
+            this.dataProvider = dataProvider ?? throw new ArgumentNullException(nameof(dataProvider));
         }
         
         public void Analyze(ReadOnlySpan<int> codepoints, IScriptResult result)
@@ -27,7 +27,7 @@ namespace Tekst
             // Первый проход: определяем скрипт каждого codepoint
             for (int i = 0; i < codepoints.Length; i++)
             {
-                scripts[i] = database.GetScript(codepoints[i]);
+                scripts[i] = dataProvider.GetScript(codepoints[i]);
             }
             
             // Второй проход: разрешаем Common и Inherited
@@ -93,18 +93,6 @@ namespace Tekst
             int newSize = Math.Max(required, scripts.Length * 2);
             scripts = new UnicodeScript[newSize];
         }
-    }
-    
-    /// <summary>
-    /// База данных Unicode Script.
-    /// Абстракция для получения скрипта по codepoint.
-    /// </summary>
-    public interface IScriptDatabase
-    {
-        /// <summary>
-        /// Получить скрипт для codepoint
-        /// </summary>
-        UnicodeScript GetScript(int codepoint);
     }
     
     /// <summary>

@@ -141,6 +141,58 @@ public readonly struct EastAsianWidthRangeEntry
 }
 
 
+/// <summary>
+/// Range entry for Grapheme_Cluster_Break property (from GraphemeBreakProperty.txt)
+/// </summary>
+public readonly struct GraphemeBreakRangeEntry
+{
+    public readonly int startCodePoint;
+    public readonly int endCodePoint;
+    public readonly GraphemeClusterBreak graphemeBreak;
+
+    public GraphemeBreakRangeEntry(int startCodePoint, int endCodePoint, GraphemeClusterBreak graphemeBreak)
+    {
+        this.startCodePoint = startCodePoint;
+        this.endCodePoint = endCodePoint;
+        this.graphemeBreak = graphemeBreak;
+    }
+}
+
+/// <summary>
+/// Range entry for Indic_Conjunct_Break property (from DerivedCoreProperties.txt)
+/// </summary>
+public readonly struct IndicConjunctBreakRangeEntry
+{
+    public readonly int startCodePoint;
+    public readonly int endCodePoint;
+    public readonly IndicConjunctBreak indicConjunctBreak;
+
+    public IndicConjunctBreakRangeEntry(int startCodePoint, int endCodePoint, IndicConjunctBreak indicConjunctBreak)
+    {
+        this.startCodePoint = startCodePoint;
+        this.endCodePoint = endCodePoint;
+        this.indicConjunctBreak = indicConjunctBreak;
+    }
+}
+
+/// <summary>
+/// Range entry for Script_Extensions property (from ScriptExtensions.txt)
+/// </summary>
+public readonly struct ScriptExtensionRangeEntry
+{
+    public readonly int startCodePoint;
+    public readonly int endCodePoint;
+    public readonly UnicodeScript[] scripts;
+
+    public ScriptExtensionRangeEntry(int startCodePoint, int endCodePoint, UnicodeScript[] scripts)
+    {
+        this.startCodePoint = startCodePoint;
+        this.endCodePoint = endCodePoint;
+        this.scripts = scripts;
+    }
+}
+
+
 public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
 {
     private const uint Magic = 0x554C5452; // "ULTR"
@@ -148,6 +200,11 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
     private const ushort FormatVersion2 = 2;
     private const ushort FormatVersion3 = 3;
     private const ushort FormatVersion4 = 4;
+    private const ushort FormatVersion5 = 5;
+    private const ushort FormatVersion6 = 6;
+    private const ushort FormatVersion7 = 7;
+    
+    private const int BmpSize = 65536; // 0x0000–0xFFFF
 
     private readonly RangeEntry[] ranges;
     private readonly MirrorEntry[] mirrors;
@@ -157,6 +214,19 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
     private readonly ExtendedPictographicRangeEntry[] extendedPictographicRanges;
     private readonly GeneralCategoryRangeEntry[] generalCategoryRanges;
     private readonly EastAsianWidthRangeEntry[] eastAsianWidthRanges;
+    private readonly GraphemeBreakRangeEntry[] graphemeBreakRanges;
+    private readonly IndicConjunctBreakRangeEntry[] indicConjunctBreakRanges;
+    private readonly ScriptExtensionRangeEntry[] scriptExtensionRanges;
+    
+    // BMP direct lookup tables (O(1) for code points 0x0000–0xFFFF)
+    private readonly BidiClass[] bmpBidiClass;
+    private readonly JoiningType[] bmpJoiningType;
+    private readonly UnicodeScript[] bmpScript;
+    private readonly LineBreakClass[] bmpLineBreak;
+    private readonly GeneralCategory[] bmpGeneralCategory;
+    private readonly EastAsianWidth[] bmpEastAsianWidth;
+    private readonly GraphemeClusterBreak[] bmpGraphemeBreak;
+    private readonly IndicConjunctBreak[] bmpIndicConjunctBreak;
 
     public int UnicodeVersionRaw { get; }
     public ushort FormatVersion { get; }
@@ -175,7 +245,9 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
 
         FormatVersion = reader.ReadUInt16();
         if (FormatVersion != FormatVersion1 && FormatVersion != FormatVersion2 && 
-            FormatVersion != FormatVersion3 && FormatVersion != FormatVersion4)
+            FormatVersion != FormatVersion3 && FormatVersion != FormatVersion4 &&
+            FormatVersion != FormatVersion5 && FormatVersion != FormatVersion6 &&
+            FormatVersion != FormatVersion7)
             throw new InvalidDataException($"Unsupported Unicode data format version: {FormatVersion}.");
 
         reader.ReadUInt16(); // Reserved
@@ -222,6 +294,33 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
             gcLength = reader.ReadUInt32();
             eawOffset = reader.ReadUInt32();
             eawLength = reader.ReadUInt32();
+        }
+
+        // Format v5 adds Grapheme_Cluster_Break section
+        uint gcbOffset = 0, gcbLength = 0;
+        
+        if (FormatVersion >= FormatVersion5)
+        {
+            gcbOffset = reader.ReadUInt32();
+            gcbLength = reader.ReadUInt32();
+        }
+
+        // Format v6 adds Indic_Conjunct_Break section
+        uint incbOffset = 0, incbLength = 0;
+        
+        if (FormatVersion >= FormatVersion6)
+        {
+            incbOffset = reader.ReadUInt32();
+            incbLength = reader.ReadUInt32();
+        }
+
+        // Format v7 adds Script_Extensions section
+        uint scxOffset = 0, scxLength = 0;
+        
+        if (FormatVersion >= FormatVersion7)
+        {
+            scxOffset = reader.ReadUInt32();
+            scxLength = reader.ReadUInt32();
         }
 
         // Read Range section
@@ -427,10 +526,197 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         {
             eastAsianWidthRanges = Array.Empty<EastAsianWidthRangeEntry>();
         }
+
+        // Read Grapheme_Cluster_Break section (format v5)
+        if (gcbOffset != 0 && gcbLength != 0)
+        {
+            stream.Position = gcbOffset;
+            uint gcbCount = reader.ReadUInt32();
+            graphemeBreakRanges = new GraphemeBreakRangeEntry[gcbCount];
+
+            for (uint i = 0; i < gcbCount; i++)
+            {
+                uint start = reader.ReadUInt32();
+                uint end = reader.ReadUInt32();
+                byte gcb = reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+
+                graphemeBreakRanges[i] = new GraphemeBreakRangeEntry(
+                    startCodePoint: unchecked((int)start),
+                    endCodePoint: unchecked((int)end),
+                    graphemeBreak: (GraphemeClusterBreak)gcb);
+            }
+        }
+        else
+        {
+            graphemeBreakRanges = Array.Empty<GraphemeBreakRangeEntry>();
+        }
+
+        // Read Indic_Conjunct_Break section (format v6)
+        if (incbOffset != 0 && incbLength != 0)
+        {
+            stream.Position = incbOffset;
+            uint incbCount = reader.ReadUInt32();
+            indicConjunctBreakRanges = new IndicConjunctBreakRangeEntry[incbCount];
+
+            for (uint i = 0; i < incbCount; i++)
+            {
+                uint start = reader.ReadUInt32();
+                uint end = reader.ReadUInt32();
+                byte incb = reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+
+                indicConjunctBreakRanges[i] = new IndicConjunctBreakRangeEntry(
+                    startCodePoint: unchecked((int)start),
+                    endCodePoint: unchecked((int)end),
+                    indicConjunctBreak: (IndicConjunctBreak)incb);
+            }
+        }
+        else
+        {
+            indicConjunctBreakRanges = Array.Empty<IndicConjunctBreakRangeEntry>();
+        }
+
+        // Read Script_Extensions section (format v7)
+        if (scxOffset != 0 && scxLength != 0)
+        {
+            stream.Position = scxOffset;
+            uint scxCount = reader.ReadUInt32();
+            scriptExtensionRanges = new ScriptExtensionRangeEntry[scxCount];
+
+            for (uint i = 0; i < scxCount; i++)
+            {
+                uint start = reader.ReadUInt32();
+                uint end = reader.ReadUInt32();
+                byte scriptCount = reader.ReadByte();
+                
+                var scripts = new UnicodeScript[scriptCount];
+                for (int j = 0; j < scriptCount; j++)
+                {
+                    scripts[j] = (UnicodeScript)reader.ReadByte();
+                }
+                
+                // Read padding to align to 4 bytes
+                int totalBytes = 8 + 1 + scriptCount; // start + end + count + scripts
+                int padding = (4 - (totalBytes % 4)) % 4;
+                for (int p = 0; p < padding; p++)
+                    reader.ReadByte();
+
+                scriptExtensionRanges[i] = new ScriptExtensionRangeEntry(
+                    startCodePoint: unchecked((int)start),
+                    endCodePoint: unchecked((int)end),
+                    scripts: scripts);
+            }
+        }
+        else
+        {
+            scriptExtensionRanges = Array.Empty<ScriptExtensionRangeEntry>();
+        }
+        
+        // Initialize BMP lookup tables for O(1) access
+        bmpBidiClass = new BidiClass[BmpSize];
+        bmpJoiningType = new JoiningType[BmpSize];
+        bmpScript = new UnicodeScript[BmpSize];
+        bmpLineBreak = new LineBreakClass[BmpSize];
+        bmpGeneralCategory = new GeneralCategory[BmpSize];
+        bmpEastAsianWidth = new EastAsianWidth[BmpSize];
+        bmpGraphemeBreak = new GraphemeClusterBreak[BmpSize];
+        bmpIndicConjunctBreak = new IndicConjunctBreak[BmpSize];
+        
+        InitializeBmpTables();
+    }
+    
+    private void InitializeBmpTables()
+    {
+        // Fill BidiClass and JoiningType from ranges
+        foreach (var range in ranges)
+        {
+            int start = Math.Max(0, range.startCodePoint);
+            int end = Math.Min(BmpSize - 1, range.endCodePoint);
+            for (int cp = start; cp <= end; cp++)
+            {
+                bmpBidiClass[cp] = range.bidiClass;
+                bmpJoiningType[cp] = range.joiningType;
+            }
+        }
+        
+        // Fill Script
+        foreach (var range in scriptRanges)
+        {
+            int start = Math.Max(0, range.startCodePoint);
+            int end = Math.Min(BmpSize - 1, range.endCodePoint);
+            for (int cp = start; cp <= end; cp++)
+            {
+                bmpScript[cp] = range.script;
+            }
+        }
+        
+        // Fill LineBreak
+        foreach (var range in lineBreakRanges)
+        {
+            int start = Math.Max(0, range.startCodePoint);
+            int end = Math.Min(BmpSize - 1, range.endCodePoint);
+            for (int cp = start; cp <= end; cp++)
+            {
+                bmpLineBreak[cp] = range.lineBreakClass;
+            }
+        }
+        
+        // Fill GeneralCategory
+        foreach (var range in generalCategoryRanges)
+        {
+            int start = Math.Max(0, range.startCodePoint);
+            int end = Math.Min(BmpSize - 1, range.endCodePoint);
+            for (int cp = start; cp <= end; cp++)
+            {
+                bmpGeneralCategory[cp] = range.generalCategory;
+            }
+        }
+        
+        // Fill EastAsianWidth
+        foreach (var range in eastAsianWidthRanges)
+        {
+            int start = Math.Max(0, range.startCodePoint);
+            int end = Math.Min(BmpSize - 1, range.endCodePoint);
+            for (int cp = start; cp <= end; cp++)
+            {
+                bmpEastAsianWidth[cp] = range.eastAsianWidth;
+            }
+        }
+        
+        // Fill GraphemeBreak
+        foreach (var range in graphemeBreakRanges)
+        {
+            int start = Math.Max(0, range.startCodePoint);
+            int end = Math.Min(BmpSize - 1, range.endCodePoint);
+            for (int cp = start; cp <= end; cp++)
+            {
+                bmpGraphemeBreak[cp] = range.graphemeBreak;
+            }
+        }
+        
+        // Fill IndicConjunctBreak
+        foreach (var range in indicConjunctBreakRanges)
+        {
+            int start = Math.Max(0, range.startCodePoint);
+            int end = Math.Min(BmpSize - 1, range.endCodePoint);
+            for (int cp = start; cp <= end; cp++)
+            {
+                bmpIndicConjunctBreak[cp] = range.indicConjunctBreak;
+            }
+        }
     }
 
     public BidiClass GetBidiClass(int codePoint)
     {
+        // Fast path for BMP (99%+ of real text)
+        if ((uint)codePoint < BmpSize)
+            return bmpBidiClass[codePoint];
+            
         var entry = FindRange(codePoint);
         return entry?.bidiClass ?? BidiClass.LeftToRight;
     }
@@ -460,6 +746,10 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
 
     public JoiningType GetJoiningType(int codePoint)
     {
+        // Fast path for BMP
+        if ((uint)codePoint < BmpSize)
+            return bmpJoiningType[codePoint];
+            
         var entry = FindRange(codePoint);
         return entry?.joiningType ?? JoiningType.NonJoining;
     }
@@ -472,12 +762,20 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
 
     public UnicodeScript GetScript(int codePoint)
     {
+        // Fast path for BMP
+        if ((uint)codePoint < BmpSize)
+            return bmpScript[codePoint];
+            
         var entry = FindScriptRange(codePoint);
         return entry?.script ?? UnicodeScript.Unknown;
     }
 
     public LineBreakClass GetLineBreakClass(int codePoint)
     {
+        // Fast path for BMP
+        if ((uint)codePoint < BmpSize)
+            return bmpLineBreak[codePoint];
+            
         var entry = FindLineBreakRange(codePoint);
         return entry?.lineBreakClass ?? LineBreakClass.XX; // XX = Unknown
     }
@@ -489,12 +787,20 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
 
     public GeneralCategory GetGeneralCategory(int codePoint)
     {
+        // Fast path for BMP
+        if ((uint)codePoint < BmpSize)
+            return bmpGeneralCategory[codePoint];
+            
         var entry = FindGeneralCategoryRange(codePoint);
         return entry?.generalCategory ?? GeneralCategory.Cn; // Cn = Not assigned
     }
 
     public EastAsianWidth GetEastAsianWidth(int codePoint)
     {
+        // Fast path for BMP
+        if ((uint)codePoint < BmpSize)
+            return bmpEastAsianWidth[codePoint];
+            
         var entry = FindEastAsianWidthRange(codePoint);
         return entry?.eastAsianWidth ?? EastAsianWidth.N; // N = Neutral
     }
@@ -555,6 +861,54 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
                script == UnicodeScript.NewTaiLue ||
                script == UnicodeScript.Takri ||
                script == UnicodeScript.Tibetan;
+    }
+
+    public GraphemeClusterBreak GetGraphemeClusterBreak(int codePoint)
+    {
+        // Fast path for BMP
+        if ((uint)codePoint < BmpSize)
+            return bmpGraphemeBreak[codePoint];
+            
+        var entry = FindGraphemeBreakRange(codePoint);
+        return entry?.graphemeBreak ?? GraphemeClusterBreak.Other;
+    }
+
+    public IndicConjunctBreak GetIndicConjunctBreak(int codePoint)
+    {
+        // Fast path for BMP
+        if ((uint)codePoint < BmpSize)
+            return bmpIndicConjunctBreak[codePoint];
+            
+        var entry = FindIndicConjunctBreakRange(codePoint);
+        return entry?.indicConjunctBreak ?? IndicConjunctBreak.None;
+    }
+
+    public UnicodeScript[] GetScriptExtensions(int codePoint)
+    {
+        var entry = FindScriptExtensionRange(codePoint);
+        if (entry != null)
+            return entry.Value.scripts;
+        
+        // Default: return array with single Script value
+        var script = GetScript(codePoint);
+        return new[] { script };
+    }
+
+    public bool HasScriptExtension(int codePoint, UnicodeScript script)
+    {
+        var entry = FindScriptExtensionRange(codePoint);
+        if (entry != null)
+        {
+            foreach (var s in entry.Value.scripts)
+            {
+                if (s == script)
+                    return true;
+            }
+            return false;
+        }
+        
+        // Default: check against single Script value
+        return GetScript(codePoint) == script;
     }
 
     private RangeEntry? FindRange(int codePoint)
@@ -713,6 +1067,69 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         {
             int mid = (lo + hi) >> 1;
             var entry = eastAsianWidthRanges[mid];
+
+            if (codePoint < entry.startCodePoint)
+                hi = mid - 1;
+            else if (codePoint > entry.endCodePoint)
+                lo = mid + 1;
+            else
+                return entry;
+        }
+
+        return null;
+    }
+
+    private GraphemeBreakRangeEntry? FindGraphemeBreakRange(int codePoint)
+    {
+        int lo = 0;
+        int hi = graphemeBreakRanges.Length - 1;
+
+        while (lo <= hi)
+        {
+            int mid = (lo + hi) >> 1;
+            var entry = graphemeBreakRanges[mid];
+
+            if (codePoint < entry.startCodePoint)
+                hi = mid - 1;
+            else if (codePoint > entry.endCodePoint)
+                lo = mid + 1;
+            else
+                return entry;
+        }
+
+        return null;
+    }
+
+    private IndicConjunctBreakRangeEntry? FindIndicConjunctBreakRange(int codePoint)
+    {
+        int lo = 0;
+        int hi = indicConjunctBreakRanges.Length - 1;
+
+        while (lo <= hi)
+        {
+            int mid = (lo + hi) >> 1;
+            var entry = indicConjunctBreakRanges[mid];
+
+            if (codePoint < entry.startCodePoint)
+                hi = mid - 1;
+            else if (codePoint > entry.endCodePoint)
+                lo = mid + 1;
+            else
+                return entry;
+        }
+
+        return null;
+    }
+
+    private ScriptExtensionRangeEntry? FindScriptExtensionRange(int codePoint)
+    {
+        int lo = 0;
+        int hi = scriptExtensionRanges.Length - 1;
+
+        while (lo <= hi)
+        {
+            int mid = (lo + hi) >> 1;
+            var entry = scriptExtensionRanges[mid];
 
             if (codePoint < entry.startCodePoint)
                 hi = mid - 1;
