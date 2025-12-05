@@ -4,7 +4,12 @@ using System.Collections;
 
 namespace TMPro
 {
-    public enum CaretPosition { None, Left, Right }
+    public enum CaretPosition
+    {
+        None,
+        Left,
+        Right
+    }
 
     public struct CaretInfo
     {
@@ -23,17 +28,7 @@ namespace TMPro
         private static Vector3[] m_rectWorldCorners = new Vector3[4];
 
 
-        /// <param name="textComponent">A reference to the text object.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <returns></returns>
-
-
-        /// <param name="textComponent">A reference to the text object.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <returns></returns>
-        public static int GetCursorIndexFromPosition(TMPText textComponent, Vector3 position, Camera camera)
+        public static int GetCursorIndexFromPosition(TMP_Text textComponent, Vector3 position, Camera camera)
         {
             int index = FindNearestCharacter(textComponent, position, camera, false);
 
@@ -52,23 +47,11 @@ namespace TMPro
                 return index;
             else
                 return index + 1;
-
         }
 
 
-        /// <param name="textComponent">A reference to the text object.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <param name="cursor">The position of the cursor insertion position relative to the position.</param>
-        /// <returns></returns>
-
-
-        /// <param name="textComponent">A reference to the text object.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <param name="cursor">The position of the cursor insertion position relative to the position.</param>
-        /// <returns></returns>
-        public static int GetCursorIndexFromPosition(TMPText textComponent, Vector3 position, Camera camera, out CaretPosition cursor)
+        public static int GetCursorIndexFromPosition(TMP_Text textComponent, Vector3 position, Camera camera,
+            out CaretPosition cursor)
         {
             int line = FindNearestLine(textComponent, position, camera);
 
@@ -110,11 +93,7 @@ namespace TMPro
         }
 
 
-        /// <param name="textComponent"></param>
-        /// <param name="position"></param>
-        /// <param name="camera"></param>
-        /// <returns></returns>
-        public static int FindNearestLine(TMPText text, Vector3 position, Camera camera)
+        public static int FindNearestLine(TMP_Text text, Vector3 position, Camera camera)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -150,12 +129,8 @@ namespace TMPro
         }
 
 
-        /// <param name="text"></param>
-        /// <param name="position"></param>
-        /// <param name="line"></param>
-        /// <param name="camera"></param>
-        /// <returns></returns>
-        public static int FindNearestCharacterOnLine(TMPText text, Vector3 position, int line, Camera camera, bool visibleOnly)
+        public static int FindNearestCharacterOnLine(TMP_Text text, Vector3 position, int line, Camera camera,
+            bool visibleOnly)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -201,21 +176,19 @@ namespace TMPro
                     closest = i;
                 }
             }
+
             return closest;
         }
 
 
-        /// <param name="rectTransform">A reference to the RectTranform of the text object.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <returns></returns>
         public static bool IsIntersectingRectTransform(RectTransform rectTransform, Vector3 position, Camera camera)
         {
             ScreenPointToWorldPointInRectangle(rectTransform, position, camera, out position);
 
             rectTransform.GetWorldCorners(m_rectWorldCorners);
 
-            if (PointIntersectRectangle(position, m_rectWorldCorners[0], m_rectWorldCorners[1], m_rectWorldCorners[2], m_rectWorldCorners[3]))
+            if (PointIntersectRectangle(position, m_rectWorldCorners[0], m_rectWorldCorners[1], m_rectWorldCorners[2],
+                    m_rectWorldCorners[3]))
             {
                 return true;
             }
@@ -224,12 +197,7 @@ namespace TMPro
         }
 
 
-        /// <param name="text">A reference to the TextMeshPro component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which is rendering the text or whichever one might be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <param name="visibleOnly">Only check for visible characters.</param>
-        /// <returns></returns>
-        public static int FindIntersectingCharacter(TMPText text, Vector3 position, Camera camera, bool visibleOnly)
+        public static int FindIntersectingCharacter(TMP_Text text, Vector3 position, Camera camera, bool visibleOnly)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -247,25 +215,13 @@ namespace TMPro
 
                 if (PointIntersectRectangle(position, bl, tl, tr, br))
                     return i;
-
             }
+
             return -1;
         }
 
 
-        /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The camera which is rendering the text object.</param>
-        /// <param name="visibleOnly">Only check for visible characters.</param>
-        /// <returns></returns>
-
-
-        /// <param name="text">A reference to the TMP Text component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <param name="visibleOnly">Only check for visible characters.</param>
-        /// <returns></returns>
-        public static int FindNearestCharacter(TMPText text, Vector3 position, Camera camera, bool visibleOnly)
+        public static int FindNearestCharacter(TMP_Text text, Vector3 position, Camera camera, bool visibleOnly)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -307,25 +263,7 @@ namespace TMPro
         }
 
 
-        /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <param name="visibleOnly">Only check for visible characters.</param>
-        /// <returns></returns>
-
-
-        /// <param name="text">A reference to the TextMeshPro component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The camera which is rendering the text object.</param>
-        /// <param name="visibleOnly">Only check for visible characters.</param>
-        /// <returns></returns>
-
-
-        /// <param name="text">A reference to the TMP_Text component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <returns></returns>
-        public static int FindIntersectingWord(TMPText text, Vector3 position, Camera camera)
+        public static int FindIntersectingWord(TMP_Text text, Vector3 position, Camera camera)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -420,23 +358,7 @@ namespace TMPro
         }
 
 
-        /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <returns></returns>
-
-
-        /// <param name="text">A reference to the TextMeshPro component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The camera which is rendering the text object.</param>
-        /// <returns></returns>
-
-
-        /// <param name="text">A reference to the TMP_Text component.</param>
-        /// <param name="position"></param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <returns></returns>
-        public static int FindNearestWord(TMPText text, Vector3 position, Camera camera)
+        public static int FindNearestWord(TMP_Text text, Vector3 position, Camera camera)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -468,15 +390,19 @@ namespace TMPro
                     {
                         isBeginRegion = true;
 
-                        bl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
-                        tl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
+                        bl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.descender,
+                            0));
+                        tl = rectTransform.TransformPoint(
+                            new(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
 
                         if (wInfo.characterCount == 1)
                         {
                             isBeginRegion = false;
 
-                            br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                            tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                            br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender,
+                                0));
+                            tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender,
+                                0));
 
                             if (PointIntersectRectangle(position, bl, tl, tr, br))
                                 return i;
@@ -502,7 +428,8 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender,
+                            0));
                         tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -527,7 +454,8 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender,
+                            0));
                         tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -554,23 +482,8 @@ namespace TMPro
             return closest;
         }
 
-        /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
-        /// <param name="position"></param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <returns></returns>
 
-
-        /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The camera which is rendering the text object.</param>
-        /// <returns></returns>
-
-
-        /// <param name="textComponent"></param>
-        /// <param name="position"></param>
-        /// <param name="camera"></param>
-        /// <returns></returns>
-        public static int FindIntersectingLine(TMPText text, Vector3 position, Camera camera)
+        public static int FindIntersectingLine(TMP_Text text, Vector3 position, Camera camera)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -595,11 +508,7 @@ namespace TMPro
         }
 
 
-        /// <param name="text">A reference to the TMP_Text component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <returns></returns>
-        public static int FindIntersectingLink(TMPText text, Vector3 position, Camera camera)
+        public static int FindIntersectingLink(TMP_Text text, Vector3 position, Camera camera)
         {
             Transform rectTransform = text.transform;
 
@@ -626,15 +535,19 @@ namespace TMPro
                     {
                         isBeginRegion = true;
 
-                        bl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
-                        tl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
+                        bl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.descender,
+                            0));
+                        tl = rectTransform.TransformPoint(
+                            new(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
 
                         if (linkInfo.linkTextLength == 1)
                         {
                             isBeginRegion = false;
 
-                            br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                            tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                            br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender,
+                                0));
+                            tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender,
+                                0));
 
                             if (PointIntersectRectangle(position, bl, tl, tr, br))
                                 return i;
@@ -645,7 +558,8 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender,
+                            0));
                         tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -655,7 +569,8 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender,
+                            0));
                         tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -667,23 +582,8 @@ namespace TMPro
             return -1;
         }
 
-        /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <returns></returns>
 
-
-        /// <param name="text">A reference to the TextMeshPro component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The camera which is rendering the text object.</param>
-        /// <returns></returns>
-
-
-        /// <param name="text">A reference to the TMP_Text component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <returns></returns>
-        public static int FindNearestLink(TMPText text, Vector3 position, Camera camera)
+        public static int FindNearestLink(TMP_Text text, Vector3 position, Camera camera)
         {
             RectTransform rectTransform = text.rectTransform;
 
@@ -713,15 +613,19 @@ namespace TMPro
                     {
                         isBeginRegion = true;
 
-                        bl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.descender, 0));
-                        tl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
+                        bl = rectTransform.TransformPoint(new(currentCharInfo.bottomLeft.x, currentCharInfo.descender,
+                            0));
+                        tl = rectTransform.TransformPoint(
+                            new(currentCharInfo.bottomLeft.x, currentCharInfo.ascender, 0));
 
                         if (linkInfo.linkTextLength == 1)
                         {
                             isBeginRegion = false;
 
-                            br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
-                            tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
+                            br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender,
+                                0));
+                            tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender,
+                                0));
 
                             if (PointIntersectRectangle(position, bl, tl, tr, br))
                                 return i;
@@ -740,7 +644,6 @@ namespace TMPro
                                 distanceSqr = d;
                                 closest = i;
                             }
-
                         }
                     }
 
@@ -748,7 +651,8 @@ namespace TMPro
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender,
+                            0));
                         tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -768,13 +672,13 @@ namespace TMPro
                             distanceSqr = d;
                             closest = i;
                         }
-
                     }
                     else if (isBeginRegion && currentLine != text.textInfo.characterInfo[characterIndex + 1].lineNumber)
                     {
                         isBeginRegion = false;
 
-                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender, 0));
+                        br = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.descender,
+                            0));
                         tr = rectTransform.TransformPoint(new(currentCharInfo.topRight.x, currentCharInfo.ascender, 0));
 
                         if (PointIntersectRectangle(position, bl, tl, tr, br))
@@ -802,24 +706,6 @@ namespace TMPro
         }
 
 
-        /// <param name="text">A reference to the TextMeshPro UGUI component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The scene camera which may be assigned to a Canvas using ScreenSpace Camera or WorldSpace render mode. Set to null is using ScreenSpace Overlay.</param>
-        /// <returns></returns>
-
-
-        /// <param name="text">A reference to the TextMeshPro component.</param>
-        /// <param name="position">Position to check for intersection.</param>
-        /// <param name="camera">The camera which is rendering the text object.</param>
-        /// <returns></returns>
-
-
-        /// <param name="m"></param>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="c"></param>
-        /// <param name="d"></param>
-        /// <returns></returns>
         private static bool PointIntersectRectangle(Vector3 m, Vector3 a, Vector3 b, Vector3 c, Vector3 d)
         {
             Vector3 normal = Vector3.Cross(b - a, d - a);
@@ -838,12 +724,8 @@ namespace TMPro
         }
 
 
-        /// <param name="transform"></param>
-        /// <param name="screenPoint"></param>
-        /// <param name="cam"></param>
-        /// <param name="worldPoint"></param>
-        /// <returns></returns>
-        public static bool ScreenPointToWorldPointInRectangle(Transform transform, Vector2 screenPoint, Camera cam, out Vector3 worldPoint)
+        public static bool ScreenPointToWorldPointInRectangle(Transform transform, Vector2 screenPoint, Camera cam,
+            out Vector3 worldPoint)
         {
             worldPoint = (Vector3)Vector2.zero;
             Ray ray = RectTransformUtility.ScreenPointToRay(cam, screenPoint);
@@ -870,12 +752,8 @@ namespace TMPro
         }
 
 
-        /// <param name="line"></param>
-        /// <param name="point"></param>
-        /// <param name="normal"></param>
-        /// <param name="intersectingPoint"></param>
-        /// <returns></returns>
-        private static bool IntersectLinePlane(LineSegment line, Vector3 point, Vector3 normal, out Vector3 intersectingPoint)
+        private static bool IntersectLinePlane(LineSegment line, Vector3 point, Vector3 normal,
+            out Vector3 intersectingPoint)
         {
             intersectingPoint = Vector3.zero;
             Vector3 u = line.Point2 - line.Point1;
@@ -902,10 +780,6 @@ namespace TMPro
         }
 
 
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="point"></param>
-        /// <returns></returns>
         public static float DistanceToLine(Vector3 a, Vector3 b, Vector3 point)
         {
             if (a == b)
@@ -917,32 +791,27 @@ namespace TMPro
             Vector3 n = b - a;
             Vector3 pa = a - point;
 
-            float c = Vector3.Dot( n, pa );
+            float c = Vector3.Dot(n, pa);
 
-            if ( c > 0.0f )
-                return Vector3.Dot( pa, pa );
+            if (c > 0.0f)
+                return Vector3.Dot(pa, pa);
 
             Vector3 bp = point - b;
 
-            if (Vector3.Dot( n, bp ) > 0.0f )
-                return Vector3.Dot( bp, bp );
+            if (Vector3.Dot(n, bp) > 0.0f)
+                return Vector3.Dot(bp, bp);
 
-            Vector3 e = pa - n * (c / Vector3.Dot( n, n ));
+            Vector3 e = pa - n * (c / Vector3.Dot(n, n));
 
-            return Vector3.Dot( e, e );
+            return Vector3.Dot(e, e);
         }
 
 
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="point"></param>
-        /// <param name="direction">-1 left, 0 in between, 1 right</param>
-        /// <returns></returns>
+        private const string k_lookupStringL =
+            "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[-]^_`abcdefghijklmnopqrstuvwxyz{|}~-";
 
-
-        private const string k_lookupStringL = "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[-]^_`abcdefghijklmnopqrstuvwxyz{|}~-";
-
-        private const string k_lookupStringU = "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[-]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~-";
+        private const string k_lookupStringU =
+            "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[-]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~-";
 
 
         public static char ToLowerFast(char c)
@@ -969,8 +838,7 @@ namespace TMPro
             return k_lookupStringU[(int)c];
         }
 
-        /// <param name="s"></param>
-        /// <returns></returns>
+
         public static int GetHashCode(string s)
         {
             if (string.IsNullOrEmpty(s))
@@ -984,7 +852,7 @@ namespace TMPro
             return hashCode;
         }
 
-        /// <returns></returns>
+
         public static int GetSimpleHashCode(string s)
         {
             int hashCode = 0;
@@ -995,7 +863,7 @@ namespace TMPro
             return hashCode;
         }
 
-        /// <returns></returns>
+
         public static uint GetSimpleHashCodeLowercase(string s)
         {
             uint hashCode = 5381;
@@ -1006,8 +874,7 @@ namespace TMPro
             return hashCode;
         }
 
-        /// <param name="s">The string from which to compute the hash code.</param>
-        /// <returns>The computed hash code.</returns>
+
         public static uint GetHashCodeCaseInSensitive(string s)
         {
             uint hashCode = 0;
@@ -1019,8 +886,6 @@ namespace TMPro
         }
 
 
-        /// <param name="hex"></param>
-        /// <returns></returns>
         public static int HexToInt(char hex)
         {
             switch (hex)
@@ -1048,12 +913,11 @@ namespace TMPro
                 case 'e': return 14;
                 case 'f': return 15;
             }
+
             return 15;
         }
 
 
-        /// <param name="s"></param>
-        /// <returns></returns>
         public static int StringHexToInt(string s)
         {
             int value = 0;

@@ -23,7 +23,8 @@ namespace UnityEngine.UI
 
         private static List<MatEntry> m_List = new List<MatEntry>();
 
-        public static Material Add(Material baseMat, int stencilID, StencilOp operation, CompareFunction compareFunction, ColorWriteMask colorWriteMask)
+        public static Material Add(Material baseMat, int stencilID, StencilOp operation,
+            CompareFunction compareFunction, ColorWriteMask colorWriteMask)
         {
             return Add(baseMat, stencilID, operation, compareFunction, colorWriteMask, 255, 255);
         }
@@ -35,7 +36,8 @@ namespace UnityEngine.UI
                 Debug.LogWarning(warning, context);
         }
 
-        public static Material Add(Material baseMat, int stencilID, StencilOp operation, CompareFunction compareFunction, ColorWriteMask colorWriteMask, int readMask, int writeMask)
+        public static Material Add(Material baseMat, int stencilID, StencilOp operation,
+            CompareFunction compareFunction, ColorWriteMask colorWriteMask, int readMask, int writeMask)
         {
             if ((stencilID <= 0 && colorWriteMask == ColorWriteMask.All) || baseMat == null)
                 return baseMat;
@@ -45,26 +47,34 @@ namespace UnityEngine.UI
                 LogWarningWhenNotInBatchmode("Material " + baseMat.name + " doesn't have _Stencil property", baseMat);
                 return baseMat;
             }
+
             if (!baseMat.HasProperty("_StencilOp"))
             {
                 LogWarningWhenNotInBatchmode("Material " + baseMat.name + " doesn't have _StencilOp property", baseMat);
                 return baseMat;
             }
+
             if (!baseMat.HasProperty("_StencilComp"))
             {
-                LogWarningWhenNotInBatchmode("Material " + baseMat.name + " doesn't have _StencilComp property", baseMat);
+                LogWarningWhenNotInBatchmode("Material " + baseMat.name + " doesn't have _StencilComp property",
+                    baseMat);
                 return baseMat;
             }
+
             if (!baseMat.HasProperty("_StencilReadMask"))
             {
-                LogWarningWhenNotInBatchmode("Material " + baseMat.name + " doesn't have _StencilReadMask property", baseMat);
+                LogWarningWhenNotInBatchmode("Material " + baseMat.name + " doesn't have _StencilReadMask property",
+                    baseMat);
                 return baseMat;
             }
+
             if (!baseMat.HasProperty("_StencilWriteMask"))
             {
-                LogWarningWhenNotInBatchmode("Material " + baseMat.name + " doesn't have _StencilWriteMask property", baseMat);
+                LogWarningWhenNotInBatchmode("Material " + baseMat.name + " doesn't have _StencilWriteMask property",
+                    baseMat);
                 return baseMat;
             }
+
             if (!baseMat.HasProperty("_ColorMask"))
             {
                 LogWarningWhenNotInBatchmode("Material " + baseMat.name + " doesn't have _ColorMask property", baseMat);
@@ -102,7 +112,10 @@ namespace UnityEngine.UI
             newEnt.colorMask = colorWriteMask;
             newEnt.useAlphaClip = operation != StencilOp.Keep && writeMask > 0;
 
-            newEnt.customMat.name = string.Format("Stencil Id:{0}, Op:{1}, Comp:{2}, WriteMask:{3}, ReadMask:{4}, ColorMask:{5} AlphaClip:{6} ({7})", stencilID, operation, compareFunction, writeMask, readMask, colorWriteMask, newEnt.useAlphaClip, baseMat.name);
+            newEnt.customMat.name = string.Format(
+                "Stencil Id:{0}, Op:{1}, Comp:{2}, WriteMask:{3}, ReadMask:{4}, ColorMask:{5} AlphaClip:{6} ({7})",
+                stencilID, operation, compareFunction, writeMask, readMask, colorWriteMask, newEnt.useAlphaClip,
+                baseMat.name);
 
             newEnt.customMat.SetFloat("_Stencil", (float)stencilID);
             newEnt.customMat.SetFloat("_StencilOp", (float)operation);
@@ -140,6 +153,7 @@ namespace UnityEngine.UI
                     ent.baseMat = null;
                     m_List.RemoveAt(i);
                 }
+
                 return;
             }
         }
@@ -154,6 +168,7 @@ namespace UnityEngine.UI
                 Misc.DestroyImmediate(ent.customMat);
                 ent.baseMat = null;
             }
+
             m_List.Clear();
         }
     }

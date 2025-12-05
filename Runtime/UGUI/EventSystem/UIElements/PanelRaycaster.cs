@@ -53,7 +53,10 @@ namespace UnityEngine.UIElements
         private GameObject selectableGameObject => m_Panel?.selectableGameObject;
 
         public override int sortOrderPriority => Mathf.FloorToInt(m_Panel?.sortingPriority ?? 0f);
-        public override int renderOrderPriority => int.MaxValue - (UIElementsRuntimeUtility.s_ResolvedSortingIndexMax - (m_Panel?.resolvedSortingIndex ?? 0));
+
+        public override int renderOrderPriority => int.MaxValue -
+                                                   (UIElementsRuntimeUtility.s_ResolvedSortingIndexMax -
+                                                    (m_Panel?.resolvedSortingIndex ?? 0));
 
         private static ScreenOverlayPanelPicker panelPicker = new ScreenOverlayPanelPicker();
 
@@ -72,8 +75,8 @@ namespace UnityEngine.UIElements
             if (displayIndex > 0 && displayIndex < Display.displays.Length)
             {
 #if UNITY_ANDROID
-                    // Changed for UITK to be coherent for Android which passes display-relative rendering coordinates
-                    h = Display.displays[displayIndex].renderingHeight;
+                // Changed for UITK to be coherent for Android which passes display-relative rendering coordinates
+                h = Display.displays[displayIndex].renderingHeight;
 #else
                     h = Display.displays[displayIndex].systemHeight;
 #endif

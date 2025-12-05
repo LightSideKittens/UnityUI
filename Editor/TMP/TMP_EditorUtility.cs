@@ -20,8 +20,8 @@ namespace TMPro.EditorUtilities
                 return m_PackagePath;
             }
         }
-        [SerializeField]
-        private static string m_PackagePath;
+
+        [SerializeField] private static string m_PackagePath;
 
         public static string packageFullPath
         {
@@ -33,8 +33,8 @@ namespace TMPro.EditorUtilities
                 return m_PackageFullPath;
             }
         }
-        [SerializeField]
-        private static string m_PackageFullPath;
+
+        [SerializeField] private static string m_PackageFullPath;
 
         private static string folderPath = "Not Found";
 
@@ -62,12 +62,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <param name="name">
-        /// Name of the new asset. Do not include the .asset extension.
-        /// </param>
-        /// <returns>
-        /// The new asset.
-        /// </returns>
         internal static T CreateAsset<T>(string name) where T : ScriptableObject
         {
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
@@ -79,9 +73,11 @@ namespace TMPro.EditorUtilities
             {
                 path += "/" + name + ".asset";
             }
-            else {
+            else
+            {
                 path = Path.GetDirectoryName(path) + "/" + name + ".asset";
             }
+
             T asset = ScriptableObject.CreateInstance<T>();
             AssetDatabase.CreateAsset(asset, AssetDatabase.GenerateUniqueAssetPath(path));
             EditorUtility.FocusProjectWindow();
@@ -104,7 +100,11 @@ namespace TMPro.EditorUtilities
                 string materialPath = AssetDatabase.GUIDToAssetPath(materialAssetGUIDs[i]);
                 Material targetMaterial = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
 
-                if (targetMaterial.HasProperty(ShaderUtilities.ID_MainTex) && targetMaterial.GetTexture(ShaderUtilities.ID_MainTex) != null && mat.GetTexture(ShaderUtilities.ID_MainTex) != null && targetMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID() == mat.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
+                if (targetMaterial.HasProperty(ShaderUtilities.ID_MainTex) &&
+                    targetMaterial.GetTexture(ShaderUtilities.ID_MainTex) != null &&
+                    mat.GetTexture(ShaderUtilities.ID_MainTex) != null &&
+                    targetMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID() ==
+                    mat.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
                 {
                     if (!refs.Contains(targetMaterial))
                         refs.Add(targetMaterial);
@@ -151,7 +151,8 @@ namespace TMPro.EditorUtilities
                     return "Assets/Packages/com.unity.ugui";
                 }
 
-                string[] matchingPaths = Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
+                string[] matchingPaths =
+                    Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
                 packagePath = ValidateLocation(matchingPaths, packagePath);
                 if (packagePath != null) return packagePath;
             }
@@ -175,7 +176,8 @@ namespace TMPro.EditorUtilities
                     return packagePath + "/Assets/Packages/com.unity.ugui";
                 }
 
-                string[] matchingPaths = Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
+                string[] matchingPaths =
+                    Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
                 string path = ValidateLocation(matchingPaths, packagePath);
                 if (path != null) return packagePath + path;
             }
@@ -184,8 +186,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <param name="paths"></param>
-        /// <returns></returns>
         private static string ValidateLocation(string[] paths, string projectPath)
         {
             for (int i = 0; i < paths.Length; i++)
@@ -202,8 +202,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <param name="characterSet"></param>
-        /// <returns></returns>
         internal static string GetDecimalCharacterSequence(int[] characterSet)
         {
             if (characterSet == null || characterSet.Length == 0)
@@ -229,7 +227,6 @@ namespace TMPro.EditorUtilities
 
                     first = last = characterSet[i];
                 }
-
             }
 
             if (first == last)
@@ -241,8 +238,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <param name="characterSet"></param>
-        /// <returns></returns>
         internal static string GetUnicodeCharacterSequence(int[] characterSet)
         {
             if (characterSet == null || characterSet.Length == 0)
@@ -268,7 +263,6 @@ namespace TMPro.EditorUtilities
 
                     first = last = characterSet[i];
                 }
-
             }
 
             if (first == last)
@@ -280,20 +274,20 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <param name="rect"></param>
-        /// <param name="thickness"></param>
-        /// <param name="color"></param>
         internal static void DrawBox(Rect rect, float thickness, Color color)
         {
-            EditorGUI.DrawRect(new Rect(rect.x - thickness, rect.y + thickness, rect.width + thickness * 2, thickness), color);
-            EditorGUI.DrawRect(new Rect(rect.x - thickness, rect.y + thickness, thickness, rect.height - thickness * 2), color);
-            EditorGUI.DrawRect(new Rect(rect.x - thickness, rect.y + rect.height - thickness * 2, rect.width + thickness * 2, thickness), color);
-            EditorGUI.DrawRect(new Rect(rect.x + rect.width, rect.y + thickness, thickness, rect.height - thickness * 2), color);
+            EditorGUI.DrawRect(new Rect(rect.x - thickness, rect.y + thickness, rect.width + thickness * 2, thickness),
+                color);
+            EditorGUI.DrawRect(new Rect(rect.x - thickness, rect.y + thickness, thickness, rect.height - thickness * 2),
+                color);
+            EditorGUI.DrawRect(
+                new Rect(rect.x - thickness, rect.y + rect.height - thickness * 2, rect.width + thickness * 2,
+                    thickness), color);
+            EditorGUI.DrawRect(
+                new Rect(rect.x + rect.width, rect.y + thickness, thickness, rect.height - thickness * 2), color);
         }
 
 
-        /// <param name="value"></param>
-        /// <returns></returns>
         internal static int GetHorizontalAlignmentGridValue(int value)
         {
             if ((value & 0x1) == 0x1)
@@ -312,8 +306,7 @@ namespace TMPro.EditorUtilities
             return 0;
         }
 
-        /// <param name="value"></param>
-        /// <returns></returns>
+
         internal static int GetVerticalAlignmentGridValue(int value)
         {
             if ((value & 0x100) == 0x100)
@@ -351,7 +344,8 @@ namespace TMPro.EditorUtilities
             }
 
             EditorGUI.BeginChangeCheck();
-            string colorString = EditorGUI.TextField(rect, string.Format("#{0}", ColorUtility.ToHtmlStringRGBA(property.colorValue)));
+            string colorString = EditorGUI.TextField(rect,
+                string.Format("#{0}", ColorUtility.ToHtmlStringRGBA(property.colorValue)));
             if (EditorGUI.EndChangeCheck())
             {
                 Color color;
@@ -360,6 +354,7 @@ namespace TMPro.EditorUtilities
                     property.colorValue = color;
                 }
             }
+
             EditorGUI.indentLevel = oldIndent;
         }
 
@@ -368,7 +363,8 @@ namespace TMPro.EditorUtilities
             var id = GUIUtility.GetControlID(content, FocusType.Keyboard, position);
             var evt = Event.current;
 
-            if (GUIUtility.keyboardControl == id && evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Space || evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter))
+            if (GUIUtility.keyboardControl == id && evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Space ||
+                    evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter))
             {
                 value = !value;
                 evt.Use();
@@ -384,6 +380,5 @@ namespace TMPro.EditorUtilities
 
             return GUI.Toggle(position, id, value, content, style);
         }
-
     }
 }

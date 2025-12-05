@@ -20,9 +20,10 @@ namespace TMPro
     [RequireComponent(typeof(CanvasRenderer))]
     [AddComponentMenu("UI/TextMeshPro - Text (UI)", 11)]
     [ExecuteAlways]
-    public class TextMeshProUGUI : TMPText
+    public class TextMeshProUGUI : TMP_Text
     {
-        public override Material materialForRendering => TMP_MaterialManager.GetMaterialForRendering(this, m_sharedMaterial);
+        public override Material materialForRendering =>
+            TMP_MaterialManager.GetMaterialForRendering(this, m_sharedMaterial);
 
         public override Mesh mesh => m_mesh;
 
@@ -37,11 +38,11 @@ namespace TMPro
                 OnPreRenderCanvas();
                 sw.Stop();
                 Debug.Log(sw.ElapsedTicks);
-                
+
                 if (!m_isMaterialDirty) return;
 
                 UpdateMaterial();
-            
+
                 m_isMaterialDirty = false;
             }
         }
@@ -103,15 +104,13 @@ namespace TMPro
         {
             if (m_textInfo == null) return;
 
-            for (int i = 1; i < MSubTextObjects.Length && MSubTextObjects[i] != null; i++)
+            for (int i = 1; i < subTextObjects.Length && subTextObjects[i] != null; i++)
             {
-                MSubTextObjects[i].SetPivotDirty();
+                subTextObjects[i].SetPivotDirty();
             }
         }
 
 
-        /// <param name="baseMaterial"></param>
-        /// <returns></returns>
         public override Material GetModifiedMaterial(Material baseMaterial)
         {
             Material mat = baseMaterial;
@@ -125,7 +124,8 @@ namespace TMPro
 
             if (m_StencilValue > 0)
             {
-                var maskMat = StencilMaterial.Add(mat, (1 << m_StencilValue) - 1, StencilOp.Keep, CompareFunction.Equal, ColorWriteMask.All, (1 << m_StencilValue) - 1, 0);
+                var maskMat = StencilMaterial.Add(mat, (1 << m_StencilValue) - 1, StencilOp.Keep, CompareFunction.Equal,
+                    ColorWriteMask.All, (1 << m_StencilValue) - 1, 0);
                 StencilMaterial.Remove(m_MaskMaterial);
                 m_MaskMaterial = maskMat;
                 mat = m_MaskMaterial;
@@ -139,29 +139,30 @@ namespace TMPro
         {
             if (m_sharedMaterial == null || CanvasRenderer == null) return;
 
-            MCanvasRenderer.materialCount = 1;
-            MCanvasRenderer.SetMaterial(materialForRendering, 0);
+            cachedCanvasRenderer.materialCount = 1;
+            cachedCanvasRenderer.SetMaterial(materialForRendering, 0);
         }
 
 
         public Vector4 maskOffset
         {
             get => m_maskOffset;
-            set { m_maskOffset = value; UpdateMask(); _havePropertiesChanged = true; }
+            set
+            {
+                m_maskOffset = value;
+                UpdateMask();
+                _havePropertiesChanged = true;
+            }
         }
 
 
-
-
-        /// <param name="clipRect"></param>
-        /// <param name="validRect"></param>
         public override void Cull(Rect clipRect, bool validRect)
         {
-            MShouldUpdateCulling = false;
+            shouldUpdateCulling = false;
 
             if (m_isLayoutDirty)
             {
-                MShouldUpdateCulling = true;
+                shouldUpdateCulling = true;
                 m_ClipRect = clipRect;
                 m_ValidRect = validRect;
                 return;
@@ -170,19 +171,19 @@ namespace TMPro
             Rect rect = GetCanvasSpaceClippingRect();
 
             var cull = !validRect || !clipRect.Overlaps(rect, true);
-            if (MCanvasRenderer.cull != cull)
+            if (cachedCanvasRenderer.cull != cull)
             {
-                MCanvasRenderer.cull = cull;
+                cachedCanvasRenderer.cull = cull;
                 onCullStateChanged.Invoke(cull);
                 OnCullingChanged();
 
-                for (int i = 1; i < MSubTextObjects.Length && MSubTextObjects[i] != null; i++)
+                for (int i = 1; i < subTextObjects.Length && subTextObjects[i] != null; i++)
                 {
-                    MSubTextObjects[i].canvasRenderer.cull = cull;
+                    subTextObjects[i].canvasRenderer.cull = cull;
                 }
             }
         }
-        
+
         private Rect m_ClipRect;
         private bool m_ValidRect;
 
@@ -191,19 +192,19 @@ namespace TMPro
             Rect rect = GetCanvasSpaceClippingRect();
 
             var cull = !m_ValidRect || !m_ClipRect.Overlaps(rect, true);
-            if (MCanvasRenderer.cull != cull)
+            if (cachedCanvasRenderer.cull != cull)
             {
-                MCanvasRenderer.cull = cull;
+                cachedCanvasRenderer.cull = cull;
                 onCullStateChanged.Invoke(cull);
                 OnCullingChanged();
 
-                for (int i = 1; i < MSubTextObjects.Length && MSubTextObjects[i] != null; i++)
+                for (int i = 1; i < subTextObjects.Length && subTextObjects[i] != null; i++)
                 {
-                    MSubTextObjects[i].canvasRenderer.cull = cull;
+                    subTextObjects[i].canvasRenderer.cull = cull;
                 }
             }
 
-            MShouldUpdateCulling = false;
+            shouldUpdateCulling = false;
         }
 
 
@@ -217,15 +218,12 @@ namespace TMPro
             if (m_textInfo == null) return;
 
             for (int i = 1; i < m_textInfo.materialCount; i++)
-                MSubTextObjects[i].UpdateMeshPadding(m_enableExtraPadding, m_isUsingBold);
+                subTextObjects[i].UpdateMeshPadding(m_enableExtraPadding, m_isUsingBold);
         }
 
 
-        /// <param name="targetColor">Target color.</param>
-        /// <param name="duration">Tween duration.</param>
-        /// <param name="ignoreTimeScale">Should ignore Time.scale?</param>
-        /// <param name="useAlpha">Should also Tween the alpha channel?</param>
-        protected override void InternalCrossFadeColor(Color targetColor, float duration, bool ignoreTimeScale, bool useAlpha)
+        protected override void InternalCrossFadeColor(Color targetColor, float duration, bool ignoreTimeScale,
+            bool useAlpha)
         {
             if (m_textInfo == null)
                 return;
@@ -234,14 +232,11 @@ namespace TMPro
 
             for (int i = 1; i < materialCount; i++)
             {
-                MSubTextObjects[i].CrossFadeColor(targetColor, duration, ignoreTimeScale, useAlpha);
+                subTextObjects[i].CrossFadeColor(targetColor, duration, ignoreTimeScale, useAlpha);
             }
         }
 
 
-        /// <param name="alpha">Target alpha.</param>
-        /// <param name="duration">Duration of the tween in seconds.</param>
-        /// <param name="ignoreTimeScale">Should ignore Time.scale?</param>
         protected override void InternalCrossFadeAlpha(float alpha, float duration, bool ignoreTimeScale)
         {
             if (m_textInfo == null)
@@ -251,35 +246,33 @@ namespace TMPro
 
             for (int i = 1; i < materialCount; i++)
             {
-                MSubTextObjects[i].CrossFadeAlpha(alpha, duration, ignoreTimeScale);
+                subTextObjects[i].CrossFadeAlpha(alpha, duration, ignoreTimeScale);
             }
         }
 
         public override void ClearMesh()
         {
-            MCanvasRenderer.SetMesh(null);
+            cachedCanvasRenderer.SetMesh(null);
 
-            for (int i = 1; i < MSubTextObjects.Length && MSubTextObjects[i] != null; i++)
-                MSubTextObjects[i].canvasRenderer.SetMesh(null);
+            for (int i = 1; i < subTextObjects.Length && subTextObjects[i] != null; i++)
+                subTextObjects[i].canvasRenderer.SetMesh(null);
         }
 
 
         public override event Action<TMP_TextInfo> OnPreRenderText;
 
 
-        /// <param name="mesh"></param>
-        /// <param name="index"></param>
         public override void UpdateGeometry(Mesh mesh, int index)
         {
             mesh.RecalculateBounds();
 
             if (index == 0)
             {
-                MCanvasRenderer.SetMesh(mesh);
+                cachedCanvasRenderer.SetMesh(mesh);
             }
             else
             {
-                MSubTextObjects[index].canvasRenderer.SetMesh(mesh);
+                subTextObjects[index].canvasRenderer.SetMesh(mesh);
             }
         }
 
@@ -290,27 +283,23 @@ namespace TMPro
         }
 
         #region TMPro_UGUI_Private
-        [SerializeField]
-        private bool m_hasFontAssetChanged;
-        
+
+        [SerializeField] private bool m_hasFontAssetChanged;
+
         private bool m_isFirstAllocation;
 
         private int m_max_characters = 8;
 
-        [SerializeField]
-        private Material m_baseMaterial;
+        [SerializeField] private Material m_baseMaterial;
 
         private bool m_isScrollRegionSet;
 
-        [SerializeField]
-        private Vector4 m_maskOffset;
+        [SerializeField] private Vector4 m_maskOffset;
 
         private Matrix4x4 m_EnvMapMatrix;
 
 
-        [NonSerialized]
-        private bool m_isRegisteredForEvents;
-
+        [NonSerialized] private bool m_isRegisteredForEvents;
 
 
         protected override void Awake()
@@ -325,8 +314,8 @@ namespace TMPro
                 return;
             }
 #endif
-            
-            MCanvas = canvas;
+
+            cachedCanvas = canvas;
 
             m_isOrthographic = true;
 
@@ -334,17 +323,17 @@ namespace TMPro
             if (m_rectTransform == null)
                 m_rectTransform = gameObject.AddComponent<RectTransform>();
 
-            MCanvasRenderer = GetComponent<CanvasRenderer>();
-            if (MCanvasRenderer == null)
-                MCanvasRenderer = gameObject.AddComponent<CanvasRenderer> ();
+            cachedCanvasRenderer = GetComponent<CanvasRenderer>();
+            if (cachedCanvasRenderer == null)
+                cachedCanvasRenderer = gameObject.AddComponent<CanvasRenderer>();
 
             if (m_mesh == null)
             {
                 m_mesh = new();
                 m_mesh.hideFlags = HideFlags.HideAndDontSave;
-                #if DEVELOPMENT_BUILD || UNITY_EDITOR
+#if DEVELOPMENT_BUILD || UNITY_EDITOR
                 m_mesh.name = "TextMeshPro UI Mesh";
-                #endif
+#endif
                 m_textInfo = new(this);
             }
 
@@ -387,11 +376,11 @@ namespace TMPro
                 m_isRegisteredForEvents = true;
             }
 
-            MCanvas = GetCanvas();
+            cachedCanvas = GetCanvas();
 
             SetActiveSubMeshes(true);
 
-            GraphicRegistry.RegisterGraphicForCanvas(MCanvas, this);
+            GraphicRegistry.RegisterGraphicForCanvas(cachedCanvas, this);
 
             ComputeMarginSize();
 
@@ -407,11 +396,11 @@ namespace TMPro
             if (!m_isAwake)
                 return;
 
-            GraphicRegistry.UnregisterGraphicForCanvas(MCanvas, this);
+            GraphicRegistry.UnregisterGraphicForCanvas(cachedCanvas, this);
             CanvasUpdateRegistry.UnRegisterCanvasElementForRebuild(this);
 
-            if (MCanvasRenderer != null)
-                MCanvasRenderer.Clear();
+            if (cachedCanvasRenderer != null)
+                cachedCanvasRenderer.Clear();
 
             SetActiveSubMeshes(false);
 
@@ -423,7 +412,7 @@ namespace TMPro
 
         protected override void OnDestroy()
         {
-            GraphicRegistry.UnregisterGraphicForCanvas(MCanvas, this);
+            GraphicRegistry.UnregisterGraphicForCanvas(cachedCanvas, this);
 
             if (m_mesh != null)
                 DestroyImmediate(m_mesh);
@@ -465,15 +454,15 @@ namespace TMPro
 
         protected override void OnValidate()
         {
-            if (MCanvasRenderer == null)
+            if (cachedCanvasRenderer == null)
             {
-                MCanvasRenderer = gameObject.GetComponent<CanvasRenderer> ();
-                if (MCanvasRenderer == null)
+                cachedCanvasRenderer = gameObject.GetComponent<CanvasRenderer>();
+                if (cachedCanvasRenderer == null)
                 {
-                    MCanvasRenderer = gameObject.AddComponent<CanvasRenderer> ();
+                    cachedCanvasRenderer = gameObject.AddComponent<CanvasRenderer>();
                 }
             }
-            
+
             if (!m_isAwake)
                 return;
 
@@ -483,7 +472,10 @@ namespace TMPro
                 m_hasFontAssetChanged = false;
             }
 
-            if (MCanvasRenderer == null || MCanvasRenderer.GetMaterial() == null || MCanvasRenderer.GetMaterial().GetTexture(ShaderUtilities.ID_MainTex) == null || m_fontAsset == null || m_fontAsset.atlasTexture.GetInstanceID() != MCanvasRenderer.GetMaterial().GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
+            if (cachedCanvasRenderer == null || cachedCanvasRenderer.GetMaterial() == null ||
+                cachedCanvasRenderer.GetMaterial().GetTexture(ShaderUtilities.ID_MainTex) == null ||
+                m_fontAsset == null || m_fontAsset.atlasTexture.GetInstanceID() != cachedCanvasRenderer.GetMaterial()
+                    .GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
             {
                 LoadFontAsset();
                 m_hasFontAssetChanged = false;
@@ -492,12 +484,11 @@ namespace TMPro
             m_padding = GetPaddingForMaterial();
             ComputeMarginSize();
             _havePropertiesChanged = true;
-                
+
             SetAllDirty();
         }
 
 
-        /// <param name="go">The affected GameObject</param>
         private void OnPrefabInstanceUpdate(GameObject go)
         {
             if (this == null)
@@ -512,7 +503,7 @@ namespace TMPro
                 if (subTextObjects.Length > 0)
                 {
                     for (int i = 0; i < subTextObjects.Length; i++)
-                        MSubTextObjects[i + 1] = subTextObjects[i];
+                        base.subTextObjects[i + 1] = subTextObjects[i];
                 }
             }
         }
@@ -540,22 +531,23 @@ namespace TMPro
             int sharedMaterialID = m_sharedMaterial.GetInstanceID();
             int maskingMaterialID = m_MaskMaterial == null ? 0 : m_MaskMaterial.GetInstanceID();
 
-            if (MCanvasRenderer == null || MCanvasRenderer.GetMaterial() == null)
+            if (cachedCanvasRenderer == null || cachedCanvasRenderer.GetMaterial() == null)
             {
-                if (MCanvasRenderer == null) return;
+                if (cachedCanvasRenderer == null) return;
 
                 if (m_fontAsset != null)
                 {
-                    MCanvasRenderer.SetMaterial(m_fontAsset.material, m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex));
+                    cachedCanvasRenderer.SetMaterial(m_fontAsset.material,
+                        m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex));
                 }
                 else
                     Debug.LogWarning("No Font Asset assigned to " + name + ". Please assign a Font Asset.", this);
             }
 
 
-            if (MCanvasRenderer.GetMaterial() != m_sharedMaterial && m_fontAsset == null)
+            if (cachedCanvasRenderer.GetMaterial() != m_sharedMaterial && m_fontAsset == null)
             {
-                m_sharedMaterial = MCanvasRenderer.GetMaterial();
+                m_sharedMaterial = cachedCanvasRenderer.GetMaterial();
             }
 
 
@@ -584,7 +576,6 @@ namespace TMPro
                     m_sharedMaterial.SetFloat(ShaderUtilities.ID_StencilID, 0);
                     m_sharedMaterial.SetFloat(ShaderUtilities.ID_StencilComp, 8);
                 }
-
             }
 
             m_padding = GetPaddingForMaterial();
@@ -624,7 +615,7 @@ namespace TMPro
             if (obj == gameObject || UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(gameObject) == obj)
             {
                 UnityEditor.Undo.RecordObject(this, "Material Assignment");
-                UnityEditor.Undo.RecordObject(MCanvasRenderer, "Material Assignment");
+                UnityEditor.Undo.RecordObject(cachedCanvasRenderer, "Material Assignment");
 
                 m_sharedMaterial = newMaterial;
 
@@ -644,7 +635,6 @@ namespace TMPro
         }
 
 
-        /// <param name="textObject"></param>
         private void ON_COLOR_GRADIENT_CHANGED(Object gradient)
         {
             _havePropertiesChanged = true;
@@ -671,7 +661,9 @@ namespace TMPro
 
                 if (m_fontAsset == null)
                 {
-                    Debug.LogWarning("The LiberationSans SDF Font Asset was not found. There is no Font Asset assigned to " + gameObject.name + ".", this);
+                    Debug.LogWarning(
+                        "The LiberationSans SDF Font Asset was not found. There is no Font Asset assigned to " +
+                        gameObject.name + ".", this);
                     return;
                 }
 
@@ -693,10 +685,14 @@ namespace TMPro
                     m_baseMaterial = null;
                 }
 
-                if (m_sharedMaterial == null || m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex) == null || m_fontAsset.atlasTexture.GetInstanceID() != m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
+                if (m_sharedMaterial == null || m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex) == null ||
+                    m_fontAsset.atlasTexture.GetInstanceID() !=
+                    m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
                 {
                     if (m_fontAsset.material == null)
-                        Debug.LogWarning("The Font Atlas Texture of the Font Asset " + m_fontAsset.name + " assigned to " + gameObject.name + " is missing.", this);
+                        Debug.LogWarning(
+                            "The Font Atlas Texture of the Font Asset " + m_fontAsset.name + " assigned to " +
+                            gameObject.name + " is missing.", this);
                     else
                         m_sharedMaterial = m_fontAsset.material;
                 }
@@ -738,7 +734,8 @@ namespace TMPro
         private void ValidateEnvMapProperty()
         {
             if (m_sharedMaterial != null)
-                m_hasEnvMapProperty = m_sharedMaterial.HasProperty(ShaderUtilities.ID_EnvMap) && m_sharedMaterial.GetTexture(ShaderUtilities.ID_EnvMap) != null;
+                m_hasEnvMapProperty = m_sharedMaterial.HasProperty(ShaderUtilities.ID_EnvMap) &&
+                                      m_sharedMaterial.GetTexture(ShaderUtilities.ID_EnvMap) != null;
             else
                 m_hasEnvMapProperty = false;
         }
@@ -769,17 +766,25 @@ namespace TMPro
 
                 m_isScrollRegionSet = true;
 
-                float softnessX = Mathf.Min(Mathf.Min(m_margin.x, m_margin.z), m_sharedMaterial.GetFloat(ShaderUtilities.ID_MaskSoftnessX));
-                float softnessY = Mathf.Min(Mathf.Min(m_margin.y, m_margin.w), m_sharedMaterial.GetFloat(ShaderUtilities.ID_MaskSoftnessY));
+                float softnessX = Mathf.Min(Mathf.Min(m_margin.x, m_margin.z),
+                    m_sharedMaterial.GetFloat(ShaderUtilities.ID_MaskSoftnessX));
+                float softnessY = Mathf.Min(Mathf.Min(m_margin.y, m_margin.w),
+                    m_sharedMaterial.GetFloat(ShaderUtilities.ID_MaskSoftnessY));
 
                 softnessX = softnessX > 0 ? softnessX : 0;
                 softnessY = softnessY > 0 ? softnessY : 0;
 
-                float width = (m_rectTransform.rect.width - Mathf.Max(m_margin.x, 0) - Mathf.Max(m_margin.z, 0)) / 2 + softnessX;
-                float height = (m_rectTransform.rect.height - Mathf.Max(m_margin.y, 0) - Mathf.Max(m_margin.w, 0)) / 2 + softnessY;
+                float width = (m_rectTransform.rect.width - Mathf.Max(m_margin.x, 0) - Mathf.Max(m_margin.z, 0)) / 2 +
+                              softnessX;
+                float height = (m_rectTransform.rect.height - Mathf.Max(m_margin.y, 0) - Mathf.Max(m_margin.w, 0)) / 2 +
+                               softnessY;
 
 
-                Vector2 center = m_rectTransform.localPosition + new Vector3((0.5f - m_rectTransform.pivot.x) * m_rectTransform.rect.width + (Mathf.Max(m_margin.x, 0) - Mathf.Max(m_margin.z, 0)) / 2, (0.5f - m_rectTransform.pivot.y) * m_rectTransform.rect.height + (-Mathf.Max(m_margin.y, 0) + Mathf.Max(m_margin.w, 0)) / 2);
+                Vector2 center = m_rectTransform.localPosition + new Vector3(
+                    (0.5f - m_rectTransform.pivot.x) * m_rectTransform.rect.width +
+                    (Mathf.Max(m_margin.x, 0) - Mathf.Max(m_margin.z, 0)) / 2,
+                    (0.5f - m_rectTransform.pivot.y) * m_rectTransform.rect.height +
+                    (-Mathf.Max(m_margin.y, 0) + Mathf.Max(m_margin.w, 0)) / 2);
 
                 Vector4 mask = new(center.x, center.y, width, height);
 
@@ -808,7 +813,6 @@ namespace TMPro
         }
 
 
-        /// <returns></returns>
         protected override Material[] GetMaterials(Material[] mats)
         {
             int materialCount = m_textInfo.materialCount;
@@ -823,7 +827,7 @@ namespace TMPro
                 if (i == 0)
                     m_fontMaterials[i] = fontMaterial;
                 else
-                    m_fontMaterials[i] = MSubTextObjects[i].material;
+                    m_fontMaterials[i] = subTextObjects[i].material;
             }
 
             m_fontSharedMaterials = m_fontMaterials;
@@ -842,7 +846,6 @@ namespace TMPro
         }
 
 
-        /// <returns></returns>
         protected override Material[] GetSharedMaterials()
         {
             int materialCount = m_textInfo.materialCount;
@@ -857,7 +860,7 @@ namespace TMPro
                 if (i == 0)
                     m_fontSharedMaterials[i] = m_sharedMaterial;
                 else
-                    m_fontSharedMaterials[i] = MSubTextObjects[i].sharedMaterial;
+                    m_fontSharedMaterials[i] = subTextObjects[i].sharedMaterial;
             }
 
             return m_fontSharedMaterials;
@@ -877,7 +880,9 @@ namespace TMPro
             {
                 if (i == 0)
                 {
-                    if (materials[i].GetTexture(ShaderUtilities.ID_MainTex) == null || materials[i].GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID() != m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
+                    if (materials[i].GetTexture(ShaderUtilities.ID_MainTex) == null ||
+                        materials[i].GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID() !=
+                        m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
                         continue;
 
                     m_sharedMaterial = m_fontSharedMaterials[i] = materials[i];
@@ -885,11 +890,13 @@ namespace TMPro
                 }
                 else
                 {
-                    if (materials[i].GetTexture(ShaderUtilities.ID_MainTex) == null || materials[i].GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID() != MSubTextObjects[i].sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
+                    if (materials[i].GetTexture(ShaderUtilities.ID_MainTex) == null ||
+                        materials[i].GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID() != subTextObjects[i]
+                            .sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
                         continue;
 
-                    if (MSubTextObjects[i].isDefaultMaterial)
-                        MSubTextObjects[i].sharedMaterial = m_fontSharedMaterials[i] = materials[i];
+                    if (subTextObjects[i].isDefaultMaterial)
+                        subTextObjects[i].sharedMaterial = m_fontSharedMaterials[i] = materials[i];
                 }
             }
         }
@@ -900,13 +907,15 @@ namespace TMPro
             if (m_fontMaterial != null && m_sharedMaterial.GetInstanceID() != m_fontMaterial.GetInstanceID())
             {
                 m_sharedMaterial = m_fontMaterial;
-                MCanvasRenderer.SetMaterial(m_sharedMaterial, m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex));
+                cachedCanvasRenderer.SetMaterial(m_sharedMaterial,
+                    m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex));
             }
-            else if(m_fontMaterial == null)
+            else if (m_fontMaterial == null)
             {
                 m_fontMaterial = CreateMaterialInstance(m_sharedMaterial);
                 m_sharedMaterial = m_fontMaterial;
-                MCanvasRenderer.SetMaterial(m_sharedMaterial, m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex));
+                cachedCanvasRenderer.SetMaterial(m_sharedMaterial,
+                    m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex));
             }
 
             thickness = Mathf.Clamp01(thickness);
@@ -947,9 +956,9 @@ namespace TMPro
                 if (mat != null)
                     mat.SetFloat("_CullMode", 2);
 
-                for (int i = 1; i < MSubTextObjects.Length && MSubTextObjects[i] != null; i++)
+                for (int i = 1; i < subTextObjects.Length && subTextObjects[i] != null; i++)
                 {
-                    mat = MSubTextObjects[i].materialForRendering;
+                    mat = subTextObjects[i].materialForRendering;
 
                     if (mat != null)
                     {
@@ -964,9 +973,9 @@ namespace TMPro
                 if (mat != null)
                     mat.SetFloat("_CullMode", 0);
 
-                for (int i = 1; i < MSubTextObjects.Length && MSubTextObjects[i] != null; i++)
+                for (int i = 1; i < subTextObjects.Length && subTextObjects[i] != null; i++)
                 {
-                    mat = MSubTextObjects[i].materialForRendering;
+                    mat = subTextObjects[i].materialForRendering;
 
                     if (mat != null)
                     {
@@ -990,7 +999,7 @@ namespace TMPro
                 m_PreviousRectTransformSize = rect.size;
                 m_PreviousPivotPosition = m_rectTransform.pivot;
 
-                MRectTransformCorners = GetTextContainerLocalCorners();
+                rectTransformCorners = GetTextContainerLocalCorners();
             }
         }
 
@@ -1006,7 +1015,7 @@ namespace TMPro
         protected override void OnCanvasHierarchyChanged()
         {
             base.OnCanvasHierarchyChanged();
-            MCanvas = canvas;
+            cachedCanvas = canvas;
         }
 
 
@@ -1014,7 +1023,7 @@ namespace TMPro
         {
             base.OnTransformParentChanged();
 
-            MCanvas = canvas;
+            cachedCanvas = canvas;
 
             ComputeMarginSize();
             _havePropertiesChanged = true;
@@ -1027,16 +1036,18 @@ namespace TMPro
                 return;
 
             bool hasCanvasScaleFactorChanged = false;
-            if (MCanvas != null && !Mathf.Approximately(MCanvasScaleFactor, MCanvas.scaleFactor))
+            if (cachedCanvas != null && !Mathf.Approximately(canvasScaleFactor, cachedCanvas.scaleFactor))
             {
-                MCanvasScaleFactor = MCanvas.scaleFactor;
+                canvasScaleFactor = cachedCanvas.scaleFactor;
                 hasCanvasScaleFactorChanged = true;
             }
 
             if (!hasCanvasScaleFactorChanged &&
                 rectTransform != null &&
-                Mathf.Abs(m_rectTransform.rect.width - m_PreviousRectTransformSize.x) < 0.0001f && Mathf.Abs(m_rectTransform.rect.height - m_PreviousRectTransformSize.y) < 0.0001f &&
-                Mathf.Abs(m_rectTransform.pivot.x - m_PreviousPivotPosition.x) < 0.0001f && Mathf.Abs(m_rectTransform.pivot.y - m_PreviousPivotPosition.y) < 0.0001f)
+                Mathf.Abs(m_rectTransform.rect.width - m_PreviousRectTransformSize.x) < 0.0001f &&
+                Mathf.Abs(m_rectTransform.rect.height - m_PreviousRectTransformSize.y) < 0.0001f &&
+                Mathf.Abs(m_rectTransform.pivot.x - m_PreviousPivotPosition.x) < 0.0001f &&
+                Mathf.Abs(m_rectTransform.pivot.y - m_PreviousPivotPosition.y) < 0.0001f)
             {
                 return;
             }
@@ -1048,39 +1059,37 @@ namespace TMPro
             SetVerticesDirty();
             SetLayoutDirty();
         }
-        
-        /// <returns></returns>
+
+
         protected Vector3[] GetTextContainerLocalCorners()
         {
             if (m_rectTransform == null) m_rectTransform = rectTransform;
 
-            m_rectTransform.GetLocalCorners(MRectTransformCorners);
+            m_rectTransform.GetLocalCorners(rectTransformCorners);
 
-            return MRectTransformCorners;
+            return rectTransformCorners;
         }
 
 
-        /// <param name="state"></param>
         protected void SetActiveSubMeshes(bool state)
         {
-            for (int i = 1; i < MSubTextObjects.Length && MSubTextObjects[i] != null; i++)
+            for (int i = 1; i < subTextObjects.Length && subTextObjects[i] != null; i++)
             {
-                if (MSubTextObjects[i].enabled != state)
-                    MSubTextObjects[i].enabled = state;
+                if (subTextObjects[i].enabled != state)
+                    subTextObjects[i].enabled = state;
             }
         }
-        
 
-        /// <returns></returns>
+
         protected override Bounds GetCompoundBounds()
         {
             Bounds mainBounds = m_mesh.bounds;
             Vector3 min = mainBounds.min;
             Vector3 max = mainBounds.max;
 
-            for (int i = 1; i < MSubTextObjects.Length && MSubTextObjects[i] != null; i++)
+            for (int i = 1; i < subTextObjects.Length && subTextObjects[i] != null; i++)
             {
-                Bounds subBounds = MSubTextObjects[i].mesh.bounds;
+                Bounds subBounds = subTextObjects[i].mesh.bounds;
                 min.x = min.x < subBounds.min.x ? min.x : subBounds.min.x;
                 min.y = min.y < subBounds.min.y ? min.y : subBounds.min.y;
 
@@ -1095,20 +1104,20 @@ namespace TMPro
 
         internal Rect GetCanvasSpaceClippingRect()
         {
-            if (MCanvas == null || MCanvas.rootCanvas == null || m_mesh == null)
+            if (cachedCanvas == null || cachedCanvas.rootCanvas == null || m_mesh == null)
                 return Rect.zero;
 
-            Transform rootCanvasTransform = MCanvas.rootCanvas.transform;
+            Transform rootCanvasTransform = cachedCanvas.rootCanvas.transform;
             Bounds compoundBounds = GetCompoundBounds();
 
-            Vector2 position =  rootCanvasTransform.InverseTransformPoint(m_rectTransform.position);
+            Vector2 position = rootCanvasTransform.InverseTransformPoint(m_rectTransform.position);
 
             Vector2 canvasLossyScale = rootCanvasTransform.lossyScale;
             Vector2 lossyScale = m_rectTransform.lossyScale / canvasLossyScale;
 
             return new(position + compoundBounds.min * lossyScale, compoundBounds.size * lossyScale);
         }
-        
+
         #endregion
     }
 }

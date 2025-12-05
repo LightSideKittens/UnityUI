@@ -7,7 +7,17 @@ namespace TMPro.EditorUtilities
     {
         static ShaderFeature s_OutlineFeature, s_UnderlayFeature, s_BevelFeature, s_GlowFeature, s_MaskFeature;
 
-        static bool s_Face = true, s_Outline = true, s_Outline2 = true, s_Outline3 = true, s_Underlay = true, s_Lighting = true, s_Glow, s_Bevel, s_Light, s_Bump, s_Env;
+        static bool s_Face = true,
+            s_Outline = true,
+            s_Outline2 = true,
+            s_Outline3 = true,
+            s_Underlay = true,
+            s_Lighting = true,
+            s_Glow,
+            s_Bevel,
+            s_Light,
+            s_Bump,
+            s_Env;
 
         static string[]
             s_FaceUVSpeedName = { "_FaceUVSpeed" },
@@ -77,7 +87,9 @@ namespace TMPro.EditorUtilities
             }
             else
             {
-                s_Outline = m_Material.HasProperty(ShaderUtilities.ID_OutlineTex) ? BeginPanel("Outline", s_Outline) : BeginPanel("Outline", s_OutlineFeature, s_Outline);
+                s_Outline = m_Material.HasProperty(ShaderUtilities.ID_OutlineTex)
+                    ? BeginPanel("Outline", s_Outline)
+                    : BeginPanel("Outline", s_OutlineFeature, s_Outline);
                 if (s_Outline)
                 {
                     DoOutlinePanel();
@@ -186,6 +198,7 @@ namespace TMPro.EditorUtilities
                 else
                     DoDebugPanel();
             }
+
             EndPanel();
 
             EditorGUILayout.Space();
@@ -210,6 +223,7 @@ namespace TMPro.EditorUtilities
                 {
                     DoBevelPanelSRP();
                 }
+
                 EndPanel();
 
                 s_Light = BeginPanel("Local Lighting", s_Light);
@@ -217,6 +231,7 @@ namespace TMPro.EditorUtilities
                 {
                     DoLocalLightingPanel();
                 }
+
                 EndPanel();
             }
 

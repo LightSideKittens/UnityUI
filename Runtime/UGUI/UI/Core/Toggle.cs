@@ -5,10 +5,6 @@ using UnityEngine.Serialization;
 
 namespace UnityEngine.UI
 {
-    /// <remarks>
-    /// The toggle component is a Selectable that controls a child graphic which displays the on / off state.
-    /// When a toggle event occurs a callback is sent to any registered listeners of UI.Toggle._onValueChanged.
-    /// </remarks>
     [AddComponentMenu("UI/Toggle", 30)]
     [RequireComponent(typeof(RectTransform))]
     public class Toggle : Selectable, IPointerClickHandler, ISubmitHandler, ICanvasElement
@@ -22,14 +18,14 @@ namespace UnityEngine.UI
 
         [Serializable]
         public class ToggleEvent : UnityEvent<bool>
-        {}
+        {
+        }
 
         public ToggleTransition toggleTransition = ToggleTransition.Fade;
 
         public Graphic graphic;
 
-        [SerializeField]
-        private ToggleGroup m_Group;
+        [SerializeField] private ToggleGroup m_Group;
 
         public ToggleGroup group
         {
@@ -41,51 +37,21 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// //Attach this script to a Toggle GameObject. To do this, go to Create>UI>Toggle.
-        /// //Set your own Text in the Inspector window
+
         ///
-        /// using UnityEngine;
-        /// using UnityEngine.UI;
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     Toggle m_Toggle;
-        ///     public Text m_Text;
         ///
-        ///     void Start()
-        ///     {
-        ///         //Fetch the Toggle GameObject
-        ///         m_Toggle = GetComponent<Toggle>();
-        ///         //Add listener for when the state of the Toggle changes, to take action
-        ///         m_Toggle.onValueChanged.AddListener(delegate {
-        ///                 ToggleValueChanged(m_Toggle);
-        ///             });
         ///
-        ///         //Initialise the Text to say the first state of the Toggle
-        ///         m_Text.text = "First Value : " + m_Toggle.isOn;
-        ///     }
         ///
-        ///     //Output the new state of the Toggle into Text
-        ///     void ToggleValueChanged(Toggle change)
-        ///     {
-        ///         m_Text.text =  "New Value : " + m_Toggle.isOn;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
         public ToggleEvent onValueChanged = new ToggleEvent();
 
         // Whether the toggle is on
-        [Tooltip("Is the toggle currently on or off?")]
-        [SerializeField]
+        [Tooltip("Is the toggle currently on or off?")] [SerializeField]
         private bool m_IsOn;
 
         protected Toggle()
-        {}
+        {
+        }
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -107,10 +73,12 @@ namespace UnityEngine.UI
         }
 
         public virtual void LayoutComplete()
-        {}
+        {
+        }
 
         public virtual void GraphicUpdateComplete()
-        {}
+        {
+        }
 
         protected override void OnDestroy()
         {
@@ -171,54 +139,22 @@ namespace UnityEngine.UI
                 newGroup.NotifyToggleOn(this);
         }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// /Attach this script to a Toggle GameObject. To do this, go to Create>UI>Toggle.
-        /// //Set your own Text in the Inspector window
+
         ///
-        /// using UnityEngine;
-        /// using UnityEngine.UI;
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     Toggle m_Toggle;
-        ///     public Text m_Text;
         ///
-        ///     void Start()
-        ///     {
-        ///         //Fetch the Toggle GameObject
-        ///         m_Toggle = GetComponent<Toggle>();
-        ///         //Add listener for when the state of the Toggle changes, and output the state
-        ///         m_Toggle.onValueChanged.AddListener(delegate {
-        ///                 ToggleValueChanged(m_Toggle);
-        ///             });
         ///
-        ///         //Initialize the Text to say whether the Toggle is in a positive or negative state
-        ///         m_Text.text = "Toggle is : " + m_Toggle.isOn;
-        ///     }
         ///
-        ///     //Output the new state of the Toggle into Text when the user uses the Toggle
-        ///     void ToggleValueChanged(Toggle change)
-        ///     {
-        ///         m_Text.text =  "Toggle is : " + m_Toggle.isOn;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
 
         public bool isOn
         {
             get { return m_IsOn; }
 
-            set
-            {
-                Set(value);
-            }
+            set { Set(value); }
         }
 
-        /// <param name="value">New Value for isOn.</param>
+
         public void SetIsOnWithoutNotify(bool value)
         {
             Set(value, false);
@@ -262,7 +198,7 @@ namespace UnityEngine.UI
                 graphic.canvasRenderer.SetAlpha(m_IsOn ? 1f : 0f);
             else
 #endif
-            graphic.CrossFadeAlpha(m_IsOn ? 1f : 0f, instant ? 0f : 0.1f, true);
+                graphic.CrossFadeAlpha(m_IsOn ? 1f : 0f, instant ? 0f : 0.1f, true);
         }
 
         protected override void Start()

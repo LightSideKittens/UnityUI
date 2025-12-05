@@ -13,7 +13,6 @@ namespace TMPro.EditorUtilities
 {
     public static class TMPro_CreateObjectMenu
     {
-        /// <param name="command"></param>
         [MenuItem("GameObject/UI/Text - TextMeshPro", false, 2001)]
         static void CreateTextMeshProGuiObjectPerform(MenuCommand menuCommand)
         {
@@ -49,7 +48,7 @@ namespace TMPro.EditorUtilities
         {
             GameObject go = TMP_DefaultControls.CreateButton(GetStandardResources());
 
-            TMPText textComponent = go.GetComponentInChildren<TMPText>();
+            TMP_Text textComponent = go.GetComponentInChildren<TMP_Text>();
             textComponent.fontSize = 24;
 
             PlaceUIElementRoot(go, menuCommand);
@@ -91,12 +90,14 @@ namespace TMPro.EditorUtilities
             {
                 s_StandardResources.standard = AssetDatabase.GetBuiltinExtraResource<Sprite>(kStandardSpritePath);
                 s_StandardResources.background = AssetDatabase.GetBuiltinExtraResource<Sprite>(kBackgroundSpritePath);
-                s_StandardResources.inputField = AssetDatabase.GetBuiltinExtraResource<Sprite>(kInputFieldBackgroundPath);
+                s_StandardResources.inputField =
+                    AssetDatabase.GetBuiltinExtraResource<Sprite>(kInputFieldBackgroundPath);
                 s_StandardResources.knob = AssetDatabase.GetBuiltinExtraResource<Sprite>(kKnobPath);
                 s_StandardResources.checkmark = AssetDatabase.GetBuiltinExtraResource<Sprite>(kCheckmarkPath);
                 s_StandardResources.dropdown = AssetDatabase.GetBuiltinExtraResource<Sprite>(kDropdownArrowPath);
                 s_StandardResources.mask = AssetDatabase.GetBuiltinExtraResource<Sprite>(kMaskPath);
             }
+
             return s_StandardResources;
         }
 
@@ -115,7 +116,8 @@ namespace TMPro.EditorUtilities
             Vector3 position = Vector3.zero;
             Vector2 localPlanePosition;
 
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRTransform, new Vector2(camera.pixelWidth / 2, camera.pixelHeight / 2), camera, out localPlanePosition))
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRTransform,
+                    new Vector2(camera.pixelWidth / 2, camera.pixelHeight / 2), camera, out localPlanePosition))
             {
                 localPlanePosition.x = localPlanePosition.x + canvasRTransform.sizeDelta.x * canvasRTransform.pivot.x;
                 localPlanePosition.y = localPlanePosition.y + canvasRTransform.sizeDelta.y * canvasRTransform.pivot.y;
@@ -127,12 +129,16 @@ namespace TMPro.EditorUtilities
                 position.y = localPlanePosition.y - canvasRTransform.sizeDelta.y * itemTransform.anchorMin.y;
 
                 Vector3 minLocalPosition;
-                minLocalPosition.x = canvasRTransform.sizeDelta.x * (0 - canvasRTransform.pivot.x) + itemTransform.sizeDelta.x * itemTransform.pivot.x;
-                minLocalPosition.y = canvasRTransform.sizeDelta.y * (0 - canvasRTransform.pivot.y) + itemTransform.sizeDelta.y * itemTransform.pivot.y;
+                minLocalPosition.x = canvasRTransform.sizeDelta.x * (0 - canvasRTransform.pivot.x) +
+                                     itemTransform.sizeDelta.x * itemTransform.pivot.x;
+                minLocalPosition.y = canvasRTransform.sizeDelta.y * (0 - canvasRTransform.pivot.y) +
+                                     itemTransform.sizeDelta.y * itemTransform.pivot.y;
 
                 Vector3 maxLocalPosition;
-                maxLocalPosition.x = canvasRTransform.sizeDelta.x * (1 - canvasRTransform.pivot.x) - itemTransform.sizeDelta.x * itemTransform.pivot.x;
-                maxLocalPosition.y = canvasRTransform.sizeDelta.y * (1 - canvasRTransform.pivot.y) - itemTransform.sizeDelta.y * itemTransform.pivot.y;
+                maxLocalPosition.x = canvasRTransform.sizeDelta.x * (1 - canvasRTransform.pivot.x) -
+                                     itemTransform.sizeDelta.x * itemTransform.pivot.x;
+                maxLocalPosition.y = canvasRTransform.sizeDelta.y * (1 - canvasRTransform.pivot.y) -
+                                     itemTransform.sizeDelta.y * itemTransform.pivot.y;
 
                 position.x = Mathf.Clamp(position.x, minLocalPosition.x, maxLocalPosition.x);
                 position.y = Mathf.Clamp(position.y, minLocalPosition.y, maxLocalPosition.y);
@@ -168,7 +174,9 @@ namespace TMPro.EditorUtilities
             GameObjectUtility.EnsureUniqueNameForSibling(element);
 
             SetParentAndAlign(element, parent);
-            if (!explicitParentChoice) SetPositionVisibleinSceneView(parent.GetComponent<RectTransform>(), element.GetComponent<RectTransform>());
+            if (!explicitParentChoice)
+                SetPositionVisibleinSceneView(parent.GetComponent<RectTransform>(),
+                    element.GetComponent<RectTransform>());
 
             Undo.RegisterFullObjectHierarchyUndo(parent == null ? element : parent, "");
 
@@ -196,6 +204,7 @@ namespace TMPro.EditorUtilities
             {
                 child.transform.localPosition = Vector3.zero;
             }
+
             child.transform.localRotation = Quaternion.identity;
             child.transform.localScale = Vector3.one;
 

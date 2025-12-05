@@ -56,6 +56,7 @@ namespace UnityEditor.UI
                 {
                     m_Padding.vector4Value = newPadding;
                 }
+
                 EditorGUI.indentLevel--;
             }
         }

@@ -121,9 +121,21 @@ namespace UnityEngine.UI.Collections
             m_List.CopyTo(array, arrayIndex);
         }
 
-        public int Count { get { return m_EnabledObjectCount; } }
-        public int Capacity { get { return m_List.Count; } }
-        public bool IsReadOnly { get { return false; } }
+        public int Count
+        {
+            get { return m_EnabledObjectCount; }
+        }
+
+        public int Capacity
+        {
+            get { return m_List.Count; }
+        }
+
+        public bool IsReadOnly
+        {
+            get { return false; }
+        }
+
         public int IndexOf(T item)
         {
             int index = -1;
@@ -135,7 +147,8 @@ namespace UnityEngine.UI.Collections
         public void Insert(int index, T item)
         {
             //We could support this, but the semantics would be weird. Order is not guaranteed..
-            throw new NotSupportedException("Random Insertion is semantically invalid, since this structure does not guarantee ordering.");
+            throw new NotSupportedException(
+                "Random Insertion is semantically invalid, since this structure does not guarantee ordering.");
         }
 
         public void RemoveAt(int index)
@@ -164,6 +177,7 @@ namespace UnityEngine.UI.Collections
                 Swap(replaceItemIndex, index);
                 m_List.RemoveAt(replaceItemIndex);
             }
+
             m_Dictionary.Remove(item);
         }
 

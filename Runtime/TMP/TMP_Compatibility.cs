@@ -6,10 +6,22 @@ namespace TMPro
 {
     public static class TMP_Compatibility
     {
-        public enum AnchorPositions { TopLeft, Top, TopRight, Left, Center, Right, BottomLeft, Bottom, BottomRight, BaseLine, None };
+        public enum AnchorPositions
+        {
+            TopLeft,
+            Top,
+            TopRight,
+            Left,
+            Center,
+            Right,
+            BottomLeft,
+            Bottom,
+            BottomRight,
+            BaseLine,
+            None
+        };
 
-        /// <param name="oldValue"></param>
-        /// <returns></returns>
+
         public static TextAlignmentOptions ConvertTextAlignmentEnumValues(TextAlignmentOptions oldValue)
         {
             switch ((int)oldValue)

@@ -7,16 +7,18 @@ using UnityEngine.UI;
 
 namespace UnityEditor.UI
 {
-
     static internal class MenuOptions
     {
-        enum MenuOptionsPriorityOrder {
+        enum MenuOptionsPriorityOrder
+        {
             // 2000 - Text (TMP)
             Image = 2001,
             RawImage = 2002,
             Panel = 2003,
+
             // 2020 - Button (TMP)
             Toggle = 2021,
+
             // 2022 - Dropdown (TMP)
             // 2023 - Input Field (TMP)
             Slider = 2024,
@@ -32,13 +34,13 @@ namespace UnityEditor.UI
 
         private const string kUILayerName = "UI";
 
-        private const string kStandardSpritePath       = "UI/Skin/UISprite.psd";
-        private const string kBackgroundSpritePath     = "UI/Skin/Background.psd";
+        private const string kStandardSpritePath = "UI/Skin/UISprite.psd";
+        private const string kBackgroundSpritePath = "UI/Skin/Background.psd";
         private const string kInputFieldBackgroundPath = "UI/Skin/InputFieldBackground.psd";
-        private const string kKnobPath                 = "UI/Skin/Knob.psd";
-        private const string kCheckmarkPath            = "UI/Skin/Checkmark.psd";
-        private const string kDropdownArrowPath        = "UI/Skin/DropdownArrow.psd";
-        private const string kMaskPath                 = "UI/Skin/UIMask.psd";
+        private const string kKnobPath = "UI/Skin/Knob.psd";
+        private const string kCheckmarkPath = "UI/Skin/Checkmark.psd";
+        private const string kDropdownArrowPath = "UI/Skin/DropdownArrow.psd";
+        private const string kMaskPath = "UI/Skin/UIMask.psd";
 
         static private DefaultControls.Resources s_StandardResources;
 
@@ -48,12 +50,14 @@ namespace UnityEditor.UI
             {
                 s_StandardResources.standard = AssetDatabase.GetBuiltinExtraResource<Sprite>(kStandardSpritePath);
                 s_StandardResources.background = AssetDatabase.GetBuiltinExtraResource<Sprite>(kBackgroundSpritePath);
-                s_StandardResources.inputField = AssetDatabase.GetBuiltinExtraResource<Sprite>(kInputFieldBackgroundPath);
+                s_StandardResources.inputField =
+                    AssetDatabase.GetBuiltinExtraResource<Sprite>(kInputFieldBackgroundPath);
                 s_StandardResources.knob = AssetDatabase.GetBuiltinExtraResource<Sprite>(kKnobPath);
                 s_StandardResources.checkmark = AssetDatabase.GetBuiltinExtraResource<Sprite>(kCheckmarkPath);
                 s_StandardResources.dropdown = AssetDatabase.GetBuiltinExtraResource<Sprite>(kDropdownArrowPath);
                 s_StandardResources.mask = AssetDatabase.GetBuiltinExtraResource<Sprite>(kMaskPath);
             }
+
             return s_StandardResources;
         }
 
@@ -95,7 +99,8 @@ namespace UnityEditor.UI
             Vector2 localPlanePosition;
             Camera camera = sceneView.camera;
             Vector3 position = Vector3.zero;
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRTransform, new Vector2(camera.pixelWidth / 2, camera.pixelHeight / 2), camera, out localPlanePosition))
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRTransform,
+                    new Vector2(camera.pixelWidth / 2, camera.pixelHeight / 2), camera, out localPlanePosition))
             {
                 // Adjust for canvas pivot
                 localPlanePosition.x = localPlanePosition.x + canvasRTransform.sizeDelta.x * canvasRTransform.pivot.x;
@@ -109,12 +114,16 @@ namespace UnityEditor.UI
                 position.y = localPlanePosition.y - canvasRTransform.sizeDelta.y * itemTransform.anchorMin.y;
 
                 Vector3 minLocalPosition;
-                minLocalPosition.x = canvasRTransform.sizeDelta.x * (0 - canvasRTransform.pivot.x) + itemTransform.sizeDelta.x * itemTransform.pivot.x;
-                minLocalPosition.y = canvasRTransform.sizeDelta.y * (0 - canvasRTransform.pivot.y) + itemTransform.sizeDelta.y * itemTransform.pivot.y;
+                minLocalPosition.x = canvasRTransform.sizeDelta.x * (0 - canvasRTransform.pivot.x) +
+                                     itemTransform.sizeDelta.x * itemTransform.pivot.x;
+                minLocalPosition.y = canvasRTransform.sizeDelta.y * (0 - canvasRTransform.pivot.y) +
+                                     itemTransform.sizeDelta.y * itemTransform.pivot.y;
 
                 Vector3 maxLocalPosition;
-                maxLocalPosition.x = canvasRTransform.sizeDelta.x * (1 - canvasRTransform.pivot.x) - itemTransform.sizeDelta.x * itemTransform.pivot.x;
-                maxLocalPosition.y = canvasRTransform.sizeDelta.y * (1 - canvasRTransform.pivot.y) - itemTransform.sizeDelta.y * itemTransform.pivot.y;
+                maxLocalPosition.x = canvasRTransform.sizeDelta.x * (1 - canvasRTransform.pivot.x) -
+                                     itemTransform.sizeDelta.x * itemTransform.pivot.x;
+                maxLocalPosition.y = canvasRTransform.sizeDelta.y * (1 - canvasRTransform.pivot.y) -
+                                     itemTransform.sizeDelta.y * itemTransform.pivot.y;
 
                 position.x = Mathf.Clamp(position.x, minLocalPosition.x, maxLocalPosition.x);
                 position.y = Mathf.Clamp(position.y, minLocalPosition.y, maxLocalPosition.y);
@@ -140,6 +149,7 @@ namespace UnityEditor.UI
                 if (prefabStage != null && !prefabStage.IsPartOfPrefabContents(parent))
                     parent = prefabStage.prefabContentsRoot;
             }
+
             if (parent.GetComponentsInParent<Canvas>(true).Length == 0)
             {
                 // Create canvas under context GameObject,
@@ -153,7 +163,8 @@ namespace UnityEditor.UI
 
             SetParentAndAlign(element, parent);
             if (!explicitParentChoice) // not a context click, so center in sceneview
-                SetPositionVisibleinSceneView(parent.GetComponent<RectTransform>(), element.GetComponent<RectTransform>());
+                SetPositionVisibleinSceneView(parent.GetComponent<RectTransform>(),
+                    element.GetComponent<RectTransform>());
 
             // This call ensure any change made to created Objects after they where registered will be part of the Undo.
             Undo.RegisterFullObjectHierarchyUndo(parent == null ? element : parent, "");
@@ -183,6 +194,7 @@ namespace UnityEditor.UI
             {
                 child.transform.localPosition = Vector3.zero;
             }
+
             child.transform.localRotation = Quaternion.identity;
             child.transform.localScale = Vector3.one;
 
@@ -288,6 +300,7 @@ namespace UnityEditor.UI
                 rect.anchoredPosition = Vector2.zero;
                 rect.sizeDelta = Vector2.zero;
             }
+
             Selection.activeGameObject = go;
         }
 
@@ -334,7 +347,8 @@ namespace UnityEditor.UI
         static public GameObject CreateNewUI()
         {
             // Root for the UI
-            var root = ObjectFactory.CreateGameObject("Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+            var root = ObjectFactory.CreateGameObject("Canvas", typeof(Canvas), typeof(CanvasScaler),
+                typeof(GraphicRaycaster));
             root.layer = LayerMask.NameToLayer(kUILayerName);
             Canvas canvas = root.GetComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -374,7 +388,8 @@ namespace UnityEditor.UI
 
         private static void CreateEventSystem(bool select, GameObject parent)
         {
-            StageHandle stage = parent == null ? StageUtility.GetCurrentStageHandle() : StageUtility.GetStageHandle(parent);
+            StageHandle stage =
+                parent == null ? StageUtility.GetCurrentStageHandle() : StageUtility.GetStageHandle(parent);
             var esys = stage.FindComponentOfType<EventSystem>();
             if (esys == null)
             {

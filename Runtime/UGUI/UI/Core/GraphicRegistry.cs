@@ -7,8 +7,11 @@ namespace UnityEngine.UI
     {
         private static GraphicRegistry s_Instance;
 
-        private readonly Dictionary<Canvas, IndexedSet<Graphic>> m_Graphics = new Dictionary<Canvas, IndexedSet<Graphic>>();
-        private readonly Dictionary<Canvas, IndexedSet<Graphic>> m_RaycastableGraphics = new Dictionary<Canvas, IndexedSet<Graphic>>();
+        private readonly Dictionary<Canvas, IndexedSet<Graphic>> m_Graphics =
+            new Dictionary<Canvas, IndexedSet<Graphic>>();
+
+        private readonly Dictionary<Canvas, IndexedSet<Graphic>> m_RaycastableGraphics =
+            new Dictionary<Canvas, IndexedSet<Graphic>>();
 
         protected GraphicRegistry()
         {
@@ -33,8 +36,7 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <param name="c">The canvas being associated with the Graphic.</param>
-        /// <param name="graphic">The Graphic being associated with the Canvas.</param>
+
         public static void RegisterGraphicForCanvas(Canvas c, Graphic graphic)
         {
             if (c == null || graphic == null)
@@ -60,8 +62,7 @@ namespace UnityEngine.UI
             RegisterRaycastGraphicForCanvas(c, graphic);
         }
 
-        /// <param name="c">The canvas being associated with the Graphic.</param>
-        /// <param name="graphic">The Graphic being associated with the Canvas.</param>
+
         public static void RegisterRaycastGraphicForCanvas(Canvas c, Graphic graphic)
         {
             if (c == null || graphic == null || !graphic.raycastTarget)
@@ -83,8 +84,7 @@ namespace UnityEngine.UI
             instance.m_RaycastableGraphics.Add(c, graphics);
         }
 
-        /// <param name="c">The Canvas to dissociate from the Graphic.</param>
-        /// <param name="graphic">The Graphic to dissociate from the Canvas.</param>
+
         public static void UnregisterGraphicForCanvas(Canvas c, Graphic graphic)
         {
             if (c == null || graphic == null)
@@ -102,8 +102,7 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <param name="c">The Canvas to dissociate from the Graphic.</param>
-        /// <param name="graphic">The Graphic to dissociate from the Canvas.</param>
+
         public static void UnregisterRaycastGraphicForCanvas(Canvas c, Graphic graphic)
         {
             if (c == null || graphic == null)
@@ -119,8 +118,7 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <param name="c">The Canvas to dissociate from the Graphic.</param>
-        /// <param name="graphic">The Graphic to dissociate from the Canvas.</param>
+
         public static void DisableGraphicForCanvas(Canvas c, Graphic graphic)
         {
             if (c == null)
@@ -138,8 +136,7 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <param name="c">The Canvas to dissociate from the Graphic.</param>
-        /// <param name="graphic">The Graphic to dissociate from the Canvas.</param>
+
         public static void DisableRaycastGraphicForCanvas(Canvas c, Graphic graphic)
         {
             if (c == null || !graphic.raycastTarget)
@@ -157,8 +154,7 @@ namespace UnityEngine.UI
 
         private static readonly List<Graphic> s_EmptyList = new List<Graphic>();
 
-        /// <param name="canvas">The Canvas to search</param>
-        /// <returns>Returns a list of Graphics. Returns an empty list if no Graphics are associated with the specified Canvas.</returns>
+
         public static IList<Graphic> GetGraphicsForCanvas(Canvas canvas)
         {
             IndexedSet<Graphic> graphics;
@@ -168,8 +164,7 @@ namespace UnityEngine.UI
             return s_EmptyList;
         }
 
-        /// <param name="canvas">The Canvas to search</param>
-        /// <returns>Returns a list of Graphics. Returns an empty list if no Graphics are associated with the specified Canvas.</returns>
+
         public static IList<Graphic> GetRaycastableGraphicsForCanvas(Canvas canvas)
         {
             IndexedSet<Graphic> graphics;

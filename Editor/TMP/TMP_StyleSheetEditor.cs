@@ -5,7 +5,6 @@ using UnityEditor;
 
 namespace TMPro.EditorUtilities
 {
-
     [CustomPropertyDrawer(typeof(TMP_Style))]
     public class StyleDrawer : PropertyDrawer
     {
@@ -57,7 +56,8 @@ namespace TMPro.EditorUtilities
             position.y += labelHeight;
             GUI.Label(position, "Opening Tags");
             Rect textRect1 = new Rect(110, position.y, position.width - 86, 35);
-            openingDefinitionProperty.stringValue = EditorGUI.TextArea(textRect1, openingDefinitionProperty.stringValue);
+            openingDefinitionProperty.stringValue =
+                EditorGUI.TextArea(textRect1, openingDefinitionProperty.stringValue);
             if (EditorGUI.EndChangeCheck())
             {
                 int size = openingDefinitionProperty.stringValue.Length;
@@ -76,7 +76,8 @@ namespace TMPro.EditorUtilities
             position.y += 38;
             GUI.Label(position, "Closing Tags");
             Rect textRect2 = new Rect(110, position.y, position.width - 86, 35);
-            closingDefinitionProperty.stringValue = EditorGUI.TextArea(textRect2, closingDefinitionProperty.stringValue);
+            closingDefinitionProperty.stringValue =
+                EditorGUI.TextArea(textRect2, closingDefinitionProperty.stringValue);
 
             if (EditorGUI.EndChangeCheck())
             {
@@ -90,16 +91,13 @@ namespace TMPro.EditorUtilities
                     element.intValue = closingDefinitionProperty.stringValue[i];
                 }
             }
-
         }
     }
-
 
 
     [CustomEditor(typeof(TMP_StyleSheet)), CanEditMultipleObjects]
     public class TMP_StyleEditor : Editor
     {
-
         TMP_StyleSheet m_StyleSheet;
         SerializedProperty m_StyleListProp;
 
@@ -144,7 +142,8 @@ namespace TMPro.EditorUtilities
 
                     Rect elementEndRegion = GUILayoutUtility.GetRect(0f, 0f, GUILayout.ExpandWidth(true));
 
-                    Rect selectionArea = new Rect(elementStartRegion.x, elementStartRegion.y, elementEndRegion.width, elementEndRegion.y - elementStartRegion.y);
+                    Rect selectionArea = new Rect(elementStartRegion.x, elementStartRegion.y, elementEndRegion.width,
+                        elementEndRegion.y - elementStartRegion.y);
                     if (DoSelectionCheck(selectionArea))
                     {
                         if (m_SelectedElement == i)
@@ -168,19 +167,29 @@ namespace TMPro.EditorUtilities
             rect.width = totalWidth * 0.175f;
 
             bool guiEnabled = GUI.enabled;
-            if (m_SelectedElement == -1 || m_SelectedElement == 0) { GUI.enabled = false; }
+            if (m_SelectedElement == -1 || m_SelectedElement == 0)
+            {
+                GUI.enabled = false;
+            }
+
             if (GUI.Button(rect, "Up"))
             {
                 SwapStyleElements(m_SelectedElement, m_SelectedElement - 1);
             }
+
             GUI.enabled = guiEnabled;
 
             rect.x += rect.width;
-            if (m_SelectedElement == elementCount - 1) { GUI.enabled = false; }
+            if (m_SelectedElement == elementCount - 1)
+            {
+                GUI.enabled = false;
+            }
+
             if (GUI.Button(rect, "Down"))
             {
                 SwapStyleElements(m_SelectedElement, m_SelectedElement + 1);
             }
+
             GUI.enabled = guiEnabled;
 
             rect.x += rect.width + totalWidth * 0.3f;
@@ -257,7 +266,6 @@ namespace TMPro.EditorUtilities
             GUI.enabled = true;
             if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
                 m_SelectedElement = -1;
-
         }
 
 
@@ -273,6 +281,7 @@ namespace TMPro.EditorUtilities
                         currentEvent.Use();
                         return true;
                     }
+
                     break;
             }
 
@@ -285,6 +294,5 @@ namespace TMPro.EditorUtilities
             m_SelectedElement = newIndex;
             m_IsStyleSheetDirty = true;
         }
-
     }
 }

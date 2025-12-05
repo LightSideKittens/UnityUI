@@ -8,18 +8,13 @@ using UnityEditor;
 
 namespace UnityEngine.UI
 {
-    /// <remarks>
-    /// The recommended workflow for using UI controls with the UI system is to create a prefab for each type of control and instantiate those when needed. This way changes can be made to the prefabs which immediately have effect on all used instances.
     ///
-    /// However, in certain cases there can be reasons to create UI controls entirely from code. The DefaultControls class provide methods to create each of the builtin UI controls. The resulting objects are the same as are obtained from using the corresponding UI menu entries in the GameObject menu in the Editor.
     ///
-    /// An example use of this is creating menu items for custom new UI controls that mimics the ones that are builtin in Unity. Some such UI controls may contain other UI controls. For example, a scroll view contains scrollbars.By using the DefaultControls methods to create those parts, it is ensured that they are identical in look and setup to the ones provided in the menu items builtin with Unity.
     ///
-    /// Note that the details of the setup of the UI controls created by the methods in this class may change with later revisions of the UI system.As such, they are not guaranteed to be 100% backwards compatible. It is recommended not to rely on the specific hierarchies of the GameObjects created by these methods, and limit your code to only interface with the root GameObject created by each method.
-    /// </remarks>
     public static class DefaultControls
     {
         static IFactoryControls m_CurrentFactory = DefaultRuntimeFactory.Default;
+
         public static IFactoryControls factory
         {
             get { return m_CurrentFactory; }
@@ -28,12 +23,7 @@ namespace UnityEngine.UI
 #endif
         }
 
-        /// <remarks>
-        /// The only available method is CreateGameObject.
-        /// It needs to be called with every Components the created Object will need because of a bug with Undo and RectTransform.
-        /// Adding a UI component on the created GameObject may crash if done after Undo.SetTransformParent,
-        /// So it's better to prevent such behavior in this class by asking for full creation with all the components.
-        /// </remarks>
+
         public interface IFactoryControls
         {
             GameObject CreateGameObject(string name, params Type[] components);
@@ -66,15 +56,15 @@ namespace UnityEngine.UI
             public Sprite mask;
         }
 
-        private const float  kWidth       = 160f;
-        private const float  kThickHeight = 30f;
-        private const float  kThinHeight  = 20f;
-        private static Vector2 s_ThickElementSize       = new Vector2(kWidth, kThickHeight);
-        private static Vector2 s_ThinElementSize        = new Vector2(kWidth, kThinHeight);
-        private static Vector2 s_ImageElementSize       = new Vector2(100f, 100f);
-        private static Color   s_DefaultSelectableColor = new Color(1f, 1f, 1f, 1f);
-        private static Color   s_PanelColor             = new Color(1f, 1f, 1f, 0.392f);
-        private static Color   s_TextColor              = new Color(50f / 255f, 50f / 255f, 50f / 255f, 1f);
+        private const float kWidth = 160f;
+        private const float kThickHeight = 30f;
+        private const float kThinHeight = 20f;
+        private static Vector2 s_ThickElementSize = new Vector2(kWidth, kThickHeight);
+        private static Vector2 s_ThinElementSize = new Vector2(kWidth, kThinHeight);
+        private static Vector2 s_ImageElementSize = new Vector2(100f, 100f);
+        private static Color s_DefaultSelectableColor = new Color(1f, 1f, 1f, 1f);
+        private static Color s_PanelColor = new Color(1f, 1f, 1f, 0.392f);
+        private static Color s_TextColor = new Color(50f / 255f, 50f / 255f, 50f / 255f, 1f);
 
         // Helper methods at top
 
@@ -110,8 +100,8 @@ namespace UnityEngine.UI
         {
             ColorBlock colors = slider.colors;
             colors.highlightedColor = new Color(0.882f, 0.882f, 0.882f);
-            colors.pressedColor     = new Color(0.698f, 0.698f, 0.698f);
-            colors.disabledColor    = new Color(0.521f, 0.521f, 0.521f);
+            colors.pressedColor = new Color(0.698f, 0.698f, 0.698f);
+            colors.disabledColor = new Color(0.521f, 0.521f, 0.521f);
         }
 
         private static void SetParentAndAlign(GameObject child, GameObject parent)
@@ -135,13 +125,7 @@ namespace UnityEngine.UI
                 SetLayerRecursively(t.GetChild(i).gameObject, layer);
         }
 
-        /// <remarks>
-        /// Hierarchy:
-        /// (root)
-        ///     Image
-        /// </remarks>
-        /// <param name="resources">The resources to use for creation.</param>
-        /// <returns>The root GameObject of the created element.</returns>
+
         public static GameObject CreatePanel(Resources resources)
         {
             GameObject panelRoot = CreateUIElementRoot("Panel", s_ThickElementSize, typeof(Image));
@@ -161,17 +145,11 @@ namespace UnityEngine.UI
             return panelRoot;
         }
 
-        /// <remarks>
-        /// Hierarchy:
-        /// (root)
-        ///     Button
-        ///         -Text
-        /// </remarks>
-        /// <param name="resources">The resources to use for creation.</param>
-        /// <returns>The root GameObject of the created element.</returns>
+
         public static GameObject CreateButton(Resources resources)
         {
-            GameObject buttonRoot = CreateUIElementRoot("Button (Legacy)", s_ThickElementSize, typeof(Image), typeof(Button));
+            GameObject buttonRoot =
+                CreateUIElementRoot("Button (Legacy)", s_ThickElementSize, typeof(Image), typeof(Button));
 
             GameObject childText = CreateUIObject("Text (Legacy)", buttonRoot, typeof(Text));
 
@@ -196,13 +174,7 @@ namespace UnityEngine.UI
             return buttonRoot;
         }
 
-        /// <remarks>
-        /// Hierarchy:
-        /// (root)
-        ///     Text
-        /// </remarks>
-        /// <param name="resources">The resources to use for creation.</param>
-        /// <returns>The root GameObject of the created element.</returns>
+
         public static GameObject CreateText(Resources resources)
         {
             GameObject go = CreateUIElementRoot("Text (Legacy)", s_ThickElementSize, typeof(Text));
@@ -214,44 +186,21 @@ namespace UnityEngine.UI
             return go;
         }
 
-        /// <remarks>
-        /// Hierarchy:
-        /// (root)
-        ///     Image
-        /// </remarks>
-        /// <param name="resources">The resources to use for creation.</param>
-        /// <returns>The root GameObject of the created element.</returns>
+
         public static GameObject CreateImage(Resources resources)
         {
             GameObject go = CreateUIElementRoot("Image", s_ImageElementSize, typeof(Image));
             return go;
         }
 
-        /// <remarks>
-        /// Hierarchy:
-        /// (root)
-        ///     RawImage
-        /// </remarks>
-        /// <param name="resources">The resources to use for creation.</param>
-        /// <returns>The root GameObject of the created element.</returns>
+
         public static GameObject CreateRawImage(Resources resources)
         {
             GameObject go = CreateUIElementRoot("RawImage", s_ImageElementSize, typeof(RawImage));
             return go;
         }
 
-        /// <remarks>
-        /// Hierarchy:
-        /// (root)
-        ///     Slider
-        ///         - Background
-        ///         - Fill Area
-        ///             - Fill
-        ///         - Handle Slide Area
-        ///             - Handle
-        /// </remarks>
-        /// <param name="resources">The resources to use for creation.</param>
-        /// <returns>The root GameObject of the created element.</returns>
+
         public static GameObject CreateSlider(Resources resources)
         {
             // Create GOs Hierarchy
@@ -314,19 +263,12 @@ namespace UnityEngine.UI
             return root;
         }
 
-        /// <remarks>
-        /// Hierarchy:
-        /// (root)
-        ///     Scrollbar
-        ///         - Sliding Area
-        ///             - Handle
-        /// </remarks>
-        /// <param name="resources">The resources to use for creation.</param>
-        /// <returns>The root GameObject of the created element.</returns>
+
         public static GameObject CreateScrollbar(Resources resources)
         {
             // Create GOs Hierarchy
-            GameObject scrollbarRoot = CreateUIElementRoot("Scrollbar", s_ThinElementSize, typeof(Image), typeof(Scrollbar));
+            GameObject scrollbarRoot =
+                CreateUIElementRoot("Scrollbar", s_ThinElementSize, typeof(Image), typeof(Scrollbar));
 
             GameObject sliderArea = CreateUIObject("Sliding Area", scrollbarRoot, typeof(RectTransform));
             GameObject handle = CreateUIObject("Handle", sliderArea, typeof(Image));
@@ -357,16 +299,7 @@ namespace UnityEngine.UI
             return scrollbarRoot;
         }
 
-        /// <remarks>
-        /// Hierarchy:
-        /// (root)
-        ///     Toggle
-        ///         - Background
-        ///             - Checkmark
-        ///         - Label
-        /// </remarks>
-        /// <param name="resources">The resources to use for creation.</param>
-        /// <returns>The root GameObject of the created element.</returns>
+
         public static GameObject CreateToggle(Resources resources)
         {
             // Set up hierarchy
@@ -397,10 +330,10 @@ namespace UnityEngine.UI
             SetDefaultColorTransitionValues(toggle);
 
             RectTransform bgRect = background.GetComponent<RectTransform>();
-            bgRect.anchorMin        = new Vector2(0f, 1f);
-            bgRect.anchorMax        = new Vector2(0f, 1f);
+            bgRect.anchorMin = new Vector2(0f, 1f);
+            bgRect.anchorMax = new Vector2(0f, 1f);
             bgRect.anchoredPosition = new Vector2(10f, -10f);
-            bgRect.sizeDelta        = new Vector2(kThinHeight, kThinHeight);
+            bgRect.sizeDelta = new Vector2(kThinHeight, kThinHeight);
 
             RectTransform checkmarkRect = checkmark.GetComponent<RectTransform>();
             checkmarkRect.anchorMin = new Vector2(0.5f, 0.5f);
@@ -409,26 +342,19 @@ namespace UnityEngine.UI
             checkmarkRect.sizeDelta = new Vector2(20f, 20f);
 
             RectTransform labelRect = childLabel.GetComponent<RectTransform>();
-            labelRect.anchorMin     = new Vector2(0f, 0f);
-            labelRect.anchorMax     = new Vector2(1f, 1f);
-            labelRect.offsetMin     = new Vector2(23f, 1f);
-            labelRect.offsetMax     = new Vector2(-5f, -2f);
+            labelRect.anchorMin = new Vector2(0f, 0f);
+            labelRect.anchorMax = new Vector2(1f, 1f);
+            labelRect.offsetMin = new Vector2(23f, 1f);
+            labelRect.offsetMax = new Vector2(-5f, -2f);
 
             return toggleRoot;
         }
 
-        /// <remarks>
-        /// Hierarchy:
-        /// (root)
-        ///     InputField
-        ///         - PlaceHolder
-        ///         - Text
-        /// </remarks>
-        /// <param name="resources">The resources to use for creation.</param>
-        /// <returns>The root GameObject of the created element.</returns>
+
         public static GameObject CreateInputField(Resources resources)
         {
-            GameObject root = CreateUIElementRoot("InputField (Legacy)", s_ThickElementSize, typeof(Image), typeof(InputField));
+            GameObject root = CreateUIElementRoot("InputField (Legacy)", s_ThickElementSize, typeof(Image),
+                typeof(InputField));
 
             GameObject childPlaceholder = CreateUIObject("Placeholder", root, typeof(Text));
             GameObject childText = CreateUIObject("Text (Legacy)", root, typeof(Text));
@@ -474,28 +400,11 @@ namespace UnityEngine.UI
             return root;
         }
 
-        /// <remarks>
-        /// Hierarchy:
-        /// (root)
-        ///     Dropdown
-        ///         - Label
-        ///         - Arrow
-        ///         - Template
-        ///             - Viewport
-        ///                 - Content
-        ///                     - Item
-        ///                         - Item Background
-        ///                         - Item Checkmark
-        ///                         - Item Label
-        ///             - Scrollbar
-        ///                 - Sliding Area
-        ///                     - Handle
-        /// </remarks>
-        /// <param name="resources">The resources to use for creation.</param>
-        /// <returns>The root GameObject of the created element.</returns>
+
         public static GameObject CreateDropdown(Resources resources)
         {
-            GameObject root = CreateUIElementRoot("Dropdown (Legacy)", s_ThickElementSize, typeof(Image), typeof(Dropdown));
+            GameObject root =
+                CreateUIElementRoot("Dropdown (Legacy)", s_ThickElementSize, typeof(Image), typeof(Dropdown));
 
             GameObject label = CreateUIObject("Label", root, typeof(Text));
             GameObject arrow = CreateUIObject("Arrow", root, typeof(Image));
@@ -584,90 +493,77 @@ namespace UnityEngine.UI
 
             // Setting default Item list.
             itemLabelText.text = "Option A";
-            dropdown.options.Add(new Dropdown.OptionData {text = "Option A"});
-            dropdown.options.Add(new Dropdown.OptionData {text = "Option B"});
-            dropdown.options.Add(new Dropdown.OptionData {text = "Option C"});
+            dropdown.options.Add(new Dropdown.OptionData { text = "Option A" });
+            dropdown.options.Add(new Dropdown.OptionData { text = "Option B" });
+            dropdown.options.Add(new Dropdown.OptionData { text = "Option C" });
             dropdown.RefreshShownValue();
 
             // Set up RectTransforms.
 
             RectTransform labelRT = label.GetComponent<RectTransform>();
-            labelRT.anchorMin           = Vector2.zero;
-            labelRT.anchorMax           = Vector2.one;
-            labelRT.offsetMin           = new Vector2(10, 6);
-            labelRT.offsetMax           = new Vector2(-25, -7);
+            labelRT.anchorMin = Vector2.zero;
+            labelRT.anchorMax = Vector2.one;
+            labelRT.offsetMin = new Vector2(10, 6);
+            labelRT.offsetMax = new Vector2(-25, -7);
 
             RectTransform arrowRT = arrow.GetComponent<RectTransform>();
-            arrowRT.anchorMin           = new Vector2(1, 0.5f);
-            arrowRT.anchorMax           = new Vector2(1, 0.5f);
-            arrowRT.sizeDelta           = new Vector2(20, 20);
-            arrowRT.anchoredPosition    = new Vector2(-15, 0);
+            arrowRT.anchorMin = new Vector2(1, 0.5f);
+            arrowRT.anchorMax = new Vector2(1, 0.5f);
+            arrowRT.sizeDelta = new Vector2(20, 20);
+            arrowRT.anchoredPosition = new Vector2(-15, 0);
 
             RectTransform templateRT = template.GetComponent<RectTransform>();
-            templateRT.anchorMin        = new Vector2(0, 0);
-            templateRT.anchorMax        = new Vector2(1, 0);
-            templateRT.pivot            = new Vector2(0.5f, 1);
+            templateRT.anchorMin = new Vector2(0, 0);
+            templateRT.anchorMax = new Vector2(1, 0);
+            templateRT.pivot = new Vector2(0.5f, 1);
             templateRT.anchoredPosition = new Vector2(0, 2);
-            templateRT.sizeDelta        = new Vector2(0, 150);
+            templateRT.sizeDelta = new Vector2(0, 150);
 
             RectTransform viewportRT = viewport.GetComponent<RectTransform>();
-            viewportRT.anchorMin        = new Vector2(0, 0);
-            viewportRT.anchorMax        = new Vector2(1, 1);
-            viewportRT.sizeDelta        = new Vector2(-18, 0);
-            viewportRT.pivot            = new Vector2(0, 1);
+            viewportRT.anchorMin = new Vector2(0, 0);
+            viewportRT.anchorMax = new Vector2(1, 1);
+            viewportRT.sizeDelta = new Vector2(-18, 0);
+            viewportRT.pivot = new Vector2(0, 1);
 
             RectTransform contentRT = content.GetComponent<RectTransform>();
-            contentRT.anchorMin         = new Vector2(0f, 1);
-            contentRT.anchorMax         = new Vector2(1f, 1);
-            contentRT.pivot             = new Vector2(0.5f, 1);
-            contentRT.anchoredPosition  = new Vector2(0, 0);
-            contentRT.sizeDelta         = new Vector2(0, 28);
+            contentRT.anchorMin = new Vector2(0f, 1);
+            contentRT.anchorMax = new Vector2(1f, 1);
+            contentRT.pivot = new Vector2(0.5f, 1);
+            contentRT.anchoredPosition = new Vector2(0, 0);
+            contentRT.sizeDelta = new Vector2(0, 28);
 
             RectTransform itemRT = item.GetComponent<RectTransform>();
-            itemRT.anchorMin            = new Vector2(0, 0.5f);
-            itemRT.anchorMax            = new Vector2(1, 0.5f);
-            itemRT.sizeDelta            = new Vector2(0, 20);
+            itemRT.anchorMin = new Vector2(0, 0.5f);
+            itemRT.anchorMax = new Vector2(1, 0.5f);
+            itemRT.sizeDelta = new Vector2(0, 20);
 
             RectTransform itemBackgroundRT = itemBackground.GetComponent<RectTransform>();
-            itemBackgroundRT.anchorMin  = Vector2.zero;
-            itemBackgroundRT.anchorMax  = Vector2.one;
-            itemBackgroundRT.sizeDelta  = Vector2.zero;
+            itemBackgroundRT.anchorMin = Vector2.zero;
+            itemBackgroundRT.anchorMax = Vector2.one;
+            itemBackgroundRT.sizeDelta = Vector2.zero;
 
             RectTransform itemCheckmarkRT = itemCheckmark.GetComponent<RectTransform>();
-            itemCheckmarkRT.anchorMin   = new Vector2(0, 0.5f);
-            itemCheckmarkRT.anchorMax   = new Vector2(0, 0.5f);
-            itemCheckmarkRT.sizeDelta   = new Vector2(20, 20);
+            itemCheckmarkRT.anchorMin = new Vector2(0, 0.5f);
+            itemCheckmarkRT.anchorMax = new Vector2(0, 0.5f);
+            itemCheckmarkRT.sizeDelta = new Vector2(20, 20);
             itemCheckmarkRT.anchoredPosition = new Vector2(10, 0);
 
             RectTransform itemLabelRT = itemLabel.GetComponent<RectTransform>();
-            itemLabelRT.anchorMin       = Vector2.zero;
-            itemLabelRT.anchorMax       = Vector2.one;
-            itemLabelRT.offsetMin       = new Vector2(20, 1);
-            itemLabelRT.offsetMax       = new Vector2(-10, -2);
+            itemLabelRT.anchorMin = Vector2.zero;
+            itemLabelRT.anchorMax = Vector2.one;
+            itemLabelRT.offsetMin = new Vector2(20, 1);
+            itemLabelRT.offsetMax = new Vector2(-10, -2);
 
             template.SetActive(false);
 
             return root;
         }
 
-        /// <remarks>
-        /// Hierarchy:
-        /// (root)
-        ///     Scrollview
-        ///         - Viewport
-        ///             - Content
-        ///         - Scrollbar Horizontal
-        ///             - Sliding Area
-        ///                 - Handle
-        ///         - Scrollbar Vertical
-        ///             - Sliding Area
-        ///                 - Handle
-        /// </remarks>
-        /// <param name="resources">The resources to use for creation.</param>
-        /// <returns>The root GameObject of the created element.</returns>
+
         public static GameObject CreateScrollView(Resources resources)
         {
-            GameObject root = CreateUIElementRoot("Scroll View", new Vector2(200, 200), typeof(Image), typeof(ScrollRect));
+            GameObject root =
+                CreateUIElementRoot("Scroll View", new Vector2(200, 200), typeof(Image), typeof(ScrollRect));
 
             GameObject viewport = CreateUIObject("Viewport", root, typeof(Image), typeof(Mask));
             GameObject content = CreateUIObject("Content", viewport, typeof(RectTransform));

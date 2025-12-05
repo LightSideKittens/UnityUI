@@ -10,7 +10,8 @@ namespace TMPro.EditorUtilities
     {
         static ShaderFeature s_OutlineFeature, s_UnderlayFeature, s_BevelFeature, s_GlowFeature, s_MaskFeature;
 
-        static bool s_Face = true, s_Outline = true, s_Outline2 = true, s_Outline3 = true, s_Underlay = true, s_Lighting = true, s_Glow, s_Bevel, s_Light, s_Bump, s_Env;
+        static bool s_Face = true, s_Outline = true, s_Outline2 = true, s_Outline3 = true, s_Underlay = true, s_Lighting
+ = true, s_Glow, s_Bevel, s_Light, s_Bump, s_Env;
 
         static string[]
             s_FaceUVSpeedName = { "_FaceUVSpeed" },

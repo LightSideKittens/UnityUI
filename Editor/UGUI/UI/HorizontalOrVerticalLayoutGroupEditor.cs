@@ -85,6 +85,7 @@ namespace UnityEditor.UI
             {
                 property.boolValue = property.hasMultipleDifferentValues ? true : !property.boolValue;
             }
+
             EditorGUI.EndProperty();
         }
     }

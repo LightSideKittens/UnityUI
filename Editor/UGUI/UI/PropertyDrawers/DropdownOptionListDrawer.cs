@@ -25,7 +25,8 @@ namespace UnityEditor.UI
 
         private void Init(SerializedProperty property)
         {
-            if (m_ReorderableList != null && m_ReorderableList.serializedProperty.serializedObject.m_NativeObjectPtr != IntPtr.Zero)
+            if (m_ReorderableList != null &&
+                m_ReorderableList.serializedProperty.serializedObject.m_NativeObjectPtr != IntPtr.Zero)
             {
                 return;
             }

@@ -17,6 +17,7 @@ namespace UnityEngine.UIElements
         }
 
         private EventSystem m_EventSystem;
+
         internal EventSystem eventSystem
         {
             get => m_EventSystem;
@@ -98,6 +99,7 @@ namespace UnityEngine.UIElements
         }
 
         private readonly HashSet<BaseRuntimePanel> trackedPanels = new();
+
         private void StartTrackingPanel(BaseRuntimePanel panel)
         {
             trackedPanels.Add(panel);
@@ -114,6 +116,7 @@ namespace UnityEngine.UIElements
             {
                 DestroyPanelGameObject(panel);
             }
+
             trackedPanels.Clear();
 
             DestroyWorldSpacePanelGameObject();
@@ -133,6 +136,7 @@ namespace UnityEngine.UIElements
         }
 
         private readonly Dictionary<BaseRuntimePanel, Action> destroyedActions = new();
+
         private void CreatePanelGameObject(BaseRuntimePanel panel)
         {
             if (panel.selectableGameObject == null)
@@ -230,13 +234,14 @@ namespace UnityEngine.UIElements
         }
 
         private PanelInputConfiguration.Settings m_InputSettings = PanelInputConfiguration.Settings.Default;
+
         void Apply(PanelInputConfiguration input)
         {
             m_InputSettings = input != null ? input.settings : PanelInputConfiguration.Settings.Default;
             m_OverrideUIToolkitEvents =
                 m_InputSettings.panelInputRedirection != PanelInputConfiguration.PanelInputRedirection.Never;
             m_HandlerTypes = EventHandlerTypes.ScreenOverlay |
-                (m_InputSettings.processWorldSpaceInput ? EventHandlerTypes.WorldSpace : 0);
+                             (m_InputSettings.processWorldSpaceInput ? EventHandlerTypes.WorldSpace : 0);
             m_WorldPickingLayers = m_InputSettings.interactionLayers;
             m_WorldPickingMaxDistance = m_InputSettings.maxInteractionDistance;
             m_CreateDefaultPanelComponents = m_InputSettings.autoCreatePanelComponents;

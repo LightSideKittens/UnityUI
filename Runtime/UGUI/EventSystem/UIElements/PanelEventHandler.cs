@@ -93,6 +93,7 @@ namespace UnityEngine.UIElements
         }
 
         private bool m_Selecting;
+
         public void OnSelect(BaseEventData eventData)
         {
             m_Selecting = true;
@@ -152,7 +153,8 @@ namespace UnityEngine.UIElements
                 UpdatePointerEventTarget(e, m_PointerEvent);
                 SendEvent(e, eventData);
 
-                PointerDeviceState.SetElementWithSoftPointerCapture(e.pointerId, e.elementTarget, eventData.pressEventCamera);
+                PointerDeviceState.SetElementWithSoftPointerCapture(e.pointerId, e.elementTarget,
+                    eventData.pressEventCamera);
             }
         }
 
@@ -346,7 +348,8 @@ namespace UnityEngine.UIElements
         {
             if (e.ShouldSendNavigationMoveEventRuntime())
             {
-                SendTabEvent(e, e.shift ? NavigationMoveEvent.Direction.Previous : NavigationMoveEvent.Direction.Next, target);
+                SendTabEvent(e, e.shift ? NavigationMoveEvent.Direction.Previous : NavigationMoveEvent.Direction.Next,
+                    target);
             }
         }
 
@@ -363,7 +366,7 @@ namespace UnityEngine.UIElements
         {
             // Use UIElementsRuntimeUtility.CreateEvent because DefaultEventSystem uses it too
             // and we want to have the same behavior as much as possible.
-            using (var ev = (KeyUpEvent) UIElementsRuntimeUtility.CreateEvent(e))
+            using (var ev = (KeyUpEvent)UIElementsRuntimeUtility.CreateEvent(e))
             {
                 ev.target = target;
                 SendEvent(ev, e);
@@ -374,14 +377,15 @@ namespace UnityEngine.UIElements
         {
             // Use UIElementsRuntimeUtility.CreateEvent because DefaultEventSystem uses it too
             // and we want to have the same behavior as much as possible.
-            using (var ev = (KeyDownEvent) UIElementsRuntimeUtility.CreateEvent(e))
+            using (var ev = (KeyDownEvent)UIElementsRuntimeUtility.CreateEvent(e))
             {
                 ev.target = target;
                 SendEvent(ev, e);
             }
         }
 
-        private bool ReadPointerData(PointerEvent pe, PointerEventData eventData, PointerEventType eventType = PointerEventType.Default)
+        private bool ReadPointerData(PointerEvent pe, PointerEventData eventData,
+            PointerEventType eventType = PointerEventType.Default)
         {
             if (m_Panel == null || eventSystem == null || eventSystem.currentInputModule == null)
                 return false;
@@ -424,19 +428,21 @@ namespace UnityEngine.UIElements
                 if (!ReadPointerData(m_PointerEvent, eventData))
                     continue;
 
-                m_Panel.SetTopElementUnderPointer(m_PointerEvent.pointerId, m_PointerEvent.elementUnderPointer, m_PointerEvent.position);
+                m_Panel.SetTopElementUnderPointer(m_PointerEvent.pointerId, m_PointerEvent.elementUnderPointer,
+                    m_PointerEvent.position);
                 m_Panel.CommitElementUnderPointers();
             }
         }
 
         enum PointerEventType
         {
-            Default, Down, Up
+            Default,
+            Down,
+            Up
         }
 
         class PointerEvent : IPointerEvent
         {
-
             public int pointerId { get; private set; }
             public string pointerType { get; private set; }
             public bool isPrimary { get; private set; }
@@ -465,8 +471,8 @@ namespace UnityEngine.UIElements
 
             public bool actionKey =>
                 Application.platform == RuntimePlatform.OSXEditor || Application.platform == RuntimePlatform.OSXPlayer
-                ? commandKey
-                : ctrlKey;
+                    ? commandKey
+                    : ctrlKey;
 
             public Vector3 screenPosition { get; private set; }
             public Vector3 screenDelta { get; private set; }
@@ -487,8 +493,8 @@ namespace UnityEngine.UIElements
                     PointerType.mouse;
 
                 isPrimary = pointerId == PointerId.mousePointerId ||
-                    pointerId == PointerId.touchPointerIdBase ||
-                    pointerId == PointerId.penPointerIdBase;
+                            pointerId == PointerId.touchPointerIdBase ||
+                            pointerId == PointerId.penPointerIdBase;
 
                 // Flip Y axis between input and UITK
                 var h = Screen.height;
@@ -571,7 +577,7 @@ namespace UnityEngine.UIElements
                 {
                     // PointerEvents making it this far have been validated by PanelRaycaster already
                     panel.ScreenToPanel(screenPosition, screenDelta,
-                        out panelPosition, allowOutside:true);
+                        out panelPosition, allowOutside: true);
                     elementTarget = null;
                 }
                 else
@@ -579,7 +585,8 @@ namespace UnityEngine.UIElements
                     if (document == null)
                         return false;
 
-                    var capturingElement = RuntimePanel.s_EventDispatcher.pointerState.GetCapturingElement(pointerId) as VisualElement;
+                    var capturingElement =
+                        RuntimePanel.s_EventDispatcher.pointerState.GetCapturingElement(pointerId) as VisualElement;
                     if (capturingElement != null && capturingElement.panel != panel)
                         return false;
 

@@ -19,14 +19,27 @@ namespace UnityEngine.UI
 
         [SerializeField] private AspectMode m_AspectMode = AspectMode.None;
 
-        public AspectMode aspectMode { get { return m_AspectMode; } set { if (SetPropertyUtility.SetStruct(ref m_AspectMode, value)) SetDirty(); } }
+        public AspectMode aspectMode
+        {
+            get { return m_AspectMode; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_AspectMode, value)) SetDirty();
+            }
+        }
 
         [SerializeField] private float m_AspectRatio = 1;
 
-        public float aspectRatio { get { return m_AspectRatio; } set { if (SetPropertyUtility.SetStruct(ref m_AspectRatio, value)) SetDirty(); } }
+        public float aspectRatio
+        {
+            get { return m_AspectRatio; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_AspectRatio, value)) SetDirty();
+            }
+        }
 
-        [System.NonSerialized]
-        private RectTransform m_Rect;
+        [System.NonSerialized] private RectTransform m_Rect;
 
         // This "delayed" mechanism is required for case 1014834.
         private bool m_DelayedSetDirty = false;
@@ -45,11 +58,13 @@ namespace UnityEngine.UI
         }
 
         // field is never assigned warning
-        #pragma warning disable 649
+#pragma warning disable 649
         private DrivenRectTransformTracker m_Tracker;
-        #pragma warning restore 649
+#pragma warning restore 649
 
-        protected AspectRatioFitter() {}
+        protected AspectRatioFitter()
+        {
+        }
 
         protected override void OnEnable()
         {
@@ -108,7 +123,8 @@ namespace UnityEngine.UI
                 case AspectMode.None:
                 {
                     if (!Application.isPlaying)
-                        m_AspectRatio = Mathf.Clamp(rectTransform.rect.width / rectTransform.rect.height, 0.001f, 1000f);
+                        m_AspectRatio = Mathf.Clamp(rectTransform.rect.width / rectTransform.rect.height, 0.001f,
+                            1000f);
 
                     break;
                 }
@@ -116,13 +132,15 @@ namespace UnityEngine.UI
                 case AspectMode.HeightControlsWidth:
                 {
                     m_Tracker.Add(this, rectTransform, DrivenTransformProperties.SizeDeltaX);
-                    rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, rectTransform.rect.height * m_AspectRatio);
+                    rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,
+                        rectTransform.rect.height * m_AspectRatio);
                     break;
                 }
                 case AspectMode.WidthControlsHeight:
                 {
                     m_Tracker.Add(this, rectTransform, DrivenTransformProperties.SizeDeltaY);
-                    rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, rectTransform.rect.width / m_AspectRatio);
+                    rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical,
+                        rectTransform.rect.width / m_AspectRatio);
                     break;
                 }
                 case AspectMode.FitInParent:
@@ -151,6 +169,7 @@ namespace UnityEngine.UI
                     {
                         sizeDelta.x = GetSizeDeltaToProduceSize(parentSize.y * aspectRatio, 0);
                     }
+
                     rectTransform.sizeDelta = sizeDelta;
 
                     break;
@@ -169,9 +188,13 @@ namespace UnityEngine.UI
             return !parent ? Vector2.zero : parent.rect.size;
         }
 
-        public virtual void SetLayoutHorizontal() {}
+        public virtual void SetLayoutHorizontal()
+        {
+        }
 
-        public virtual void SetLayoutVertical() {}
+        public virtual void SetLayoutVertical()
+        {
+        }
 
         protected void SetDirty()
         {
@@ -185,12 +208,14 @@ namespace UnityEngine.UI
             {
                 return false;
             }
+
             return true;
         }
 
         public bool IsAspectModeValid()
         {
-            if (!DoesParentExists() && (aspectMode == AspectMode.EnvelopeParent || aspectMode == AspectMode.FitInParent))
+            if (!DoesParentExists() &&
+                (aspectMode == AspectMode.EnvelopeParent || aspectMode == AspectMode.FitInParent))
                 return false;
 
             return true;
@@ -201,13 +226,13 @@ namespace UnityEngine.UI
             return m_DoesParentExist;
         }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         protected override void OnValidate()
         {
             m_AspectRatio = Mathf.Clamp(m_AspectRatio, 0.001f, 1000f);
             m_DelayedSetDirty = true;
         }
 
-    #endif
+#endif
     }
 }

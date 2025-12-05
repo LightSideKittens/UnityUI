@@ -8,11 +8,17 @@ using UnityEngine.Rendering;
 
 namespace TMPro
 {
-    public enum VertexSortingOrder { Normal, Reverse };
+    public enum VertexSortingOrder
+    {
+        Normal,
+        Reverse
+    };
 
     public struct TMP_MeshInfo
     {
-        private static readonly Color32 s_DefaultColor = new(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
+        private static readonly Color32
+            s_DefaultColor = new(byte.MaxValue, byte.MaxValue, byte.MaxValue, byte.MaxValue);
+
         private static readonly Vector3 s_DefaultNormal = new(0.0f, 0.0f, -1f);
         private static readonly Vector4 s_DefaultTangent = new(-1f, 0.0f, 0.0f, 1f);
         private static readonly Bounds s_DefaultBounds = new();
@@ -34,8 +40,6 @@ namespace TMPro
         public Material material;
 
 
-        /// <param name="mesh"></param>
-        /// <param name="size"></param>
         public TMP_MeshInfo(Mesh mesh, int size)
         {
             if (mesh == null)
@@ -96,9 +100,6 @@ namespace TMPro
         }
 
 
-        /// <param name="mesh"></param>
-        /// <param name="size"></param>
-        /// <param name="isVolumetric"></param>
         public TMP_MeshInfo(Mesh mesh, int size, bool isVolumetric)
         {
             if (mesh == null)
@@ -200,8 +201,6 @@ namespace TMPro
         }
 
 
-        /// <param name="meshData"></param>
-        /// <param name="size"></param>
         public void ResizeMeshInfo(int size)
         {
             size = Mathf.Min(size, 16383);
@@ -263,8 +262,6 @@ namespace TMPro
         }
 
 
-        /// <param name="size"></param>
-        /// <param name="isVolumetric"></param>
         public void ResizeMeshInfo(int size, bool isVolumetric)
         {
             int s0 = !isVolumetric ? 4 : 8;
@@ -416,7 +413,6 @@ namespace TMPro
         }
 
 
-        /// <param name="startIndex"></param>
         public void ClearUnusedVertices(int startIndex)
         {
             int length = vertices.Length - startIndex;
@@ -426,7 +422,6 @@ namespace TMPro
         }
 
 
-        /// <param name="startIndex"></param>
         public void ClearUnusedVertices(int startIndex, bool updateMesh)
         {
             int length = vertices.Length - startIndex;
@@ -439,7 +434,7 @@ namespace TMPro
         }
 
 
-        public void SortGeometry (VertexSortingOrder order)
+        public void SortGeometry(VertexSortingOrder order)
         {
             switch (order)
             {
@@ -454,14 +449,13 @@ namespace TMPro
 
                         if (src < dst)
                             SwapVertexData(src, dst);
-
                     }
+
                     break;
             }
         }
 
 
-        /// <param name="sortingOrder"></param>
         public void SortGeometry(IList<int> sortingOrder)
         {
             int indexCount = sortingOrder.Count;
@@ -485,8 +479,6 @@ namespace TMPro
         }
 
 
-        /// <param name="src">Index of the first vertex attribute of the source character / quad.</param>
-        /// <param name="dst">Index of the first vertex attribute of the destination character / quad.</param>
         public void SwapVertexData(int src, int dst)
         {
             int src_Index = src;

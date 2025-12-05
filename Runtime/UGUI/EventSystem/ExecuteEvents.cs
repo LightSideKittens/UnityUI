@@ -8,7 +8,7 @@ namespace UnityEngine.EventSystems
     {
         object UIControl { get; }
     }
-    
+
     public static class ExecuteEvents
     {
         public delegate void EventFunction<T1>(T1 handler, BaseEventData eventData);
@@ -16,7 +16,8 @@ namespace UnityEngine.EventSystems
         public static T ValidateEventData<T>(BaseEventData data) where T : class
         {
             if ((data as T) == null)
-                throw new ArgumentException(String.Format("Invalid type: {0} passed to event expecting {1}", data.GetType(), typeof(T)));
+                throw new ArgumentException(String.Format("Invalid type: {0} passed to event expecting {1}",
+                    data.GetType(), typeof(T)));
             return data as T;
         }
 
@@ -62,7 +63,8 @@ namespace UnityEngine.EventSystems
             handler.OnPointerClick(ValidateEventData<PointerEventData>(eventData));
         }
 
-        private static readonly EventFunction<IInitializePotentialDragHandler> s_InitializePotentialDragHandler = Execute;
+        private static readonly EventFunction<IInitializePotentialDragHandler> s_InitializePotentialDragHandler =
+            Execute;
 
         private static void Execute(IInitializePotentialDragHandler handler, BaseEventData eventData)
         {
@@ -250,7 +252,8 @@ namespace UnityEngine.EventSystems
             }
         }
 
-        public static bool Execute<T>(GameObject target, BaseEventData eventData, EventFunction<T> functor) where T : IEventSystemHandler
+        public static bool Execute<T>(GameObject target, BaseEventData eventData, EventFunction<T> functor)
+            where T : IEventSystemHandler
         {
             var internalHandlers = ListPool<IEventSystemHandler>.Get();
             GetEventList<T>(target, internalHandlers);
@@ -268,7 +271,8 @@ namespace UnityEngine.EventSystems
                 catch (Exception e)
                 {
                     var temp = internalHandlers[i];
-                    Debug.LogException(new Exception(string.Format("Type {0} expected {1} received.", typeof(T).Name, temp.GetType().Name), e));
+                    Debug.LogException(new Exception(
+                        string.Format("Type {0} expected {1} received.", typeof(T).Name, temp.GetType().Name), e));
                     continue;
                 }
 
@@ -289,7 +293,8 @@ namespace UnityEngine.EventSystems
 
         private static readonly List<Transform> s_InternalTransformList = new List<Transform>(30);
 
-        public static GameObject ExecuteHierarchy<T>(GameObject root, BaseEventData eventData, EventFunction<T> callbackFunction) where T : IEventSystemHandler
+        public static GameObject ExecuteHierarchy<T>(GameObject root, BaseEventData eventData,
+            EventFunction<T> callbackFunction) where T : IEventSystemHandler
         {
             GetEventChain(root, s_InternalTransformList);
 
@@ -300,10 +305,12 @@ namespace UnityEngine.EventSystems
                 if (Execute(transform.gameObject, eventData, callbackFunction))
                     return transform.gameObject;
             }
+
             return null;
         }
 
-        private static void GetEventList<T>(GameObject go, IList<IEventSystemHandler> results) where T : IEventSystemHandler
+        private static void GetEventList<T>(GameObject go, IList<IEventSystemHandler> results)
+            where T : IEventSystemHandler
         {
             // Debug.LogWarning("GetEventList<" + typeof(T).Name + ">");
             if (results == null)
@@ -317,21 +324,23 @@ namespace UnityEngine.EventSystems
             for (var i = 0; i < components.Count; i++)
             {
                 if (components[i] is T)
-                { 
+                {
                     results.Add(components[i]);
                 }
             }
+
             ListPool<IEventSystemHandler>.Release(components);
-            
+
             var components1 = ListPool<IUIControlElement>.Get();
             go.GetComponents(components1);
             for (var i = 0; i < components1.Count; i++)
             {
                 if (components1[i].UIControl is T handler)
-                { 
+                {
                     results.Add(handler);
                 }
             }
+
             ListPool<IUIControlElement>.Release(components1);
         }
 
@@ -356,6 +365,7 @@ namespace UnityEngine.EventSystems
                     return t.gameObject;
                 t = t.parent;
             }
+
             return null;
         }
     }

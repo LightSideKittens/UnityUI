@@ -16,10 +16,7 @@ namespace UnityEngine.EventSystems
 
         protected Dictionary<int, PointerEventData> m_PointerData = new Dictionary<int, PointerEventData>();
 
-        /// <param name="id">Touch ID</param>
-        /// <param name="data">Found data</param>
-        /// <param name="create">If not found should it be created</param>
-        /// <returns>True if pointer is found.</returns>
+
         protected bool GetPointerData(int id, out PointerEventData data, bool create)
         {
             if (!m_PointerData.TryGetValue(id, out data) && create)
@@ -31,6 +28,7 @@ namespace UnityEngine.EventSystems
                 m_PointerData.Add(id, data);
                 return true;
             }
+
             return false;
         }
 
@@ -39,10 +37,7 @@ namespace UnityEngine.EventSystems
             m_PointerData.Remove(data.pointerId);
         }
 
-        /// <param name="input">Touch being processed</param>
-        /// <param name="pressed">Are we pressed this frame</param>
-        /// <param name="released">Are we released this frame</param>
-        /// <returns></returns>
+
         protected PointerEventData GetTouchPointerEventData(Touch input, out bool pressed, out bool released)
         {
             PointerEventData pointerData;
@@ -104,7 +99,7 @@ namespace UnityEngine.EventSystems
             @to.radiusVariance = @from.radiusVariance;
         }
 
-        /// <param name="buttonId">Mouse button ID</param>
+
         protected PointerEventData.FramePressState StateForMouseButton(int buttonId)
         {
             var pressed = input.GetMouseButtonDown(buttonId);
@@ -149,6 +144,7 @@ namespace UnityEngine.EventSystems
                     if (m_TrackedButtons[i].eventData.PressedThisFrame())
                         return true;
                 }
+
                 return false;
             }
 
@@ -160,6 +156,7 @@ namespace UnityEngine.EventSystems
                     if (m_TrackedButtons[i].eventData.ReleasedThisFrame())
                         return true;
                 }
+
                 return false;
             }
 
@@ -181,10 +178,12 @@ namespace UnityEngine.EventSystems
                     tracked = new ButtonState { button = button, eventData = new MouseButtonEventData() };
                     m_TrackedButtons.Add(tracked);
                 }
+
                 return tracked;
             }
 
-            public void SetButtonState(PointerEventData.InputButton button, PointerEventData.FramePressState stateForMouseButton, PointerEventData data)
+            public void SetButtonState(PointerEventData.InputButton button,
+                PointerEventData.FramePressState stateForMouseButton, PointerEventData data)
             {
                 var toModify = GetButtonState(button);
                 toModify.eventData.buttonState = stateForMouseButton;
@@ -200,12 +199,14 @@ namespace UnityEngine.EventSystems
 
             public bool PressedThisFrame()
             {
-                return buttonState == PointerEventData.FramePressState.Pressed || buttonState == PointerEventData.FramePressState.PressedAndReleased;
+                return buttonState == PointerEventData.FramePressState.Pressed ||
+                       buttonState == PointerEventData.FramePressState.PressedAndReleased;
             }
 
             public bool ReleasedThisFrame()
             {
-                return buttonState == PointerEventData.FramePressState.Released || buttonState == PointerEventData.FramePressState.PressedAndReleased;
+                return buttonState == PointerEventData.FramePressState.Released ||
+                       buttonState == PointerEventData.FramePressState.PressedAndReleased;
             }
         }
 
@@ -239,6 +240,7 @@ namespace UnityEngine.EventSystems
                 leftData.delta = pos - leftData.position;
                 leftData.position = pos;
             }
+
             leftData.scrollDelta = input.mouseScrollDelta;
             leftData.button = PointerEventData.InputButton.Left;
             eventSystem.RaycastAll(leftData, m_RaycastResultCache);
@@ -275,7 +277,8 @@ namespace UnityEngine.EventSystems
             return data;
         }
 
-        private static bool ShouldStartDrag(Vector2 pressPos, Vector2 currentPos, float threshold, bool useDragThreshold)
+        private static bool ShouldStartDrag(Vector2 pressPos, Vector2 currentPos, float threshold,
+            bool useDragThreshold)
         {
             if (!useDragThreshold)
                 return true;
@@ -285,7 +288,9 @@ namespace UnityEngine.EventSystems
 
         protected virtual void ProcessMove(PointerEventData pointerEvent)
         {
-            var targetGO = (Cursor.lockState == CursorLockMode.Locked ? null : pointerEvent.pointerCurrentRaycast.gameObject);
+            var targetGO = (Cursor.lockState == CursorLockMode.Locked
+                ? null
+                : pointerEvent.pointerCurrentRaycast.gameObject);
             HandlePointerExitAndEnter(pointerEvent, targetGO);
         }
 
@@ -297,7 +302,8 @@ namespace UnityEngine.EventSystems
                 return;
 
             if (!pointerEvent.dragging
-                && ShouldStartDrag(pointerEvent.pressPosition, pointerEvent.position, eventSystem.pixelDragThreshold, pointerEvent.useDragThreshold))
+                && ShouldStartDrag(pointerEvent.pressPosition, pointerEvent.position, eventSystem.pixelDragThreshold,
+                    pointerEvent.useDragThreshold))
             {
                 ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.beginDragHandler);
                 pointerEvent.dragging = true;
@@ -316,6 +322,7 @@ namespace UnityEngine.EventSystems
                     pointerEvent.pointerPress = null;
                     pointerEvent.rawPointerPress = null;
                 }
+
                 ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.dragHandler);
             }
         }
@@ -353,11 +360,11 @@ namespace UnityEngine.EventSystems
                 sb.AppendLine("<B>Pointer:</b> " + pointer.Key);
                 sb.AppendLine(pointer.Value.ToString());
             }
+
             return sb.ToString();
         }
 
-        /// <param name="currentOverGo">The GameObject the pointer is currently over.</param>
-        /// <param name="pointerEvent">Current event data.</param>
+
         protected void DeselectIfSelectionChanged(GameObject currentOverGo, BaseEventData pointerEvent)
         {
             // Selection tracking

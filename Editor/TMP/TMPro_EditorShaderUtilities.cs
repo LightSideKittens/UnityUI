@@ -6,12 +6,8 @@ using System.Collections;
 
 namespace TMPro.EditorUtilities
 {
-
-    public static class EditorShaderUtilities 
+    public static class EditorShaderUtilities
     {
-
-        /// <param name="source"></param>
-        /// <returns></returns>
         public static void CopyMaterialProperties(Material source, Material destination)
         {
             MaterialProperty[] source_prop = MaterialEditor.GetMaterialProperties(new Material[] { source });
@@ -24,7 +20,7 @@ namespace TMPro.EditorUtilities
                     switch (source.shader.GetPropertyType(i))
                     {
                         case UnityEngine.Rendering.ShaderPropertyType.Color:
-                            destination.SetColor(property_ID, source.GetColor(property_ID));                          
+                            destination.SetColor(property_ID, source.GetColor(property_ID));
                             break;
                         case UnityEngine.Rendering.ShaderPropertyType.Float:
                             destination.SetFloat(property_ID, source.GetFloat(property_ID));
@@ -41,9 +37,6 @@ namespace TMPro.EditorUtilities
                     }
                 }
             }
-
         }
-      
     }
-
 }

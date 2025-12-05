@@ -35,9 +35,9 @@ public static class ArabicShaper
         public FormEntry(int isolated, int final, int initial, int medial)
         {
             this.isolated = isolated;
-            this.final    = final;
-            this.initial  = initial;
-            this.medial   = medial;
+            this.final = final;
+            this.initial = initial;
+            this.medial = medial;
         }
 
         public int GetCodepoint(ArabicForm form)
@@ -59,8 +59,8 @@ public static class ArabicShaper
     }
 
     private const int ZWNJ = 0x200C;
-    private const int ZWJ  = 0x200D;
-    
+    private const int ZWJ = 0x200D;
+
     private static readonly object initLock = new();
     private static bool initialized;
 
@@ -76,7 +76,7 @@ public static class ArabicShaper
                 return;
 
             joiningTypes = ParseDerivedJoiningTypes(Resources.Load<TextAsset>("DerivedJoiningType").text);
-            formEntries  = ParseArabicContextForms(Resources.Load<TextAsset>("ArabicContextForms").text);
+            formEntries = ParseArabicContextForms(Resources.Load<TextAsset>("ArabicContextForms").text);
 
             initialized = true;
         }
@@ -371,7 +371,7 @@ public static class ArabicShaper
         for (int logicalIndex = 0; logicalIndex < shapedLength; logicalIndex++)
         {
             int originalIndex = shapeIndexMap[logicalIndex];
-            int visualIndex   = logicalToVisualMap[logicalIndex];
+            int visualIndex = logicalToVisualMap[logicalIndex];
 
             if (visualIndex < 0 || visualIndex >= shapedLength)
                 continue;
@@ -388,7 +388,7 @@ public static class ArabicShaper
             }
         }
     }
-    
+
 
     private static bool TryGetLamAlefLigature(bool joinPrevLam, int alefCp, out int ligatureCp)
     {
@@ -496,7 +496,7 @@ public static class ArabicShaper
                     continue;
 
                 string rangePart = parts[0].Trim();
-                string typePart  = parts[1].Trim();
+                string typePart = parts[1].Trim();
 
                 if (string.IsNullOrEmpty(rangePart) || string.IsNullOrEmpty(typePart))
                     continue;
@@ -519,7 +519,7 @@ public static class ArabicShaper
                 if (dotDot >= 0)
                 {
                     string startHex = rangePart.Substring(0, dotDot);
-                    string endHex   = rangePart.Substring(dotDot + 2);
+                    string endHex = rangePart.Substring(dotDot + 2);
 
                     if (!int.TryParse(startHex, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out start))
                         continue;
@@ -591,7 +591,7 @@ public static class ArabicShaper
             CultureInfo.InvariantCulture,
             out value);
     }
-    
+
     private static bool IsTransparentForJoining(JoiningType jt)
     {
         return jt == JoiningType.T;

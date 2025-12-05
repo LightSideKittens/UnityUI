@@ -1,9 +1,7 @@
 namespace UnityEngine.UI
 {
-
     internal static class Misc
     {
-
         static public void Destroy(UnityEngine.Object obj)
         {
             if (obj != null)

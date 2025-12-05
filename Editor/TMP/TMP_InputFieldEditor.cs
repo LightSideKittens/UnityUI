@@ -138,13 +138,16 @@ namespace TMPro.EditorUtilities
 
             #region INPUT FIELD SETTINGS
 
-            m_foldout.fontSettings = EditorGUILayout.Foldout(m_foldout.fontSettings, "Input Field Settings", true, TMP_UIStyleManager.boldFoldout);
+            m_foldout.fontSettings = EditorGUILayout.Foldout(m_foldout.fontSettings, "Input Field Settings", true,
+                TMP_UIStyleManager.boldFoldout);
 
             if (m_foldout.fontSettings)
             {
                 EditorGUI.indentLevel++;
                 EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(m_GlobalFontAsset, new GUIContent("Font Asset", "Set the Font Asset for both Placeholder and Input Field text object."));
+                EditorGUILayout.PropertyField(m_GlobalFontAsset,
+                    new GUIContent("Font Asset",
+                        "Set the Font Asset for both Placeholder and Input Field text object."));
                 if (EditorGUI.EndChangeCheck())
                 {
                     TMP_InputField inputField = target as TMP_InputField;
@@ -153,7 +156,9 @@ namespace TMPro.EditorUtilities
 
 
                 EditorGUI.BeginChangeCheck();
-                EditorGUILayout.PropertyField(m_GlobalPointSize, new GUIContent("Point Size", "Set the point size of both Placeholder and Input Field text object."));
+                EditorGUILayout.PropertyField(m_GlobalPointSize,
+                    new GUIContent("Point Size",
+                        "Set the point size of both Placeholder and Input Field text object."));
                 if (EditorGUI.EndChangeCheck())
                 {
                     TMP_InputField inputField = target as TMP_InputField;
@@ -204,7 +209,8 @@ namespace TMPro.EditorUtilities
                         {
                             EditorGUILayout.PropertyField(m_RegexValue);
                         }
-                        else if (m_CharacterValidation.enumValueIndex == (int)TMP_InputField.CharacterValidation.CustomValidator)
+                        else if (m_CharacterValidation.enumValueIndex ==
+                                 (int)TMP_InputField.CharacterValidation.CustomValidator)
                         {
                             EditorGUILayout.PropertyField(m_InputValidator);
                         }
@@ -232,37 +238,54 @@ namespace TMPro.EditorUtilities
                 {
                     EditorGUILayout.PropertyField(m_CaretColor);
                 }
+
                 EditorGUILayout.EndFadeGroup();
 
                 EditorGUILayout.PropertyField(m_SelectionColor);
 
                 EditorGUI.indentLevel--;
             }
+
             #endregion
 
 
             #region CONTROL SETTINGS
-            m_foldout.extraSettings = EditorGUILayout.Foldout(m_foldout.extraSettings, "Control Settings", true, TMP_UIStyleManager.boldFoldout);
+
+            m_foldout.extraSettings = EditorGUILayout.Foldout(m_foldout.extraSettings, "Control Settings", true,
+                TMP_UIStyleManager.boldFoldout);
 
             if (m_foldout.extraSettings)
             {
                 EditorGUI.indentLevel++;
 
-                EditorGUILayout.PropertyField(m_OnFocusSelectAll, new GUIContent("OnFocus - Select All", "Should all the text be selected when the Input Field is selected?"));
-                EditorGUILayout.PropertyField(m_ResetOnDeActivation, new GUIContent("Reset On Deactivation", "Should the Text and Caret position be reset when Input Field loses focus and is Deactivated?"));
+                EditorGUILayout.PropertyField(m_OnFocusSelectAll,
+                    new GUIContent("OnFocus - Select All",
+                        "Should all the text be selected when the Input Field is selected?"));
+                EditorGUILayout.PropertyField(m_ResetOnDeActivation,
+                    new GUIContent("Reset On Deactivation",
+                        "Should the Text and Caret position be reset when Input Field loses focus and is Deactivated?"));
 
                 EditorGUI.indentLevel++;
                 GUI.enabled = !m_ResetOnDeActivation.boolValue;
-                EditorGUILayout.PropertyField(m_KeepTextSelectionVisible, new GUIContent("Keep Text Selection Visible", "Should the text selection remain visible when the input field loses focus and is deactivated?"));
+                EditorGUILayout.PropertyField(m_KeepTextSelectionVisible,
+                    new GUIContent("Keep Text Selection Visible",
+                        "Should the text selection remain visible when the input field loses focus and is deactivated?"));
                 GUI.enabled = true;
                 EditorGUI.indentLevel--;
 
-                EditorGUILayout.PropertyField(m_RestoreOriginalTextOnEscape, new GUIContent("Restore On ESC Key", "Should the original text be restored when pressing ESC? (Property not applicable for HoloLens)"));
-                EditorGUILayout.PropertyField(m_ShouldActivateOnSelect, new GUIContent("Should Activate On Select", "Determines if the Input Field will be activated when selected."));
-                EditorGUILayout.PropertyField(m_HideMobileKeyboard, new GUIContent("Hide Soft Keyboard", "Controls the visibility of the mobile virtual keyboard."));
+                EditorGUILayout.PropertyField(m_RestoreOriginalTextOnEscape,
+                    new GUIContent("Restore On ESC Key",
+                        "Should the original text be restored when pressing ESC? (Property not applicable for HoloLens)"));
+                EditorGUILayout.PropertyField(m_ShouldActivateOnSelect,
+                    new GUIContent("Should Activate On Select",
+                        "Determines if the Input Field will be activated when selected."));
+                EditorGUILayout.PropertyField(m_HideMobileKeyboard,
+                    new GUIContent("Hide Soft Keyboard", "Controls the visibility of the mobile virtual keyboard."));
 
                 EditorGUI.BeginDisabledGroup(m_HideMobileKeyboard.boolValue);
-                EditorGUILayout.PropertyField(m_HideMobileInput, new GUIContent("Hide Mobile Input", "Controls the visibility of the editable text field above the mobile virtual keyboard."));
+                EditorGUILayout.PropertyField(m_HideMobileInput,
+                    new GUIContent("Hide Mobile Input",
+                        "Controls the visibility of the editable text field above the mobile virtual keyboard."));
                 EditorGUI.EndDisabledGroup();
 
                 EditorGUILayout.PropertyField(m_ReadOnly);
@@ -271,6 +294,7 @@ namespace TMPro.EditorUtilities
 
                 EditorGUI.indentLevel--;
             }
+
             #endregion
 
 

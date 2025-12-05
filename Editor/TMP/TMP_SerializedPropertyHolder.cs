@@ -10,6 +10,7 @@ namespace TMPro
         public uint firstCharacter;
         public uint secondCharacter;
 
-        public GlyphPairAdjustmentRecord glyphPairAdjustmentRecord = new(new GlyphAdjustmentRecord(), new GlyphAdjustmentRecord());
+        public GlyphPairAdjustmentRecord glyphPairAdjustmentRecord =
+            new(new GlyphAdjustmentRecord(), new GlyphAdjustmentRecord());
     }
 }

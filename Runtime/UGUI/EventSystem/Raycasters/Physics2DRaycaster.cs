@@ -18,7 +18,8 @@ namespace UnityEngine.EventSystems
 #endif
 
         protected Physics2DRaycaster()
-        {}
+        {
+        }
 
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
@@ -35,7 +36,8 @@ namespace UnityEngine.EventSystems
             {
                 if (ReflectionMethodsCache.Singleton.getRayIntersectionAll == null)
                     return;
-                m_Hits = ReflectionMethodsCache.Singleton.getRayIntersectionAll(ray, distanceToClipPlane, finalEventMask);
+                m_Hits = ReflectionMethodsCache.Singleton.getRayIntersectionAll(ray, distanceToClipPlane,
+                    finalEventMask);
                 hitCount = m_Hits.Length;
             }
             else
@@ -49,7 +51,8 @@ namespace UnityEngine.EventSystems
                     m_LastMaxRayIntersections = m_MaxRayIntersections;
                 }
 
-                hitCount = ReflectionMethodsCache.Singleton.getRayIntersectionAllNonAlloc(ray, m_Hits, distanceToClipPlane, finalEventMask);
+                hitCount = ReflectionMethodsCache.Singleton.getRayIntersectionAllNonAlloc(ray, m_Hits,
+                    distanceToClipPlane, finalEventMask);
             }
 
             if (hitCount != 0)

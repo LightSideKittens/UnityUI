@@ -26,14 +26,14 @@ namespace UnityEditor.Events
             {
                 Color fontColor = new Color(0.7f, 0.7f, 0.7f);
                 labelStyle.padding.right += 20;
-                labelStyle.normal.textColor    = fontColor;
-                labelStyle.active.textColor    = fontColor;
-                labelStyle.focused.textColor   = fontColor;
-                labelStyle.hover.textColor     = fontColor;
-                labelStyle.onNormal.textColor  = fontColor;
-                labelStyle.onActive.textColor  = fontColor;
+                labelStyle.normal.textColor = fontColor;
+                labelStyle.active.textColor = fontColor;
+                labelStyle.focused.textColor = fontColor;
+                labelStyle.hover.textColor = fontColor;
+                labelStyle.onNormal.textColor = fontColor;
+                labelStyle.onActive.textColor = fontColor;
                 labelStyle.onFocused.textColor = fontColor;
-                labelStyle.onHover.textColor   = fontColor;
+                labelStyle.onHover.textColor = fontColor;
 
                 componentName.normal.textColor = fontColor;
                 componentName.active.textColor = fontColor;
@@ -66,6 +66,7 @@ namespace UnityEditor.Events
                 if (interceptedEvents.Any())
                     m_InterceptsAnyEvent = true;
             }
+
             Profiler.EndSample();
         }
 
@@ -75,6 +76,7 @@ namespace UnityEditor.Events
             {
                 m_Title = EditorGUIUtility.TrTextContent("Intercepted Events");
             }
+
             return m_Title;
         }
 
@@ -110,6 +112,7 @@ namespace UnityEditor.Events
                     {
                         maxEventLabelSize.x = labelSize.x;
                     }
+
                     if (maxEventLabelSize.y < labelSize.y)
                     {
                         maxEventLabelSize.y = labelSize.y;
@@ -159,18 +162,23 @@ namespace UnityEditor.Events
                     labelRect.x = initialX;
                 }
             }
+
             Profiler.EndSample();
         }
 
         //Lookup cache to avoid recalculating which types uses which events:
         //Caches all interfaces that inherit from IEventSystemHandler
         static List<Type> s_EventSystemInterfaces = null;
+
         //Caches all GUIContents in a single list to avoid creating too much GUIContent and strings.
         private static List<GUIContent> s_PossibleEvents = null;
+
         //Caches all events used by each interface
         static Dictionary<Type, List<int>> s_InterfaceEventSystemEvents = null;
+
         //Caches each concrete type and it's events
-        static readonly Dictionary<Type, ComponentInterceptedEvents> s_ComponentEvents2 = new Dictionary<Type, ComponentInterceptedEvents>();
+        static readonly Dictionary<Type, ComponentInterceptedEvents> s_ComponentEvents2 =
+            new Dictionary<Type, ComponentInterceptedEvents>();
 
 
         protected static List<ComponentInterceptedEvents> GetEventsInfo(GameObject gameObject)
@@ -214,8 +222,10 @@ namespace UnityEditor.Events
                     {
                         componentEvent = new ComponentInterceptedEvents();
                         componentEvent.componentName = new GUIContent(type.Name);
-                        componentEvent.interceptedEvents = events.OrderBy(index => s_PossibleEvents[index].text).ToArray();
+                        componentEvent.interceptedEvents =
+                            events.OrderBy(index => s_PossibleEvents[index].text).ToArray();
                     }
+
                     s_ComponentEvents2.Add(type, componentEvent);
 
                     Profiler.EndSample();
@@ -253,13 +263,15 @@ namespace UnityEditor.Events
                 s_EventSystemInterfaces.Add(type);
                 List<int> eventIndexList = new List<int>();
 
-                MethodInfo[] methodInfos = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                MethodInfo[] methodInfos =
+                    type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 for (int mi = 0; mi < methodInfos.Length; mi++)
                 {
                     MethodInfo methodInfo = methodInfos[mi];
                     eventIndexList.Add(s_PossibleEvents.Count);
                     s_PossibleEvents.Add(new GUIContent(methodInfo.Name));
                 }
+
                 s_InterfaceEventSystemEvents.Add(type, eventIndexList);
             }
         }

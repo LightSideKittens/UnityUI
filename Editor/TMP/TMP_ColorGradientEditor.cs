@@ -22,7 +22,7 @@ namespace TMPro.EditorUtilities
             m_BottomLeftColor = serializedObject.FindProperty("bottomLeft");
             m_BottomRightColor = serializedObject.FindProperty("bottomRight");
         }
-        
+
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
@@ -48,12 +48,14 @@ namespace TMPro.EditorUtilities
                         break;
                 }
             }
+
             Rect rect;
             switch ((ColorMode)m_ColorMode.enumValueIndex)
             {
                 case ColorMode.Single:
                     EditorGUI.BeginChangeCheck();
-                    rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
+                    rect = EditorGUILayout.GetControlRect(true,
+                        EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
                     EditorGUI.PrefixLabel(rect, new GUIContent("Colors"));
                     rect.x += EditorGUIUtility.labelWidth;
                     rect.width = (rect.width - EditorGUIUtility.labelWidth) / (EditorGUIUtility.wideMode ? 1f : 2f);
@@ -64,10 +66,12 @@ namespace TMPro.EditorUtilities
                         m_BottomLeftColor.colorValue = m_TopLeftColor.colorValue;
                         m_BottomRightColor.colorValue = m_TopLeftColor.colorValue;
                     }
+
                     break;
 
                 case ColorMode.HorizontalGradient:
-                    rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
+                    rect = EditorGUILayout.GetControlRect(true,
+                        EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
                     EditorGUI.PrefixLabel(rect, new GUIContent("Colors"));
                     rect.x += EditorGUIUtility.labelWidth;
                     rect.width = (rect.width - EditorGUIUtility.labelWidth) / 2f;
@@ -87,10 +91,12 @@ namespace TMPro.EditorUtilities
                     {
                         m_BottomRightColor.colorValue = m_TopRightColor.colorValue;
                     }
+
                     break;
 
                 case ColorMode.VerticalGradient:
-                    rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
+                    rect = EditorGUILayout.GetControlRect(false,
+                        EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
                     EditorGUI.PrefixLabel(rect, new GUIContent("Colors"));
                     rect.x += EditorGUIUtility.labelWidth;
                     rect.width = (rect.width - EditorGUIUtility.labelWidth) / (EditorGUIUtility.wideMode ? 1f : 2f);
@@ -103,7 +109,8 @@ namespace TMPro.EditorUtilities
                         m_TopRightColor.colorValue = m_TopLeftColor.colorValue;
                     }
 
-                    rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
+                    rect = EditorGUILayout.GetControlRect(false,
+                        EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
                     rect.x += EditorGUIUtility.labelWidth;
                     rect.width = (rect.width - EditorGUIUtility.labelWidth) / (EditorGUIUtility.wideMode ? 1f : 2f);
                     rect.height = EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2);
@@ -114,20 +121,23 @@ namespace TMPro.EditorUtilities
                     {
                         m_BottomRightColor.colorValue = m_BottomLeftColor.colorValue;
                     }
+
                     break;
 
                 case ColorMode.FourCornersGradient:
-                    rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
+                    rect = EditorGUILayout.GetControlRect(true,
+                        EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
                     EditorGUI.PrefixLabel(rect, new GUIContent("Colors"));
                     rect.x += EditorGUIUtility.labelWidth;
-                    rect.width = (rect.width - EditorGUIUtility.labelWidth)  / 2f;
+                    rect.width = (rect.width - EditorGUIUtility.labelWidth) / 2f;
                     rect.height = EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2);
-                    
+
                     TMP_EditorUtility.DrawColorProperty(rect, m_TopLeftColor);
                     rect.x += rect.width;
                     TMP_EditorUtility.DrawColorProperty(rect, m_TopRightColor);
 
-                    rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
+                    rect = EditorGUILayout.GetControlRect(false,
+                        EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
                     rect.x += EditorGUIUtility.labelWidth;
                     rect.width = (rect.width - EditorGUIUtility.labelWidth) / 2f;
                     rect.height = EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2);
@@ -140,7 +150,6 @@ namespace TMPro.EditorUtilities
 
             if (serializedObject.ApplyModifiedProperties())
                 TMPro_EventManager.ON_COLOR_GRADIENT_PROPERTY_CHANGED(target as TMP_ColorGradient);
-
         }
     }
 }

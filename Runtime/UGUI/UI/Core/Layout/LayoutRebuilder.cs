@@ -7,6 +7,7 @@ namespace UnityEngine.UI
     public class LayoutRebuilder : ICanvasElement
     {
         private RectTransform m_ToRebuild;
+
         //There are a few of reasons we need to cache the Hash fromt he transform:
         //  - This is a ValueType (struct) and .Net calculates Hash from the Value Type fields.
         //  - The key of a Dictionary should have a constant Hash value.
@@ -15,7 +16,8 @@ namespace UnityEngine.UI
         // So this struct gets used as a key to a dictionary, so we need to guarantee a constant Hash value.
         private int m_CachedHashFromTransform;
 
-        static ObjectPool<LayoutRebuilder> s_Rebuilders = new ObjectPool<LayoutRebuilder>(() => new LayoutRebuilder(), null, x => x.Clear());
+        static ObjectPool<LayoutRebuilder> s_Rebuilders =
+            new ObjectPool<LayoutRebuilder>(() => new LayoutRebuilder(), null, x => x.Clear());
 
         private void Initialize(RectTransform controller)
         {
@@ -39,7 +41,10 @@ namespace UnityEngine.UI
             MarkLayoutForRebuild(driven);
         }
 
-        public Transform transform { get { return m_ToRebuild; }}
+        public Transform transform
+        {
+            get { return m_ToRebuild; }
+        }
 
         public bool IsDestroyed()
         {
@@ -51,11 +56,7 @@ namespace UnityEngine.UI
             components.RemoveAll(e => e is Behaviour && !((Behaviour)e).isActiveAndEnabled);
         }
 
-        /// <param name="layoutRoot">The layout element to perform the layout rebuild on.</param>
-        /// <remarks>
-        /// Normal use of the layout system should not use this method. Instead MarkLayoutForRebuild should be used instead, which triggers a delayed layout rebuild during the next layout pass. The delayed rebuild automatically handles objects in the entire layout hierarchy in the correct order, and prevents multiple recalculations for the same layout elements.
-        /// However, for special layout calculation needs, ::ref::ForceRebuildLayoutImmediate can be used to get the layout of a sub-tree resolved immediately. This can even be done from inside layout calculation methods such as ILayoutController.SetLayoutHorizontal orILayoutController.SetLayoutVertical. Usage should be restricted to cases where multiple layout passes are unavaoidable despite the extra cost in performance.
-        /// </remarks>
+
         public static void ForceRebuildLayoutImmediate(RectTransform layoutRoot)
         {
             var rebuilder = s_Rebuilders.Get();
@@ -139,7 +140,7 @@ namespace UnityEngine.UI
             // If there are no controllers on this rect we can skip this entire sub-tree
             // We don't need to consider controllers on children deeper in the sub-tree either,
             // since they will be their own roots.
-            if (components.Count > 0  || rect.TryGetComponent(typeof(ILayoutGroup), out _))
+            if (components.Count > 0 || rect.TryGetComponent(typeof(ILayoutGroup), out _))
             {
                 // Layout calculations needs to executed bottom up with children being done before their parents,
                 // because the parent calculated sizes rely on the sizes of the children.
@@ -154,7 +155,7 @@ namespace UnityEngine.UI
             ListPool<Component>.Release(components);
         }
 
-        /// <param name="rect">Rect to rebuild.</param>
+
         public static void MarkLayoutForRebuild(RectTransform rect)
         {
             if (rect == null || rect.gameObject == null)
@@ -230,15 +231,15 @@ namespace UnityEngine.UI
         }
 
         public void GraphicUpdateComplete()
-        {}
+        {
+        }
 
         public override int GetHashCode()
         {
             return m_CachedHashFromTransform;
         }
 
-        /// <param name="obj">The other object to compare</param>
-        /// <returns>Are they equal</returns>
+
         public override bool Equals(object obj)
         {
             return obj.GetHashCode() == GetHashCode();

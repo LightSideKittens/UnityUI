@@ -9,42 +9,24 @@ namespace UnityEngine.UI
     [ExecuteAlways]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
-    /// <remarks>
-    /// The RectMask2D behaves in a similar way to a standard Mask component. It differs though in some of the restrictions that it has.
-    /// A RectMask2D:
-    /// *Only works in the 2D plane
-    /// *Requires elements on the mask to be coplanar.
-    /// *Does not require stencil buffer / extra draw calls
-    /// *Requires fewer draw calls
-    /// *Culls elements that are outside the mask area.
-    /// </remarks>
     public class RectMask2D : UIBehaviour, IClipper, ICanvasRaycastFilter
     {
-        [NonSerialized]
-        private readonly RectangularVertexClipper m_VertexClipper = new RectangularVertexClipper();
+        [NonSerialized] private readonly RectangularVertexClipper m_VertexClipper = new RectangularVertexClipper();
 
-        [NonSerialized]
-        private RectTransform m_RectTransform;
+        [NonSerialized] private RectTransform m_RectTransform;
 
-        [NonSerialized]
-        private HashSet<MaskableGraphic> m_MaskableTargets = new HashSet<MaskableGraphic>();
+        [NonSerialized] private HashSet<MaskableGraphic> m_MaskableTargets = new HashSet<MaskableGraphic>();
 
-        [NonSerialized]
-        private HashSet<IClippable> m_ClipTargets = new HashSet<IClippable>();
+        [NonSerialized] private HashSet<IClippable> m_ClipTargets = new HashSet<IClippable>();
 
-        [NonSerialized]
-        private bool m_ShouldRecalculateClipRects;
+        [NonSerialized] private bool m_ShouldRecalculateClipRects;
 
-        [NonSerialized]
-        private List<RectMask2D> m_Clippers = new List<RectMask2D>();
+        [NonSerialized] private List<RectMask2D> m_Clippers = new List<RectMask2D>();
 
-        [NonSerialized]
-        private Rect m_LastClipRectCanvasSpace;
-        [NonSerialized]
-        private bool m_ForceClip;
+        [NonSerialized] private Rect m_LastClipRectCanvasSpace;
+        [NonSerialized] private bool m_ForceClip;
 
-        [SerializeField]
-        private Vector4 m_Padding = new Vector4();
+        [SerializeField] private Vector4 m_Padding = new Vector4();
 
         public Vector4 padding
         {
@@ -56,12 +38,11 @@ namespace UnityEngine.UI
             }
         }
 
-        [SerializeField]
-        private Vector2Int m_Softness;
+        [SerializeField] private Vector2Int m_Softness;
 
         public Vector2Int softness
         {
-            get { return m_Softness;  }
+            get { return m_Softness; }
             set
             {
                 m_Softness.x = Mathf.Max(0, value.x);
@@ -70,10 +51,9 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <remarks>
-        /// Returns a non-destroyed instance or a null reference.
-        /// </remarks>
+
         [NonSerialized] private Canvas m_Canvas;
+
         internal Canvas Canvas
         {
             get
@@ -95,10 +75,7 @@ namespace UnityEngine.UI
 
         public Rect canvasRect
         {
-            get
-            {
-                return m_VertexClipper.GetCanvasRect(rectTransform, Canvas);
-            }
+            get { return m_VertexClipper.GetCanvasRect(rectTransform, Canvas); }
         }
 
         public RectTransform rectTransform
@@ -107,7 +84,8 @@ namespace UnityEngine.UI
         }
 
         protected RectMask2D()
-        {}
+        {
+        }
 
         protected override void OnEnable()
         {
@@ -178,7 +156,8 @@ namespace UnityEngine.UI
                         m_Corners[i] = rootCanvas.transform.InverseTransformPoint(m_Corners[i]);
                 }
 
-                return new Rect(m_Corners[0].x, m_Corners[0].y, m_Corners[2].x - m_Corners[0].x, m_Corners[2].y - m_Corners[0].y);
+                return new Rect(m_Corners[0].x, m_Corners[0].y, m_Corners[2].x - m_Corners[0].x,
+                    m_Corners[2].y - m_Corners[0].y);
             }
         }
 
@@ -282,7 +261,7 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <param name="clippable">Add the clippable object for this mask</param>
+
         public void AddClippable(IClippable clippable)
         {
             if (clippable == null)
@@ -298,7 +277,7 @@ namespace UnityEngine.UI
             m_ForceClip = true;
         }
 
-        /// <param name="clippable">Remove the clippable object from this mask</param>
+
         public void RemoveClippable(IClippable clippable)
         {
             if (clippable == null)

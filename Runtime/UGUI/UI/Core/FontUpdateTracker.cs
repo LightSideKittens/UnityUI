@@ -4,14 +4,11 @@ using UnityEngine;
 
 namespace UnityEngine.UI
 {
-    /// <remarks>
-    /// When Unity rebuilds a font atlas a callback is sent to the font. Using this class you can register your text as needing to be rebuilt if the font atlas is updated.
-    /// </remarks>
     public static class FontUpdateTracker
     {
         static Dictionary<Font, HashSet<Text>> m_Tracked = new Dictionary<Font, HashSet<Text>>();
 
-        /// <param name="t">The Text object to track</param>
+
         public static void TrackText(Text t)
         {
             if (t.font == null)
@@ -28,6 +25,7 @@ namespace UnityEngine.UI
                 exists = new HashSet<Text>();
                 m_Tracked.Add(t.font, exists);
             }
+
             exists.Add(t);
         }
 
@@ -43,7 +41,7 @@ namespace UnityEngine.UI
                 text.FontTextureChanged();
         }
 
-        /// <param name="t">The Text object to no longer track</param>
+
         public static void UntrackText(Text t)
         {
             if (t.font == null)

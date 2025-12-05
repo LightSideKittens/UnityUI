@@ -12,26 +12,64 @@ namespace TMPro
         public Vector2 uv2;
         public Color32 color;
 
-        public static TMP_Vertex zero { get { return k_Zero; } }
+        public static TMP_Vertex zero
+        {
+            get { return k_Zero; }
+        }
 
         private static readonly TMP_Vertex k_Zero = new();
     }
 
     public struct TMP_Offset
     {
-        public float left { get { return m_Left; } set { m_Left = value; } }
+        public float left
+        {
+            get { return m_Left; }
+            set { m_Left = value; }
+        }
 
-        public float right { get { return m_Right; } set { m_Right = value; } }
+        public float right
+        {
+            get { return m_Right; }
+            set { m_Right = value; }
+        }
 
-        public float top { get { return m_Top; } set { m_Top = value; } }
+        public float top
+        {
+            get { return m_Top; }
+            set { m_Top = value; }
+        }
 
-        public float bottom { get { return m_Bottom; } set { m_Bottom = value; } }
+        public float bottom
+        {
+            get { return m_Bottom; }
+            set { m_Bottom = value; }
+        }
 
-        public float horizontal { get { return m_Left; } set { m_Left = value; m_Right = value; } }
+        public float horizontal
+        {
+            get { return m_Left; }
+            set
+            {
+                m_Left = value;
+                m_Right = value;
+            }
+        }
 
-        public float vertical { get { return m_Top; } set { m_Top = value; m_Bottom = value; } }
+        public float vertical
+        {
+            get { return m_Top; }
+            set
+            {
+                m_Top = value;
+                m_Bottom = value;
+            }
+        }
 
-        public static TMP_Offset zero { get { return k_ZeroOffset; } }
+        public static TMP_Offset zero
+        {
+            get { return k_ZeroOffset; }
+        }
 
         private float m_Left;
         private float m_Right;
@@ -40,10 +78,7 @@ namespace TMPro
 
         private static readonly TMP_Offset k_ZeroOffset = new(0F, 0F, 0F, 0F);
 
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="top"></param>
-        /// <param name="bottom"></param>
+
         public TMP_Offset(float left, float right, float top, float bottom)
         {
             m_Left = left;
@@ -52,8 +87,7 @@ namespace TMPro
             m_Bottom = bottom;
         }
 
-        /// <param name="horizontal"></param>
-        /// <param name="vertical"></param>
+
         public TMP_Offset(float horizontal, float vertical)
         {
             m_Left = horizontal;
@@ -65,9 +99,9 @@ namespace TMPro
         public static bool operator ==(TMP_Offset lhs, TMP_Offset rhs)
         {
             return lhs.m_Left == rhs.m_Left &&
-                    lhs.m_Right == rhs.m_Right &&
-                    lhs.m_Top == rhs.m_Top &&
-                    lhs.m_Bottom == rhs.m_Bottom;
+                   lhs.m_Right == rhs.m_Right &&
+                   lhs.m_Top == rhs.m_Top &&
+                   lhs.m_Bottom == rhs.m_Bottom;
         }
 
         public static bool operator !=(TMP_Offset lhs, TMP_Offset rhs)
@@ -103,7 +137,7 @@ namespace TMPro
             return !(lhs == rhs);
         }
     }
-    
+
     [DebuggerDisplay("Unicode '{character}'  ({((uint)character).ToString(\"X\")})")]
     public struct TMP_CharacterInfo
     {

@@ -12,7 +12,7 @@ namespace TMPro
         internal static Vector2 k_InfinityVectorPositive = new(32767, 32767);
         internal static Vector2 k_InfinityVectorNegative = new(-32767, -32767);
 
-        public TMPText textComponent;
+        public TMP_Text textComponent;
 
         public int characterCount;
         public int spriteCount;
@@ -51,7 +51,7 @@ namespace TMPro
             meshInfo = new TMP_MeshInfo[1];
         }
 
-        public TMP_TextInfo(TMPText textComponent)
+        public TMP_TextInfo(TMP_Text textComponent)
         {
             this.textComponent = textComponent;
 
@@ -125,7 +125,6 @@ namespace TMPro
         }
 
 
-        /// <param name="materials"></param>
         public void ClearUnusedVertices(MaterialReference[] materials)
         {
             for (int i = 0; i < meshInfo.Length; i++)
@@ -167,7 +166,7 @@ namespace TMPro
             }
         }
 
-        /// <returns>A copy of the MeshInfo[]</returns>
+
         public TMP_MeshInfo[] CopyMeshInfoVertexData()
         {
             if (m_CachedMeshInfo == null || m_CachedMeshInfo.Length != meshInfo.Length)
@@ -208,11 +207,7 @@ namespace TMPro
         }
 
 
-
-        /// <typeparam name="T"></typeparam>
-        /// <param name="array"></param>
-        /// <param name="size"></param>
-        public static void Resize<T> (ref T[] array, int size)
+        public static void Resize<T>(ref T[] array, int size)
         {
             int newSize = size > 1024 ? size + 256 : Mathf.NextPowerOfTwo(size);
 
@@ -220,10 +215,6 @@ namespace TMPro
         }
 
 
-        /// <typeparam name="T"></typeparam>
-        /// <param name="array"></param>
-        /// <param name="size"></param>
-        /// <param name="isFixedSize"></param>
         public static void Resize<T>(ref T[] array, int size, bool isBlockAllocated)
         {
             if (isBlockAllocated) size = size > 1024 ? size + 256 : Mathf.NextPowerOfTwo(size);
@@ -232,6 +223,5 @@ namespace TMPro
 
             Array.Resize(ref array, size);
         }
-
     }
 }

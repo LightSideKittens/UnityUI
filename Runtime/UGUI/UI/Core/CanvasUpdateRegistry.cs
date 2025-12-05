@@ -11,29 +11,35 @@ namespace UnityEngine.UI
         PostLayout = 2,
         PreRender = 3
     }
+
     public interface ICanvasElement
     {
         void Rebuild(CanvasUpdate executing);
         Transform transform { get; }
     }
+
     public class CanvasUpdateRegistry
     {
         private static CanvasUpdateRegistry s_Instance;
 
         private bool m_PerformingLayoutUpdate;
         private bool m_PerformingGraphicUpdate;
-        private string[] m_CanvasUpdateProfilerStrings = new string[] { "CanvasUpdate.Prelayout", "CanvasUpdate.Layout", "CanvasUpdate.PostLayout", "CanvasUpdate.PreRender" };
+
+        private string[] m_CanvasUpdateProfilerStrings = new string[]
+            { "CanvasUpdate.Prelayout", "CanvasUpdate.Layout", "CanvasUpdate.PostLayout", "CanvasUpdate.PreRender" };
+
         private const string m_CullingUpdateProfilerString = "ClipperRegistry.Cull";
 
         private readonly IndexedSet<ICanvasElement> m_LayoutRebuildQueue = new IndexedSet<ICanvasElement>();
         private readonly IndexedSet<ICanvasElement> m_GraphicRebuildQueue = new IndexedSet<ICanvasElement>();
 
         public static event Action Updated;
+
         protected CanvasUpdateRegistry()
         {
             Canvas.willRenderCanvases += PerformUpdate;
         }
-        
+
         public static CanvasUpdateRegistry instance
         {
             get
@@ -45,6 +51,7 @@ namespace UnityEngine.UI
         }
 
         private static readonly Comparison<ICanvasElement> s_SortLayoutFunction = SortLayoutList;
+
         private void PerformUpdate()
         {
             UISystemProfilerApi.BeginSample(UISystemProfilerApi.SampleType.Layout);
@@ -70,6 +77,7 @@ namespace UnityEngine.UI
                         Debug.LogException(e, rebuild.transform);
                     }
                 }
+
                 Profiling.Profiler.EndSample();
             }
 
@@ -83,7 +91,7 @@ namespace UnityEngine.UI
 
             m_PerformingGraphicUpdate = true;
             RemoveDestroyed(m_GraphicRebuildQueue);
-            
+
             Profiling.Profiler.BeginSample(m_CanvasUpdateProfilerStrings[3]);
             for (var k = 0; k < m_GraphicRebuildQueue.Count; k++)
             {
@@ -97,6 +105,7 @@ namespace UnityEngine.UI
                     Debug.LogException(e, m_GraphicRebuildQueue[k].transform);
                 }
             }
+
             Profiling.Profiler.EndSample();
 
             m_GraphicRebuildQueue.Clear();
@@ -104,9 +113,9 @@ namespace UnityEngine.UI
             UISystemProfilerApi.EndSample(UISystemProfilerApi.SampleType.Render);
             Updated?.Invoke();
         }
-        
+
         private static bool lastIsPlaying = false;
-        
+
         [Conditional("UNITY_EDITOR")]
         private static void RemoveDestroyed(IndexedSet<ICanvasElement> list)
         {
@@ -114,11 +123,11 @@ namespace UnityEngine.UI
             {
                 lastIsPlaying = false;
             }
-            
+
             if (lastIsPlaying) return;
-            
+
             lastIsPlaying = Application.isPlaying;
-            
+
             for (int i = 0; i < list.Count; i++)
             {
                 if (list[i] is Object obj)
@@ -128,9 +137,9 @@ namespace UnityEngine.UI
                         list.RemoveAt(i--);
                     }
                 }
-            }       
+            }
         }
-        
+
         private static int ParentCount(Transform child)
         {
             if (child == null)
@@ -143,6 +152,7 @@ namespace UnityEngine.UI
                 count++;
                 parent = parent.parent;
             }
+
             return count;
         }
 
@@ -153,10 +163,12 @@ namespace UnityEngine.UI
 
             return ParentCount(t1) - ParentCount(t2);
         }
+
         public static void RegisterCanvasElementForLayoutRebuild(ICanvasElement element)
         {
             instance.InternalRegisterCanvasElementForLayoutRebuild(element);
         }
+
         public static bool TryRegisterCanvasElementForLayoutRebuild(ICanvasElement element)
         {
             return instance.InternalRegisterCanvasElementForLayoutRebuild(element);
@@ -176,10 +188,12 @@ namespace UnityEngine.UI
 
             return m_LayoutRebuildQueue.AddUnique(element);
         }
+
         public static void RegisterCanvasElementForGraphicRebuild(ICanvasElement element)
         {
             instance.InternalRegisterCanvasElementForGraphicRebuild(element);
         }
+
         public static bool TryRegisterCanvasElementForGraphicRebuild(ICanvasElement element)
         {
             return instance.InternalRegisterCanvasElementForGraphicRebuild(element);
@@ -189,17 +203,21 @@ namespace UnityEngine.UI
         {
             if (m_PerformingGraphicUpdate)
             {
-                Debug.LogError(string.Format("Trying to add {0} for graphic rebuild while we are already inside a graphic rebuild loop. This is not supported.", element));
+                Debug.LogError(string.Format(
+                    "Trying to add {0} for graphic rebuild while we are already inside a graphic rebuild loop. This is not supported.",
+                    element));
                 return false;
             }
 
             return m_GraphicRebuildQueue.AddUnique(element);
         }
+
         public static void UnRegisterCanvasElementForRebuild(ICanvasElement element)
         {
             instance.InternalUnRegisterCanvasElementForLayoutRebuild(element);
             instance.InternalUnRegisterCanvasElementForGraphicRebuild(element);
         }
+
         public static void DisableCanvasElementForRebuild(ICanvasElement element)
         {
             instance.InternalDisableCanvasElementForLayoutRebuild(element);
@@ -210,10 +228,12 @@ namespace UnityEngine.UI
         {
             if (m_PerformingLayoutUpdate)
             {
-                Debug.LogError(string.Format("Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.", element));
+                Debug.LogError(string.Format(
+                    "Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.",
+                    element));
                 return;
             }
-            
+
             instance.m_LayoutRebuildQueue.Remove(element);
         }
 
@@ -221,10 +241,12 @@ namespace UnityEngine.UI
         {
             if (m_PerformingGraphicUpdate)
             {
-                Debug.LogError(string.Format("Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.", element));
+                Debug.LogError(string.Format(
+                    "Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.",
+                    element));
                 return;
             }
-            
+
             instance.m_GraphicRebuildQueue.Remove(element);
         }
 
@@ -232,10 +254,12 @@ namespace UnityEngine.UI
         {
             if (m_PerformingLayoutUpdate)
             {
-                Debug.LogError(string.Format("Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.", element));
+                Debug.LogError(string.Format(
+                    "Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.",
+                    element));
                 return;
             }
-            
+
             instance.m_LayoutRebuildQueue.DisableItem(element);
         }
 
@@ -243,16 +267,20 @@ namespace UnityEngine.UI
         {
             if (m_PerformingGraphicUpdate)
             {
-                Debug.LogError(string.Format("Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.", element));
+                Debug.LogError(string.Format(
+                    "Trying to remove {0} from rebuild list while we are already inside a rebuild loop. This is not supported.",
+                    element));
                 return;
             }
-            
+
             instance.m_GraphicRebuildQueue.DisableItem(element);
         }
+
         public static bool IsRebuildingLayout()
         {
             return instance.m_PerformingLayoutUpdate;
         }
+
         public static bool IsRebuildingGraphics()
         {
             return instance.m_PerformingGraphicUpdate;

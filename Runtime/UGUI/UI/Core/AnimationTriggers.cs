@@ -6,140 +6,75 @@ namespace UnityEngine.UI
     [Serializable]
     public class AnimationTriggers
     {
-        private const string kDefaultNormalAnimName      = "Normal";
+        private const string kDefaultNormalAnimName = "Normal";
         private const string kDefaultHighlightedAnimName = "Highlighted";
-        private const string kDefaultPressedAnimName     = "Pressed";
-        private const string kDefaultSelectedAnimName    = "Selected";
-        private const string kDefaultDisabledAnimName    = "Disabled";
+        private const string kDefaultPressedAnimName = "Pressed";
+        private const string kDefaultSelectedAnimName = "Selected";
+        private const string kDefaultDisabledAnimName = "Disabled";
 
-        [FormerlySerializedAs("normalTrigger")]
-        [SerializeField]
-        private string m_NormalTrigger    = kDefaultNormalAnimName;
+        [FormerlySerializedAs("normalTrigger")] [SerializeField]
+        private string m_NormalTrigger = kDefaultNormalAnimName;
 
-        [FormerlySerializedAs("highlightedTrigger")]
-        [SerializeField]
+        [FormerlySerializedAs("highlightedTrigger")] [SerializeField]
         private string m_HighlightedTrigger = kDefaultHighlightedAnimName;
 
-        [FormerlySerializedAs("pressedTrigger")]
-        [SerializeField]
+        [FormerlySerializedAs("pressedTrigger")] [SerializeField]
         private string m_PressedTrigger = kDefaultPressedAnimName;
 
-        [FormerlySerializedAs("m_HighlightedTrigger")]
-        [SerializeField]
+        [FormerlySerializedAs("m_HighlightedTrigger")] [SerializeField]
         private string m_SelectedTrigger = kDefaultSelectedAnimName;
 
-        [FormerlySerializedAs("disabledTrigger")]
-        [SerializeField]
+        [FormerlySerializedAs("disabledTrigger")] [SerializeField]
         private string m_DisabledTrigger = kDefaultDisabledAnimName;
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class ExampleClass : MonoBehaviour
-        /// {
-        ///     public Animator buttonAnimator;
-        ///     public Button button;
-        ///     void SomeFunction()
-        ///     {
-        ///         //Sets the button to the Normal state (Useful when making tutorials).
-        ///         buttonAnimator.SetTrigger(button.animationTriggers.normalTrigger);
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public string normalTrigger      { get { return m_NormalTrigger; } set { m_NormalTrigger = value; } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
         ///
-        /// public class ExampleClass : MonoBehaviour
-        /// {
-        ///     public Animator buttonAnimator;
-        ///     public Button button;
-        ///     void SomeFunction()
-        ///     {
-        ///         //Sets the button to the Highlighted state (Useful when making tutorials).
-        ///         buttonAnimator.SetTrigger(button.animationTriggers.highlightedTrigger);
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public string highlightedTrigger { get { return m_HighlightedTrigger; } set { m_HighlightedTrigger = value; } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class ExampleClass : MonoBehaviour
-        /// {
-        ///     public Animator buttonAnimator;
-        ///     public Button button;
-        ///     void SomeFunction()
-        ///     {
-        ///         //Sets the button to the Pressed state (Useful when making tutorials).
-        ///         buttonAnimator.SetTrigger(button.animationTriggers.pressedTrigger);
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public string pressedTrigger     { get { return m_PressedTrigger; } set { m_PressedTrigger = value; } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class ExampleClass : MonoBehaviour
-        /// {
-        ///     public Animator buttonAnimator;
-        ///     public Button button;
-        ///     void SomeFunction()
-        ///     {
-        ///         //Sets the button to the Selected state (Useful when making tutorials).
-        ///         buttonAnimator.SetTrigger(button.animationTriggers.selectedTrigger);
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public string selectedTrigger    { get { return m_SelectedTrigger; } set { m_SelectedTrigger = value; } }
+        public string normalTrigger
+        {
+            get { return m_NormalTrigger; }
+            set { m_NormalTrigger = value; }
+        }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
+
         ///
-        /// public class ExampleClass : MonoBehaviour
-        /// {
-        ///     public Animator buttonAnimator;
-        ///     public Button button;
-        ///     void SomeFunction()
-        ///     {
-        ///         //Sets the button to the Disabled state (Useful when making tutorials).
-        ///         buttonAnimator.SetTrigger(button.animationTriggers.disabledTrigger);
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public string disabledTrigger    { get { return m_DisabledTrigger; } set { m_DisabledTrigger = value; } }
+
+
+        public string highlightedTrigger
+        {
+            get { return m_HighlightedTrigger; }
+            set { m_HighlightedTrigger = value; }
+        }
+
+
+        ///
+
+
+        public string pressedTrigger
+        {
+            get { return m_PressedTrigger; }
+            set { m_PressedTrigger = value; }
+        }
+
+
+        ///
+
+
+        public string selectedTrigger
+        {
+            get { return m_SelectedTrigger; }
+            set { m_SelectedTrigger = value; }
+        }
+
+
+        ///
+
+
+        public string disabledTrigger
+        {
+            get { return m_DisabledTrigger; }
+            set { m_DisabledTrigger = value; }
+        }
     }
 }

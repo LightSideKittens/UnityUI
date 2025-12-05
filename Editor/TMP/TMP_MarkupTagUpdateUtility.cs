@@ -52,9 +52,10 @@ internal class TMP_MarkupTagUpdateUtility
         new("SLASH_ALPHA", "/alpha", "// </alpha>"),
         MarkupTagDescriptor.linefeed,
 
-        new("FONT", "font", "// <font=\"Name of Font Asset\"> or <font family=\"Arial\" style=\"Regular\">" ),
+        new("FONT", "font", "// <font=\"Name of Font Asset\"> or <font family=\"Arial\" style=\"Regular\">"),
         new("SLASH_FONT", "/font", "// </font>"),
-        new("MATERIAL", "material", "// <material=\"Name of Material Preset\"> or as attribute <font=\"Name of font asset\" material=\"Name of material\">"),
+        new("MATERIAL", "material",
+            "// <material=\"Name of Material Preset\"> or as attribute <font=\"Name of font asset\" material=\"Name of material\">"),
         new("SLASH_MATERIAL", "/material", "// </material>"),
         new("SIZE", "size", "// <size>"),
         new("SLASH_SIZE", "/size", "// </size>"),
@@ -79,11 +80,11 @@ internal class TMP_MarkupTagUpdateUtility
 
         new("POSITION", "pos", "// <pos>"),
         new("SLASH_POSITION", "/pos", "// </pos>"),
-        new("VERTICAL_OFFSET", "voffset","// <voffset>"),
+        new("VERTICAL_OFFSET", "voffset", "// <voffset>"),
         new("SLASH_VERTICAL_OFFSET", "/voffset", "// </voffset>"),
         new("ROTATE", "rotate", "// <rotate>"),
         new("SLASH_ROTATE", "/rotate", "// </rotate>"),
-        new("TRANSFORM", "transform","// <transform=\"position, rotation, scale\">"),
+        new("TRANSFORM", "transform", "// <transform=\"position, rotation, scale\">"),
         new("SLASH_TRANSFORM", "/transform", "// </transform>"),
         new("SPACE", "space", "// <space>"),
         new("SLASH_SPACE", "/space", "// </space>"),
@@ -113,7 +114,7 @@ internal class TMP_MarkupTagUpdateUtility
 
         new("NO_BREAK", "nobr", "// <nobr>"),
         new("SLASH_NO_BREAK", "/nobr", "// </nobr>"),
-        new("NO_PARSE", "noparse","// <noparse>"),
+        new("NO_PARSE", "noparse", "// <noparse>"),
         new("SLASH_NO_PARSE", "/noparse", "// </noparse>"),
         new("PAGE", "page", "// <page>"),
         new("SLASH_PAGE", "/page", "// </page>"),
@@ -165,7 +166,7 @@ internal class TMP_MarkupTagUpdateUtility
         MarkupTagDescriptor.linefeed,
 
         new("// Named Colors"),
-        new("RED", "red",""),
+        new("RED", "red", ""),
         new("GREEN", "green", ""),
         new("BLUE", "blue", ""),
         new("WHITE", "white", ""),
@@ -247,14 +248,16 @@ internal class TMP_MarkupTagUpdateUtility
                 if (markupHashCodes.ContainsKey(hashCode) == false)
                     markupHashCodes.Add(hashCode, descriptor);
                 else
-                    Debug.Log("[" + descriptor.name + "] with HashCode [" + hashCode + "] collides with [" + markupHashCodes[hashCode].name + "].");
+                    Debug.Log("[" + descriptor.name + "] with HashCode [" + hashCode + "] collides with [" +
+                              markupHashCodes[hashCode].name + "].");
             }
         }
 
         Debug.Log(output);
     }
 
-    const string k_lookupStringU = "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[-]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~-";
+    const string k_lookupStringU =
+        "-------------------------------- !-#$%&-()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[-]^_`ABCDEFGHIJKLMNOPQRSTUVWXYZ{|}~-";
 
     public static char ToUpperFast(char c)
     {

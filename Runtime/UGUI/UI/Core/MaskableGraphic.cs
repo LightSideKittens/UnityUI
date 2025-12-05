@@ -6,14 +6,11 @@ namespace UnityEngine.UI
 {
     public abstract class MaskableGraphic : Graphic, IClippable, IMaskable, IMaterialModifier
     {
-        [NonSerialized]
-        protected bool m_ShouldRecalculateStencil = true;
+        [NonSerialized] protected bool m_ShouldRecalculateStencil = true;
 
-        [NonSerialized]
-        protected Material m_MaskMaterial;
+        [NonSerialized] protected Material m_MaskMaterial;
 
-        [NonSerialized]
-        private RectMask2D m_ParentMask;
+        [NonSerialized] private RectMask2D m_ParentMask;
 
         // m_Maskable is whether this graphic is allowed to be masked or not. It has the matching public property maskable.
         // The default for m_Maskable is true, so graphics under a mask are masked out of the box.
@@ -21,21 +18,19 @@ namespace UnityEngine.UI
         // m_IncludeForMasking is whether we actually consider this graphic for masking or not - this is an implementation detail.
         // m_IncludeForMasking should only be true if m_Maskable is true AND a parent of the graphic has an IMask component.
         // Things would still work correctly if m_IncludeForMasking was always true when m_Maskable is, but performance would suffer.
-        [SerializeField]
-        private bool m_Maskable = true;
+        [SerializeField] private bool m_Maskable = true;
 
         private bool m_IsMaskingGraphic = false;
 
         [Serializable]
-        public class CullStateChangedEvent : UnityEvent<bool> {}
+        public class CullStateChangedEvent : UnityEvent<bool>
+        {
+        }
 
         // Event delegates triggered on click.
-        [SerializeField]
-        private CullStateChangedEvent m_OnCullStateChanged = new CullStateChangedEvent();
+        [SerializeField] private CullStateChangedEvent m_OnCullStateChanged = new CullStateChangedEvent();
 
-        /// <remarks>
-        /// Called whene the culling state of this MaskableGraphic either becomes culled or visible. You can use this to control other elements of your UI as culling happens.
-        /// </remarks>
+
         public CullStateChangedEvent onCullStateChanged
         {
             get { return m_OnCullStateChanged; }
@@ -56,9 +51,6 @@ namespace UnityEngine.UI
         }
 
 
-        /// <remarks>
-        /// If toggled ensure to call MaskUtilities.NotifyStencilStateChanged(this); manually as it changes how stenciles are calculated for this image.
-        /// </remarks>
         public bool isMaskingGraphic
         {
             get { return m_IsMaskingGraphic; }
@@ -71,8 +63,7 @@ namespace UnityEngine.UI
             }
         }
 
-        [NonSerialized]
-        protected int m_StencilValue;
+        [NonSerialized] protected int m_StencilValue;
 
         public virtual Material GetModifiedMaterial(Material baseMaterial)
         {
@@ -96,11 +87,13 @@ namespace UnityEngine.UI
             // it adds some coupling between components though :(
             if (m_StencilValue > 0 && !isMaskingGraphic)
             {
-                var maskMat = StencilMaterial.Add(toUse, (1 << m_StencilValue) - 1, StencilOp.Keep, CompareFunction.Equal, ColorWriteMask.All, (1 << m_StencilValue) - 1, 0);
+                var maskMat = StencilMaterial.Add(toUse, (1 << m_StencilValue) - 1, StencilOp.Keep,
+                    CompareFunction.Equal, ColorWriteMask.All, (1 << m_StencilValue) - 1, 0);
                 StencilMaterial.Remove(m_MaskMaterial);
                 m_MaskMaterial = maskMat;
                 toUse = m_MaskMaterial;
             }
+
             return toUse;
         }
 
@@ -198,6 +191,7 @@ namespace UnityEngine.UI
         }
 
         readonly Vector3[] m_Corners = new Vector3[4];
+
         private Rect rootCanvasRect
         {
             get

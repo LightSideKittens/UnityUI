@@ -7,11 +7,6 @@ namespace UnityEngine.UI
     [AddComponentMenu("UI/Slider", 34)]
     [ExecuteAlways]
     [RequireComponent(typeof(RectTransform))]
-    /// <remarks>
-    /// The slider component is a Selectable that controls a fill, a handle, or both. The fill, when used, spans from the minimum value to the current value while the handle, when used, follow the current value.
-    /// The anchors of the fill and handle RectTransforms are driven by the Slider. The fill and handle can be direct children of the GameObject with the Slider, or intermediary RectTransforms can be placed in between for additional control.
-    /// When a change to the slider value occurs, a callback is sent to any registered listeners of UI.Slider.onValueChanged.
-    /// </remarks>
     public class Slider : Selectable, IDragHandler, IInitializePotentialDragHandler, ICanvasElement
     {
         public enum Direction
@@ -26,233 +21,150 @@ namespace UnityEngine.UI
         }
 
         [Serializable]
-        public class SliderEvent : UnityEvent<float> {}
-
-        [SerializeField]
-        private RectTransform m_FillRect;
-
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI;  // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public Slider mainSlider;
-        ///     //Reference to new "RectTransform"(Child of FillArea).
-        ///     public RectTransform newFillRect;
-        ///
-        ///     //Deactivates the old FillRect and assigns a new one.
-        ///     void Start()
-        ///     {
-        ///         mainSlider.fillRect.gameObject.SetActive(false);
-        ///         mainSlider.fillRect = newFillRect;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public RectTransform fillRect { get { return m_FillRect; } set { if (SetPropertyUtility.SetClass(ref m_FillRect, value)) {UpdateCachedReferences(); UpdateVisuals(); } } }
-
-        [SerializeField]
-        private RectTransform m_HandleRect;
-
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public Slider mainSlider;
-        ///     //Reference to new "RectTransform" (Child of "Handle Slide Area").
-        ///     public RectTransform handleHighlighted;
-        ///
-        ///     //Deactivates the old Handle, then assigns and enables the new one.
-        ///     void Start()
-        ///     {
-        ///         mainSlider.handleRect.gameObject.SetActive(false);
-        ///         mainSlider.handleRect = handleHighlighted;
-        ///         mainSlider.handleRect.gameObject.SetActive(true);
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public RectTransform handleRect { get { return m_HandleRect; } set { if (SetPropertyUtility.SetClass(ref m_HandleRect, value)) { UpdateCachedReferences(); UpdateVisuals(); } } }
-
-        [Space]
-
-        [SerializeField]
-        private Direction m_Direction = Direction.LeftToRight;
-
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public Slider mainSlider;
-        ///
-        ///     public void Start()
-        ///     {
-        ///         //Changes the direction of the slider.
-        ///         if (mainSlider.direction == Slider.Direction.BottomToTop)
-        ///         {
-        ///             mainSlider.direction = Slider.Direction.TopToBottom;
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public Direction direction { get { return m_Direction; } set { if (SetPropertyUtility.SetStruct(ref m_Direction, value)) UpdateVisuals(); } }
-
-        [SerializeField]
-        private float m_MinValue = 0;
-
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public Slider mainSlider;
-        ///
-        ///     void Start()
-        ///     {
-        ///         // Changes the minimum value of the slider to 10;
-        ///         mainSlider.minValue = 10;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public float minValue { get { return m_MinValue; } set { if (SetPropertyUtility.SetStruct(ref m_MinValue, value)) { Set(m_Value); UpdateVisuals(); } } }
-
-        [SerializeField]
-        private float m_MaxValue = 1;
-
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public Slider mainSlider;
-        ///
-        ///     void Start()
-        ///     {
-        ///         // Changes the max value of the slider to 20;
-        ///         mainSlider.maxValue = 20;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public float maxValue { get { return m_MaxValue; } set { if (SetPropertyUtility.SetStruct(ref m_MaxValue, value)) { Set(m_Value); UpdateVisuals(); } } }
-
-        [SerializeField]
-        private bool m_WholeNumbers = false;
-
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public Slider mainSlider;
-        ///
-        ///     public void Start()
-        ///     {
-        ///         //sets the slider's value to accept whole numbers only.
-        ///         mainSlider.wholeNumbers = true;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public bool wholeNumbers { get { return m_WholeNumbers; } set { if (SetPropertyUtility.SetStruct(ref m_WholeNumbers, value)) { Set(m_Value); UpdateVisuals(); } } }
-
-        [SerializeField]
-        protected float m_Value;
-
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public Slider mainSlider;
-        ///
-        ///     //Invoked when a submit button is clicked.
-        ///     public void SubmitSliderSetting()
-        ///     {
-        ///         //Displays the value of the slider in the console.
-        ///         Debug.Log(mainSlider.value);
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public virtual float value
+        public class SliderEvent : UnityEvent<float>
         {
-            get
-            {
-                return wholeNumbers ? Mathf.Round(m_Value) : m_Value;
-            }
+        }
+
+        [SerializeField] private RectTransform m_FillRect;
+
+
+        ///
+        ///
+
+
+        public RectTransform fillRect
+        {
+            get { return m_FillRect; }
             set
             {
-                Set(value);
+                if (SetPropertyUtility.SetClass(ref m_FillRect, value))
+                {
+                    UpdateCachedReferences();
+                    UpdateVisuals();
+                }
             }
         }
 
-        /// <param name="input">The new value for the slider.</param>
+        [SerializeField] private RectTransform m_HandleRect;
+
+
+        ///
+        ///
+
+
+        public RectTransform handleRect
+        {
+            get { return m_HandleRect; }
+            set
+            {
+                if (SetPropertyUtility.SetClass(ref m_HandleRect, value))
+                {
+                    UpdateCachedReferences();
+                    UpdateVisuals();
+                }
+            }
+        }
+
+        [Space] [SerializeField] private Direction m_Direction = Direction.LeftToRight;
+
+
+        ///
+        ///
+
+
+        public Direction direction
+        {
+            get { return m_Direction; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_Direction, value)) UpdateVisuals();
+            }
+        }
+
+        [SerializeField] private float m_MinValue = 0;
+
+
+        ///
+        ///
+
+
+        public float minValue
+        {
+            get { return m_MinValue; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_MinValue, value))
+                {
+                    Set(m_Value);
+                    UpdateVisuals();
+                }
+            }
+        }
+
+        [SerializeField] private float m_MaxValue = 1;
+
+
+        ///
+        ///
+
+
+        public float maxValue
+        {
+            get { return m_MaxValue; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_MaxValue, value))
+                {
+                    Set(m_Value);
+                    UpdateVisuals();
+                }
+            }
+        }
+
+        [SerializeField] private bool m_WholeNumbers = false;
+
+
+        ///
+        ///
+
+
+        public bool wholeNumbers
+        {
+            get { return m_WholeNumbers; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_WholeNumbers, value))
+                {
+                    Set(m_Value);
+                    UpdateVisuals();
+                }
+            }
+        }
+
+        [SerializeField] protected float m_Value;
+
+
+        ///
+        ///
+
+
+        public virtual float value
+        {
+            get { return wholeNumbers ? Mathf.Round(m_Value) : m_Value; }
+            set { Set(value); }
+        }
+
+
         public virtual void SetValueWithoutNotify(float input)
         {
             Set(input, false);
         }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
+
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public Slider mainSlider;
         ///
-        ///     //Set to invoke when "OnValueChanged" method is called.
-        ///     void CheckNormalisedValue()
-        ///     {
-        ///         //Displays the normalised value of the slider everytime the value changes.
-        ///         Debug.Log(mainSlider.normalizedValue);
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
+
         public float normalizedValue
         {
             get
@@ -261,44 +173,22 @@ namespace UnityEngine.UI
                     return 0;
                 return Mathf.InverseLerp(minValue, maxValue, value);
             }
-            set
-            {
-                this.value = Mathf.Lerp(minValue, maxValue, value);
-            }
+            set { this.value = Mathf.Lerp(minValue, maxValue, value); }
         }
 
-        [Space]
+        [Space] [SerializeField] private SliderEvent m_OnValueChanged = new SliderEvent();
 
-        [SerializeField]
-        private SliderEvent m_OnValueChanged = new SliderEvent();
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public Slider mainSlider;
         ///
-        ///     public void Start()
-        ///     {
-        ///         //Adds a listener to the main slider and invokes a method when the value changes.
-        ///         mainSlider.onValueChanged.AddListener(delegate {ValueChangeCheck(); });
-        ///     }
         ///
-        ///     // Invoked when the value of the slider changes.
-        ///     public void ValueChangeCheck()
-        ///     {
-        ///         Debug.Log(mainSlider.value);
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public SliderEvent onValueChanged { get { return m_OnValueChanged; } set { m_OnValueChanged = value; } }
+
+
+        public SliderEvent onValueChanged
+        {
+            get { return m_OnValueChanged; }
+            set { m_OnValueChanged = value; }
+        }
 
         // Private fields
 
@@ -312,18 +202,22 @@ namespace UnityEngine.UI
         private Vector2 m_Offset = Vector2.zero;
 
         // field is never assigned warning
-        #pragma warning disable 649
+#pragma warning disable 649
         private DrivenRectTransformTracker m_Tracker;
-        #pragma warning restore 649
+#pragma warning restore 649
 
         // This "delayed" mechanism is required for case 1037681.
         private bool m_DelayedUpdateVisuals = false;
 
         // Size of each step.
-        float stepSize { get { return wholeNumbers ? 1 : (maxValue - minValue) * 0.1f; } }
+        float stepSize
+        {
+            get { return wholeNumbers ? 1 : (maxValue - minValue) * 0.1f; }
+        }
 
         protected Slider()
-        {}
+        {
+        }
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -359,10 +253,12 @@ namespace UnityEngine.UI
         }
 
         public virtual void LayoutComplete()
-        {}
+        {
+        }
 
         public virtual void GraphicUpdateComplete()
-        {}
+        {
+        }
 
         protected override void OnEnable()
         {
@@ -400,10 +296,12 @@ namespace UnityEngine.UI
                 if (m_FillImage != null && m_FillImage.type == Image.Type.Filled)
                     oldNormalizedValue = m_FillImage.fillAmount;
                 else
-                    oldNormalizedValue = (reverseValue ? 1 - m_FillRect.anchorMin[(int)axis] : m_FillRect.anchorMax[(int)axis]);
+                    oldNormalizedValue =
+                        (reverseValue ? 1 - m_FillRect.anchorMin[(int)axis] : m_FillRect.anchorMax[(int)axis]);
             }
             else if (m_HandleContainerRect != null)
-                oldNormalizedValue = (reverseValue ? 1 - m_HandleRect.anchorMin[(int)axis] : m_HandleRect.anchorMin[(int)axis]);
+                oldNormalizedValue =
+                    (reverseValue ? 1 - m_HandleRect.anchorMin[(int)axis] : m_HandleRect.anchorMin[(int)axis]);
 
             UpdateVisuals();
 
@@ -412,6 +310,7 @@ namespace UnityEngine.UI
                 UISystemProfilerApi.AddMarker("Slider.value", this);
                 onValueChanged.Invoke(m_Value);
             }
+
             // UUM-34170 Apparently, some properties on slider such as IsInteractable and Normalcolor Animation is broken.
             // We need to call base here to render the animation on Scene
             base.OnDidApplyAnimationProperties();
@@ -454,11 +353,7 @@ namespace UnityEngine.UI
             return newValue;
         }
 
-        /// <param name="input">The new value for the slider.</param>
-        /// <param name="sendCallback">If the OnValueChanged callback should be invoked.</param>
-        /// <remarks>
-        /// Process the input to ensure the value is between min and max value. If the input is different set the value and send the callback is required.
-        /// </remarks>
+
         protected virtual void Set(float input, bool sendCallback = true)
         {
             // Clamp the input
@@ -495,8 +390,20 @@ namespace UnityEngine.UI
             Vertical = 1
         }
 
-        Axis axis { get { return (m_Direction == Direction.LeftToRight || m_Direction == Direction.RightToLeft) ? Axis.Horizontal : Axis.Vertical; } }
-        bool reverseValue { get { return m_Direction == Direction.RightToLeft || m_Direction == Direction.TopToBottom; } }
+        Axis axis
+        {
+            get
+            {
+                return (m_Direction == Direction.LeftToRight || m_Direction == Direction.RightToLeft)
+                    ? Axis.Horizontal
+                    : Axis.Vertical;
+            }
+        }
+
+        bool reverseValue
+        {
+            get { return m_Direction == Direction.RightToLeft || m_Direction == Direction.TopToBottom; }
+        }
 
         // Force-update the slider. Useful if you've changed the properties and want it to update visually.
         private void UpdateVisuals()
@@ -574,10 +481,12 @@ namespace UnityEngine.UI
             base.OnPointerDown(eventData);
 
             m_Offset = Vector2.zero;
-            if (m_HandleContainerRect != null && RectTransformUtility.RectangleContainsScreenPoint(m_HandleRect, eventData.pointerPressRaycast.screenPosition, eventData.enterEventCamera))
+            if (m_HandleContainerRect != null && RectTransformUtility.RectangleContainsScreenPoint(m_HandleRect,
+                    eventData.pointerPressRaycast.screenPosition, eventData.enterEventCamera))
             {
                 Vector2 localMousePos;
-                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(m_HandleRect, eventData.pointerPressRaycast.screenPosition, eventData.pressEventCamera, out localMousePos))
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(m_HandleRect,
+                        eventData.pointerPressRaycast.screenPosition, eventData.pressEventCamera, out localMousePos))
                     m_Offset = localMousePos;
             }
             else
@@ -664,27 +573,9 @@ namespace UnityEngine.UI
             eventData.useDragThreshold = false;
         }
 
-        /// <param name="direction">The direction of the slider</param>
-        /// <param name="includeRectLayouts">Should the layout be flipped together with the slider direction</param>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
+
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public Slider mainSlider;
         ///
-        ///     public void Start()
-        ///     {
-        ///         mainSlider.SetDirection(Slider.Direction.LeftToRight, false);
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
         public void SetDirection(Direction direction, bool includeRectLayouts)
         {
             Axis oldAxis = axis;

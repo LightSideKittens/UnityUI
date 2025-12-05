@@ -5,9 +5,6 @@ using UnityEngine.Serialization;
 namespace UnityEngine.EventSystems
 {
     [AddComponentMenu("Event/Standalone Input Module")]
-    /// <remarks>
-    /// Input module for working with, mouse, keyboard, or controller.
-    /// </remarks>
     public class StandaloneInputModule : PointerInputModule
     {
         private float m_PrevActionTime;
@@ -27,27 +24,19 @@ namespace UnityEngine.EventSystems
         {
         }
 
-        [SerializeField]
-        private string m_HorizontalAxis = "Horizontal";
+        [SerializeField] private string m_HorizontalAxis = "Horizontal";
 
-        [SerializeField]
-        private string m_VerticalAxis = "Vertical";
+        [SerializeField] private string m_VerticalAxis = "Vertical";
 
-        [SerializeField]
-        private string m_SubmitButton = "Submit";
+        [SerializeField] private string m_SubmitButton = "Submit";
 
-        [SerializeField]
-        private string m_CancelButton = "Cancel";
+        [SerializeField] private string m_CancelButton = "Cancel";
 
-        [SerializeField]
-        private float m_InputActionsPerSecond = 10;
+        [SerializeField] private float m_InputActionsPerSecond = 10;
 
-        [SerializeField]
-        private float m_RepeatDelay = 0.5f;
+        [SerializeField] private float m_RepeatDelay = 0.5f;
 
-        [SerializeField]
-        [FormerlySerializedAs("m_AllowActivationOnMobileDevice")]
-        [HideInInspector]
+        [SerializeField] [FormerlySerializedAs("m_AllowActivationOnMobileDevice")] [HideInInspector]
         private bool m_ForceModuleActive;
 
         public float inputActionsPerSecond
@@ -56,9 +45,7 @@ namespace UnityEngine.EventSystems
             set { m_InputActionsPerSecond = value; }
         }
 
-        /// <remarks>
-        /// If the same direction is sustained, the inputActionsPerSecond property can be used to control the rate at which events are fired. However, it can be desirable that the first repetition is delayed, so the user doesn't get repeated actions by accident.
-        /// </remarks>
+
         public float repeatDelay
         {
             get { return m_RepeatDelay; }
@@ -102,7 +89,8 @@ namespace UnityEngine.EventSystems
         {
             if (!eventSystem.isFocused && ShouldIgnoreEventsOnNoFocus())
             {
-                if (m_InputPointerEvent != null && m_InputPointerEvent.pointerDrag != null && m_InputPointerEvent.dragging)
+                if (m_InputPointerEvent != null && m_InputPointerEvent.pointerDrag != null &&
+                    m_InputPointerEvent.dragging)
                 {
                     ReleaseMouse(m_InputPointerEvent, m_InputPointerEvent.pointerCurrentRaycast.gameObject);
                 }
@@ -127,6 +115,7 @@ namespace UnityEngine.EventSystems
             {
                 ExecuteEvents.Execute(pointerEvent.pointerClick, pointerEvent, ExecuteEvents.pointerClickHandler);
             }
+
             if (pointerEvent.pointerDrag != null && pointerEvent.dragging)
             {
                 ExecuteEvents.ExecuteHierarchy(currentOverGo, pointerEvent, ExecuteEvents.dropHandler);
@@ -244,15 +233,11 @@ namespace UnityEngine.EventSystems
                 else
                     RemovePointerData(pointer);
             }
+
             return input.touchCount > 0;
         }
 
-        /// <param name="pointerEvent">Event data relating to the touch event, such as position and ID to be passed to the touch event destination object.</param>
-        /// <param name="pressed">This is true for the first frame of a touch event, and false thereafter. This can therefore be used to determine the instant a touch event occurred.</param>
-        /// <param name="released">This is true only for the last frame of a touch event.</param>
-        /// <remarks>
-        /// This method can be overridden in derived classes to change how touch press events are handled.
-        /// </remarks>
+
         protected void ProcessTouchPress(PointerEventData pointerEvent, bool pressed, bool released)
         {
             var currentOverGo = pointerEvent.pointerCurrentRaycast.gameObject;
@@ -285,7 +270,8 @@ namespace UnityEngine.EventSystems
                 // search for the control that will receive the press
                 // if we can't find a press handler set the press
                 // handler to be what would receive a click.
-                var newPressed = ExecuteEvents.ExecuteHierarchy(currentOverGo, pointerEvent, ExecuteEvents.pointerDownHandler);
+                var newPressed =
+                    ExecuteEvents.ExecuteHierarchy(currentOverGo, pointerEvent, ExecuteEvents.pointerDownHandler);
 
                 var newClick = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
 
@@ -322,7 +308,8 @@ namespace UnityEngine.EventSystems
                 pointerEvent.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(currentOverGo);
 
                 if (pointerEvent.pointerDrag != null)
-                    ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.initializePotentialDrag);
+                    ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent,
+                        ExecuteEvents.initializePotentialDrag);
             }
 
             // PointerUp notification
@@ -359,14 +346,15 @@ namespace UnityEngine.EventSystems
                 pointerEvent.pointerDrag = null;
 
                 // send exit events as we need to simulate this on touch up on touch device
-                ExecuteEvents.ExecuteHierarchy(pointerEvent.pointerEnter, pointerEvent, ExecuteEvents.pointerExitHandler);
+                ExecuteEvents.ExecuteHierarchy(pointerEvent.pointerEnter, pointerEvent,
+                    ExecuteEvents.pointerExitHandler);
                 pointerEvent.pointerEnter = null;
             }
 
             m_InputPointerEvent = pointerEvent;
         }
 
-        /// <returns>If the submit event was used by the selected object.</returns>
+
         protected bool SendSubmitEventToSelectedObject()
         {
             if (eventSystem.currentSelectedGameObject == null)
@@ -394,6 +382,7 @@ namespace UnityEngine.EventSystems
                 if (move.x > 0)
                     move.x = 1f;
             }
+
             if (input.GetButtonDown(m_VerticalAxis))
             {
                 if (move.y < 0)
@@ -401,10 +390,11 @@ namespace UnityEngine.EventSystems
                 if (move.y > 0)
                     move.y = 1f;
             }
+
             return move;
         }
 
-        /// <returns>If the move event was used by the selected object.</returns>
+
         protected bool SendMoveEventToSelectedObject()
         {
             float time = Time.unscaledTime;
@@ -475,7 +465,9 @@ namespace UnityEngine.EventSystems
 
             if (!Mathf.Approximately(leftButtonData.buttonData.scrollDelta.sqrMagnitude, 0.0f))
             {
-                var scrollHandler = ExecuteEvents.GetEventHandler<IScrollHandler>(leftButtonData.buttonData.pointerCurrentRaycast.gameObject);
+                var scrollHandler =
+                    ExecuteEvents.GetEventHandler<IScrollHandler>(leftButtonData.buttonData.pointerCurrentRaycast
+                        .gameObject);
                 ExecuteEvents.ExecuteHierarchy(scrollHandler, leftButtonData.buttonData, ExecuteEvents.scrollHandler);
             }
         }
@@ -516,7 +508,8 @@ namespace UnityEngine.EventSystems
                 // search for the control that will receive the press
                 // if we can't find a press handler set the press
                 // handler to be what would receive a click.
-                var newPressed = ExecuteEvents.ExecuteHierarchy(currentOverGo, pointerEvent, ExecuteEvents.pointerDownHandler);
+                var newPressed =
+                    ExecuteEvents.ExecuteHierarchy(currentOverGo, pointerEvent, ExecuteEvents.pointerDownHandler);
                 var newClick = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
 
                 // didnt find a press handler... search for a click handler
@@ -552,7 +545,8 @@ namespace UnityEngine.EventSystems
                 pointerEvent.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(currentOverGo);
 
                 if (pointerEvent.pointerDrag != null)
-                    ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.initializePotentialDrag);
+                    ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent,
+                        ExecuteEvents.initializePotentialDrag);
 
                 m_InputPointerEvent = pointerEvent;
             }

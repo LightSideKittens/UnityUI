@@ -13,7 +13,7 @@ namespace TMPro
         public Color bottomLeft;
         public Color bottomRight;
 
-        public VertexGradient (Color color)
+        public VertexGradient(Color color)
         {
             topLeft = color;
             topRight = color;
@@ -21,10 +21,7 @@ namespace TMPro
             bottomRight = color;
         }
 
-        /// <param name="color0">Top left color.</param>
-        /// <param name="color1">Top right color.</param>
-        /// <param name="color2">Bottom left color.</param>
-        /// <param name="color3">Bottom right color.</param>
+
         public VertexGradient(Color color0, Color color1, Color color2, Color color3)
         {
             topLeft = color0;
@@ -37,7 +34,7 @@ namespace TMPro
 
     public struct TMP_LinkInfo
     {
-        public TMPText textComponent;
+        public TMP_Text textComponent;
 
         public int hashCode;
 
@@ -59,8 +56,7 @@ namespace TMPro
             linkIdLength = length;
         }
 
-        /// <param name="textInfo"></param>
-        /// <returns></returns>
+
         public string GetLinkText()
         {
             string text = string.Empty;
@@ -72,14 +68,13 @@ namespace TMPro
             return text;
         }
 
-        /// <returns></returns>
+
         public string GetLink()
         {
             return GetLinkID();
         }
 
-        /// <param name="text">The source input text.</param>
-        /// <returns></returns>
+
         public string GetLinkID()
         {
             if (textComponent == null)
@@ -92,13 +87,13 @@ namespace TMPro
 
     public struct TMP_WordInfo
     {
-        public TMPText textComponent;
+        public TMP_Text textComponent;
 
         public int firstCharacterIndex;
         public int lastCharacterIndex;
         public int characterCount;
 
-        /// <returns></returns>
+
         public string GetWord()
         {
             string word = string.Empty;
@@ -129,7 +124,8 @@ namespace TMPro
 
         public override string ToString()
         {
-            string s = "Min (" + min.x.ToString("f2") + ", " + min.y.ToString("f2") + ")   Max (" + max.x.ToString("f2") + ", " + max.y.ToString("f2") + ")";
+            string s = "Min (" + min.x.ToString("f2") + ", " + min.y.ToString("f2") + ")   Max (" +
+                       max.x.ToString("f2") + ", " + max.y.ToString("f2") + ")";
             return s;
         }
     }
@@ -150,7 +146,8 @@ namespace TMPro
 
         public override string ToString()
         {
-            string s = "Min (" + min.x.ToString("f2") + ", " + min.y.ToString("f2") + ")   Max (" + max.x.ToString("f2") + ", " + max.y.ToString("f2") + ")";
+            string s = "Min (" + min.x.ToString("f2") + ", " + min.y.ToString("f2") + ")   Max (" +
+                       max.x.ToString("f2") + ", " + max.y.ToString("f2") + ")";
             return s;
         }
     }
@@ -254,5 +251,4 @@ namespace TMPro
         public int valueLength;
         public TagUnitType unitType;
     }
-
 }

@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 namespace UnityEditor.UI
 {
-
     [CustomEditor(typeof(Image), true)]
     [CanEditMultipleObjects]
     public class ImageEditor : GraphicEditor
@@ -33,6 +32,7 @@ namespace UnityEditor.UI
         private class Styles
         {
             public static GUIContent text = EditorGUIUtility.TrTextContent("Fill Origin");
+
             public static GUIContent[] OriginHorizontalStyle =
             {
                 EditorGUIUtility.TrTextContent("Left"),
@@ -75,18 +75,18 @@ namespace UnityEditor.UI
             base.OnEnable();
 
             m_SpriteContent = EditorGUIUtility.TrTextContent("Source Image");
-            m_SpriteTypeContent     = EditorGUIUtility.TrTextContent("Image Type");
-            m_ClockwiseContent      = EditorGUIUtility.TrTextContent("Clockwise");
+            m_SpriteTypeContent = EditorGUIUtility.TrTextContent("Image Type");
+            m_ClockwiseContent = EditorGUIUtility.TrTextContent("Clockwise");
 
-            m_Sprite                = serializedObject.FindProperty("m_Sprite");
-            m_Type                  = serializedObject.FindProperty("m_Type");
-            m_FillCenter            = serializedObject.FindProperty("m_FillCenter");
-            m_FillMethod            = serializedObject.FindProperty("m_FillMethod");
-            m_FillOrigin            = serializedObject.FindProperty("m_FillOrigin");
-            m_FillClockwise         = serializedObject.FindProperty("m_FillClockwise");
-            m_FillAmount            = serializedObject.FindProperty("m_FillAmount");
-            m_PreserveAspect        = serializedObject.FindProperty("m_PreserveAspect");
-            m_UseSpriteMesh         = serializedObject.FindProperty("m_UseSpriteMesh");
+            m_Sprite = serializedObject.FindProperty("m_Sprite");
+            m_Type = serializedObject.FindProperty("m_Type");
+            m_FillCenter = serializedObject.FindProperty("m_FillCenter");
+            m_FillMethod = serializedObject.FindProperty("m_FillMethod");
+            m_FillOrigin = serializedObject.FindProperty("m_FillOrigin");
+            m_FillClockwise = serializedObject.FindProperty("m_FillClockwise");
+            m_FillAmount = serializedObject.FindProperty("m_FillAmount");
+            m_PreserveAspect = serializedObject.FindProperty("m_PreserveAspect");
+            m_UseSpriteMesh = serializedObject.FindProperty("m_UseSpriteMesh");
             m_PixelsPerUnitMultiplier = serializedObject.FindProperty("m_PixelsPerUnitMultiplier");
 
             m_ShowType = new AnimBool(m_Sprite.objectReferenceValue != null);
@@ -148,6 +148,7 @@ namespace UnityEditor.UI
                 EditorGUILayout.PropertyField(m_PreserveAspect);
                 EditorGUI.indentLevel--;
             }
+
             EditorGUILayout.EndFadeGroup();
             NativeSizeButtonGUI();
 
@@ -157,7 +158,8 @@ namespace UnityEditor.UI
         void SetShowNativeSize(bool instant)
         {
             Image.Type type = (Image.Type)m_Type.enumValueIndex;
-            bool showNativeSize = (type == Image.Type.Simple || type == Image.Type.Filled) && m_Sprite.objectReferenceValue != null;
+            bool showNativeSize = (type == Image.Type.Simple || type == Image.Type.Filled) &&
+                                  m_Sprite.objectReferenceValue != null;
             base.SetShowNativeSize(showNativeSize, instant);
         }
 
@@ -181,6 +183,7 @@ namespace UnityEditor.UI
                         m_Type.enumValueIndex = (int)Image.Type.Simple;
                     }
                 }
+
                 (serializedObject.targetObject as Image).DisableSpriteOptimizations();
             }
         }
@@ -194,13 +197,16 @@ namespace UnityEditor.UI
             {
                 Image.Type typeEnum = (Image.Type)m_Type.enumValueIndex;
 
-                bool showSlicedOrTiled = (!m_Type.hasMultipleDifferentValues && (typeEnum == Image.Type.Sliced || typeEnum == Image.Type.Tiled));
+                bool showSlicedOrTiled = (!m_Type.hasMultipleDifferentValues &&
+                                          (typeEnum == Image.Type.Sliced || typeEnum == Image.Type.Tiled));
                 if (showSlicedOrTiled && targets.Length > 1)
                     showSlicedOrTiled = targets.Select(obj => obj as Image).All(img => img.hasBorder);
 
                 m_ShowSlicedOrTiled.target = showSlicedOrTiled;
-                m_ShowSliced.target = (showSlicedOrTiled && !m_Type.hasMultipleDifferentValues && typeEnum == Image.Type.Sliced);
-                m_ShowTiled.target = (showSlicedOrTiled && !m_Type.hasMultipleDifferentValues && typeEnum == Image.Type.Tiled);
+                m_ShowSliced.target = (showSlicedOrTiled && !m_Type.hasMultipleDifferentValues &&
+                                       typeEnum == Image.Type.Sliced);
+                m_ShowTiled.target = (showSlicedOrTiled && !m_Type.hasMultipleDifferentValues &&
+                                      typeEnum == Image.Type.Tiled);
                 m_ShowFilled.target = (!m_Type.hasMultipleDifferentValues && typeEnum == Image.Type.Filled);
 
                 Image image = target as Image;
@@ -210,6 +216,7 @@ namespace UnityEditor.UI
                         EditorGUILayout.PropertyField(m_FillCenter);
                     EditorGUILayout.PropertyField(m_PixelsPerUnitMultiplier);
                 }
+
                 EditorGUILayout.EndFadeGroup();
 
                 if (EditorGUILayout.BeginFadeGroup(m_ShowSliced.faded))
@@ -217,13 +224,19 @@ namespace UnityEditor.UI
                     if (image.sprite != null && !image.hasBorder)
                         EditorGUILayout.HelpBox("This Image doesn't have a border.", MessageType.Warning);
                 }
+
                 EditorGUILayout.EndFadeGroup();
 
                 if (EditorGUILayout.BeginFadeGroup(m_ShowTiled.faded))
                 {
-                    if (image.sprite != null && !image.hasBorder && (image.sprite.texture != null && image.sprite.texture.wrapMode != TextureWrapMode.Repeat || image.sprite.packed))
-                        EditorGUILayout.HelpBox("It looks like you want to tile a sprite with no border. It would be more efficient to modify the Sprite properties, clear the Packing tag and set the Wrap mode to Repeat.", MessageType.Warning);
+                    if (image.sprite != null && !image.hasBorder &&
+                        (image.sprite.texture != null && image.sprite.texture.wrapMode != TextureWrapMode.Repeat ||
+                         image.sprite.packed))
+                        EditorGUILayout.HelpBox(
+                            "It looks like you want to tile a sprite with no border. It would be more efficient to modify the Sprite properties, clear the Packing tag and set the Wrap mode to Repeat.",
+                            MessageType.Warning);
                 }
+
                 EditorGUILayout.EndFadeGroup();
 
                 if (EditorGUILayout.BeginFadeGroup(m_ShowFilled.faded))
@@ -234,6 +247,7 @@ namespace UnityEditor.UI
                     {
                         m_FillOrigin.intValue = 0;
                     }
+
                     var shapeRect = EditorGUILayout.GetControlRect(true);
                     switch ((Image.FillMethod)m_FillMethod.enumValueIndex)
                     {
@@ -266,13 +280,17 @@ namespace UnityEditor.UI
                         EditorGUILayout.PropertyField(m_FillClockwise, m_ClockwiseContent);
                     }
                 }
+
                 EditorGUILayout.EndFadeGroup();
             }
             --EditorGUI.indentLevel;
         }
 
 
-        public override bool HasPreviewGUI() { return true; }
+        public override bool HasPreviewGUI()
+        {
+            return true;
+        }
 
 
         public override void OnPreviewGUI(Rect rect, GUIStyle background)
@@ -286,9 +304,6 @@ namespace UnityEditor.UI
             SpriteDrawUtility.DrawSprite(sf, rect, image.canvasRenderer.GetColor());
         }
 
-        /// <returns>
-        /// The Image details.
-        /// </returns>
 
         public override string GetInfoString()
         {

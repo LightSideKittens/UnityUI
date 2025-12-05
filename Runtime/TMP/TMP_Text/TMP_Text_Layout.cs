@@ -3,22 +3,25 @@ using UnityEngine.UI;
 
 namespace TMPro
 {
-    public abstract partial class TMPText : ILayoutIgnorer
+    public abstract partial class TMP_Text : ILayoutIgnorer
     {
+        protected static Vector2 largePositiveVector2 = new(TMP_Math.INT_MAX, TMP_Math.INT_MAX);
+        protected static Vector2 largeNegativeVector2 = new(TMP_Math.INT_MIN, TMP_Math.INT_MIN);
+        protected static float largePositiveFloat = TMP_Math.FLOAT_MAX;
+        protected static float largeNegativeFloat = TMP_Math.FLOAT_MIN;
+
         protected Vector2 preferredSize;
         public virtual float preferredWidth => preferredSize.x;
         public virtual float preferredHeight => preferredSize.y;
 
-        /// <returns></returns>
         protected virtual Bounds GetCompoundBounds()
         {
             return new();
         }
-        
-        /// <returns></returns>
+
         protected void SetTextBounds()
         {
-            Extents extent = new(k_LargePositiveVector2, k_LargeNegativeVector2);
+            Extents extent = new(largePositiveVector2, largeNegativeVector2);
 
             for (int i = 0; i < m_textInfo.characterCount && i < m_textInfo.characterInfo.Length; i++)
             {
@@ -50,10 +53,7 @@ namespace TMPro
             if (m_margin.y > 0) preferredSize.y += m_margin.y;
             if (m_margin.w > 0) preferredSize.y += m_margin.w;
         }
-        
-        /// <param name="startIndex"></param>
-        /// <param name="endIndex"></param>
-        /// <param name="offset"></param>
+
         protected void AdjustLineOffset(int startIndex, int endIndex, float offset)
         {
             Vector3 vertexOffset = new(0, offset, 0);
@@ -80,7 +80,6 @@ namespace TMPro
             }
         }
 
-        /// <param name="size"></param>
         protected void ResizeLineExtents(int size)
         {
             size = size > 1024 ? size + 256 : Mathf.NextPowerOfTwo(size + 1);
@@ -92,21 +91,16 @@ namespace TMPro
                     temp_lineInfo[i] = m_textInfo.lineInfo[i];
                 else
                 {
-                    temp_lineInfo[i].lineExtents.min = k_LargePositiveVector2;
-                    temp_lineInfo[i].lineExtents.max = k_LargeNegativeVector2;
+                    temp_lineInfo[i].lineExtents.min = largePositiveVector2;
+                    temp_lineInfo[i].lineExtents.max = largeNegativeVector2;
 
-                    temp_lineInfo[i].ascender = k_LargeNegativeFloat;
-                    temp_lineInfo[i].descender = k_LargePositiveFloat;
+                    temp_lineInfo[i].ascender = largeNegativeFloat;
+                    temp_lineInfo[i].descender = largePositiveFloat;
                 }
             }
 
             m_textInfo.lineInfo = temp_lineInfo;
         }
-
-        protected static Vector2 k_LargePositiveVector2 = new(TMP_Math.INT_MAX, TMP_Math.INT_MAX);
-        protected static Vector2 k_LargeNegativeVector2 = new(TMP_Math.INT_MIN, TMP_Math.INT_MIN);
-        protected static float k_LargePositiveFloat = TMP_Math.FLOAT_MAX;
-        protected static float k_LargeNegativeFloat = TMP_Math.FLOAT_MIN;
 
         public virtual void ComputeMarginSize()
         {

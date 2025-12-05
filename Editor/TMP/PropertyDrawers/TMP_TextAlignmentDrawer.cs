@@ -3,7 +3,6 @@ using UnityEditor;
 
 namespace TMPro.EditorUtilities
 {
-
     [CustomPropertyDrawer(typeof(TextAlignmentOptions))]
     public class TMP_TextAlignmentDrawer : PropertyDrawer
     {
@@ -16,19 +15,27 @@ namespace TMPro.EditorUtilities
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return EditorGUIUtility.currentViewWidth > k_WideViewWidth ? k_AlignmentButtonHeight : k_AlignmentButtonHeight * 2 + 3;
+            return EditorGUIUtility.currentViewWidth > k_WideViewWidth
+                ? k_AlignmentButtonHeight
+                : k_AlignmentButtonHeight * 2 + 3;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             var id = GUIUtility.GetControlID(k_TextAlignmentHash, FocusType.Keyboard, position);
-            
+
             EditorGUI.BeginProperty(position, label, property);
             {
                 var controlArea = EditorGUI.PrefixLabel(position, id, label);
-                
+
                 var horizontalAligment = new Rect(controlArea.x, controlArea.y, k_GroupWidth, k_AlignmentButtonHeight);
-                var verticalAligment = new Rect(!(EditorGUIUtility.currentViewWidth > k_WideViewWidth) ? controlArea.x : horizontalAligment.xMax + k_ControlsSpacing, !(EditorGUIUtility.currentViewWidth > k_WideViewWidth) ? controlArea.y + k_AlignmentButtonHeight + 3 : controlArea.y, k_GroupWidth, k_AlignmentButtonHeight);
+                var verticalAligment = new Rect(
+                    !(EditorGUIUtility.currentViewWidth > k_WideViewWidth)
+                        ? controlArea.x
+                        : horizontalAligment.xMax + k_ControlsSpacing,
+                    !(EditorGUIUtility.currentViewWidth > k_WideViewWidth)
+                        ? controlArea.y + k_AlignmentButtonHeight + 3
+                        : controlArea.y, k_GroupWidth, k_AlignmentButtonHeight);
 
                 EditorGUI.BeginChangeCheck();
 
@@ -56,7 +63,7 @@ namespace TMPro.EditorUtilities
             {
                 foreach (var obj in alignment.serializedObject.targetObjects)
                 {
-                    var text = obj as TMPText;
+                    var text = obj as TMP_Text;
                     if (text != null)
                     {
                         values[TMP_EditorUtility.GetHorizontalAlignmentGridValue((int)text.alignment)] = true;
@@ -69,11 +76,15 @@ namespace TMPro.EditorUtilities
             for (var i = 0; i < values.Length; i++)
             {
                 var oldValue = values[i];
-                var newValue = TMP_EditorUtility.EditorToggle(position, oldValue, TMP_UIStyleManager.alignContentA[i], i == 0 ? TMP_UIStyleManager.alignmentButtonLeft : (i == 5 ? TMP_UIStyleManager.alignmentButtonRight : TMP_UIStyleManager.alignmentButtonMid));
+                var newValue = TMP_EditorUtility.EditorToggle(position, oldValue, TMP_UIStyleManager.alignContentA[i],
+                    i == 0
+                        ? TMP_UIStyleManager.alignmentButtonLeft
+                        : (i == 5 ? TMP_UIStyleManager.alignmentButtonRight : TMP_UIStyleManager.alignmentButtonMid));
                 if (newValue != oldValue)
                 {
                     selected = i;
                 }
+
                 position.x += position.width;
             }
 
@@ -92,7 +103,7 @@ namespace TMPro.EditorUtilities
             {
                 foreach (var obj in alignment.serializedObject.targetObjects)
                 {
-                    var text = obj as TMPText;
+                    var text = obj as TMP_Text;
                     if (text != null)
                     {
                         values[TMP_EditorUtility.GetVerticalAlignmentGridValue((int)text.alignment)] = true;
@@ -105,11 +116,15 @@ namespace TMPro.EditorUtilities
             for (var i = 0; i < values.Length; i++)
             {
                 var oldValue = values[i];
-                var newValue = TMP_EditorUtility.EditorToggle(position, oldValue, TMP_UIStyleManager.alignContentB[i], i == 0 ? TMP_UIStyleManager.alignmentButtonLeft : (i == 5 ? TMP_UIStyleManager.alignmentButtonRight : TMP_UIStyleManager.alignmentButtonMid));
+                var newValue = TMP_EditorUtility.EditorToggle(position, oldValue, TMP_UIStyleManager.alignContentB[i],
+                    i == 0
+                        ? TMP_UIStyleManager.alignmentButtonLeft
+                        : (i == 5 ? TMP_UIStyleManager.alignmentButtonRight : TMP_UIStyleManager.alignmentButtonMid));
                 if (newValue != oldValue)
                 {
                     selected = i;
                 }
+
                 position.x += position.width;
             }
 
@@ -129,7 +144,9 @@ namespace TMPro.EditorUtilities
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return EditorGUIUtility.currentViewWidth > k_WideViewWidth ? k_AlignmentButtonHeight : k_AlignmentButtonHeight * 2 + 3;
+            return EditorGUIUtility.currentViewWidth > k_WideViewWidth
+                ? k_AlignmentButtonHeight
+                : k_AlignmentButtonHeight * 2 + 3;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -167,7 +184,7 @@ namespace TMPro.EditorUtilities
             {
                 foreach (var obj in alignment.serializedObject.targetObjects)
                 {
-                    var text = obj as TMPText;
+                    var text = obj as TMP_Text;
                     if (text != null)
                     {
                         values[TMP_EditorUtility.GetHorizontalAlignmentGridValue((int)text.horizontalAlignment)] = true;
@@ -180,11 +197,15 @@ namespace TMPro.EditorUtilities
             for (var i = 0; i < values.Length; i++)
             {
                 var oldValue = values[i];
-                var newValue = TMP_EditorUtility.EditorToggle(position, oldValue, TMP_UIStyleManager.alignContentA[i], i == 0 ? TMP_UIStyleManager.alignmentButtonLeft : (i == 5 ? TMP_UIStyleManager.alignmentButtonRight : TMP_UIStyleManager.alignmentButtonMid));
+                var newValue = TMP_EditorUtility.EditorToggle(position, oldValue, TMP_UIStyleManager.alignContentA[i],
+                    i == 0
+                        ? TMP_UIStyleManager.alignmentButtonLeft
+                        : (i == 5 ? TMP_UIStyleManager.alignmentButtonRight : TMP_UIStyleManager.alignmentButtonMid));
                 if (newValue != oldValue)
                 {
                     selected = i;
                 }
+
                 position.x += position.width;
             }
 
@@ -205,7 +226,9 @@ namespace TMPro.EditorUtilities
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            return EditorGUIUtility.currentViewWidth > k_WideViewWidth ? k_AlignmentButtonHeight : k_AlignmentButtonHeight * 2 + 3;
+            return EditorGUIUtility.currentViewWidth > k_WideViewWidth
+                ? k_AlignmentButtonHeight
+                : k_AlignmentButtonHeight * 2 + 3;
         }
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
@@ -217,7 +240,13 @@ namespace TMPro.EditorUtilities
                 var controlArea = EditorGUI.PrefixLabel(position, id, label);
 
                 var horizontalAligment = new Rect(controlArea.x, controlArea.y, k_GroupWidth, k_AlignmentButtonHeight);
-                var verticalAligment = new Rect(!(EditorGUIUtility.currentViewWidth > k_WideViewWidth) ? controlArea.x : horizontalAligment.xMax + k_ControlsSpacing, !(EditorGUIUtility.currentViewWidth > k_WideViewWidth) ? controlArea.y + k_AlignmentButtonHeight + 3 : controlArea.y, k_GroupWidth, k_AlignmentButtonHeight);
+                var verticalAligment = new Rect(
+                    !(EditorGUIUtility.currentViewWidth > k_WideViewWidth)
+                        ? controlArea.x
+                        : horizontalAligment.xMax + k_ControlsSpacing,
+                    !(EditorGUIUtility.currentViewWidth > k_WideViewWidth)
+                        ? controlArea.y + k_AlignmentButtonHeight + 3
+                        : controlArea.y, k_GroupWidth, k_AlignmentButtonHeight);
 
                 EditorGUI.BeginChangeCheck();
 
@@ -244,7 +273,7 @@ namespace TMPro.EditorUtilities
             {
                 foreach (var obj in alignment.serializedObject.targetObjects)
                 {
-                    var text = obj as TMPText;
+                    var text = obj as TMP_Text;
                     if (text != null)
                     {
                         values[TMP_EditorUtility.GetVerticalAlignmentGridValue((int)text.verticalAlignment)] = true;
@@ -257,11 +286,15 @@ namespace TMPro.EditorUtilities
             for (var i = 0; i < values.Length; i++)
             {
                 var oldValue = values[i];
-                var newValue = TMP_EditorUtility.EditorToggle(position, oldValue, TMP_UIStyleManager.alignContentB[i], i == 0 ? TMP_UIStyleManager.alignmentButtonLeft : (i == 5 ? TMP_UIStyleManager.alignmentButtonRight : TMP_UIStyleManager.alignmentButtonMid));
+                var newValue = TMP_EditorUtility.EditorToggle(position, oldValue, TMP_UIStyleManager.alignContentB[i],
+                    i == 0
+                        ? TMP_UIStyleManager.alignmentButtonLeft
+                        : (i == 5 ? TMP_UIStyleManager.alignmentButtonRight : TMP_UIStyleManager.alignmentButtonMid));
                 if (newValue != oldValue)
                 {
                     selected = i;
                 }
+
                 position.x += position.width;
             }
 

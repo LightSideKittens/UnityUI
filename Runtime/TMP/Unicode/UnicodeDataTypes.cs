@@ -1,20 +1,13 @@
 ﻿#nullable enable
 
 
-/// <summary>
-/// Direction of a paragraph or a line in visual/logical terms.
-/// This is NOT a direct Unicode property; it is a convenience enum for the layout engine.
-/// </summary>
 public enum BidiDirection : byte
 {
     LeftToRight = 0,
     RightToLeft = 1
 }
 
-/// <summary>
-/// Unicode Bidi_Class property values (bc), long names.
-/// See UAX #9 and UCD property Bidi_Class.
-/// </summary>
+
 public enum BidiClass : byte
 {
     LeftToRight,
@@ -46,9 +39,7 @@ public enum BidiClass : byte
     PopDirectionalIsolate
 }
 
-/// <summary>
-/// Unicode Bidi_Paired_Bracket_Type values (bpt).
-/// </summary>
+
 public enum BidiPairedBracketType : byte
 {
     None,
@@ -56,9 +47,7 @@ public enum BidiPairedBracketType : byte
     Close
 }
 
-/// <summary>
-/// Unicode Joining_Type property values (jt).
-/// </summary>
+
 public enum JoiningType : byte
 {
     NonJoining,
@@ -69,10 +58,7 @@ public enum JoiningType : byte
     DualJoining
 }
 
-/// <summary>
-/// Unicode Joining_Group property values (jg).
-/// Full list from the UCD property definition.
-/// </summary>
+
 public enum JoiningGroup : byte
 {
     NoJoiningGroup,
@@ -187,51 +173,26 @@ public enum JoiningGroup : byte
     Zhain
 }
 
-/// <summary>
-/// Core abstraction over Unicode character properties used by the Bidi engine
-/// and the Arabic shaping engine. Implementations are expected to cover
-/// the entire range of Unicode scalar values (U+0000..U+10FFFF).
-/// </summary>
+
 public interface IUnicodeDataProvider
 {
-    /// <summary>
-    /// Returns the Unicode Bidi_Class property for the given code point.
-    /// </summary>
     BidiClass GetBidiClass(int codePoint);
 
-    /// <summary>
-    /// Returns whether the given code point has Bidi_Mirrored = Yes.
-    /// </summary>
+
     bool IsBidiMirrored(int codePoint);
 
-    /// <summary>
-    /// Returns the Bidi_Mirroring_Glyph for the given code point, if defined.
-    /// If there is no mirroring glyph, implementors may return the input code point.
-    /// </summary>
+
     int GetBidiMirroringGlyph(int codePoint);
 
-    /// <summary>
-    /// Returns the Unicode Bidi_Paired_Bracket_Type for the given code point.
-    /// </summary>
+
     BidiPairedBracketType GetBidiPairedBracketType(int codePoint);
 
-    /// <summary>
-    /// Returns the Unicode Bidi_Paired_Bracket for the given code point.
-    /// If there is no paired bracket, implementors may return the input code point.
-    /// </summary>
+
     int GetBidiPairedBracket(int codePoint);
 
-    /// <summary>
-    /// Returns the Unicode Joining_Type property for the given code point.
-    /// This is required for Arabic (and related) cursive shaping.
-    /// </summary>
+
     JoiningType GetJoiningType(int codePoint);
 
-    /// <summary>
-    /// Returns the Unicode Joining_Group property for the given code point.
-    /// Characters not explicitly listed in ArabicShaping / DerivedJoiningGroup
-    /// must be treated as No_Joining_Group.
-    /// </summary>
+
     JoiningGroup GetJoiningGroup(int codePoint);
-    
 }

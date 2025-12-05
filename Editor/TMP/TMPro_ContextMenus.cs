@@ -7,10 +7,8 @@ using UnityEngine.TextCore.Text;
 
 namespace TMPro.EditorUtilities
 {
-
     public class TMP_ContextMenus : Editor
     {
-
         private static Texture m_copiedTexture;
 
         private static Material m_copiedProperties;
@@ -33,7 +31,7 @@ namespace TMPro.EditorUtilities
             EditorUtility.FocusProjectWindow();
             EditorGUIUtility.PingObject(mat);
         }
-        #endif
+#endif
 
 
         [MenuItem("CONTEXT/Material/Create Material Preset", false)]
@@ -50,7 +48,8 @@ namespace TMPro.EditorUtilities
 
             if (assetPath.IndexOf("Assets/", System.StringComparison.InvariantCultureIgnoreCase) == -1)
             {
-                Debug.LogWarning("Material Preset cannot be created from a material that is located outside the project.");
+                Debug.LogWarning(
+                    "Material Preset cannot be created from a material that is located outside the project.");
                 return;
             }
 
@@ -64,7 +63,7 @@ namespace TMPro.EditorUtilities
 
             for (int i = 0; i < selectedObjects.Length; i++)
             {
-                TMPText textObject = selectedObjects[i].GetComponent<TMPText>();
+                TMP_Text textObject = selectedObjects[i].GetComponent<TMP_Text>();
 
                 if (textObject != null)
                 {
@@ -269,7 +268,7 @@ namespace TMPro.EditorUtilities
                 mat.SetTexture(ShaderUtilities.ID_MainTex, m_copiedTexture);
             }
         }
-        #endif
+#endif
 
 
         [MenuItem("CONTEXT/TMP_FontAsset/Extract Atlas", false, 2200)]
@@ -278,7 +277,8 @@ namespace TMPro.EditorUtilities
             TMP_FontAsset font = command.context as TMP_FontAsset;
 
             string fontPath = AssetDatabase.GetAssetPath(font);
-            string texPath = Path.GetDirectoryName(fontPath) + "/" + Path.GetFileNameWithoutExtension(fontPath) + " Atlas.png";
+            string texPath = Path.GetDirectoryName(fontPath) + "/" + Path.GetFileNameWithoutExtension(fontPath) +
+                             " Atlas.png";
 
             SerializedObject texprop = new SerializedObject(font.material.GetTexture(ShaderUtilities.ID_MainTex));
             texprop.FindProperty("m_IsReadable").boolValue = true;
@@ -297,7 +297,7 @@ namespace TMPro.EditorUtilities
             DestroyImmediate(tex);
         }
 
-        /// <param name="command"></param>
+
         [MenuItem("CONTEXT/TMP_FontAsset/Update Atlas Texture...", false, 2000)]
         static void RegenerateFontAsset(MenuCommand command)
         {
@@ -310,7 +310,6 @@ namespace TMPro.EditorUtilities
         }
 
 
-        /// <param name="command"></param>
         [MenuItem("CONTEXT/TMP_FontAsset/Reset", true, 100)]
         static bool ClearFontAssetDataValidate(MenuCommand command)
         {
@@ -335,7 +334,7 @@ namespace TMPro.EditorUtilities
             TMPro_EventManager.ON_FONT_PROPERTY_CHANGED(true, fontAsset);
         }
 
-        /// <param name="command"></param>
+
         [MenuItem("CONTEXT/TMP_FontAsset/Clear Dynamic Data", true, 2100)]
         static bool ClearFontCharacterDataValidate(MenuCommand command)
         {
@@ -381,8 +380,8 @@ namespace TMPro.EditorUtilities
             AssetDatabase.Refresh();
         }
 
-        /// <param name="command"></param>
-        #if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
+
+#if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
         [MenuItem("CONTEXT/TMP_FontAsset/Import Font Features", true, 2110)]
         static bool ReimportFontFeaturesValidate(MenuCommand command)
         {
@@ -404,9 +403,9 @@ namespace TMPro.EditorUtilities
 
             TMPro_EventManager.ON_FONT_PROPERTY_CHANGED(true, fontAsset);
         }
-        #endif
+#endif
 
-        /// <param name="command"></param>
+
         [MenuItem("CONTEXT/TrueTypeFontImporter/Create TMP Font Asset...", false, 200)]
         static void CreateFontAsset(MenuCommand command)
         {

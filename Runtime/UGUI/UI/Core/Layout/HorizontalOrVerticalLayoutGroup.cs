@@ -8,52 +8,78 @@ namespace UnityEngine.UI
     {
         [SerializeField] protected float m_Spacing = 0;
 
-        public float spacing { get { return m_Spacing; } set { SetProperty(ref m_Spacing, value); } }
+        public float spacing
+        {
+            get { return m_Spacing; }
+            set { SetProperty(ref m_Spacing, value); }
+        }
 
         [SerializeField] protected bool m_ChildForceExpandWidth = true;
 
-        public bool childForceExpandWidth { get { return m_ChildForceExpandWidth; } set { SetProperty(ref m_ChildForceExpandWidth, value); } }
+        public bool childForceExpandWidth
+        {
+            get { return m_ChildForceExpandWidth; }
+            set { SetProperty(ref m_ChildForceExpandWidth, value); }
+        }
 
         [SerializeField] protected bool m_ChildForceExpandHeight = true;
 
-        public bool childForceExpandHeight { get { return m_ChildForceExpandHeight; } set { SetProperty(ref m_ChildForceExpandHeight, value); } }
+        public bool childForceExpandHeight
+        {
+            get { return m_ChildForceExpandHeight; }
+            set { SetProperty(ref m_ChildForceExpandHeight, value); }
+        }
 
         [SerializeField] protected bool m_ChildControlWidth = true;
 
-        /// <remarks>
-        /// If set to false, the layout group will only affect the positions of the children while leaving the widths untouched. The widths of the children can be set via the respective RectTransforms in this case.
+
         ///
-        /// If set to true, the widths of the children are automatically driven by the layout group according to their respective minimum, preferred, and flexible widths. This is useful if the widths of the children should change depending on how much space is available.In this case the width of each child cannot be set manually in the RectTransform, but the minimum, preferred and flexible width for each child can be controlled by adding a LayoutElement component to it.
-        /// </remarks>
-        public bool childControlWidth { get { return m_ChildControlWidth; } set { SetProperty(ref m_ChildControlWidth, value); } }
+
+
+        public bool childControlWidth
+        {
+            get { return m_ChildControlWidth; }
+            set { SetProperty(ref m_ChildControlWidth, value); }
+        }
 
         [SerializeField] protected bool m_ChildControlHeight = true;
 
-        /// <remarks>
-        /// If set to false, the layout group will only affect the positions of the children while leaving the heights untouched. The heights of the children can be set via the respective RectTransforms in this case.
+
         ///
-        /// If set to true, the heights of the children are automatically driven by the layout group according to their respective minimum, preferred, and flexible heights. This is useful if the heights of the children should change depending on how much space is available.In this case the height of each child cannot be set manually in the RectTransform, but the minimum, preferred and flexible height for each child can be controlled by adding a LayoutElement component to it.
-        /// </remarks>
-        public bool childControlHeight { get { return m_ChildControlHeight; } set { SetProperty(ref m_ChildControlHeight, value); } }
+
+
+        public bool childControlHeight
+        {
+            get { return m_ChildControlHeight; }
+            set { SetProperty(ref m_ChildControlHeight, value); }
+        }
 
         [SerializeField] protected bool m_ChildScaleWidth = false;
 
-        public bool childScaleWidth { get { return m_ChildScaleWidth; } set { SetProperty(ref m_ChildScaleWidth, value); } }
+        public bool childScaleWidth
+        {
+            get { return m_ChildScaleWidth; }
+            set { SetProperty(ref m_ChildScaleWidth, value); }
+        }
 
         [SerializeField] protected bool m_ChildScaleHeight = false;
 
-        public bool childScaleHeight { get { return m_ChildScaleHeight; } set { SetProperty(ref m_ChildScaleHeight, value); } }
+        public bool childScaleHeight
+        {
+            get { return m_ChildScaleHeight; }
+            set { SetProperty(ref m_ChildScaleHeight, value); }
+        }
 
-        /// <remarks>
-        /// If False the first child object will be positioned first.
-        /// If True the last child object will be positioned first.
-        /// </remarks>
-        public bool reverseArrangement { get { return m_ReverseArrangement; } set { SetProperty(ref m_ReverseArrangement, value); } }
+
+        public bool reverseArrangement
+        {
+            get { return m_ReverseArrangement; }
+            set { SetProperty(ref m_ReverseArrangement, value); }
+        }
 
         [SerializeField] protected bool m_ReverseArrangement = false;
 
-        /// <param name="axis">The axis to calculate for. 0 is horizontal and 1 is vertical.</param>
-        /// <param name="isVertical">Is this group a vertical group?</param>
+
         protected void CalcAlongAxis(int axis, bool isVertical)
         {
             float combinedPadding = (axis == 0 ? padding.horizontal : padding.vertical);
@@ -102,12 +128,12 @@ namespace UnityEngine.UI
                 totalMin -= spacing;
                 totalPreferred -= spacing;
             }
+
             totalPreferred = Mathf.Max(totalMin, totalPreferred);
             SetLayoutInputForAxis(totalMin, totalPreferred, totalFlexible, axis);
         }
 
-        /// <param name="axis">The axis to handle. 0 is horizontal and 1 is vertical.</param>
-        /// <param name="isVertical">Is this group a vertical group?</param>
+
         protected void SetChildrenAlongAxis(int axis, bool isVertical)
         {
             float size = rectTransform.rect.size[axis];
@@ -153,14 +179,16 @@ namespace UnityEngine.UI
                 if (surplusSpace > 0)
                 {
                     if (GetTotalFlexibleSize(axis) == 0)
-                        pos = GetStartOffset(axis, GetTotalPreferredSize(axis) - (axis == 0 ? padding.horizontal : padding.vertical));
+                        pos = GetStartOffset(axis,
+                            GetTotalPreferredSize(axis) - (axis == 0 ? padding.horizontal : padding.vertical));
                     else if (GetTotalFlexibleSize(axis) > 0)
                         itemFlexibleMultiplier = surplusSpace / GetTotalFlexibleSize(axis);
                 }
 
                 float minMaxLerp = 0;
                 if (GetTotalMinSize(axis) != GetTotalPreferredSize(axis))
-                    minMaxLerp = Mathf.Clamp01((size - GetTotalMinSize(axis)) / (GetTotalPreferredSize(axis) - GetTotalMinSize(axis)));
+                    minMaxLerp = Mathf.Clamp01((size - GetTotalMinSize(axis)) /
+                                               (GetTotalPreferredSize(axis) - GetTotalMinSize(axis)));
 
                 for (int i = startIndex; m_ReverseArrangement ? i >= endIndex : i < endIndex; i += increment)
                 {
@@ -180,6 +208,7 @@ namespace UnityEngine.UI
                         float offsetInCell = (childSize - child.sizeDelta[axis]) * alignmentOnAxis;
                         SetChildAlongAxisWithScale(child, axis, pos + offsetInCell, scaleFactor);
                     }
+
                     pos += childSize * scaleFactor + spacing;
                 }
             }

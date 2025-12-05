@@ -21,8 +21,7 @@ namespace TMPro
             public string filePath;
             public ulong hashCode;
 
-            /// <param name="faceNameAndStyle">String that combines the family name with style name</param>
-            /// <param name="index">Index of the font face and style.</param>
+
             public FontReference(string fontFilePath, string faceNameAndStyle, int index)
             {
                 familyName = null;
@@ -44,7 +43,8 @@ namespace TMPro
 
                     if (readingFlag == 0)
                     {
-                        bool isSeparator = i + 2 < length && c == ' ' && faceNameAndStyle[i + 1] == '-' && faceNameAndStyle[i + 2] == ' ';
+                        bool isSeparator = i + 2 < length && c == ' ' && faceNameAndStyle[i + 1] == '-' &&
+                                           faceNameAndStyle[i + 2] == ' ';
 
                         if (isSeparator)
                         {
@@ -55,14 +55,16 @@ namespace TMPro
                             continue;
                         }
 
-                        familyNameHashCode = (familyNameHashCode << 5) + familyNameHashCode ^ TMP_TextUtilities.ToUpperFast(c);
+                        familyNameHashCode = (familyNameHashCode << 5) + familyNameHashCode ^
+                                             TMP_TextUtilities.ToUpperFast(c);
                         conversionArray[writingIndex++] = c;
                         continue;
                     }
 
                     if (readingFlag == 1)
                     {
-                        styleNameHashCode = (styleNameHashCode << 5) + styleNameHashCode ^ TMP_TextUtilities.ToUpperFast(c);
+                        styleNameHashCode = (styleNameHashCode << 5) + styleNameHashCode ^
+                                            TMP_TextUtilities.ToUpperFast(c);
                         conversionArray[writingIndex++] = c;
 
                         if (i + 1 == length)
@@ -90,7 +92,8 @@ namespace TMPro
                 FontEngineError error = FontEngine.LoadFontFace(s_SystemFontPaths[i]);
                 if (error != FontEngineError.Success)
                 {
-                    Debug.LogWarning("Error [" + error + "] trying to load the font at path [" + s_SystemFontPaths[i] + "].");
+                    Debug.LogWarning("Error [" + error + "] trying to load the font at path [" + s_SystemFontPaths[i] +
+                                     "].");
                     continue;
                 }
 
@@ -107,7 +110,9 @@ namespace TMPro
 
                     s_SystemFontLookup.Add(fontRef.hashCode, fontRef);
 
-                    Debug.Log("[" + i + "] Family Name [" + fontRef.familyName + "]   Style Name [" + fontRef.styleName + "]   Index [" + fontRef.faceIndex + "]   HashCode [" + fontRef.hashCode + "]    Path [" + fontRef.filePath + "].");
+                    Debug.Log("[" + i + "] Family Name [" + fontRef.familyName + "]   Style Name [" +
+                              fontRef.styleName + "]   Index [" + fontRef.faceIndex + "]   HashCode [" +
+                              fontRef.hashCode + "]    Path [" + fontRef.filePath + "].");
                 }
 
                 FontEngine.UnloadFontFace();
@@ -115,18 +120,12 @@ namespace TMPro
         }
 
 
-        /// <param name="familyName"></param>
-        /// <param name="fontRef"></param>
-        /// <returns></returns>
         public static bool TryGetSystemFontReference(string familyName, out FontReference fontRef)
         {
             return s_Instance.TryGetSystemFontReferenceInternal(familyName, null, out fontRef);
         }
 
-        /// <param name="familyName"></param>
-        /// <param name="styleName"></param>
-        /// <param name="fontRef"></param>
-        /// <returns></returns>
+
         public static bool TryGetSystemFontReference(string familyName, string styleName, out FontReference fontRef)
         {
             return s_Instance.TryGetSystemFontReferenceInternal(familyName, styleName, out fontRef);
@@ -140,7 +139,9 @@ namespace TMPro
             fontRef = new();
 
             uint familyNameHashCode = TMP_TextUtilities.GetHashCodeCaseInSensitive(familyName);
-            uint styleNameHashCode = string.IsNullOrEmpty(styleName) ? s_RegularStyleNameHashCode : TMP_TextUtilities.GetHashCodeCaseInSensitive(styleName);
+            uint styleNameHashCode = string.IsNullOrEmpty(styleName)
+                ? s_RegularStyleNameHashCode
+                : TMP_TextUtilities.GetHashCodeCaseInSensitive(styleName);
             ulong key = (ulong)styleNameHashCode << 32 | familyNameHashCode;
 
             if (s_SystemFontLookup.ContainsKey(key))

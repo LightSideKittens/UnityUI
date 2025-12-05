@@ -27,10 +27,18 @@ namespace UnityEditor.UI
             tex.name = "[Generated] Checker Texture";
             tex.hideFlags = HideFlags.DontSave;
 
-            for (int y = 0; y < 8; ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(x, y, c1);
-            for (int y = 8; y < 16; ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(x, y, c0);
-            for (int y = 0; y < 8; ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(x, y, c0);
-            for (int y = 8; y < 16; ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(x, y, c1);
+            for (int y = 0; y < 8; ++y)
+            for (int x = 0; x < 8; ++x)
+                tex.SetPixel(x, y, c1);
+            for (int y = 8; y < 16; ++y)
+            for (int x = 0; x < 8; ++x)
+                tex.SetPixel(x, y, c0);
+            for (int y = 0; y < 8; ++y)
+            for (int x = 8; x < 16; ++x)
+                tex.SetPixel(x, y, c0);
+            for (int y = 8; y < 16; ++y)
+            for (int x = 8; x < 16; ++x)
+                tex.SetPixel(x, y, c1);
 
             tex.Apply();
             tex.filterMode = FilterMode.Point;
@@ -107,7 +115,8 @@ namespace UnityEditor.UI
         }
 
         // Draw the specified Image.
-        private static void DrawSprite(Texture tex, Rect drawArea, Vector4 padding, Rect outer, Rect inner, Rect uv, Color color, Material mat)
+        private static void DrawSprite(Texture tex, Rect drawArea, Vector4 padding, Rect outer, Rect inner, Rect uv,
+            Color color, Material mat)
         {
             // Create the texture rectangle that is centered inside rect.
             Rect outerRect = drawArea;

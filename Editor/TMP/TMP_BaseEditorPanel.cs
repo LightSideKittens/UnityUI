@@ -8,18 +8,36 @@ namespace TMPro.EditorUtilities
 {
     public abstract class TMP_BaseEditorPanel : Editor
     {
-        static readonly GUIContent k_RtlToggleLabel = new("Enable RTL Editor", "Reverses text direction and allows right to left editing.");
-        static readonly GUIContent k_FontAssetLabel = new("Font Asset", "The Font Asset containing the glyphs that can be rendered for this text.");
-        static readonly GUIContent k_MaterialPresetLabel = new("Material Preset", "The material used for rendering. Only materials created from the Font Asset can be used.");
-        static readonly GUIContent k_StyleLabel = new("Text Style", "The style from a style sheet to be applied to the text.");
-        static readonly GUIContent k_AutoSizeLabel = new("Auto Size", "Auto sizes the text to fit the available space.");
-        static readonly GUIContent k_FontSizeLabel = new("Font Size", "The size the text will be rendered at in points.");
+        static readonly GUIContent k_RtlToggleLabel =
+            new("Enable RTL Editor", "Reverses text direction and allows right to left editing.");
+
+        static readonly GUIContent k_FontAssetLabel = new("Font Asset",
+            "The Font Asset containing the glyphs that can be rendered for this text.");
+
+        static readonly GUIContent k_MaterialPresetLabel = new("Material Preset",
+            "The material used for rendering. Only materials created from the Font Asset can be used.");
+
+        static readonly GUIContent k_StyleLabel =
+            new("Text Style", "The style from a style sheet to be applied to the text.");
+
+        static readonly GUIContent k_AutoSizeLabel =
+            new("Auto Size", "Auto sizes the text to fit the available space.");
+
+        static readonly GUIContent k_FontSizeLabel =
+            new("Font Size", "The size the text will be rendered at in points.");
+
         static readonly GUIContent k_AutoSizeOptionsLabel = new("Auto Size Options");
         static readonly GUIContent k_MinLabel = new("Min", "The minimum font size.");
         static readonly GUIContent k_MaxLabel = new("Max", "The maximum font size.");
-        static readonly GUIContent k_WdLabel = new("WD%", "Compresses character width up to this value before reducing font size.");
-        static readonly GUIContent k_LineLabel = new("Line", "Negative value only. Compresses line height down to this value before reducing font size.");
-        static readonly GUIContent k_FontStyleLabel = new("Font Style", "Styles to apply to the text such as Bold or Italic.");
+
+        static readonly GUIContent k_WdLabel = new("WD%",
+            "Compresses character width up to this value before reducing font size.");
+
+        static readonly GUIContent k_LineLabel = new("Line",
+            "Negative value only. Compresses line height down to this value before reducing font size.");
+
+        static readonly GUIContent k_FontStyleLabel =
+            new("Font Style", "Styles to apply to the text such as Bold or Italic.");
 
         static readonly GUIContent k_BoldLabel = new("B", "Bold");
         static readonly GUIContent k_ItalicLabel = new("I", "Italic");
@@ -31,40 +49,79 @@ namespace TMPro.EditorUtilities
 
         static readonly GUIContent k_ColorModeLabel = new("Color Mode", "The type of gradient to use.");
         static readonly GUIContent k_BaseColorLabel = new("Vertex Color", "The base color of the text vertices.");
-        static readonly GUIContent k_ColorPresetLabel = new("Color Preset", "A Color Preset which override the local color settings.");
-        static readonly GUIContent k_ColorGradientLabel = new("Color Gradient", "The gradient color applied over the Vertex Color. Can be locally set or driven by a Gradient Asset.");
-        static readonly GUIContent k_CorenerColorsLabel = new("Colors", "The color composition of the gradient.");
-        static readonly GUIContent k_OverrideTagsLabel = new("Override Tags", "Whether the color settings override the <color> tag.");
 
-        static readonly GUIContent k_SpacingOptionsLabel = new("Spacing Options (em)", "Spacing adjustments between different elements of the text. Values are in font units where a value of 1 equals 1/100em.");
+        static readonly GUIContent k_ColorPresetLabel =
+            new("Color Preset", "A Color Preset which override the local color settings.");
+
+        static readonly GUIContent k_ColorGradientLabel = new("Color Gradient",
+            "The gradient color applied over the Vertex Color. Can be locally set or driven by a Gradient Asset.");
+
+        static readonly GUIContent k_CorenerColorsLabel = new("Colors", "The color composition of the gradient.");
+
+        static readonly GUIContent k_OverrideTagsLabel =
+            new("Override Tags", "Whether the color settings override the <color> tag.");
+
+        static readonly GUIContent k_SpacingOptionsLabel = new("Spacing Options (em)",
+            "Spacing adjustments between different elements of the text. Values are in font units where a value of 1 equals 1/100em.");
+
         static readonly GUIContent k_CharacterSpacingLabel = new("Character");
         static readonly GUIContent k_WordSpacingLabel = new("Word");
         static readonly GUIContent k_LineSpacingLabel = new("Line");
         static readonly GUIContent k_ParagraphSpacingLabel = new("Paragraph");
 
-        static readonly GUIContent k_AlignmentLabel = new("Alignment", "Horizontal and vertical alignment of the text within its container.");
-        static readonly GUIContent k_WrapMixLabel = new("Wrap Mix (W <-> C)", "How much to favor words versus characters when distributing the text.");
+        static readonly GUIContent k_AlignmentLabel =
+            new("Alignment", "Horizontal and vertical alignment of the text within its container.");
 
-        static readonly GUIContent k_WrappingLabel = new("Wrapping", "Wraps text to the next line when reaching the edge of the container.");
+        static readonly GUIContent k_WrapMixLabel = new("Wrap Mix (W <-> C)",
+            "How much to favor words versus characters when distributing the text.");
+
+        static readonly GUIContent k_WrappingLabel =
+            new("Wrapping", "Wraps text to the next line when reaching the edge of the container.");
+
         static readonly GUIContent[] k_WrappingOptions = { new("Disabled"), new("Enabled") };
-        static readonly GUIContent k_OverflowLabel = new("Overflow", "How to display text which goes past the edge of the container.");
 
-        static readonly GUIContent k_MarginsLabel = new("Margins", "The space between the text and the edge of its container.");
-        static readonly GUIContent k_GeometrySortingLabel = new("Geometry Sorting", "The order in which text geometry is sorted. Used to adjust the way overlapping characters are displayed.");
-        static readonly GUIContent k_IsTextObjectScaleStatic = new("Is Scale Static", "Controls whether a text object will be excluded from the InteralUpdate callback to handle scale changes of the text object or its parent(s).");
-        static readonly GUIContent k_RichTextLabel = new("Rich Text", "Enables the use of rich text tags such as <color> and <font>.");
-        static readonly GUIContent k_EscapeCharactersLabel = new("Parse Escape Characters", "Whether to display strings such as \"\\n\" as is or replace them by the character they represent.");
-        static readonly GUIContent k_VisibleDescenderLabel = new("Visible Descender", "Compute descender values from visible characters only. Used to adjust layout behavior when hiding and revealing characters dynamically.");
-        static readonly GUIContent k_SpriteAssetLabel = new("Sprite Asset", "The Sprite Asset used when NOT specifically referencing one using <sprite=\"Sprite Asset Name\">.");
-        static readonly GUIContent k_StyleSheetAssetLabel = new("Style Sheet Asset", "The Style Sheet Asset used by this text object.");
+        static readonly GUIContent k_OverflowLabel =
+            new("Overflow", "How to display text which goes past the edge of the container.");
 
-        static readonly GUIContent k_HorizontalMappingLabel = new("Horizontal Mapping", "Horizontal UV mapping when using a shader with a texture face option.");
-        static readonly GUIContent k_VerticalMappingLabel = new("Vertical Mapping", "Vertical UV mapping when using a shader with a texture face option.");
-        static readonly GUIContent k_LineOffsetLabel = new("Line Offset", "Adds an horizontal offset to each successive line. Used for slanted texturing.");
+        static readonly GUIContent k_MarginsLabel =
+            new("Margins", "The space between the text and the edge of its container.");
 
-        static readonly GUIContent k_FontFeaturesLabel = new("Font Features", "Font features available for the primary font asset assigned to the text component.");
-        static readonly GUIContent k_PaddingLabel = new("Extra Padding", "Adds some padding between the characters and the edge of the text mesh. Can reduce graphical errors when displaying small text.");
-        
+        static readonly GUIContent k_GeometrySortingLabel = new("Geometry Sorting",
+            "The order in which text geometry is sorted. Used to adjust the way overlapping characters are displayed.");
+
+        static readonly GUIContent k_IsTextObjectScaleStatic = new("Is Scale Static",
+            "Controls whether a text object will be excluded from the InteralUpdate callback to handle scale changes of the text object or its parent(s).");
+
+        static readonly GUIContent k_RichTextLabel =
+            new("Rich Text", "Enables the use of rich text tags such as <color> and <font>.");
+
+        static readonly GUIContent k_EscapeCharactersLabel = new("Parse Escape Characters",
+            "Whether to display strings such as \"\\n\" as is or replace them by the character they represent.");
+
+        static readonly GUIContent k_VisibleDescenderLabel = new("Visible Descender",
+            "Compute descender values from visible characters only. Used to adjust layout behavior when hiding and revealing characters dynamically.");
+
+        static readonly GUIContent k_SpriteAssetLabel = new("Sprite Asset",
+            "The Sprite Asset used when NOT specifically referencing one using <sprite=\"Sprite Asset Name\">.");
+
+        static readonly GUIContent k_StyleSheetAssetLabel =
+            new("Style Sheet Asset", "The Style Sheet Asset used by this text object.");
+
+        static readonly GUIContent k_HorizontalMappingLabel = new("Horizontal Mapping",
+            "Horizontal UV mapping when using a shader with a texture face option.");
+
+        static readonly GUIContent k_VerticalMappingLabel = new("Vertical Mapping",
+            "Vertical UV mapping when using a shader with a texture face option.");
+
+        static readonly GUIContent k_LineOffsetLabel = new("Line Offset",
+            "Adds an horizontal offset to each successive line. Used for slanted texturing.");
+
+        static readonly GUIContent k_FontFeaturesLabel = new("Font Features",
+            "Font features available for the primary font asset assigned to the text component.");
+
+        static readonly GUIContent k_PaddingLabel = new("Extra Padding",
+            "Adds some padding between the characters and the edge of the text mesh. Can reduce graphical errors when displaying small text.");
+
         protected static string[] k_UiStateLabel = { "<i>(Click to collapse)</i> ", "<i>(Click to expand)</i> " };
 
         static Dictionary<int, TMP_Style> k_AvailableStyles = new();
@@ -148,7 +205,7 @@ namespace TMPro.EditorUtilities
 
         protected bool m_HavePropertiesChanged;
 
-        protected TMPText m_TextComponent;
+        protected TMP_Text m_TextComponent;
         protected RectTransform m_RectTransform;
 
         protected Material m_TargetMaterial;
@@ -187,7 +244,7 @@ namespace TMPro.EditorUtilities
             m_WordSpacingProp = serializedObject.FindProperty("m_wordSpacing");
             m_LineSpacingProp = serializedObject.FindProperty("m_lineSpacing");
             m_ParagraphSpacingProp = serializedObject.FindProperty("m_paragraphSpacing");
-            
+
             m_HorizontalAlignmentProp = serializedObject.FindProperty("m_HorizontalAlignment");
             autoHorizontalAlignment = serializedObject.FindProperty("autoHorizontalAlignment");
             m_VerticalAlignmentProp = serializedObject.FindProperty("m_VerticalAlignment");
@@ -219,13 +276,14 @@ namespace TMPro.EditorUtilities
 
             m_ColorModeProp = serializedObject.FindProperty("m_colorMode");
 
-            m_TextComponent = (TMPText)target;
+            m_TextComponent = (TMP_Text)target;
             m_RectTransform = m_TextComponent.rectTransform;
 
             m_TargetMaterial = m_TextComponent.fontSharedMaterial;
 
             if (m_TargetMaterial != null)
-                UnityEditorInternal.InternalEditorUtility.SetIsInspectorExpanded(m_TargetMaterial, Foldout.materialInspector);
+                UnityEditorInternal.InternalEditorUtility.SetIsInspectorExpanded(m_TargetMaterial,
+                    Foldout.materialInspector);
 
             m_MaterialPresetNames = GetMaterialPresets();
 
@@ -240,7 +298,8 @@ namespace TMPro.EditorUtilities
         protected virtual void OnDisable()
         {
             if (m_TargetMaterial != null)
-                Foldout.materialInspector = UnityEditorInternal.InternalEditorUtility.GetIsInspectorExpanded(m_TargetMaterial);
+                Foldout.materialInspector =
+                    UnityEditorInternal.InternalEditorUtility.GetIsInspectorExpanded(m_TargetMaterial);
 
             if (Undo.undoRedoPerformed != null)
                 Undo.undoRedoPerformed -= OnUndoRedo;
@@ -282,21 +341,32 @@ namespace TMPro.EditorUtilities
             Vector4 marginOffset = m_TextComponent.margin;
             Vector3 lossyScale = m_RectTransform.lossyScale;
 
-            m_HandlePoints[0] = m_RectCorners[0] + m_RectTransform.TransformDirection(new Vector3(marginOffset.x * lossyScale.x, marginOffset.w * lossyScale.y, 0));
-            m_HandlePoints[1] = m_RectCorners[1] + m_RectTransform.TransformDirection(new Vector3(marginOffset.x * lossyScale.x, -marginOffset.y * lossyScale.y, 0));
-            m_HandlePoints[2] = m_RectCorners[2] + m_RectTransform.TransformDirection(new Vector3(-marginOffset.z * lossyScale.x, -marginOffset.y * lossyScale.y, 0));
-            m_HandlePoints[3] = m_RectCorners[3] + m_RectTransform.TransformDirection(new Vector3(-marginOffset.z * lossyScale.x, marginOffset.w * lossyScale.y, 0));
+            m_HandlePoints[0] = m_RectCorners[0] +
+                                m_RectTransform.TransformDirection(new Vector3(marginOffset.x * lossyScale.x,
+                                    marginOffset.w * lossyScale.y, 0));
+            m_HandlePoints[1] = m_RectCorners[1] +
+                                m_RectTransform.TransformDirection(new Vector3(marginOffset.x * lossyScale.x,
+                                    -marginOffset.y * lossyScale.y, 0));
+            m_HandlePoints[2] = m_RectCorners[2] +
+                                m_RectTransform.TransformDirection(new Vector3(-marginOffset.z * lossyScale.x,
+                                    -marginOffset.y * lossyScale.y, 0));
+            m_HandlePoints[3] = m_RectCorners[3] +
+                                m_RectTransform.TransformDirection(new Vector3(-marginOffset.z * lossyScale.x,
+                                    marginOffset.w * lossyScale.y, 0));
 
-            Handles.DrawSolidRectangleWithOutline(m_HandlePoints, new Color32(255, 255, 255, 0), new Color32(255, 255, 0, 255));
+            Handles.DrawSolidRectangleWithOutline(m_HandlePoints, new Color32(255, 255, 255, 0),
+                new Color32(255, 255, 0, 255));
 
             Matrix4x4 matrix = m_RectTransform.worldToLocalMatrix;
 
             Vector3 oldLeft = (m_HandlePoints[0] + m_HandlePoints[1]) * 0.5f;
-            #if UNITY_2022_1_OR_NEWER
-            Vector3 newLeft = Handles.FreeMoveHandle(oldLeft, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
-            #else
-            Vector3 newLeft = Handles.FreeMoveHandle(oldLeft, Quaternion.identity, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
-            #endif
+#if UNITY_2022_1_OR_NEWER
+            Vector3 newLeft = Handles.FreeMoveHandle(oldLeft,
+                HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
+#else
+            Vector3 newLeft =
+ Handles.FreeMoveHandle(oldLeft, Quaternion.identity, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
+#endif
             bool hasChanged = false;
             if (oldLeft != newLeft)
             {
@@ -309,11 +379,13 @@ namespace TMPro.EditorUtilities
             }
 
             Vector3 oldTop = (m_HandlePoints[1] + m_HandlePoints[2]) * 0.5f;
-            #if UNITY_2022_1_OR_NEWER
-            Vector3 newTop = Handles.FreeMoveHandle(oldTop, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
-            #else
-            Vector3 newTop = Handles.FreeMoveHandle(oldTop, Quaternion.identity, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
-            #endif
+#if UNITY_2022_1_OR_NEWER
+            Vector3 newTop = Handles.FreeMoveHandle(oldTop,
+                HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
+#else
+            Vector3 newTop =
+ Handles.FreeMoveHandle(oldTop, Quaternion.identity, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
+#endif
             if (oldTop != newTop)
             {
                 oldTop = matrix.MultiplyPoint(oldTop);
@@ -325,11 +397,13 @@ namespace TMPro.EditorUtilities
             }
 
             Vector3 oldRight = (m_HandlePoints[2] + m_HandlePoints[3]) * 0.5f;
-            #if UNITY_2022_1_OR_NEWER
-            Vector3 newRight = Handles.FreeMoveHandle(oldRight, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
-            #else
-            Vector3 newRight = Handles.FreeMoveHandle(oldRight, Quaternion.identity, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
-            #endif
+#if UNITY_2022_1_OR_NEWER
+            Vector3 newRight = Handles.FreeMoveHandle(oldRight,
+                HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
+#else
+            Vector3 newRight =
+ Handles.FreeMoveHandle(oldRight, Quaternion.identity, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
+#endif
             if (oldRight != newRight)
             {
                 oldRight = matrix.MultiplyPoint(oldRight);
@@ -341,11 +415,13 @@ namespace TMPro.EditorUtilities
             }
 
             Vector3 oldBottom = (m_HandlePoints[3] + m_HandlePoints[0]) * 0.5f;
-            #if UNITY_2022_1_OR_NEWER
-            Vector3 newBottom = Handles.FreeMoveHandle(oldBottom, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
-            #else
-            Vector3 newBottom = Handles.FreeMoveHandle(oldBottom, Quaternion.identity, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
-            #endif
+#if UNITY_2022_1_OR_NEWER
+            Vector3 newBottom = Handles.FreeMoveHandle(oldBottom,
+                HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
+#else
+            Vector3 newBottom =
+ Handles.FreeMoveHandle(oldBottom, Quaternion.identity, HandleUtility.GetHandleSize(m_RectTransform.position) * 0.05f, Vector3.zero, Handles.DotHandleCap);
+#endif
             if (oldBottom != newBottom)
             {
                 oldBottom = matrix.MultiplyPoint(oldBottom);
@@ -358,7 +434,7 @@ namespace TMPro.EditorUtilities
 
             if (hasChanged)
             {
-                Undo.RecordObjects(new Object[] {m_RectTransform, m_TextComponent }, "Margin Changes");
+                Undo.RecordObjects(new Object[] { m_RectTransform, m_TextComponent }, "Margin Changes");
                 m_TextComponent.margin = marginOffset;
                 EditorUtility.SetDirty(target);
             }
@@ -373,14 +449,14 @@ namespace TMPro.EditorUtilities
 
             var oldfs = EditorStyles.textArea.fontSize;
             fs = EditorGUILayout.IntSlider("Text Area Font Size (Editor)", fs, 12, 32);
-            
+
             EditorGUI.indentLevel = 0;
 
             float labelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 110f;
 
             EditorGUIUtility.labelWidth = labelWidth;
-            
+
             EditorGUI.BeginChangeCheck();
             EditorStyles.textArea.fontSize = fs;
             EditorGUILayout.PropertyField(m_TextProp, GUIContent.none);
@@ -418,7 +494,6 @@ namespace TMPro.EditorUtilities
 
                 EditorGUI.EndProperty();
             }
-
         }
 
         protected void DrawMainSettings()
@@ -437,7 +512,8 @@ namespace TMPro.EditorUtilities
 
             DrawTextureMapping();
 
-            m_TextComponent.renderMode = (TextRenderFlags)EditorGUILayout.EnumPopup("Render Mode", m_TextComponent.renderMode);
+            m_TextComponent.renderMode =
+                (TextRenderFlags)EditorGUILayout.EnumPopup("Render Mode", m_TextComponent.renderMode);
         }
 
         void DrawFont()
@@ -459,7 +535,7 @@ namespace TMPro.EditorUtilities
 
             Rect rect;
 
-            if (m_MaterialPresetNames != null && !isFontAssetDirty )
+            if (m_MaterialPresetNames != null && !isFontAssetDirty)
             {
                 EditorGUI.BeginChangeCheck();
                 rect = EditorGUILayout.GetControlRect(false, 17);
@@ -473,9 +549,12 @@ namespace TMPro.EditorUtilities
                 EditorStyles.popup.fontSize = 11;
 
                 if (m_FontSharedMaterialProp.objectReferenceValue != null)
-                    m_MaterialPresetIndexLookup.TryGetValue(m_FontSharedMaterialProp.objectReferenceValue.GetInstanceID(), out m_MaterialPresetSelectionIndex);
+                    m_MaterialPresetIndexLookup.TryGetValue(
+                        m_FontSharedMaterialProp.objectReferenceValue.GetInstanceID(),
+                        out m_MaterialPresetSelectionIndex);
 
-                m_MaterialPresetSelectionIndex = EditorGUI.Popup(rect, k_MaterialPresetLabel, m_MaterialPresetSelectionIndex, m_MaterialPresetNames);
+                m_MaterialPresetSelectionIndex = EditorGUI.Popup(rect, k_MaterialPresetLabel,
+                    m_MaterialPresetSelectionIndex, m_MaterialPresetNames);
 
                 EditorGUI.EndProperty();
 
@@ -508,33 +587,56 @@ namespace TMPro.EditorUtilities
 
                 rect.width = Mathf.Max(25f, rect.width / 7f);
 
-                v1 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 1) == 1, k_BoldLabel, TMP_UIStyleManager.alignmentButtonLeft) ? 1 : 0;
+                v1 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 1) == 1, k_BoldLabel,
+                    TMP_UIStyleManager.alignmentButtonLeft)
+                    ? 1
+                    : 0;
                 rect.x += rect.width;
-                v2 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 2) == 2, k_ItalicLabel, TMP_UIStyleManager.alignmentButtonMid) ? 2 : 0;
+                v2 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 2) == 2, k_ItalicLabel,
+                    TMP_UIStyleManager.alignmentButtonMid)
+                    ? 2
+                    : 0;
                 rect.x += rect.width;
-                v3 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 4) == 4, k_UnderlineLabel, TMP_UIStyleManager.alignmentButtonMid) ? 4 : 0;
+                v3 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 4) == 4, k_UnderlineLabel,
+                    TMP_UIStyleManager.alignmentButtonMid)
+                    ? 4
+                    : 0;
                 rect.x += rect.width;
-                v7 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 64) == 64, k_StrikethroughLabel, TMP_UIStyleManager.alignmentButtonRight) ? 64 : 0;
+                v7 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 64) == 64, k_StrikethroughLabel,
+                    TMP_UIStyleManager.alignmentButtonRight)
+                    ? 64
+                    : 0;
                 rect.x += rect.width;
 
                 int selected = 0;
 
                 EditorGUI.BeginChangeCheck();
-                v4 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 8) == 8, k_LowercaseLabel, TMP_UIStyleManager.alignmentButtonLeft) ? 8 : 0;
+                v4 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 8) == 8, k_LowercaseLabel,
+                    TMP_UIStyleManager.alignmentButtonLeft)
+                    ? 8
+                    : 0;
                 if (EditorGUI.EndChangeCheck() && v4 > 0)
                 {
                     selected = v4;
                 }
+
                 rect.x += rect.width;
                 EditorGUI.BeginChangeCheck();
-                v5 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 16) == 16, k_UppercaseLabel, TMP_UIStyleManager.alignmentButtonMid) ? 16 : 0;
+                v5 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 16) == 16, k_UppercaseLabel,
+                    TMP_UIStyleManager.alignmentButtonMid)
+                    ? 16
+                    : 0;
                 if (EditorGUI.EndChangeCheck() && v5 > 0)
                 {
                     selected = v5;
                 }
+
                 rect.x += rect.width;
                 EditorGUI.BeginChangeCheck();
-                v6 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 32) == 32, k_SmallcapsLabel, TMP_UIStyleManager.alignmentButtonRight) ? 32 : 0;
+                v6 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 32) == 32, k_SmallcapsLabel,
+                    TMP_UIStyleManager.alignmentButtonRight)
+                    ? 32
+                    : 0;
                 if (EditorGUI.EndChangeCheck() && v6 > 0)
                 {
                     selected = v6;
@@ -563,13 +665,25 @@ namespace TMPro.EditorUtilities
                 rect.width -= EditorGUIUtility.labelWidth;
                 rect.width = Mathf.Max(25f, rect.width / 4f);
 
-                v1 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 1) == 1, k_BoldLabel, TMP_UIStyleManager.alignmentButtonLeft) ? 1 : 0;
+                v1 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 1) == 1, k_BoldLabel,
+                    TMP_UIStyleManager.alignmentButtonLeft)
+                    ? 1
+                    : 0;
                 rect.x += rect.width;
-                v2 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 2) == 2, k_ItalicLabel, TMP_UIStyleManager.alignmentButtonMid) ? 2 : 0;
+                v2 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 2) == 2, k_ItalicLabel,
+                    TMP_UIStyleManager.alignmentButtonMid)
+                    ? 2
+                    : 0;
                 rect.x += rect.width;
-                v3 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 4) == 4, k_UnderlineLabel, TMP_UIStyleManager.alignmentButtonMid) ? 4 : 0;
+                v3 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 4) == 4, k_UnderlineLabel,
+                    TMP_UIStyleManager.alignmentButtonMid)
+                    ? 4
+                    : 0;
                 rect.x += rect.width;
-                v7 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 64) == 64, k_StrikethroughLabel, TMP_UIStyleManager.alignmentButtonRight) ? 64 : 0;
+                v7 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 64) == 64, k_StrikethroughLabel,
+                    TMP_UIStyleManager.alignmentButtonRight)
+                    ? 64
+                    : 0;
 
                 rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight + 2f);
 
@@ -581,21 +695,32 @@ namespace TMPro.EditorUtilities
                 int selected = 0;
 
                 EditorGUI.BeginChangeCheck();
-                v4 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 8) == 8, k_LowercaseLabel, TMP_UIStyleManager.alignmentButtonLeft) ? 8 : 0;
+                v4 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 8) == 8, k_LowercaseLabel,
+                    TMP_UIStyleManager.alignmentButtonLeft)
+                    ? 8
+                    : 0;
                 if (EditorGUI.EndChangeCheck() && v4 > 0)
                 {
                     selected = v4;
                 }
+
                 rect.x += rect.width;
                 EditorGUI.BeginChangeCheck();
-                v5 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 16) == 16, k_UppercaseLabel, TMP_UIStyleManager.alignmentButtonMid) ? 16 : 0;
+                v5 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 16) == 16, k_UppercaseLabel,
+                    TMP_UIStyleManager.alignmentButtonMid)
+                    ? 16
+                    : 0;
                 if (EditorGUI.EndChangeCheck() && v5 > 0)
                 {
                     selected = v5;
                 }
+
                 rect.x += rect.width;
                 EditorGUI.BeginChangeCheck();
-                v6 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 32) == 32, k_SmallcapsLabel, TMP_UIStyleManager.alignmentButtonRight) ? 32 : 0;
+                v6 = TMP_EditorUtility.EditorToggle(rect, (styleValue & 32) == 32, k_SmallcapsLabel,
+                    TMP_UIStyleManager.alignmentButtonRight)
+                    ? 32
+                    : 0;
                 if (EditorGUI.EndChangeCheck() && v6 > 0)
                 {
                     selected = v6;
@@ -620,7 +745,8 @@ namespace TMPro.EditorUtilities
             EditorGUI.BeginChangeCheck();
 
             EditorGUI.BeginDisabledGroup(m_AutoSizingProp.boolValue);
-            EditorGUILayout.PropertyField(m_FontSizeProp, k_FontSizeLabel, GUILayout.MaxWidth(EditorGUIUtility.labelWidth + 50f));
+            EditorGUILayout.PropertyField(m_FontSizeProp, k_FontSizeLabel,
+                GUILayout.MaxWidth(EditorGUIUtility.labelWidth + 50f));
             EditorGUI.EndDisabledGroup();
 
             if (EditorGUI.EndChangeCheck())
@@ -669,6 +795,7 @@ namespace TMPro.EditorUtilities
                     m_FontSizeMinProp.floatValue = Mathf.Min(minSize, m_FontSizeMaxProp.floatValue);
                     m_HavePropertiesChanged = true;
                 }
+
                 rect.x += rect.width;
 
                 EditorGUIUtility.labelWidth = 27;
@@ -681,6 +808,7 @@ namespace TMPro.EditorUtilities
                     m_FontSizeMaxProp.floatValue = Mathf.Max(m_FontSizeMinProp.floatValue, maxSize);
                     m_HavePropertiesChanged = true;
                 }
+
                 rect.x += rect.width;
 
                 EditorGUI.BeginChangeCheck();
@@ -703,7 +831,6 @@ namespace TMPro.EditorUtilities
             }
 
             EditorGUI.indentLevel -= 1;
-
 
 
             EditorGUILayout.Space();
@@ -764,7 +891,8 @@ namespace TMPro.EditorUtilities
 
                 EditorGUILayout.PropertyField(colorMode, k_ColorModeLabel);
 
-                Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
+                Rect rect = EditorGUILayout.GetControlRect(true,
+                    EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
 
                 EditorGUI.PrefixLabel(rect, k_CorenerColorsLabel);
 
@@ -795,7 +923,8 @@ namespace TMPro.EditorUtilities
                     case ColorMode.VerticalGradient:
                         TMP_EditorUtility.DrawColorProperty(rect, topLeft);
 
-                        rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
+                        rect = EditorGUILayout.GetControlRect(false,
+                            EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
                         rect.x += EditorGUIUtility.labelWidth;
 
                         TMP_EditorUtility.DrawColorProperty(rect, bottomLeft);
@@ -812,7 +941,8 @@ namespace TMPro.EditorUtilities
 
                         TMP_EditorUtility.DrawColorProperty(rect, topRight);
 
-                        rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
+                        rect = EditorGUILayout.GetControlRect(false,
+                            EditorGUIUtility.singleLineHeight * (EditorGUIUtility.wideMode ? 1 : 2));
                         rect.x += EditorGUIUtility.labelWidth;
                         rect.width = (rect.width - EditorGUIUtility.labelWidth) / 2f;
 
@@ -830,7 +960,8 @@ namespace TMPro.EditorUtilities
                     if (obj != null)
                     {
                         obj.ApplyModifiedProperties();
-                        TMPro_EventManager.ON_COLOR_GRADIENT_PROPERTY_CHANGED(m_FontColorGradientPresetProp.objectReferenceValue as TMP_ColorGradient);
+                        TMPro_EventManager.ON_COLOR_GRADIENT_PROPERTY_CHANGED(
+                            m_FontColorGradientPresetProp.objectReferenceValue as TMP_ColorGradient);
                     }
                 }
 
@@ -866,7 +997,7 @@ namespace TMPro.EditorUtilities
             rect = EditorGUILayout.GetControlRect(false, EditorGUIUtility.singleLineHeight);
 
             rect.x += currentLabelWidth;
-            rect.width = (rect.width - currentLabelWidth -3f) / 2f;
+            rect.width = (rect.width - currentLabelWidth - 3f) / 2f;
             EditorGUIUtility.labelWidth = Mathf.Min(rect.width * 0.55f, 80f);
 
             EditorGUI.PropertyField(rect, m_LineSpacingProp, k_LineSpacingLabel);
@@ -898,7 +1029,10 @@ namespace TMPro.EditorUtilities
             EditorGUI.PropertyField(rect, m_HorizontalAlignmentProp, GUIContent.none);
             EditorGUI.PropertyField(rect, m_VerticalAlignmentProp, GUIContent.none);
 
-            if (((HorizontalAlignmentOptions)m_HorizontalAlignmentProp.intValue & HorizontalAlignmentOptions.Justified) == HorizontalAlignmentOptions.Justified || ((HorizontalAlignmentOptions)m_HorizontalAlignmentProp.intValue & HorizontalAlignmentOptions.Flush) == HorizontalAlignmentOptions.Flush)
+            if (((HorizontalAlignmentOptions)m_HorizontalAlignmentProp.intValue &
+                 HorizontalAlignmentOptions.Justified) == HorizontalAlignmentOptions.Justified ||
+                ((HorizontalAlignmentOptions)m_HorizontalAlignmentProp.intValue & HorizontalAlignmentOptions.Flush) ==
+                HorizontalAlignmentOptions.Flush)
                 DrawPropertySlider(k_WrapMixLabel, m_WordWrappingRatiosProp);
 
             if (EditorGUI.EndChangeCheck())
@@ -908,7 +1042,7 @@ namespace TMPro.EditorUtilities
             EditorGUI.EndProperty();
 
             EditorGUILayout.PropertyField(autoHorizontalAlignment);
-            
+
             EditorGUILayout.Space();
         }
 
@@ -974,7 +1108,7 @@ namespace TMPro.EditorUtilities
 
             EditorGUILayout.Space();
         }
-        
+
         protected void DrawRichText()
         {
             EditorGUI.BeginChangeCheck();
@@ -1042,7 +1176,7 @@ namespace TMPro.EditorUtilities
             for (int i = 0; i < featureCount; i++)
             {
                 SerializedProperty activeFeatureProperty = m_FontFeaturesActiveProp.GetArrayElementAtIndex(i);
-                
+
                 for (int j = 0; j < k_FontFeatures.Length; j++)
                 {
                     if (activeFeatureProperty.intValue == k_FontFeatures[j].TagToInt())
@@ -1054,15 +1188,15 @@ namespace TMPro.EditorUtilities
             }
 
             EditorGUI.BeginChangeCheck();
-            
+
             int mask = EditorGUILayout.MaskField(k_FontFeaturesLabel, srcMask, k_FontFeatures);
-            
+
             if (EditorGUI.EndChangeCheck())
             {
                 m_FontFeaturesActiveProp.ClearArray();
 
                 int writeIndex = 0;
-                
+
                 for (int i = 0; i < k_FontFeatures.Length; i++)
                 {
                     int bit = 0x1 << i;
@@ -1077,7 +1211,7 @@ namespace TMPro.EditorUtilities
                 }
 
                 m_HavePropertiesChanged = true;
-            }   
+            }
         }
 
         protected void DrawPadding()
@@ -1212,7 +1346,8 @@ namespace TMPro.EditorUtilities
             Rect dragZone = new Rect(position.x, position.y, position.width, position.height);
             position.y += EditorGUIUtility.singleLineHeight;
 
-            return EditorGUI.DoFloatField(EditorGUI.s_RecycledEditor, position, dragZone, controlId, value, EditorGUI.kFloatFieldFormatString, EditorStyles.numberField, true);
+            return EditorGUI.DoFloatField(EditorGUI.s_RecycledEditor, position, dragZone, controlId, value,
+                EditorGUI.kFloatFieldFormatString, EditorStyles.numberField, true);
         }
 
         protected void DrawPropertySlider(GUIContent label, SerializedProperty property)
@@ -1226,6 +1361,5 @@ namespace TMPro.EditorUtilities
         protected abstract bool IsMixSelectionTypes();
 
         protected abstract void OnUndoRedo();
-
     }
 }

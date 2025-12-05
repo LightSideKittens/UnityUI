@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-
 using UnityEngine.UI;
 
 
 namespace TMPro
 {
-
     public static class TMP_MaterialManager
     {
         private static List<MaskingMaterial> m_materialList = new();
@@ -31,14 +29,13 @@ namespace TMPro
             }
         }
 
-        /// <param name="baseMaterial"></param>
-        /// <param name="stencilID"></param>
-        /// <returns></returns>
+
         public static Material GetStencilMaterial(Material baseMaterial, int stencilID)
         {
             if (!baseMaterial.HasProperty(ShaderUtilities.ID_StencilID))
             {
-                Debug.LogWarning("Selected Shader does not support Stencil Masking. Please select the Distance Field or Mobile Distance Field Shader.");
+                Debug.LogWarning(
+                    "Selected Shader does not support Stencil Masking. Please select the Distance Field or Mobile Distance Field Shader.");
                 return baseMaterial;
             }
 
@@ -46,13 +43,14 @@ namespace TMPro
 
             for (int i = 0; i < m_materialList.Count; i++)
             {
-                if (m_materialList[i].baseMaterial.GetInstanceID() == baseMaterialID && m_materialList[i].stencilID == stencilID)
+                if (m_materialList[i].baseMaterial.GetInstanceID() == baseMaterialID &&
+                    m_materialList[i].stencilID == stencilID)
                 {
                     m_materialList[i].count += 1;
 
-                    #if TMP_DEBUG_MODE
+#if TMP_DEBUG_MODE
                     ListMaterials();
-                    #endif
+#endif
 
                     return m_materialList[i].stencilMaterial;
                 }
@@ -63,9 +61,9 @@ namespace TMPro
             stencilMaterial = new(baseMaterial);
             stencilMaterial.hideFlags = HideFlags.HideAndDontSave;
 
-            #if UNITY_EDITOR
-                stencilMaterial.name += " Masking ID:" + stencilID;
-            #endif
+#if UNITY_EDITOR
+            stencilMaterial.name += " Masking ID:" + stencilID;
+#endif
 
             stencilMaterial.shaderKeywords = baseMaterial.shaderKeywords;
 
@@ -81,15 +79,14 @@ namespace TMPro
 
             m_materialList.Add(temp);
 
-            #if TMP_DEBUG_MODE
+#if TMP_DEBUG_MODE
             ListMaterials();
-            #endif
+#endif
 
             return stencilMaterial;
         }
 
 
-        /// <param name="stencilMaterial"></param>
         public static void ReleaseStencilMaterial(Material stencilMaterial)
         {
             int stencilMaterialID = stencilMaterial.GetInstanceID();
@@ -112,9 +109,9 @@ namespace TMPro
             }
 
 
-            #if TMP_DEBUG_MODE
+#if TMP_DEBUG_MODE
             ListMaterials();
-            #endif
+#endif
         }
 
 
@@ -126,13 +123,9 @@ namespace TMPro
                 return null;
             else
                 return m_materialList[index].baseMaterial;
-
         }
 
 
-        /// <param name="material"></param>
-        /// <param name="stencilID"></param>
-        /// <returns></returns>
         public static Material SetStencil(Material material, int stencilID)
         {
             material.SetFloat(ShaderUtilities.ID_StencilID, stencilID);
@@ -168,7 +161,6 @@ namespace TMPro
         }
 
 
-
         public static void RemoveStencilMaterial(Material stencilMaterial)
         {
             int index = m_materialList.FindIndex(item => item.stencilMaterial == stencilMaterial);
@@ -178,11 +170,10 @@ namespace TMPro
                 m_materialList.RemoveAt(index);
             }
 
-            #if TMP_DEBUG_MODE
+#if TMP_DEBUG_MODE
             ListMaterials();
-            #endif
+#endif
         }
-
 
 
         public static void ReleaseBaseMaterial(Material baseMaterial)
@@ -198,19 +189,21 @@ namespace TMPro
                 if (m_materialList[index].count > 1)
                 {
                     m_materialList[index].count -= 1;
-                    Debug.Log("Removed (1) reference to " + m_materialList[index].stencilMaterial.name + ". There are " + m_materialList[index].count + " references left.");
+                    Debug.Log("Removed (1) reference to " + m_materialList[index].stencilMaterial.name +
+                              ". There are " + m_materialList[index].count + " references left.");
                 }
                 else
                 {
-                    Debug.Log("Removed last reference to " + m_materialList[index].stencilMaterial.name + " with ID " + m_materialList[index].stencilMaterial.GetInstanceID());
+                    Debug.Log("Removed last reference to " + m_materialList[index].stencilMaterial.name + " with ID " +
+                              m_materialList[index].stencilMaterial.GetInstanceID());
                     Object.DestroyImmediate(m_materialList[index].stencilMaterial);
                     m_materialList.RemoveAt(index);
                 }
             }
 
-            #if TMP_DEBUG_MODE
+#if TMP_DEBUG_MODE
             ListMaterials();
-            #endif
+#endif
         }
 
 
@@ -228,12 +221,11 @@ namespace TMPro
 
                 Object.DestroyImmediate(stencilMaterial);
             }
+
             m_materialList.Clear();
         }
 
 
-        /// <param name="obj"></param>
-        /// <returns></returns>
         public static int GetStencilID(GameObject obj)
         {
             var count = 0;
@@ -252,17 +244,18 @@ namespace TMPro
                 {
                     var mask = components[i];
                     if (mask != null && mask.MaskEnabled() && mask.graphic.IsActive())
-            {
+                    {
                         ++count;
                         break;
                     }
-            }
+                }
 
                 if (t == stopAfter)
                     break;
 
                 t = t.parent;
             }
+
             TMP_ListPool<Mask>.Release(components);
 
             return Mathf.Min((1 << count) - 1, 255);
@@ -299,6 +292,7 @@ namespace TMPro
                 if (canvas.overrideSorting)
                     break;
             }
+
             TMP_ListPool<Canvas>.Release(canvasList);
 
             return canvas != null ? canvas.transform : null;
@@ -328,9 +322,9 @@ namespace TMPro
 
             fallbackMaterial.hideFlags = HideFlags.HideAndDontSave;
 
-            #if UNITY_EDITOR
-                fallbackMaterial.name += " + " + tex.name;
-            #endif
+#if UNITY_EDITOR
+            fallbackMaterial.name += " + " + tex.name;
+#endif
 
             fallback = new();
             fallback.fallbackID = key;
@@ -342,18 +336,15 @@ namespace TMPro
             m_fallbackMaterials.Add(key, fallback);
             m_fallbackMaterialLookup.Add(fallbackMaterial.GetInstanceID(), key);
 
-            #if TMP_DEBUG_MODE
+#if TMP_DEBUG_MODE
             ListFallbackMaterials();
-            #endif
+#endif
 
             return fallbackMaterial;
         }
 
 
-        /// <param name="sourceMaterial">The material containing the source material properties to be copied to the new material.</param>
-        /// <param name="targetMaterial">The font atlas texture that should be assigned to the new material.</param>
-        /// <returns></returns>
-        public static Material GetFallbackMaterial (Material sourceMaterial, Material targetMaterial)
+        public static Material GetFallbackMaterial(Material sourceMaterial, Material targetMaterial)
         {
             int sourceID = sourceMaterial.GetInstanceID();
             Texture tex = targetMaterial.GetTexture(ShaderUtilities.ID_MainTex);
@@ -372,30 +363,36 @@ namespace TMPro
             }
 
             Material fallbackMaterial;
-            if (sourceMaterial.HasProperty(ShaderUtilities.ID_GradientScale) && targetMaterial.HasProperty(ShaderUtilities.ID_GradientScale))
+            if (sourceMaterial.HasProperty(ShaderUtilities.ID_GradientScale) &&
+                targetMaterial.HasProperty(ShaderUtilities.ID_GradientScale))
             {
                 fallbackMaterial = new(sourceMaterial);
                 fallbackMaterial.hideFlags = HideFlags.HideAndDontSave;
 
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 fallbackMaterial.name += " + " + tex.name;
 #endif
 
                 fallbackMaterial.SetTexture(ShaderUtilities.ID_MainTex, tex);
-                fallbackMaterial.SetFloat(ShaderUtilities.ID_GradientScale, targetMaterial.GetFloat(ShaderUtilities.ID_GradientScale));
-                fallbackMaterial.SetFloat(ShaderUtilities.ID_TextureWidth, targetMaterial.GetFloat(ShaderUtilities.ID_TextureWidth));
-                fallbackMaterial.SetFloat(ShaderUtilities.ID_TextureHeight, targetMaterial.GetFloat(ShaderUtilities.ID_TextureHeight));
-                fallbackMaterial.SetFloat(ShaderUtilities.ID_WeightNormal, targetMaterial.GetFloat(ShaderUtilities.ID_WeightNormal));
-                fallbackMaterial.SetFloat(ShaderUtilities.ID_WeightBold, targetMaterial.GetFloat(ShaderUtilities.ID_WeightBold));
+                fallbackMaterial.SetFloat(ShaderUtilities.ID_GradientScale,
+                    targetMaterial.GetFloat(ShaderUtilities.ID_GradientScale));
+                fallbackMaterial.SetFloat(ShaderUtilities.ID_TextureWidth,
+                    targetMaterial.GetFloat(ShaderUtilities.ID_TextureWidth));
+                fallbackMaterial.SetFloat(ShaderUtilities.ID_TextureHeight,
+                    targetMaterial.GetFloat(ShaderUtilities.ID_TextureHeight));
+                fallbackMaterial.SetFloat(ShaderUtilities.ID_WeightNormal,
+                    targetMaterial.GetFloat(ShaderUtilities.ID_WeightNormal));
+                fallbackMaterial.SetFloat(ShaderUtilities.ID_WeightBold,
+                    targetMaterial.GetFloat(ShaderUtilities.ID_WeightBold));
             }
             else
             {
                 fallbackMaterial = new(targetMaterial);
                 fallbackMaterial.hideFlags = HideFlags.HideAndDontSave;
 
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 fallbackMaterial.name += " + " + tex.name;
-                #endif
+#endif
             }
 
             fallback = new();
@@ -408,15 +405,14 @@ namespace TMPro
             m_fallbackMaterials.Add(key, fallback);
             m_fallbackMaterialLookup.Add(fallbackMaterial.GetInstanceID(), key);
 
-            #if TMP_DEBUG_MODE
+#if TMP_DEBUG_MODE
             ListFallbackMaterials();
-            #endif
+#endif
 
             return fallbackMaterial;
         }
 
 
-        /// <param name="targetMaterial"></param>
         public static void AddFallbackMaterialReference(Material targetMaterial)
         {
             if (targetMaterial == null) return;
@@ -433,7 +429,6 @@ namespace TMPro
         }
 
 
-        /// <param name="targetMaterial"></param>
         public static void RemoveFallbackMaterialReference(Material targetMaterial)
         {
             if (targetMaterial == null) return;
@@ -475,7 +470,6 @@ namespace TMPro
         }
 
 
-        /// <param name="fallbackMaterial">Material to be released.</param>
         public static void ReleaseFallbackMaterial(Material fallbackMaterial)
         {
             if (fallbackMaterial == null) return;
@@ -495,9 +489,9 @@ namespace TMPro
 
             isFallbackListDirty = true;
 
-            #if TMP_DEBUG_MODE
+#if TMP_DEBUG_MODE
             ListFallbackMaterials();
-            #endif
+#endif
         }
 
 
@@ -520,11 +514,10 @@ namespace TMPro
         }
 
 
-        /// <param name="source"></param>
-        /// <param name="destination"></param>
         public static void CopyMaterialPresetProperties(Material source, Material destination)
         {
-            if (!source.HasProperty(ShaderUtilities.ID_GradientScale) || !destination.HasProperty(ShaderUtilities.ID_GradientScale))
+            if (!source.HasProperty(ShaderUtilities.ID_GradientScale) ||
+                !destination.HasProperty(ShaderUtilities.ID_GradientScale))
                 return;
 
             Texture dst_texture = destination.GetTexture(ShaderUtilities.ID_MainTex);
@@ -549,7 +542,7 @@ namespace TMPro
         }
 
 
-        #if TMP_DEBUG_MODE
+#if TMP_DEBUG_MODE
         public static void ListMaterials()
         {
 
@@ -590,13 +583,12 @@ namespace TMPro
                 if (baseMaterial != null)
                     output += " - Base Material is [" + baseMaterial.name + "] with ID " + baseMaterial.GetInstanceID();
                 if (fallbackMaterial != null)
-                    output += " is associated with [" + fallbackMaterial.name + "] with ID " + fallbackMaterial.GetInstanceID() + " and is referenced " + fallback.Value.count + " time(s).";
+                    output +=
+ " is associated with [" + fallbackMaterial.name + "] with ID " + fallbackMaterial.GetInstanceID() + " and is referenced " + fallback.Value.count + " time(s).";
 
                 Debug.Log(output);
             }
         }
-        #endif
+#endif
     }
-
 }
-

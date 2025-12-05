@@ -3,9 +3,6 @@ using UnityEngine.UI.Collections;
 
 namespace UnityEngine.UI
 {
-    /// <remarks>
-    /// This is used during the CanvasUpdate loop to cull clippable elements. The clipping is called after layout, but before Graphic update.
-    /// </remarks>
     public class ClipperRegistry
     {
         static ClipperRegistry s_Instance;
@@ -39,7 +36,7 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <param name="c">The clipper element to add</param>
+
         public static void Register(IClipper c)
         {
             if (c == null)
@@ -47,13 +44,13 @@ namespace UnityEngine.UI
             instance.m_Clippers.AddUnique(c);
         }
 
-        /// <param name="c">The Element to try and remove.</param>
+
         public static void Unregister(IClipper c)
         {
             instance.m_Clippers.Remove(c);
         }
 
-        /// <param name="c">The Element to try and disable.</param>
+
         public static void Disable(IClipper c)
         {
             instance.m_Clippers.DisableItem(c);

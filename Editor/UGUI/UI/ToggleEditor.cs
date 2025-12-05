@@ -52,6 +52,7 @@ namespace UnityEditor.UI
                     }
                 }
             }
+
             EditorGUILayout.PropertyField(m_TransitionProperty);
             EditorGUILayout.PropertyField(m_GraphicProperty);
             EditorGUI.BeginChangeCheck();

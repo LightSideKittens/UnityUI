@@ -50,7 +50,8 @@ namespace UnityEditor.EventSystems
                 EditorGUILayout.PropertyField(callbacksProperty, m_EventIDName);
                 Rect callbackRect = GUILayoutUtility.GetLastRect();
 
-                Rect removeButtonPos = new Rect(callbackRect.xMax - removeButtonSize.x - 8, callbackRect.y + 1, removeButtonSize.x, removeButtonSize.y);
+                Rect removeButtonPos = new Rect(callbackRect.xMax - removeButtonSize.x - 8, callbackRect.y + 1,
+                    removeButtonSize.x, removeButtonSize.y);
                 if (GUI.Button(removeButtonPos, m_IconToolbarMinus, GUIStyle.none))
                 {
                     toBeRemovedEntry = i;
@@ -99,11 +100,13 @@ namespace UnityEditor.EventSystems
                         active = false;
                     }
                 }
+
                 if (active)
                     menu.AddItem(m_EventTypes[i], false, OnAddNewSelected, i);
                 else
                     menu.AddDisabledItem(m_EventTypes[i]);
             }
+
             menu.ShowAsContext();
             Event.current.Use();
         }
@@ -113,7 +116,8 @@ namespace UnityEditor.EventSystems
             int selected = (int)index;
 
             m_DelegatesProperty.arraySize += 1;
-            SerializedProperty delegateEntry = m_DelegatesProperty.GetArrayElementAtIndex(m_DelegatesProperty.arraySize - 1);
+            SerializedProperty delegateEntry =
+                m_DelegatesProperty.GetArrayElementAtIndex(m_DelegatesProperty.arraySize - 1);
             SerializedProperty eventProperty = delegateEntry.FindPropertyRelative("eventID");
             eventProperty.enumValueIndex = selected;
             serializedObject.ApplyModifiedProperties();

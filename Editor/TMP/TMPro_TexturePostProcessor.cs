@@ -7,7 +7,8 @@ namespace TMPro.EditorUtilities
 {
     internal class TMPro_TexturePostProcessor : AssetPostprocessor
     {
-        private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+        private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets,
+            string[] movedAssets, string[] movedFromAssetPaths)
         {
             if (Time.frameCount == 0)
                 return;
@@ -23,7 +24,8 @@ namespace TMPro.EditorUtilities
 
                 if (assetType == typeof(TMP_FontAsset))
                 {
-                    TMP_FontAsset fontAsset = AssetDatabase.LoadAssetAtPath(asset, typeof(TMP_FontAsset)) as TMP_FontAsset;
+                    TMP_FontAsset fontAsset =
+                        AssetDatabase.LoadAssetAtPath(asset, typeof(TMP_FontAsset)) as TMP_FontAsset;
 
                     if (fontAsset != null && fontAsset.m_CharacterLookupDictionary != null)
                         TMP_EditorResourceManager.RegisterFontAssetForDefinitionRefresh(fontAsset);

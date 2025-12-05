@@ -66,17 +66,15 @@ namespace TMPro
             set => m_MaterialHashCode = value;
         }
 
-        [SerializeField]
-        internal string m_Version;
+        [SerializeField] internal string m_Version;
 
         internal int m_InstanceID;
 
         internal int m_HashCode;
 
-        [SerializeField]
-        internal FaceInfo m_FaceInfo;
+        [SerializeField] internal FaceInfo m_FaceInfo;
 
-        [SerializeField][FormerlySerializedAs("material")]
+        [SerializeField] [FormerlySerializedAs("material")]
         internal Material m_Material;
 
         internal int m_MaterialHashCode;

@@ -1,5 +1,3 @@
-
-
 namespace UnityEngine.TextCore
 {
     public enum OTL_FeatureTag : uint

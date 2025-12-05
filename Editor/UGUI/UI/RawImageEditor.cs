@@ -18,10 +18,10 @@ namespace UnityEditor.UI
             // Note we have precedence for calling rectangle for just rect, even in the Inspector.
             // For example in the Camera component's Viewport Rect.
             // Hence sticking with Rect here to be consistent with corresponding property in the API.
-            m_UVRectContent     = EditorGUIUtility.TrTextContent("UV Rect");
+            m_UVRectContent = EditorGUIUtility.TrTextContent("UV Rect");
 
-            m_Texture           = serializedObject.FindProperty("m_Texture");
-            m_UVRect            = serializedObject.FindProperty("m_UVRect");
+            m_Texture = serializedObject.FindProperty("m_Texture");
+            m_UVRect = serializedObject.FindProperty("m_UVRect");
 
             SetShowNativeSize(true);
         }

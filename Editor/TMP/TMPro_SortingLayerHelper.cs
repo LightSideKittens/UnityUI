@@ -7,10 +7,7 @@ namespace TMPro
     {
         public static string[] sortingLayerNames
         {
-            get
-            {
-                return GetSortingLayerNames();
-            }
+            get { return GetSortingLayerNames(); }
         }
 
         static string[] GetSortingLayerNames()

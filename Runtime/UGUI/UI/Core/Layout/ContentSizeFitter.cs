@@ -5,9 +5,6 @@ namespace UnityEngine.UI
     [AddComponentMenu("Layout/Content Size Fitter", 141)]
     [ExecuteAlways]
     [RequireComponent(typeof(RectTransform))]
-    /// <remarks>
-    /// The ContentSizeFitter can be used on GameObjects that have one or more ILayoutElement components, such as Text, Image, HorizontalLayoutGroup, VerticalLayoutGroup, and GridLayoutGroup.
-    /// </remarks>
     public class ContentSizeFitter : UIBehaviour, ILayoutSelfController
     {
         public enum FitMode
@@ -19,13 +16,28 @@ namespace UnityEngine.UI
 
         [SerializeField] protected FitMode m_HorizontalFit = FitMode.Unconstrained;
 
-        public FitMode horizontalFit { get { return m_HorizontalFit; } set { if (SetPropertyUtility.SetStruct(ref m_HorizontalFit, value)) SetDirty(); } }
+        public FitMode horizontalFit
+        {
+            get { return m_HorizontalFit; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_HorizontalFit, value)) SetDirty();
+            }
+        }
 
         [SerializeField] protected FitMode m_VerticalFit = FitMode.Unconstrained;
 
-        public FitMode verticalFit { get { return m_VerticalFit; } set { if (SetPropertyUtility.SetStruct(ref m_VerticalFit, value)) SetDirty(); } }
+        public FitMode verticalFit
+        {
+            get { return m_VerticalFit; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_VerticalFit, value)) SetDirty();
+            }
+        }
 
         [System.NonSerialized] private RectTransform m_Rect;
+
         private RectTransform rectTransform
         {
             get
@@ -37,12 +49,13 @@ namespace UnityEngine.UI
         }
 
         // field is never assigned warning
-        #pragma warning disable 649
+#pragma warning disable 649
         private DrivenRectTransformTracker m_Tracker;
-        #pragma warning restore 649
+#pragma warning restore 649
 
         protected ContentSizeFitter()
-        {}
+        {
+        }
 
         protected override void OnEnable()
         {
@@ -72,13 +85,16 @@ namespace UnityEngine.UI
                 return;
             }
 
-            m_Tracker.Add(this, rectTransform, (axis == 0 ? DrivenTransformProperties.SizeDeltaX : DrivenTransformProperties.SizeDeltaY));
+            m_Tracker.Add(this, rectTransform,
+                (axis == 0 ? DrivenTransformProperties.SizeDeltaX : DrivenTransformProperties.SizeDeltaY));
 
             // Set size to min or preferred size
             if (fitting == FitMode.MinSize)
-                rectTransform.SetSizeWithCurrentAnchors((RectTransform.Axis)axis, LayoutUtility.GetMinSize(m_Rect, axis));
+                rectTransform.SetSizeWithCurrentAnchors((RectTransform.Axis)axis,
+                    LayoutUtility.GetMinSize(m_Rect, axis));
             else
-                rectTransform.SetSizeWithCurrentAnchors((RectTransform.Axis)axis, LayoutUtility.GetPreferredSize(m_Rect, axis));
+                rectTransform.SetSizeWithCurrentAnchors((RectTransform.Axis)axis,
+                    LayoutUtility.GetPreferredSize(m_Rect, axis));
         }
 
         public virtual void SetLayoutHorizontal()
@@ -100,12 +116,12 @@ namespace UnityEngine.UI
             LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
         }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         protected override void OnValidate()
         {
             SetDirty();
         }
 
-    #endif
+#endif
     }
 }

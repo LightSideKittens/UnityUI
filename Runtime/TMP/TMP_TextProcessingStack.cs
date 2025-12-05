@@ -132,7 +132,6 @@ namespace TMPro
     }
 
 
-    /// <typeparam name="T"></typeparam>
     [DebuggerDisplay("Item count = {m_Count}")]
     public struct TMP_TextProcessingStack<T>
     {
@@ -147,7 +146,6 @@ namespace TMPro
         private const int k_DefaultCapacity = 4;
 
 
-        /// <param name="stack"></param>
         public TMP_TextProcessingStack(T[] stack)
         {
             itemStack = stack;
@@ -160,7 +158,6 @@ namespace TMPro
         }
 
 
-        /// <param name="capacity"></param>
         public TMP_TextProcessingStack(int capacity)
         {
             itemStack = new T[capacity];
@@ -206,15 +203,10 @@ namespace TMPro
         public int rolloverSize
         {
             get { return m_RolloverSize; }
-            set
-            {
-                m_RolloverSize = value;
-            }
+            set { m_RolloverSize = value; }
         }
 
 
-        /// <param name="stack">The stack of elements.</param>
-        /// <param name="item"></param>
         internal static void SetDefault(TMP_TextProcessingStack<T>[] stack, T item)
         {
             for (int i = 0; i < stack.Length; i++)
@@ -229,7 +221,6 @@ namespace TMPro
         }
 
 
-        /// <param name="item"></param>
         public void SetDefault(T item)
         {
             if (itemStack == null)
@@ -245,7 +236,6 @@ namespace TMPro
         }
 
 
-        /// <param name="item"></param>
         public void Add(T item)
         {
             if (index < itemStack.Length)
@@ -256,7 +246,6 @@ namespace TMPro
         }
 
 
-        /// <returns></returns>
         public T Remove()
         {
             index -= 1;
@@ -267,7 +256,6 @@ namespace TMPro
                 m_Count = 0;
                 index = 1;
                 return itemStack[0];
-
             }
 
             return itemStack[index - 1];
@@ -296,7 +284,6 @@ namespace TMPro
                 index = (index + 1) % m_RolloverSize;
                 m_Count = m_Count < m_RolloverSize ? m_Count + 1 : m_RolloverSize;
             }
-
         }
 
         public T Pop()
@@ -320,7 +307,7 @@ namespace TMPro
             return item;
         }
 
-        /// <returns></returns>
+
         public T Peek()
         {
             if (index == 0)
@@ -330,7 +317,6 @@ namespace TMPro
         }
 
 
-        /// <returns>itemStack <T></returns>
         public T CurrentItem()
         {
             if (index > 0)
@@ -340,7 +326,6 @@ namespace TMPro
         }
 
 
-        /// <returns></returns>
         public T PreviousItem()
         {
             if (index > 1)

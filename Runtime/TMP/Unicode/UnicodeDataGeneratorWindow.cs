@@ -13,7 +13,7 @@ public class UnicodeDataGeneratorWindow : EditorWindow
         [SerializeField] private int maxFailuresToLog;
         [SerializeField] private TextAsset unicodeDataAsset;
         [SerializeField] private TextAsset bidiCharacterTestAsset;
-    
+
         public void RunBidiCharacterTests()
         {
             if (unicodeDataAsset == null || bidiCharacterTestAsset == null)
@@ -28,12 +28,13 @@ public class UnicodeDataGeneratorWindow : EditorWindow
                 BidiEngine engine = new BidiEngine(provider);
 
                 BidiConformanceRunner runner = new BidiConformanceRunner(engine);
-                BidiConformanceSummary summary = runner.RunBidiCharacterTests(bidiCharacterTestAsset.text, maxFailuresToLog);
+                BidiConformanceSummary summary =
+                    runner.RunBidiCharacterTests(bidiCharacterTestAsset.text, maxFailuresToLog);
 
                 var log = $"BidiCharacterTest done. Passed={summary.passedTests}, " +
                           $"Failed={summary.failedTests}, Skipped={summary.skippedTests}." +
                           $"Sample Failures:\n{summary.sampleFailures}";
-                
+
                 Debug.Log(log);
                 File.WriteAllText(Path.Combine(Application.persistentDataPath, "UnicodeTestResults.txt"), log);
             }
@@ -46,13 +47,13 @@ public class UnicodeDataGeneratorWindow : EditorWindow
         public void OnGui()
         {
             maxFailuresToLog = EditorGUILayout.IntField("Max Failures To Log", maxFailuresToLog);
-            
+
             unicodeDataAsset = (TextAsset)EditorGUILayout.ObjectField(
                 "UnicodeData.bytes",
                 unicodeDataAsset,
                 typeof(TextAsset),
                 false);
-            
+
             bidiCharacterTestAsset = (TextAsset)EditorGUILayout.ObjectField(
                 "BidiCharacterTest.txt",
                 bidiCharacterTestAsset,
@@ -65,32 +66,32 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             }
         }
     }
-    
+
     [SerializeField] private TextAsset derivedBidiClassAsset;
     [SerializeField] private TextAsset derivedJoiningTypeAsset;
     [SerializeField] private TextAsset arabicShapingAsset;
     [SerializeField] private TextAsset bidiBracketsAsset;
     [SerializeField] private TextAsset bidiMirroringAsset;
-    
-    [SerializeField] private TestData testing;
+
+    [SerializeField] private TestData testing = new();
 
     [SerializeField] private DefaultAsset outputFolder;
 
     [SerializeField] private string outputFileName = "UnicodeData.bytes";
 
-    /*[MenuItem("Tools/RTL/Unicode Data Generator")]
+    [MenuItem("Tools/RTL/Unicode Data Generator")]
     public static void ShowWindow()
     {
         UnicodeDataGeneratorWindow window = GetWindow<UnicodeDataGeneratorWindow>();
         window.titleContent = new GUIContent("Unicode Data Generator");
         window.minSize = new Vector2(450, 200);
-    }*/
-    
+    }
+
     private void OnGUI()
     {
         EditorGUILayout.LabelField("Unicode Data Generator", EditorStyles.boldLabel);
         EditorGUILayout.Space();
-        
+
         EditorGUILayout.Space();
 
         EditorGUI.BeginChangeCheck();
@@ -143,6 +144,7 @@ public class UnicodeDataGeneratorWindow : EditorWindow
 
         EditorGUILayout.Space();
         EditorGUILayout.BeginFoldoutHeaderGroup(true, "Testing");
+        testing ??= new();
         testing.OnGui();
         EditorGUILayout.EndFoldoutHeaderGroup();
         EditorGUILayout.Space();
@@ -169,15 +171,15 @@ public class UnicodeDataGeneratorWindow : EditorWindow
 
             string derivedBidiClassPath = GetAbsolutePathFromTextAsset(derivedBidiClassAsset, projectRoot);
             string derivedJoiningTypePath = GetAbsolutePathFromTextAsset(derivedJoiningTypeAsset, projectRoot);
-            string arabicShapingPath     = GetAbsolutePathFromTextAsset(arabicShapingAsset, projectRoot);
+            string arabicShapingPath = GetAbsolutePathFromTextAsset(arabicShapingAsset, projectRoot);
 
-            string bidiBracketsPath  = GetAbsolutePathFromTextAsset(bidiBracketsAsset,  projectRoot);
+            string bidiBracketsPath = GetAbsolutePathFromTextAsset(bidiBracketsAsset, projectRoot);
             string bidiMirroringPath = GetAbsolutePathFromTextAsset(bidiMirroringAsset, projectRoot);
 
-            if (string.IsNullOrEmpty(derivedBidiClassPath)  ||
+            if (string.IsNullOrEmpty(derivedBidiClassPath) ||
                 string.IsNullOrEmpty(derivedJoiningTypePath) ||
-                string.IsNullOrEmpty(arabicShapingPath)      ||
-                string.IsNullOrEmpty(bidiBracketsPath)       ||
+                string.IsNullOrEmpty(arabicShapingPath) ||
+                string.IsNullOrEmpty(bidiBracketsPath) ||
                 string.IsNullOrEmpty(bidiMirroringPath))
             {
                 Debug.LogError("UnicodeDataGenerator: one or more TextAssets do not have valid asset paths.");
@@ -213,7 +215,7 @@ public class UnicodeDataGeneratorWindow : EditorWindow
 
             List<RangeEntry> ranges = builder.BuildRangeEntries();
 
-            List<MirrorEntry> mirrors  = UnicodeDataBuilder.BuildMirrorEntries(bidiMirroringPath);
+            List<MirrorEntry> mirrors = UnicodeDataBuilder.BuildMirrorEntries(bidiMirroringPath);
             List<BracketEntry> brackets = UnicodeDataBuilder.BuildBracketEntries(bidiBracketsPath);
 
             UnicodeBinaryWriter.WriteBinary(
@@ -281,7 +283,8 @@ public class UnicodeDataGeneratorWindow : EditorWindow
 
         if (!AssetDatabase.IsValidFolder(assetPath))
         {
-            Debug.LogWarning($"UnicodeDataGenerator: selected output asset is not a folder, using 'Assets' instead. ({assetPath})");
+            Debug.LogWarning(
+                $"UnicodeDataGenerator: selected output asset is not a folder, using 'Assets' instead. ({assetPath})");
             return "Assets";
         }
 

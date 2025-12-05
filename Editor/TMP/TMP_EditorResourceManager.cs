@@ -15,7 +15,7 @@ namespace TMPro
             TMP_FontAsset.RegisterResourceForUpdate += TMP_EditorResourceManager.RegisterResourceForUpdate;
             TMP_FontAsset.RegisterResourceForReimport += TMP_EditorResourceManager.RegisterResourceForReimport;
             TMP_FontAsset.OnFontAssetTextureChanged += TMP_EditorResourceManager.AddTextureToAsset;
-            TMP_FontAsset.SetAtlasTextureIsReadable +=  FontEngineEditorUtilities.SetAtlasTextureIsReadable;
+            TMP_FontAsset.SetAtlasTextureIsReadable += FontEngineEditorUtilities.SetAtlasTextureIsReadable;
             TMP_FontAsset.GetSourceFontRef += TMP_EditorResourceManager.GetSourceFontRef;
             TMP_FontAsset.SetSourceFontGUID += TMP_EditorResourceManager.SetSourceFontGUID;
 
@@ -29,7 +29,10 @@ namespace TMPro
                     string fontAssetPath = AssetDatabase.GUIDToAssetPath(fontAssetGUIDs[i]);
                     TMP_FontAsset fontAsset = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(fontAssetPath);
 
-                    if (fontAsset != null && (fontAsset.atlasPopulationMode == AtlasPopulationMode.Dynamic || fontAsset.atlasPopulationMode == AtlasPopulationMode.DynamicOS) && fontAsset.clearDynamicDataOnBuild && fontAsset.atlasTexture.width > 1)
+                    if (fontAsset != null &&
+                        (fontAsset.atlasPopulationMode == AtlasPopulationMode.Dynamic ||
+                         fontAsset.atlasPopulationMode == AtlasPopulationMode.DynamicOS) &&
+                        fontAsset.clearDynamicDataOnBuild && fontAsset.atlasTexture.width > 1)
                     {
                         Debug.Log("Clearing [" + fontAsset.name + "] dynamic font asset data.");
                         fontAsset.ClearCharacterAndGlyphTablesInternal();
@@ -69,11 +72,11 @@ namespace TMPro
                 Camera.onPostRender += OnCameraPostRender;
             else
             {
-                #if UNITY_2023_3_OR_NEWER
-                    RenderPipelineManager.endContextRendering += OnEndOfFrame;
-                #else
+#if UNITY_2023_3_OR_NEWER
+                RenderPipelineManager.endContextRendering += OnEndOfFrame;
+#else
                     RenderPipelineManager.endFrameRendering += OnEndOfFrame;
-                #endif
+#endif
             }
 
             Canvas.willRenderCanvases += OnPreRenderCanvases;
@@ -92,19 +95,19 @@ namespace TMPro
             DoPreRenderUpdates();
         }
 
-        #if UNITY_2023_3_OR_NEWER
+#if UNITY_2023_3_OR_NEWER
         void OnEndOfFrame(ScriptableRenderContext renderContext, List<Camera> cameras)
         {
             DoPostRenderUpdates();
         }
-        #else
+#else
         void OnEndOfFrame(ScriptableRenderContext renderContext, Camera[] cameras)
         {
             DoPostRenderUpdates();
         }
-        #endif
+#endif
 
-        /// <param name="obj"></param>
+
         internal static void RegisterResourceForReimport(Object obj)
         {
             if (!EditorUtility.IsPersistent(obj))
@@ -124,7 +127,7 @@ namespace TMPro
             m_ObjectReImportQueue.Add(obj);
         }
 
-        /// <param name="obj"></param>
+
         internal static void RegisterResourceForUpdate(Object obj)
         {
             if (!EditorUtility.IsPersistent(obj))
@@ -144,7 +147,7 @@ namespace TMPro
             m_ObjectUpdateQueue.Add(obj);
         }
 
-        /// <param name="fontAsset"></param>
+
         internal static void RegisterFontAssetForDefinitionRefresh(TMP_FontAsset fontAsset)
         {
             instance.InternalRegisterFontAssetForDefinitionRefresh(fontAsset);
@@ -161,8 +164,7 @@ namespace TMPro
             m_FontAssetDefinitionRefreshQueue.Add(fontAsset);
         }
 
-        /// <param name="tex">The texture to be added as sub object.</param>
-        /// <param name="obj">The object to which this texture sub object will be added.</param>
+
         internal static void AddTextureToAsset(Texture tex, Object obj)
         {
             if (!EditorUtility.IsPersistent(obj))
@@ -174,16 +176,14 @@ namespace TMPro
             RegisterResourceForReimport(obj);
         }
 
-        /// <param name="guid"></param>
-        /// <returns></returns>
+
         internal static Font GetSourceFontRef(string guid)
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
             return AssetDatabase.LoadAssetAtPath<Font>(path);
         }
 
-        /// <param name="font"></param>
-        /// <returns></returns>
+
         internal static string SetSourceFontGUID(Font font)
         {
             return AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(font));
@@ -196,9 +196,9 @@ namespace TMPro
             for (int i = 0; i < objUpdateCount; i++)
             {
                 EditorUtilities.TMP_PropertyDrawerUtilities.s_RefreshGlyphProxyLookup = true;
-                #if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
+#if TEXTCORE_FONT_ENGINE_1_5_OR_NEWER
                 UnityEditor.TextCore.Text.TextCorePropertyDrawerUtilities.s_RefreshGlyphProxyLookup = true;
-                #endif
+#endif
 
                 Object obj = m_ObjectUpdateQueue[i];
                 if (obj != null)

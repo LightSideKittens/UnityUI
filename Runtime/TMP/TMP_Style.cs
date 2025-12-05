@@ -18,50 +18,63 @@ namespace TMPro
                 return k_NormalStyle;
             }
         }
+
         internal static TMP_Style k_NormalStyle;
 
         public string name
-        { get { return m_Name; } set { if (value != m_Name) m_Name = value; } }
+        {
+            get { return m_Name; }
+            set
+            {
+                if (value != m_Name) m_Name = value;
+            }
+        }
 
         public int hashCode
-        { get { return m_HashCode; } set { if (value != m_HashCode) m_HashCode = value; } }
+        {
+            get { return m_HashCode; }
+            set
+            {
+                if (value != m_HashCode) m_HashCode = value;
+            }
+        }
 
         public string styleOpeningDefinition
-        { get { return m_OpeningDefinition; } }
+        {
+            get { return m_OpeningDefinition; }
+        }
 
         public string styleClosingDefinition
-        { get { return m_ClosingDefinition; } }
+        {
+            get { return m_ClosingDefinition; }
+        }
 
 
         public uint[] styleOpeningTagArray
-        { get { return m_OpeningTagArray; } }
+        {
+            get { return m_OpeningTagArray; }
+        }
 
 
         public uint[] styleClosingTagArray
-        { get { return m_ClosingTagArray; } }
+        {
+            get { return m_ClosingTagArray; }
+        }
 
 
-        [SerializeField]
-        private string m_Name;
+        [SerializeField] private string m_Name;
 
-        [SerializeField]
-        private int m_HashCode;
+        [SerializeField] private int m_HashCode;
 
-        [SerializeField]
-        private string m_OpeningDefinition;
+        [SerializeField] private string m_OpeningDefinition;
 
-        [SerializeField]
-        private string m_ClosingDefinition;
+        [SerializeField] private string m_ClosingDefinition;
 
-        [SerializeField]
-        private uint[] m_OpeningTagArray;
+        [SerializeField] private uint[] m_OpeningTagArray;
 
-        [SerializeField]
-        private uint[] m_ClosingTagArray;
+        [SerializeField] private uint[] m_ClosingTagArray;
 
-        /// <param name="styleName">Name of the style.</param>
-        /// <param name="styleOpeningDefinition">Style opening definition.</param>
-        /// <param name="styleClosingDefinition">Style closing definition.</param>
+
         internal TMP_Style(string styleName, string styleOpeningDefinition, string styleClosingDefinition)
         {
             m_Name = styleName;
@@ -93,6 +106,5 @@ namespace TMPro
                 m_ClosingTagArray[i] = m_ClosingDefinition[i];
             }
         }
-
     }
 }

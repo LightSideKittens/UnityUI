@@ -1,6 +1,5 @@
 namespace UnityEngine.EventSystems
 {
-
     public enum EventTriggerType
     {
         PointerEnter = 0,

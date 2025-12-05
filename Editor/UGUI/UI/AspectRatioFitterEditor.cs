@@ -57,13 +57,15 @@ namespace UnityEditor.UI
 
         private static void ShowNoParentWarning()
         {
-            var text = L10n.Tr("You cannot use this Aspect Mode because this Component's GameObject does not have a parent object.");
+            var text = L10n.Tr(
+                "You cannot use this Aspect Mode because this Component's GameObject does not have a parent object.");
             EditorGUILayout.HelpBox(text, MessageType.Warning, true);
         }
 
         private static void ShowCanvasRenderModeInvalidWarning()
         {
-            var text = L10n.Tr("You cannot use this Aspect Mode because this Component is attached to a Canvas with a fixed width and height.");
+            var text = L10n.Tr(
+                "You cannot use this Aspect Mode because this Component is attached to a Canvas with a fixed width and height.");
             EditorGUILayout.HelpBox(text, MessageType.Warning, true);
         }
     }

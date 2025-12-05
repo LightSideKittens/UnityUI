@@ -5,8 +5,8 @@ using System.Collections.Generic;
 
 namespace TMPro
 {
-
-    [Serializable][ExcludeFromPresetAttribute]
+    [Serializable]
+    [ExcludeFromPresetAttribute]
     public class TMP_StyleSheet : ScriptableObject
     {
         internal List<TMP_Style> styles
@@ -14,8 +14,7 @@ namespace TMPro
             get { return m_StyleList; }
         }
 
-        [SerializeField]
-        private List<TMP_Style> m_StyleList = new(1);
+        [SerializeField] private List<TMP_Style> m_StyleList = new(1);
         private Dictionary<int, TMP_Style> m_StyleLookupDictionary;
 
         private void Reset()
@@ -23,8 +22,7 @@ namespace TMPro
             LoadStyleDictionaryInternal();
         }
 
-        /// <param name="hashCode">Hash code of the style.</param>
-        /// <returns>The style matching the hash code.</returns>
+
         public TMP_Style GetStyle(int hashCode)
         {
             if (m_StyleLookupDictionary == null)
@@ -36,8 +34,7 @@ namespace TMPro
             return null;
         }
 
-        /// <param name="name">The name of the style.</param>
-        /// <returns>The style if found.</returns>
+
         public TMP_Style GetStyle(string name)
         {
             if (m_StyleLookupDictionary == null)
@@ -79,10 +76,9 @@ namespace TMPro
                 m_StyleLookupDictionary.Add(normalStyleHashCode, style);
             }
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             TMPro_EventManager.ON_TEXT_STYLE_PROPERTY_CHANGED(true);
-            #endif
+#endif
         }
     }
-
 }

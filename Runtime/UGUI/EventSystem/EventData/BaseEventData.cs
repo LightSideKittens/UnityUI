@@ -9,9 +9,7 @@ namespace UnityEngine.EventSystems
             m_Used = false;
         }
 
-        /// <remarks>
-        /// Internally sets a flag that can be checked via used to see if further processing should happen.
-        /// </remarks>
+
         public virtual void Use()
         {
             m_Used = true;
@@ -26,6 +24,7 @@ namespace UnityEngine.EventSystems
     public class BaseEventData : AbstractEventData
     {
         private readonly EventSystem m_EventSystem;
+
         public BaseEventData(EventSystem eventSystem)
         {
             m_EventSystem = eventSystem;

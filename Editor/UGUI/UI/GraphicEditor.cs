@@ -5,7 +5,6 @@ using UnityEngine.UI;
 
 namespace UnityEditor.UI
 {
-
     [CustomEditor(typeof(MaskableGraphic), false)]
     [CanEditMultipleObjects]
     public class GraphicEditor : Editor
@@ -36,7 +35,8 @@ namespace UnityEditor.UI
 
         protected virtual void OnEnable()
         {
-            m_CorrectButtonContent = EditorGUIUtility.TrTextContent("Set Native Size", "Sets the size to match the content.");
+            m_CorrectButtonContent =
+                EditorGUIUtility.TrTextContent("Set Native Size", "Sets the size to match the content.");
             m_PaddingContent = EditorGUIUtility.TrTextContent("Raycast Padding");
             m_LeftContent = EditorGUIUtility.TrTextContent("Left");
             m_RightContent = EditorGUIUtility.TrTextContent("Right");
@@ -97,8 +97,7 @@ namespace UnityEditor.UI
             Handles.DrawLine(p3, p0);
         }
 
-        /// <param name="show">Are we showing or hiding the AnimBool for the size.</param>
-        /// <param name="instant">Should the size AnimBool change instantly.</param>
+
         protected void SetShowNativeSize(bool show, bool instant)
         {
             if (instant)
@@ -126,6 +125,7 @@ namespace UnityEditor.UI
                 }
                 EditorGUILayout.EndHorizontal();
             }
+
             EditorGUILayout.EndFadeGroup();
         }
 
@@ -189,6 +189,7 @@ namespace UnityEditor.UI
                     {
                         m_RaycastPadding.vector4Value = newPadding;
                     }
+
                     EditorGUI.indentLevel--;
                 }
             }

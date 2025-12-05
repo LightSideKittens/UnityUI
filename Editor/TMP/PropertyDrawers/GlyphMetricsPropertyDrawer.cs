@@ -6,16 +6,23 @@ using System.Collections;
 
 namespace TMPro.EditorUtilities
 {
-
     [CustomPropertyDrawer(typeof(GlyphMetrics))]
     internal class GlyphMetricsPropertyDrawer : PropertyDrawer
     {
-        private static readonly GUIContent k_GlyphMetricLabel = new("Glyph Metrics", "The layout metrics of the glyph.");
+        private static readonly GUIContent
+            k_GlyphMetricLabel = new("Glyph Metrics", "The layout metrics of the glyph.");
+
         private static readonly GUIContent k_WidthPropertyLabel = new("W:", "The width of the glyph.");
         private static readonly GUIContent k_HeightPropertyLabel = new("H:", "The height of the glyph.");
-        private static readonly GUIContent k_BearingXPropertyLabel = new("BX:", "The horizontal bearing X of the glyph.");
-        private static readonly GUIContent k_BearingYPropertyLabel = new("BY:", "The horizontal bearing Y of the glyph.");
-        private static readonly GUIContent k_HorizontalAdvancePropertyLabel = new("AD:", "The horizontal advance of the glyph.");
+
+        private static readonly GUIContent k_BearingXPropertyLabel =
+            new("BX:", "The horizontal bearing X of the glyph.");
+
+        private static readonly GUIContent k_BearingYPropertyLabel =
+            new("BY:", "The horizontal bearing Y of the glyph.");
+
+        private static readonly GUIContent k_HorizontalAdvancePropertyLabel =
+            new("AD:", "The horizontal advance of the glyph.");
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -33,17 +40,21 @@ namespace TMPro.EditorUtilities
             EditorGUIUtility.fieldWidth = 15f;
 
             float width = (rect.width - 75f) / 2;
-            EditorGUI.PropertyField(new Rect(rect.x + width * 0, rect.y + 20, width - 5f, 18), prop_Width, k_WidthPropertyLabel);
-            EditorGUI.PropertyField(new Rect(rect.x + width * 1, rect.y + 20, width - 5f, 18), prop_Height, k_HeightPropertyLabel);
+            EditorGUI.PropertyField(new Rect(rect.x + width * 0, rect.y + 20, width - 5f, 18), prop_Width,
+                k_WidthPropertyLabel);
+            EditorGUI.PropertyField(new Rect(rect.x + width * 1, rect.y + 20, width - 5f, 18), prop_Height,
+                k_HeightPropertyLabel);
 
             width = (rect.width - 75f) / 3;
             EditorGUI.BeginChangeCheck();
-            EditorGUI.PropertyField(new Rect(rect.x + width * 0, rect.y + 40, width - 5f, 18), prop_HoriBearingX, k_BearingXPropertyLabel);
-            EditorGUI.PropertyField(new Rect(rect.x + width * 1, rect.y + 40, width - 5f, 18), prop_HoriBearingY, k_BearingYPropertyLabel);
-            EditorGUI.PropertyField(new Rect(rect.x + width * 2, rect.y + 40, width - 5f, 18), prop_HoriAdvance, k_HorizontalAdvancePropertyLabel);
+            EditorGUI.PropertyField(new Rect(rect.x + width * 0, rect.y + 40, width - 5f, 18), prop_HoriBearingX,
+                k_BearingXPropertyLabel);
+            EditorGUI.PropertyField(new Rect(rect.x + width * 1, rect.y + 40, width - 5f, 18), prop_HoriBearingY,
+                k_BearingYPropertyLabel);
+            EditorGUI.PropertyField(new Rect(rect.x + width * 2, rect.y + 40, width - 5f, 18), prop_HoriAdvance,
+                k_HorizontalAdvancePropertyLabel);
             if (EditorGUI.EndChangeCheck())
             {
-
             }
         }
 
@@ -51,6 +62,5 @@ namespace TMPro.EditorUtilities
         {
             return 65f;
         }
-
     }
 }

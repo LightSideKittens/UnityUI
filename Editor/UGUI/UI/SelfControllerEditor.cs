@@ -5,7 +5,8 @@ namespace UnityEditor.UI
 {
     public class SelfControllerEditor : Editor
     {
-        static string s_Warning = "Parent has a type of layout group component. A child of a layout group should not have a {0} component, since it should be driven by the layout group.";
+        static string s_Warning =
+            "Parent has a type of layout group component. A child of a layout group should not have a {0} component, since it should be driven by the layout group.";
 
         public override void OnInspectorGUI()
         {
@@ -28,8 +29,10 @@ namespace UnityEditor.UI
                     }
                 }
             }
+
             if (anyHaveLayoutParent)
-                EditorGUILayout.HelpBox(string.Format(s_Warning, ObjectNames.NicifyVariableName(target.GetType().Name)), MessageType.Warning);
+                EditorGUILayout.HelpBox(string.Format(s_Warning, ObjectNames.NicifyVariableName(target.GetType().Name)),
+                    MessageType.Warning);
         }
     }
 }

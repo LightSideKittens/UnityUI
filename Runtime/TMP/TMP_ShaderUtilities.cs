@@ -279,7 +279,9 @@ namespace TMPro
 
                 float range = (weight + faceDilate) * (scale - m_clamp);
 
-                t = Mathf.Max(1, Mathf.Max(Mathf.Abs(underlayOffsetX), Mathf.Abs(underlayOffsetY)) + underlayDilate + underlaySoftness);
+                t = Mathf.Max(1,
+                    Mathf.Max(Mathf.Abs(underlayOffsetX), Mathf.Abs(underlayOffsetY)) + underlayDilate +
+                    underlaySoftness);
 
                 ratio_C = isRatioEnabled ? Mathf.Max(0, scale - m_clamp - range) / (scale * t) : 1;
 
@@ -299,7 +301,9 @@ namespace TMPro
             if (material == null || !material.HasProperty(ID_ClipRect))
                 return false;
 
-            if (material.shaderKeywords.Contains(Keyword_MASK_SOFT) || material.shaderKeywords.Contains(Keyword_MASK_HARD) || material.shaderKeywords.Contains(Keyword_MASK_TEX))
+            if (material.shaderKeywords.Contains(Keyword_MASK_SOFT) ||
+                material.shaderKeywords.Contains(Keyword_MASK_HARD) ||
+                material.shaderKeywords.Contains(Keyword_MASK_TEX))
                 return true;
 
             return false;
@@ -394,7 +398,6 @@ namespace TMPro
                 }
                 else if (material.HasProperty(ID_UnderlayOffsetX))
                 {
-
                     offsetX = material.GetFloat(ID_UnderlayOffsetX) * scaleRatio_C;
                     offsetY = material.GetFloat(ID_UnderlayOffsetY) * scaleRatio_C;
                     dilate = material.GetFloat(ID_UnderlayDilate) * scaleRatio_C;
@@ -453,9 +456,15 @@ namespace TMPro
 
             if (!isOutlineModeEnabled)
             {
-                padding = Mathf.Max(padding, dilation.y + softness.y * 0.5f + Mathf.Max(Mathf.Abs(outlineOffset1.x), Mathf.Abs(outlineOffset1.y)));
-                padding = Mathf.Max(padding, dilation.z + softness.z * 0.5f + Mathf.Max(Mathf.Abs(outlineOffset2.x), Mathf.Abs(outlineOffset2.y)));
-                padding = Mathf.Max(padding, dilation.w + softness.w * 0.5f + Mathf.Max(Mathf.Abs(outlineOffset3.x), Mathf.Abs(outlineOffset3.y)));
+                padding = Mathf.Max(padding,
+                    dilation.y + softness.y * 0.5f +
+                    Mathf.Max(Mathf.Abs(outlineOffset1.x), Mathf.Abs(outlineOffset1.y)));
+                padding = Mathf.Max(padding,
+                    dilation.z + softness.z * 0.5f +
+                    Mathf.Max(Mathf.Abs(outlineOffset2.x), Mathf.Abs(outlineOffset2.y)));
+                padding = Mathf.Max(padding,
+                    dilation.w + softness.w * 0.5f +
+                    Mathf.Max(Mathf.Abs(outlineOffset3.x), Mathf.Abs(outlineOffset3.y)));
             }
             else
             {
@@ -466,13 +475,15 @@ namespace TMPro
                 padding = Mathf.Max(padding, dilation.z + softness.z * 0.5f + offsetOutline2);
 
                 float maxOffset = Mathf.Max(offsetOutline1, offsetOutline2);
-                padding += Mathf.Max(0 ,(dilation.w + softness.w * 0.5f) - Mathf.Max(0, padding - maxOffset));
+                padding += Mathf.Max(0, (dilation.w + softness.w * 0.5f) - Mathf.Max(0, padding - maxOffset));
             }
 
             Vector2 underlayOffset = mat.GetVector(ID_UnderlayOffset);
             float underlayDilation = mat.GetFloat(ID_UnderlayDilate);
             float underlaySoftness = mat.GetFloat(ID_UnderlaySoftness);
-            padding = Mathf.Max(padding, underlayDilation + underlaySoftness * 0.5f + Mathf.Max(Mathf.Abs(underlayOffset.x), Mathf.Abs(underlayOffset.y)));
+            padding = Mathf.Max(padding,
+                underlayDilation + underlaySoftness * 0.5f +
+                Mathf.Max(Mathf.Abs(underlayOffset.x), Mathf.Abs(underlayOffset.y)));
 
             return padding * gradientScale;
         }
@@ -569,7 +580,6 @@ namespace TMPro
                 maxPadding.y = maxPadding.y < padding.y ? padding.y : maxPadding.y;
                 maxPadding.z = maxPadding.z < padding.z ? padding.z : maxPadding.z;
                 maxPadding.w = maxPadding.w < padding.w ? padding.w : maxPadding.w;
-
             }
 
             float gradientScale = materials[0].GetFloat(ID_GradientScale);
@@ -581,8 +591,5 @@ namespace TMPro
 
             return uniformPadding + 0.25f;
         }
-
-
     }
-
 }

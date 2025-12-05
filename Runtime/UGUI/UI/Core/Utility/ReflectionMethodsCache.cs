@@ -8,7 +8,9 @@ namespace UnityEngine.UI
     {
 #if PACKAGE_PHYSICS
         public delegate bool Raycast3DCallback(Ray r, out RaycastHit hit, float f, int i);
+
         public delegate RaycastHit[] RaycastAllCallback(Ray r, float f, int i);
+
         public delegate int GetRaycastNonAllocCallback(Ray r, RaycastHit[] results, float f, int i);
 
         public Raycast3DCallback raycast3D = null;
@@ -18,7 +20,9 @@ namespace UnityEngine.UI
 
 #if PACKAGE_PHYSICS2D
         public delegate RaycastHit2D Raycast2DCallback(Vector2 p1, Vector2 p2, float f, int i);
+
         public delegate RaycastHit2D[] GetRayIntersectionAllCallback(Ray r, float f, int i);
+
         public delegate int GetRayIntersectionAllNonAllocCallback(Ray r, RaycastHit2D[] results, float f, int i);
 
         public Raycast2DCallback raycast2D = null;
@@ -34,30 +38,43 @@ namespace UnityEngine.UI
         public ReflectionMethodsCache()
         {
 #if PACKAGE_PHYSICS
-            var raycast3DMethodInfo = typeof(Physics).GetMethod("Raycast", new[] {typeof(Ray), typeof(RaycastHit).MakeByRefType(), typeof(float), typeof(int)});
+            var raycast3DMethodInfo = typeof(Physics).GetMethod("Raycast",
+                new[] { typeof(Ray), typeof(RaycastHit).MakeByRefType(), typeof(float), typeof(int) });
             if (raycast3DMethodInfo != null)
                 raycast3D = (Raycast3DCallback)Delegate.CreateDelegate(typeof(Raycast3DCallback), raycast3DMethodInfo);
 
-            var raycastAllMethodInfo = typeof(Physics).GetMethod("RaycastAll", new[] {typeof(Ray), typeof(float), typeof(int)});
+            var raycastAllMethodInfo =
+                typeof(Physics).GetMethod("RaycastAll", new[] { typeof(Ray), typeof(float), typeof(int) });
             if (raycastAllMethodInfo != null)
-                raycast3DAll = (RaycastAllCallback)Delegate.CreateDelegate(typeof(RaycastAllCallback), raycastAllMethodInfo);
+                raycast3DAll =
+                    (RaycastAllCallback)Delegate.CreateDelegate(typeof(RaycastAllCallback), raycastAllMethodInfo);
 
-            var getRaycastAllNonAllocMethodInfo = typeof(Physics).GetMethod("RaycastNonAlloc", new[] { typeof(Ray), typeof(RaycastHit[]), typeof(float), typeof(int) });
+            var getRaycastAllNonAllocMethodInfo = typeof(Physics).GetMethod("RaycastNonAlloc",
+                new[] { typeof(Ray), typeof(RaycastHit[]), typeof(float), typeof(int) });
             if (getRaycastAllNonAllocMethodInfo != null)
-                getRaycastNonAlloc = (GetRaycastNonAllocCallback)Delegate.CreateDelegate(typeof(GetRaycastNonAllocCallback), getRaycastAllNonAllocMethodInfo);
+                getRaycastNonAlloc =
+                    (GetRaycastNonAllocCallback)Delegate.CreateDelegate(typeof(GetRaycastNonAllocCallback),
+                        getRaycastAllNonAllocMethodInfo);
 #endif
 #if PACKAGE_PHYSICS2D
-            var raycast2DMethodInfo = typeof(Physics2D).GetMethod("Raycast", new[] { typeof(Vector2), typeof(Vector2), typeof(float), typeof(int) });
+            var raycast2DMethodInfo = typeof(Physics2D).GetMethod("Raycast",
+                new[] { typeof(Vector2), typeof(Vector2), typeof(float), typeof(int) });
             if (raycast2DMethodInfo != null)
                 raycast2D = (Raycast2DCallback)Delegate.CreateDelegate(typeof(Raycast2DCallback), raycast2DMethodInfo);
 
-            var getRayIntersectionAllMethodInfo = typeof(Physics2D).GetMethod("GetRayIntersectionAll", new[] {typeof(Ray), typeof(float), typeof(int)});
+            var getRayIntersectionAllMethodInfo = typeof(Physics2D).GetMethod("GetRayIntersectionAll",
+                new[] { typeof(Ray), typeof(float), typeof(int) });
             if (getRayIntersectionAllMethodInfo != null)
-                getRayIntersectionAll = (GetRayIntersectionAllCallback)Delegate.CreateDelegate(typeof(GetRayIntersectionAllCallback), getRayIntersectionAllMethodInfo);
+                getRayIntersectionAll =
+                    (GetRayIntersectionAllCallback)Delegate.CreateDelegate(typeof(GetRayIntersectionAllCallback),
+                        getRayIntersectionAllMethodInfo);
 
-            var getRayIntersectionAllNonAllocMethodInfo = typeof(Physics2D).GetMethod("GetRayIntersectionNonAlloc", new[] { typeof(Ray), typeof(RaycastHit2D[]), typeof(float), typeof(int) });
+            var getRayIntersectionAllNonAllocMethodInfo = typeof(Physics2D).GetMethod("GetRayIntersectionNonAlloc",
+                new[] { typeof(Ray), typeof(RaycastHit2D[]), typeof(float), typeof(int) });
             if (getRayIntersectionAllNonAllocMethodInfo != null)
-                getRayIntersectionAllNonAlloc = (GetRayIntersectionAllNonAllocCallback)Delegate.CreateDelegate(typeof(GetRayIntersectionAllNonAllocCallback), getRayIntersectionAllNonAllocMethodInfo);
+                getRayIntersectionAllNonAlloc =
+                    (GetRayIntersectionAllNonAllocCallback)Delegate.CreateDelegate(
+                        typeof(GetRayIntersectionAllNonAllocCallback), getRayIntersectionAllNonAllocMethodInfo);
 #endif
         }
 

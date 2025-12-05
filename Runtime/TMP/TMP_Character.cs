@@ -11,8 +11,7 @@ namespace TMPro
             scale = 1.0f;
         }
 
-        /// <param name="unicode">Unicode value.</param>
-        /// <param name="glyph">Glyph</param>
+
         public TMP_Character(uint unicode, Glyph glyph)
         {
             this.unicode = unicode;
@@ -22,9 +21,7 @@ namespace TMPro
             scale = 1.0f;
         }
 
-        /// <param name="unicode">Unicode value.</param>
-        /// <param name="fontAsset">The font asset to which this character belongs.</param>
-        /// <param name="glyph">Glyph</param>
+
         public TMP_Character(uint unicode, TMP_FontAsset fontAsset, Glyph glyph)
         {
             this.unicode = unicode;
@@ -34,8 +31,7 @@ namespace TMPro
             scale = 1.0f;
         }
 
-        /// <param name="unicode">Unicode value.</param>
-        /// <param name="glyphIndex">Glyph index.</param>
+
         internal TMP_Character(uint unicode, uint glyphIndex)
         {
             this.unicode = unicode;

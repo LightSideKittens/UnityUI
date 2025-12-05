@@ -58,7 +58,7 @@ namespace UnityEditor.UI
                     EditorGUI.PropertyField(drawRect, wrapAround);
                     drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                 }
-                break;
+                    break;
                 case Navigation.Mode.Explicit:
                 {
                     SerializedProperty selectOnUp = prop.FindPropertyRelative(kSelectOnUpProp);
@@ -75,7 +75,7 @@ namespace UnityEditor.UI
                     EditorGUI.PropertyField(drawRect, selectOnRight);
                     drawRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                 }
-                break;
+                    break;
             }
 
             --EditorGUI.indentLevel;
@@ -132,14 +132,16 @@ namespace UnityEditor.UI
 
             Action<Navigation.Mode> callback = (value) =>
             {
-                wrapAround.EnableInClassList(kHiddenClass, value != Navigation.Mode.Vertical && value != Navigation.Mode.Horizontal);
+                wrapAround.EnableInClassList(kHiddenClass,
+                    value != Navigation.Mode.Vertical && value != Navigation.Mode.Horizontal);
                 selectOnUp.EnableInClassList(kHiddenClass, value != Navigation.Mode.Explicit);
                 selectOnDown.EnableInClassList(kHiddenClass, value != Navigation.Mode.Explicit);
                 selectOnLeft.EnableInClassList(kHiddenClass, value != Navigation.Mode.Explicit);
                 selectOnRight.EnableInClassList(kHiddenClass, value != Navigation.Mode.Explicit);
             };
 
-            navigation.RegisterValueChangeCallback((e) => callback.Invoke((Navigation.Mode)e.changedProperty.enumValueIndex));
+            navigation.RegisterValueChangeCallback((e) =>
+                callback.Invoke((Navigation.Mode)e.changedProperty.enumValueIndex));
             callback.Invoke((Navigation.Mode)property.FindPropertyRelative(kModeProp).enumValueFlag);
 
             container.Add(indented);

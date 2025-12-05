@@ -65,10 +65,7 @@ namespace TMPro
     {
         public int NameHashCode
         {
-            get
-            {
-                return m_Attributes == null ? 0 : m_Attributes[0].NameHashCode;
-            }
+            get { return m_Attributes == null ? 0 : m_Attributes[0].NameHashCode; }
             set
             {
                 if (m_Attributes == null)
@@ -102,7 +99,7 @@ namespace TMPro
             set { m_Attributes = value; }
         }
 
-        /// <param name="nameHashCode"></param>
+
         public MarkupElement(int nameHashCode, int startIndex, int length)
         {
             m_Attributes = new MarkupAttribute[8];
@@ -192,7 +189,9 @@ namespace TMPro
 
         private string DebuggerDisplay()
         {
-            return m_ElementType == TextProcessingElementType.TextCharacterElement ? $"Unicode ({m_CharacterElement.Unicode})   '{(char)m_CharacterElement.Unicode}' " : $"Markup = {(MarkupTag)m_MarkupElement.NameHashCode}";
+            return m_ElementType == TextProcessingElementType.TextCharacterElement
+                ? $"Unicode ({m_CharacterElement.Unicode})   '{(char)m_CharacterElement.Unicode}' "
+                : $"Markup = {(MarkupTag)m_MarkupElement.NameHashCode}";
         }
 
         private TextProcessingElementType m_ElementType;
@@ -202,6 +201,4 @@ namespace TMPro
         private CharacterElement m_CharacterElement;
         private MarkupElement m_MarkupElement;
     }
-
-
 }

@@ -7,19 +7,17 @@ namespace UnityEngine.UI
     [AddComponentMenu("UI/Effects/Shadow", 80)]
     public class Shadow : BaseMeshEffect
     {
-        [SerializeField]
-        private Color m_EffectColor = new Color(0f, 0f, 0f, 0.5f);
+        [SerializeField] private Color m_EffectColor = new Color(0f, 0f, 0f, 0.5f);
 
-        [SerializeField]
-        private Vector2 m_EffectDistance = new Vector2(1f, -1f);
+        [SerializeField] private Vector2 m_EffectDistance = new Vector2(1f, -1f);
 
-        [SerializeField]
-        private bool m_UseGraphicAlpha = true;
+        [SerializeField] private bool m_UseGraphicAlpha = true;
 
         private const float kMaxEffectDistance = 600f;
 
         protected Shadow()
-        {}
+        {
+        }
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -101,12 +99,7 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <param name="verts">Vert list to copy</param>
-        /// <param name="color">Shadow color</param>
-        /// <param name="start">The start index in the verts list</param>
-        /// <param name="end">The end index in the vers list</param>
-        /// <param name="x">The shadows x offset</param>
-        /// <param name="y">The shadows y offset</param>
+
         protected void ApplyShadow(List<UIVertex> verts, Color32 color, int start, int end, float x, float y)
         {
             ApplyShadowZeroAlloc(verts, color, start, end, x, y);

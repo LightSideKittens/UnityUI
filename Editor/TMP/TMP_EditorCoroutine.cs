@@ -11,15 +11,13 @@ namespace TMPro.EditorUtilities
     {
         readonly IEnumerator coroutine;
 
-        /// <param name="routine"></param>
+
         TMP_EditorCoroutine(IEnumerator routine)
         {
             this.coroutine = routine;
         }
 
 
-        /// <param name="newCoroutine">Coroutine</param>
-        /// <returns>new EditorCoroutine</returns>
         public static TMP_EditorCoroutine StartCoroutine(IEnumerator routine)
         {
             TMP_EditorCoroutine coroutine = new TMP_EditorCoroutine(routine);
@@ -27,8 +25,6 @@ namespace TMPro.EditorUtilities
 
             return coroutine;
         }
-
-
 
 
         void Start()
@@ -42,7 +38,7 @@ namespace TMPro.EditorUtilities
             if (EditorApplication.update != null)
                 EditorApplication.update -= EditorUpdate;
         }
- 
+
 
         void EditorUpdate()
         {
@@ -51,7 +47,6 @@ namespace TMPro.EditorUtilities
 
             if (coroutine.Current != null)
             {
-
             }
         }
     }

@@ -14,7 +14,7 @@ namespace UnityEngine.UI
         private Font m_LastTrackedFont;
 #endif
 
-        [TextArea(3, 10)][SerializeField] protected string m_Text = String.Empty;
+        [TextArea(3, 10)] [SerializeField] protected string m_Text = String.Empty;
 
         private TextGenerator m_TextCache;
         private TextGenerator m_TextCacheForLayout;
@@ -27,7 +27,11 @@ namespace UnityEngine.UI
 
         public TextGenerator cachedTextGenerator
         {
-            get { return m_TextCache ?? (m_TextCache = (m_Text.Length != 0 ? new TextGenerator(m_Text.Length) : new TextGenerator())); }
+            get
+            {
+                return m_TextCache ?? (m_TextCache =
+                    (m_Text.Length != 0 ? new TextGenerator(m_Text.Length) : new TextGenerator()));
+            }
         }
 
         public TextGenerator cachedTextGeneratorForLayout
@@ -75,49 +79,16 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <remarks>
-        /// This is the font used by the Text component. Use it to alter or return the font from the Text. There are many free fonts available online.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// //Create a new Text GameObject by going to Create>UI>Text in the Editor. Attach this script to the Text GameObject. Then, choose or click and drag your own font into the Font section in the Inspector window.
+
         ///
-        /// using UnityEngine;
-        /// using UnityEngine.UI;
         ///
-        /// public class TextFontExample : MonoBehaviour
-        /// {
-        ///     Text m_Text;
-        ///     //Attach your own Font in the Inspector
-        ///     public Font m_Font;
         ///
-        ///     void Start()
-        ///     {
-        ///         //Fetch the Text component from the GameObject
-        ///         m_Text = GetComponent<Text>();
-        ///     }
         ///
-        ///     void Update()
-        ///     {
-        ///         if (Input.GetKey(KeyCode.Space))
-        ///         {
-        ///             //Change the Text Font to the Font attached in the Inspector
-        ///             m_Text.font = m_Font;
-        ///             //Change the Text to the message below
-        ///             m_Text.text = "My Font Changed!";
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
+
         public Font font
         {
-            get
-            {
-                return m_FontData.font;
-            }
+            get { return m_FontData.font; }
             set
             {
                 if (m_FontData.font == value)
@@ -140,43 +111,15 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <remarks>
-        /// This is the string value of a Text component. Use this to read or edit the message displayed in Text.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using UnityEngine.UI;
+
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public Text m_MyText;
         ///
-        ///     void Start()
-        ///     {
-        ///         //Text sets your text to say this message
-        ///         m_MyText.text = "This is my text";
-        ///     }
         ///
-        ///     void Update()
-        ///     {
-        ///         //Press the space key to change the Text message
-        ///         if (Input.GetKey(KeyCode.Space))
-        ///         {
-        ///             m_MyText.text = "My text has now changed.";
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
+
         public virtual string text
         {
-            get
-            {
-                return m_Text;
-            }
+            get { return m_Text; }
             set
             {
                 if (String.IsNullOrEmpty(value))
@@ -198,10 +141,7 @@ namespace UnityEngine.UI
 
         public bool supportRichText
         {
-            get
-            {
-                return m_FontData.richText;
-            }
+            get { return m_FontData.richText; }
             set
             {
                 if (m_FontData.richText == value)
@@ -215,10 +155,7 @@ namespace UnityEngine.UI
 
         public bool resizeTextForBestFit
         {
-            get
-            {
-                return m_FontData.bestFit;
-            }
+            get { return m_FontData.bestFit; }
             set
             {
                 if (m_FontData.bestFit == value)
@@ -231,10 +168,7 @@ namespace UnityEngine.UI
 
         public int resizeTextMinSize
         {
-            get
-            {
-                return m_FontData.minSize;
-            }
+            get { return m_FontData.minSize; }
             set
             {
                 if (m_FontData.minSize == value)
@@ -248,10 +182,7 @@ namespace UnityEngine.UI
 
         public int resizeTextMaxSize
         {
-            get
-            {
-                return m_FontData.maxSize;
-            }
+            get { return m_FontData.maxSize; }
             set
             {
                 if (m_FontData.maxSize == value)
@@ -263,54 +194,17 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <remarks>
-        /// This is the positioning of the Text relative to its RectTransform. You can alter this via script or in the Inspector of a Text component using the buttons in the Alignment section.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// //Create a Text GameObject by going to __Create__>__UI__>__Text__. Attach this script to the GameObject to see it working.
+
         ///
-        /// using UnityEngine;
-        /// using UnityEngine.UI;
         ///
-        /// public class UITextAlignment : MonoBehaviour
-        /// {
-        ///     Text m_Text;
         ///
-        ///     void Start()
-        ///     {
-        ///         //Fetch the Text Component
-        ///         m_Text = GetComponent<Text>();
-        ///         //Switch the Text alignment to the middle
-        ///         m_Text.alignment = TextAnchor.MiddleCenter;
-        ///     }
         ///
-        /// //This is a legacy function used for an instant demonstration. See the <a href="https://unity3d.com/learn/tutorials/s/user-interface-ui">UI Tutorials pages </a> and [[wiki:UISystem|UI Section]] of the manual for more information on creating your own buttons etc.
-        ///     void OnGUI()
-        ///     {
-        ///         //Press this Button to change the Text alignment to the lower right
-        ///         if (GUI.Button(new Rect(0, 0, 100, 40), "Lower Right"))
-        ///         {
-        ///             m_Text.alignment = TextAnchor.LowerRight;
-        ///         }
         ///
-        ///         //Press this Button to change the Text alignment to the upper left
-        ///         if (GUI.Button(new Rect(150, 0, 100, 40), "Upper Left"))
-        ///         {
-        ///             m_Text.alignment = TextAnchor.UpperLeft;
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
+
         public TextAnchor alignment
         {
-            get
-            {
-                return m_FontData.alignment;
-            }
+            get { return m_FontData.alignment; }
             set
             {
                 if (m_FontData.alignment == value)
@@ -322,15 +216,10 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <remarks>
-        /// This can result in better fitting left and right alignment, but may result in incorrect positioning when attempting to overlay multiple fonts (such as a specialized outline font) on top of each other.
-        /// </remarks>
+
         public bool alignByGeometry
         {
-            get
-            {
-                return m_FontData.alignByGeometry;
-            }
+            get { return m_FontData.alignByGeometry; }
             set
             {
                 if (m_FontData.alignByGeometry == value)
@@ -341,60 +230,19 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <remarks>
-        /// This is the size of the Font of the Text. Use this to fetch or change the size of the Font. When changing the Font size, remember to take into account the RectTransform of the Text. Larger Font sizes or messages may not fit in certain rectangle sizes and do not show in the Scene.
-        /// Note: Point size is not consistent from one font to another.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// //For this script to work, create a new Text GameObject by going to Create>U>Text. Attach the script to the Text GameObject. Make sure the GameObject has a RectTransform component.
+
         ///
-        /// using UnityEngine;
-        /// using UnityEngine.UI;
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     Text m_Text;
-        ///     RectTransform m_RectTransform;
         ///
-        ///     void Start()
-        ///     {
-        ///         //Fetch the Text and RectTransform components from the GameObject
-        ///         m_Text = GetComponent<Text>();
-        ///         m_RectTransform = GetComponent<RectTransform>();
-        ///     }
         ///
-        ///     void Update()
-        ///     {
-        ///         //Press the space key to change the Font size
-        ///         if (Input.GetKey(KeyCode.Space))
-        ///         {
-        ///             changeFontSize();
-        ///         }
-        ///     }
         ///
-        ///     void changeFontSize()
-        ///     {
-        ///         //Change the Font Size to 16
-        ///         m_Text.fontSize = 30;
         ///
-        ///         //Change the RectTransform size to allow larger fonts and sentences
-        ///         m_RectTransform.sizeDelta = new Vector2(m_Text.fontSize * 10, 100);
         ///
-        ///         //Change the m_Text text to the message below
-        ///         m_Text.text = "I changed my Font size!";
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
+
         public int fontSize
         {
-            get
-            {
-                return m_FontData.fontSize;
-            }
+            get { return m_FontData.fontSize; }
             set
             {
                 if (m_FontData.fontSize == value)
@@ -406,15 +254,10 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <remarks>
-        /// When set to HorizontalWrapMode.Overflow, text can exceed the horizontal boundaries of the Text graphic. When set to HorizontalWrapMode.Wrap, text will be word-wrapped to fit within the boundaries.
-        /// </remarks>
+
         public HorizontalWrapMode horizontalOverflow
         {
-            get
-            {
-                return m_FontData.horizontalOverflow;
-            }
+            get { return m_FontData.horizontalOverflow; }
             set
             {
                 if (m_FontData.horizontalOverflow == value)
@@ -428,10 +271,7 @@ namespace UnityEngine.UI
 
         public VerticalWrapMode verticalOverflow
         {
-            get
-            {
-                return m_FontData.verticalOverflow;
-            }
+            get { return m_FontData.verticalOverflow; }
             set
             {
                 if (m_FontData.verticalOverflow == value)
@@ -445,10 +285,7 @@ namespace UnityEngine.UI
 
         public float lineSpacing
         {
-            get
-            {
-                return m_FontData.lineSpacing;
-            }
+            get { return m_FontData.lineSpacing; }
             set
             {
                 if (m_FontData.lineSpacing == value)
@@ -463,10 +300,7 @@ namespace UnityEngine.UI
 
         public FontStyle fontStyle
         {
-            get
-            {
-                return m_FontData.fontStyle;
-            }
+            get { return m_FontData.fontStyle; }
             set
             {
                 if (m_FontData.fontStyle == value)
@@ -478,9 +312,7 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <remarks>
-        /// For dynamic fonts, the value is equivalent to the scale factor of the canvas. For non-dynamic fonts, the value is calculated from the requested text size and the size from the font.
-        /// </remarks>
+
         public float pixelsPerUnit
         {
             get
@@ -537,8 +369,7 @@ namespace UnityEngine.UI
                 font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         }
 
-        /// <param name="extents">The extents the text can draw in.</param>
-        /// <returns>Generated settings.</returns>
+
         public TextGenerationSettings GetGenerationSettings(Vector2 extents)
         {
             var settings = new TextGenerationSettings();
@@ -573,20 +404,21 @@ namespace UnityEngine.UI
         {
             switch (anchor)
             {
-                case TextAnchor.LowerLeft:    return new Vector2(0, 0);
-                case TextAnchor.LowerCenter:  return new Vector2(0.5f, 0);
-                case TextAnchor.LowerRight:   return new Vector2(1, 0);
-                case TextAnchor.MiddleLeft:   return new Vector2(0, 0.5f);
+                case TextAnchor.LowerLeft: return new Vector2(0, 0);
+                case TextAnchor.LowerCenter: return new Vector2(0.5f, 0);
+                case TextAnchor.LowerRight: return new Vector2(1, 0);
+                case TextAnchor.MiddleLeft: return new Vector2(0, 0.5f);
                 case TextAnchor.MiddleCenter: return new Vector2(0.5f, 0.5f);
-                case TextAnchor.MiddleRight:  return new Vector2(1, 0.5f);
-                case TextAnchor.UpperLeft:    return new Vector2(0, 1);
-                case TextAnchor.UpperCenter:  return new Vector2(0.5f, 1);
-                case TextAnchor.UpperRight:   return new Vector2(1, 1);
+                case TextAnchor.MiddleRight: return new Vector2(1, 0.5f);
+                case TextAnchor.UpperLeft: return new Vector2(0, 1);
+                case TextAnchor.UpperCenter: return new Vector2(0.5f, 1);
+                case TextAnchor.UpperRight: return new Vector2(1, 1);
                 default: return Vector2.zero;
             }
         }
 
         readonly UIVertex[] m_TempVerts = new UIVertex[4];
+
         protected override void OnPopulateMesh(VertexHelper toFill)
         {
             if (font == null)
@@ -645,8 +477,13 @@ namespace UnityEngine.UI
             m_DisableFontTextureRebuiltCallback = false;
         }
 
-        public virtual void CalculateLayoutInputHorizontal() {}
-        public virtual void CalculateLayoutInputVertical() {}
+        public virtual void CalculateLayoutInputHorizontal()
+        {
+        }
+
+        public virtual void CalculateLayoutInputVertical()
+        {
+        }
 
         public virtual float minWidth
         {
@@ -662,7 +499,10 @@ namespace UnityEngine.UI
             }
         }
 
-        public virtual float flexibleWidth { get { return -1; } }
+        public virtual float flexibleWidth
+        {
+            get { return -1; }
+        }
 
         public virtual float minHeight
         {
@@ -678,9 +518,15 @@ namespace UnityEngine.UI
             }
         }
 
-        public virtual float flexibleHeight { get { return -1; } }
+        public virtual float flexibleHeight
+        {
+            get { return -1; }
+        }
 
-        public virtual int layoutPriority { get { return 0; } }
+        public virtual int layoutPriority
+        {
+            get { return 0; }
+        }
 
 #if UNITY_EDITOR
         public override void OnRebuildRequested()
@@ -725,6 +571,7 @@ namespace UnityEngine.UI
 
                 m_LastTrackedFont = newFont;
             }
+
             base.OnValidate();
         }
 

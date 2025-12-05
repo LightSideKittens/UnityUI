@@ -4,7 +4,11 @@ using System.Collections.Generic;
 
 namespace TMPro
 {
-    public enum Compute_DistanceTransform_EventTypes { Processing, Completed };
+    public enum Compute_DistanceTransform_EventTypes
+    {
+        Processing,
+        Completed
+    };
 
 
     public static class TMPro_EventManager
@@ -53,7 +57,8 @@ namespace TMPro
             TEXTMESHPRO_PROPERTY_EVENT.Call(isChanged, obj);
         }
 
-        public static void ON_DRAG_AND_DROP_MATERIAL_CHANGED(GameObject sender, Material currentMaterial, Material newMaterial)
+        public static void ON_DRAG_AND_DROP_MATERIAL_CHANGED(GameObject sender, Material currentMaterial,
+            Material newMaterial)
         {
             DRAG_AND_DROP_MATERIAL_EVENT.Call(sender, currentMaterial, newMaterial);
         }
@@ -114,7 +119,5 @@ namespace TMPro
             EventType = type;
             Colors = colors;
         }
-
     }
-
 }

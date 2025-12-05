@@ -9,22 +9,18 @@ using UnityEditor;
 
 namespace UnityEngine.UI
 {
-
     [AddComponentMenu("UI/Legacy/Input Field", 103)]
     public class InputField
         : Selectable,
-        IUpdateSelectedHandler,
-        IBeginDragHandler,
-        IDragHandler,
-        IEndDragHandler,
-        IPointerClickHandler,
-        ISubmitHandler,
-        ICanvasElement,
-        ILayoutElement
+            IUpdateSelectedHandler,
+            IBeginDragHandler,
+            IDragHandler,
+            IEndDragHandler,
+            IPointerClickHandler,
+            ISubmitHandler,
+            ICanvasElement,
+            ILayoutElement
     {
-        /// <remarks>
-        /// The ContentType affects character validation, keyboard type used (on platforms with on-screen keyboards), whether the InputField accepts multiple lines, and whether the text is autocorrected (on platforms that offer input auto-correction) or is treated as a password where the characters are not shown directly.
-        /// </remarks>
         public enum ContentType
         {
             Standard,
@@ -56,33 +52,24 @@ namespace UnityEngine.UI
             Password,
         }
 
-        /// <remarks>
-        /// Note that the character validation does not validate the entire string as being valid or not. It only does validation on a per-character level, resulting in the typed character either being added to the string or not
-        /// </remarks>
+
         public enum CharacterValidation
         {
             None,
 
             Integer,
-            /// <remarks>
-            /// Characters 0-9, . (dot), and - (dash / minus sign) are allowed. The dash is only allowed as the first character. Only one dot in the string is allowed.
-            /// </remarks>
+
+
             Decimal,
 
             Alphanumeric,
 
-            /// <remarks>
-            /// Allows letters, spaces, and ' (apostrophe). A character after a space is automatically made upper case. A character not after a space is automatically made lowercase. A character after an apostrophe can be either upper or lower case. Only one apostrophe in the string is allowed. More than one space in a row is not allowed.
+
             ///
-            /// A characters is considered a letter if it is categorized as a Unicode letter, as implemented by the Char.Isletter method in .Net.
-            /// </remarks>
             Name,
 
-            /// <remarks>
-            /// Allows characters A-Z, a.z, 0-9, @, . (dot), !, #, $, %, &amp;, ', *, +, -, /, =, ?, ^, _, `, {, |, }, and ~.
+
             ///
-            /// Only one @ is allowed in the string and more than one dot in a row are not allowed. Note that the character validation does not validate the entire string as being a valid email address since it only does validation on a per-character level, resulting in the typed character either being added to the string or not.
-            /// </remarks>
             EmailAddress
         }
 
@@ -98,59 +85,55 @@ namespace UnityEngine.UI
         public delegate char OnValidateInput(string text, int charIndex, char addedChar);
 
         [Serializable]
-        public class SubmitEvent : UnityEvent<string> {}
+        public class SubmitEvent : UnityEvent<string>
+        {
+        }
 
         [Serializable]
-        public class EndEditEvent : UnityEvent<string> {}
+        public class EndEditEvent : UnityEvent<string>
+        {
+        }
 
         [Serializable]
-        public class OnChangeEvent : UnityEvent<string> {}
+        public class OnChangeEvent : UnityEvent<string>
+        {
+        }
 
         protected TouchScreenKeyboard m_Keyboard;
         static private readonly char[] kSeparators = { ' ', '.', ',', '\t', '\r', '\n' };
 
-    #if UNITY_ANDROID
+#if UNITY_ANDROID
         static private bool s_IsQuestDeviceEvaluated = false;
-    #endif // if UNITY_ANDROID
+#endif // if UNITY_ANDROID
 
         static private bool s_IsQuestDevice = false;
 
 
-        [SerializeField]
-        [FormerlySerializedAs("text")]
+        [SerializeField] [FormerlySerializedAs("text")]
         protected Text m_TextComponent;
 
-        [SerializeField]
-        protected Graphic m_Placeholder;
+        [SerializeField] protected Graphic m_Placeholder;
 
-        [SerializeField]
-        private ContentType m_ContentType = ContentType.Standard;
+        [SerializeField] private ContentType m_ContentType = ContentType.Standard;
 
-        [FormerlySerializedAs("inputType")]
-        [SerializeField]
+        [FormerlySerializedAs("inputType")] [SerializeField]
         private InputType m_InputType = InputType.Standard;
 
-        [FormerlySerializedAs("asteriskChar")]
-        [SerializeField]
+        [FormerlySerializedAs("asteriskChar")] [SerializeField]
         private char m_AsteriskChar = '*';
 
-        [FormerlySerializedAs("keyboardType")]
-        [SerializeField]
+        [FormerlySerializedAs("keyboardType")] [SerializeField]
         private TouchScreenKeyboardType m_KeyboardType = TouchScreenKeyboardType.Default;
 
-        [SerializeField]
-        private LineType m_LineType = LineType.SingleLine;
+        [SerializeField] private LineType m_LineType = LineType.SingleLine;
 
-        [FormerlySerializedAs("hideMobileInput")]
-        [SerializeField]
+        [FormerlySerializedAs("hideMobileInput")] [SerializeField]
         private bool m_HideMobileInput = false;
 
-        [FormerlySerializedAs("validation")]
-        [SerializeField]
+        [FormerlySerializedAs("validation")] [SerializeField]
         private CharacterValidation m_CharacterValidation = CharacterValidation.None;
 
-        [FormerlySerializedAs("characterLimit")]
-        [SerializeField]
+        [FormerlySerializedAs("characterLimit")] [SerializeField]
         private int m_CharacterLimit = 0;
 
         [FormerlySerializedAs("onSubmit")]
@@ -160,46 +143,31 @@ namespace UnityEngine.UI
         [SerializeField]
         private SubmitEvent m_OnSubmit = new SubmitEvent();
 
-        [SerializeField]
-        private EndEditEvent m_OnDidEndEdit = new EndEditEvent();
+        [SerializeField] private EndEditEvent m_OnDidEndEdit = new EndEditEvent();
 
-        [FormerlySerializedAs("onValueChange")]
-        [FormerlySerializedAs("m_OnValueChange")]
-        [SerializeField]
+        [FormerlySerializedAs("onValueChange")] [FormerlySerializedAs("m_OnValueChange")] [SerializeField]
         private OnChangeEvent m_OnValueChanged = new OnChangeEvent();
 
-        [FormerlySerializedAs("onValidateInput")]
-        [SerializeField]
+        [FormerlySerializedAs("onValidateInput")] [SerializeField]
         private OnValidateInput m_OnValidateInput;
 
-        [FormerlySerializedAs("selectionColor")]
-        [SerializeField]
+        [FormerlySerializedAs("selectionColor")] [SerializeField]
         private Color m_CaretColor = new Color(50f / 255f, 50f / 255f, 50f / 255f, 1f);
 
-        [SerializeField]
-        private bool m_CustomCaretColor = false;
+        [SerializeField] private bool m_CustomCaretColor = false;
 
-        [SerializeField]
-        private Color m_SelectionColor = new Color(168f / 255f, 206f / 255f, 255f / 255f, 192f / 255f);
+        [SerializeField] private Color m_SelectionColor = new Color(168f / 255f, 206f / 255f, 255f / 255f, 192f / 255f);
 
-        [SerializeField]
-        [Multiline]
-        [FormerlySerializedAs("mValue")]
+        [SerializeField] [Multiline] [FormerlySerializedAs("mValue")]
         protected string m_Text = string.Empty;
 
-        [SerializeField]
-        [Range(0f, 4f)]
-        private float m_CaretBlinkRate = 0.85f;
+        [SerializeField] [Range(0f, 4f)] private float m_CaretBlinkRate = 0.85f;
 
-        [SerializeField]
-        [Range(1, 5)]
-        private int m_CaretWidth = 1;
+        [SerializeField] [Range(1, 5)] private int m_CaretWidth = 1;
 
-        [SerializeField]
-        private bool m_ReadOnly = false;
+        [SerializeField] private bool m_ReadOnly = false;
 
-        [SerializeField]
-        private bool m_ShouldActivateOnSelect = true;
+        [SerializeField] private bool m_ShouldActivateOnSelect = true;
 
         protected int m_CaretPosition = 0;
         protected int m_CaretSelectPosition = 0;
@@ -273,32 +241,14 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
+
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
         ///
-        ///     public void Start()
-        ///     {
-        ///         //This setting can be toggled in the inspector.
-        ///         mainInputField.shouldHideMobileInput = true;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
+
         public bool shouldHideMobileInput
         {
-            set
-            {
-                SetPropertyUtility.SetStruct(ref m_HideMobileInput, value);
-            }
+            set { SetPropertyUtility.SetStruct(ref m_HideMobileInput, value); }
             get
             {
                 switch (Application.platform)
@@ -316,54 +266,22 @@ namespace UnityEngine.UI
 
         public virtual bool shouldActivateOnSelect
         {
-            set
-            {
-                m_ShouldActivateOnSelect = value;
-            }
-            get
-            {
-                return m_ShouldActivateOnSelect && Application.platform != RuntimePlatform.tvOS;
-            }
+            set { m_ShouldActivateOnSelect = value; }
+            get { return m_ShouldActivateOnSelect && Application.platform != RuntimePlatform.tvOS; }
         }
 
 
-        /// <remarks>
-        /// Note that null is invalid value  for InputField.text.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
         ///
-        ///     public void Start()
-        ///     {
-        ///         mainInputField.text = "Enter Text Here...";
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
+
         public string text
         {
-            get
-            {
-                return m_Text;
-            }
-            set
-            {
-                SetText(value);
-            }
+            get { return m_Text; }
+            set { SetText(value); }
         }
 
-        /// <remarks>
-        /// This is not necessarily the same as what is visible on screen.
-        /// </remarks>
+
         public void SetTextWithoutNotify(string input)
         {
             SetText(input, false);
@@ -395,7 +313,9 @@ namespace UnityEngine.UI
             }
             else
             {
-                m_Text = characterLimit > 0 && value.Length > characterLimit ? value.Substring(0, characterLimit) : value;
+                m_Text = characterLimit > 0 && value.Length > characterLimit
+                    ? value.Substring(0, characterLimit)
+                    : value;
             }
 
 #if UNITY_EDITOR
@@ -419,29 +339,11 @@ namespace UnityEngine.UI
             UpdateLabel();
         }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
+
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public GameObject mainInputField;
         ///
-        ///     void Update()
-        ///     {
-        ///         //If the input field is focused, change its color to green.
-        ///         if (mainInputField.GetComponent<InputField>().isFocused == true)
-        ///         {
-        ///             mainInputField.GetComponent<Image>().color = Color.green;
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
+
         public bool isFocused
         {
             get { return m_AllowInput; }
@@ -460,7 +362,14 @@ namespace UnityEngine.UI
             }
         }
 
-        public int caretWidth { get { return m_CaretWidth; } set { if (SetPropertyUtility.SetStruct(ref m_CaretWidth, value)) MarkGeometryAsDirty(); } }
+        public int caretWidth
+        {
+            get { return m_CaretWidth; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_CaretWidth, value)) MarkGeometryAsDirty();
+            }
+        }
 
         public Text textComponent
         {
@@ -487,191 +396,102 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <remarks>
-        /// If a Text component is used as the placeholder, it's recommended to make the placeholder text look different from the real text of the InputField so they are not easily confused. For example, the placeholder text might be a more subtle color or have lower alpha value.
-        /// </remarks>
-        public Graphic placeholder { get { return m_Placeholder; } set { SetPropertyUtility.SetClass(ref m_Placeholder, value); } }
 
-        public Color caretColor { get { return customCaretColor ? m_CaretColor : textComponent.color; } set { if (SetPropertyUtility.SetColor(ref m_CaretColor, value)) MarkGeometryAsDirty(); } }
+        public Graphic placeholder
+        {
+            get { return m_Placeholder; }
+            set { SetPropertyUtility.SetClass(ref m_Placeholder, value); }
+        }
 
-        public bool customCaretColor { get { return m_CustomCaretColor; } set { if (m_CustomCaretColor != value) { m_CustomCaretColor = value; MarkGeometryAsDirty(); } } }
+        public Color caretColor
+        {
+            get { return customCaretColor ? m_CaretColor : textComponent.color; }
+            set
+            {
+                if (SetPropertyUtility.SetColor(ref m_CaretColor, value)) MarkGeometryAsDirty();
+            }
+        }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
-        ///
-        ///     // Changes the color of the highlight that shows what characters are selected.
-        ///     void ChangeSelectionColor()
-        ///     {
-        ///         mainInputField.selectionColor = Color.red;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public Color selectionColor { get { return m_SelectionColor; } set { if (SetPropertyUtility.SetColor(ref m_SelectionColor, value)) MarkGeometryAsDirty(); } }
+        public bool customCaretColor
+        {
+            get { return m_CustomCaretColor; }
+            set
+            {
+                if (m_CustomCaretColor != value)
+                {
+                    m_CustomCaretColor = value;
+                    MarkGeometryAsDirty();
+                }
+            }
+        }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
-        ///
-        ///     // Checks if there is anything entered into the input field.
-        ///     void LockInput(InputField input)
-        ///     {
-        ///         if (input.text.Length > 0)
-        ///         {
-        ///             Debug.Log("Text has been entered");
-        ///         }
-        ///         else if (input.text.Length == 0)
-        ///         {
-        ///             Debug.Log("Main Input Empty");
-        ///         }
-        ///     }
-        ///
-        ///     public void Start()
-        ///     {
-        ///         //Adds a listener that invokes the "LockInput" method when the player finishes editing the main input field.
-        ///         //Passes the main input field into the method when "LockInput" is invoked
-        ///         mainInputField.onEndEdit.AddListener(delegate {LockInput(mainInputField); });
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public EndEditEvent onEndEdit { get { return m_OnDidEndEdit; } set { SetPropertyUtility.SetClass(ref m_OnDidEndEdit, value); } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
         ///
-        ///     // Checks if there is anything entered into the input field.
-        ///     void LockInput(InputField input)
-        ///     {
-        ///         if (input.text.Length > 0)
-        ///         {
-        ///             Debug.Log("Text has been entered");
-        ///         }
-        ///         else if (input.text.Length == 0)
-        ///         {
-        ///             Debug.Log("Main Input Empty");
-        ///         }
-        ///     }
-        ///
-        ///     public void Start()
-        ///     {
-        ///         //Adds a listener that invokes the "LockInput" method when the player finishes editing the main input field.
-        ///         //Passes the main input field into the method when "LockInput" is invoked
-        ///         mainInputField.onSubmit.AddListener(delegate {LockInput(mainInputField); });
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public SubmitEvent onSubmit { get { return m_OnSubmit; } set { SetPropertyUtility.SetClass(ref m_OnSubmit, value); } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
-        ///
-        ///     public void Start()
-        ///     {
-        ///         //Adds a listener to the main input field and invokes a method when the value changes.
-        ///         mainInputField.onValueChange.AddListener(delegate {ValueChangeCheck(); });
-        ///     }
-        ///
-        ///     // Invoked when the value of the text field changes.
-        ///     public void ValueChangeCheck()
-        ///     {
-        ///         Debug.Log("Value Changed");
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public OnChangeEvent onValueChanged { get { return m_OnValueChanged; } set { SetPropertyUtility.SetClass(ref m_OnValueChanged, value); } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
-        ///
-        ///     public void Start()
-        ///     {
-        ///         // Sets the MyValidate method to invoke after the input field's default input validation invoke (default validation happens every time a character is entered into the text field.)
-        ///         mainInputField.onValidateInput += delegate(string input, int charIndex, char addedChar) { return MyValidate(addedChar); };
-        ///     }
-        ///
-        ///     private char MyValidate(char charToValidate)
-        ///     {
-        ///         //Checks if a dollar sign is entered....
-        ///         if (charToValidate == '$')
-        ///         {
-        ///             // ... if it is change it to an empty character.
-        ///             charToValidate = '\0';
-        ///         }
-        ///         return charToValidate;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public OnValidateInput onValidateInput { get { return m_OnValidateInput; } set { SetPropertyUtility.SetClass(ref m_OnValidateInput, value); } }
+        public Color selectionColor
+        {
+            get { return m_SelectionColor; }
+            set
+            {
+                if (SetPropertyUtility.SetColor(ref m_SelectionColor, value)) MarkGeometryAsDirty();
+            }
+        }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
+
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
-        ///     public string playerName;
         ///
-        ///     void Start()
-        ///     {
-        ///         //Changes the character limit in the main input field.
-        ///         mainInputField.characterLimit = playerName.Length;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+        ///
+
+
+        public EndEditEvent onEndEdit
+        {
+            get { return m_OnDidEndEdit; }
+            set { SetPropertyUtility.SetClass(ref m_OnDidEndEdit, value); }
+        }
+
+
+        ///
+        ///
+        ///
+
+
+        public SubmitEvent onSubmit
+        {
+            get { return m_OnSubmit; }
+            set { SetPropertyUtility.SetClass(ref m_OnSubmit, value); }
+        }
+
+
+        ///
+        ///
+        ///
+
+
+        public OnChangeEvent onValueChanged
+        {
+            get { return m_OnValueChanged; }
+            set { SetPropertyUtility.SetClass(ref m_OnValueChanged, value); }
+        }
+
+
+        ///
+        ///
+        ///
+
+
+        public OnValidateInput onValidateInput
+        {
+            get { return m_OnValidateInput; }
+            set { SetPropertyUtility.SetClass(ref m_OnValidateInput, value); }
+        }
+
+
+        ///
+        ///
+
+
         public int characterLimit
         {
             get { return m_CharacterLimit; }
@@ -686,66 +506,25 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <remarks>
-        /// The ContentType affects character validation, keyboard type used (on platforms with on-screen keyboards), whether the InputField accepts multiple lines, and whether the text is autocorrected (on platforms that offer input auto-correction) or is treated as a password where the characters are not shown directly.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
-        ///     public string playerName;
-        ///
-        ///     void Start()
-        ///     {
-        ///         //Changes the character limit in the main input field.
-        ///         mainInputField.characterLimit = playerName.Length;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public ContentType contentType { get { return m_ContentType; } set { if (SetPropertyUtility.SetStruct(ref m_ContentType, value)) EnforceContentType(); } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public GameObject mainInputField;
         ///
-        ///     //When you press a button, this method is called.
-        ///     public void ChangeInputField(int type)
-        ///     {
-        ///         if (type == 0)
-        ///         {
-        ///             //Change the input field to "Single Line" line type.
-        ///             mainInputField.GetComponent<InputField>().lineType = InputField.LineType.SingleLine;
-        ///         }
-        ///         else if (type == 1)
-        ///         {
-        ///             //Change the input field to "MultiLine Newline" line type.
-        ///             mainInputField.GetComponent<InputField>().lineType = InputField.LineType.MultiLineNewline;
-        ///         }
-        ///         else if (type == 2)
-        ///         {
-        ///             //Change the input field to "MultiLine Submit" line type.
-        ///             mainInputField.GetComponent<InputField>().lineType = InputField.LineType.MultiLineSubmit;
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
+
+        public ContentType contentType
+        {
+            get { return m_ContentType; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_ContentType, value)) EnforceContentType();
+            }
+        }
+
+
+        ///
+        ///
+
+
         public LineType lineType
         {
             get { return m_LineType; }
@@ -759,9 +538,19 @@ namespace UnityEngine.UI
             }
         }
 
-        public InputType inputType { get { return m_InputType; } set { if (SetPropertyUtility.SetStruct(ref m_InputType, value)) SetToCustom(); } }
+        public InputType inputType
+        {
+            get { return m_InputType; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_InputType, value)) SetToCustom();
+            }
+        }
 
-        public TouchScreenKeyboard touchScreenKeyboard { get { return m_Keyboard; } }
+        public TouchScreenKeyboard touchScreenKeyboard
+        {
+            get { return m_Keyboard; }
+        }
 
         public TouchScreenKeyboardType keyboardType
         {
@@ -773,69 +562,52 @@ namespace UnityEngine.UI
             }
         }
 
-        public CharacterValidation characterValidation { get { return m_CharacterValidation; } set { if (SetPropertyUtility.SetStruct(ref m_CharacterValidation, value)) SetToCustom(); } }
+        public CharacterValidation characterValidation
+        {
+            get { return m_CharacterValidation; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_CharacterValidation, value)) SetToCustom();
+            }
+        }
 
-        /// <remarks>
-        /// Setting read only allows for highlighting of text without allowing modifications via keyboard.
-        /// </remarks>
-        public bool readOnly { get { return m_ReadOnly; } set { m_ReadOnly = value; } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
+        public bool readOnly
+        {
+            get { return m_ReadOnly; }
+            set { m_ReadOnly = value; }
+        }
+
+
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
         ///
-        ///     public void Update()
-        ///     {
-        ///         //Check to see if the input field is set to allow multiple lines.
-        ///         if (mainInputField.multiLine)
-        ///         {
-        ///             //Set the input field to only allow Single Lines, if it is currently set to allow Multiple lines.
-        ///             mainInputField.lineType = InputField.LineType.SingleLine;
-        ///             //Print to console
-        ///             Debug.Log("The main input field is now set to allow single lines only!");
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public bool multiLine { get { return m_LineType == LineType.MultiLineNewline || lineType == LineType.MultiLineSubmit; } }
 
-        /// <remarks>
-        /// Not shown in the inspector.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
+
+        public bool multiLine
+        {
+            get { return m_LineType == LineType.MultiLineNewline || lineType == LineType.MultiLineSubmit; }
+        }
+
+
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
         ///
-        ///     void Start()
-        ///     {
-        ///         // changes the password symbol. 0 = $, 1 = ! 2 = £ and so on.
-        ///         mainInputField.asteriskChar = "$!£%&*"[0];
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public char asteriskChar { get { return m_AsteriskChar; } set { if (SetPropertyUtility.SetStruct(ref m_AsteriskChar, value)) UpdateLabel(); } }
 
-        public bool wasCanceled { get { return m_WasCanceled; } }
 
-        /// <param name="pos">The input position to be clampped</param>
+        public char asteriskChar
+        {
+            get { return m_AsteriskChar; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_AsteriskChar, value)) UpdateLabel();
+            }
+        }
+
+        public bool wasCanceled
+        {
+            get { return m_WasCanceled; }
+        }
+
+
         protected void ClampPos(ref int pos)
         {
             if (pos < 0) pos = 0;
@@ -843,22 +615,43 @@ namespace UnityEngine.UI
         }
 
 
-        protected int caretPositionInternal { get { return m_CaretPosition + compositionString.Length; } set { m_CaretPosition = value; ClampPos(ref m_CaretPosition); } }
-        protected int caretSelectPositionInternal { get { return m_CaretSelectPosition + compositionString.Length; } set { m_CaretSelectPosition = value; ClampPos(ref m_CaretSelectPosition); } }
-        private bool hasSelection { get { return caretPositionInternal != caretSelectPositionInternal; } }
+        protected int caretPositionInternal
+        {
+            get { return m_CaretPosition + compositionString.Length; }
+            set
+            {
+                m_CaretPosition = value;
+                ClampPos(ref m_CaretPosition);
+            }
+        }
+
+        protected int caretSelectPositionInternal
+        {
+            get { return m_CaretSelectPosition + compositionString.Length; }
+            set
+            {
+                m_CaretSelectPosition = value;
+                ClampPos(ref m_CaretSelectPosition);
+            }
+        }
+
+        private bool hasSelection
+        {
+            get { return caretPositionInternal != caretSelectPositionInternal; }
+        }
 
 
         public int caretPosition
         {
             get { return m_CaretSelectPosition + compositionString.Length; }
-            set { selectionAnchorPosition = value; selectionFocusPosition = value; }
+            set
+            {
+                selectionAnchorPosition = value;
+                selectionFocusPosition = value;
+            }
         }
 
-        /// <remarks>
-        /// When making a selection with a mouse, the anchor is where in the document the mouse button is initially pressed.
-        /// Get: Returns the beginning position of selection
-        /// Set: If Input.compositionString is 0 set the fixed position.
-        /// </remarks>
+
         public int selectionAnchorPosition
         {
             get { return m_CaretPosition + compositionString.Length; }
@@ -872,11 +665,7 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <remarks>
-        /// When making a selection with a mouse, the focus is where in the document the mouse button is released.
-        /// Get: Returns the end position of selection
-        /// Set: If Input.compositionString is 0 set the variable position.
-        /// </remarks>
+
         public int selectionFocusPosition
         {
             get { return m_CaretSelectPosition + compositionString.Length; }
@@ -890,7 +679,7 @@ namespace UnityEngine.UI
             }
         }
 
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
         // Remember: This is NOT related to text validation!
         // This is Unity's own OnValidate method which is invoked when changing values in the Inspector.
         protected override void OnValidate()
@@ -915,9 +704,9 @@ namespace UnityEngine.UI
                 SetCaretActive();
         }
 
-    #endif // if UNITY_EDITOR
+#endif // if UNITY_EDITOR
 
-    #if UNITY_ANDROID
+#if UNITY_ANDROID
         protected override void Awake()
         {
             base.Awake();
@@ -930,7 +719,7 @@ namespace UnityEngine.UI
             s_IsQuestDevice = SystemInfo.deviceModel == kOculusQuestDeviceModel;
             s_IsQuestDeviceEvaluated = true;
         }
-    #endif // if UNITY_ANDROID
+#endif // if UNITY_ANDROID
 
         protected override void OnEnable()
         {
@@ -942,7 +731,8 @@ namespace UnityEngine.UI
 
             // If we have a cached renderer then we had OnDisable called so just restore the material.
             if (m_CachedInputRenderer != null)
-                m_CachedInputRenderer.SetMaterial(m_TextComponent.GetModifiedMaterial(Graphic.defaultGraphicMaterial), Texture2D.whiteTexture);
+                m_CachedInputRenderer.SetMaterial(m_TextComponent.GetModifiedMaterial(Graphic.defaultGraphicMaterial),
+                    Texture2D.whiteTexture);
 
             if (m_TextComponent != null)
             {
@@ -965,6 +755,7 @@ namespace UnityEngine.UI
                 m_TextComponent.UnregisterDirtyVerticesCallback(UpdateLabel);
                 m_TextComponent.UnregisterDirtyMaterialCallback(UpdateCaretMaterial);
             }
+
             CanvasUpdateRegistry.DisableCanvasElementForRebuild(this);
 
             // Clear needs to be called otherwise sync never happens as the object is disabled.
@@ -1007,6 +798,7 @@ namespace UnityEngine.UI
                 // Then wait again.
                 yield return null;
             }
+
             m_BlinkCoroutine = null;
         }
 
@@ -1041,57 +833,26 @@ namespace UnityEngine.UI
         private void UpdateCaretMaterial()
         {
             if (m_TextComponent != null && m_CachedInputRenderer != null)
-                m_CachedInputRenderer.SetMaterial(m_TextComponent.GetModifiedMaterial(Graphic.defaultGraphicMaterial), Texture2D.whiteTexture);
+                m_CachedInputRenderer.SetMaterial(m_TextComponent.GetModifiedMaterial(Graphic.defaultGraphicMaterial),
+                    Texture2D.whiteTexture);
         }
 
-        /// <remarks>
-        /// Handles what happens after a user selects an InputField. This is a protected property. To return the focus state use InputField.isFocused. To shift focus to another GameObject, use EventSystem.SetSelectedGameObject.
-        /// A common use of this is allowing the user to type once focussed. Another way is outputting a message when the user clicks on a field(often seen when creating passwords).
-        /// </remarks>
-        /// <example>
-        /// //Create an Input Field by going to __Create__>__UI__>__Input Field__. Attach this script to the Input Field GameObject
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using UnityEngine.UI;
+
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     InputField m_InputField;
-        ///     void Start()
-        ///     {
-        ///         //Fetch the Input Field component from the GameObject
-        ///         m_InputField = GetComponent<InputField>();
-        ///     }
         ///
-        ///     void Update()
-        ///     {
-        ///         //Check if the Input Field is in focus and able to alter
-        ///         if (m_InputField.isFocused)
-        ///         {
-        ///             //Change the Color of the Input Field's Image to green
-        ///             m_InputField.GetComponent<Image>().color = Color.green;
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
         protected void OnFocus()
         {
             SelectAll();
         }
 
-        /// <remarks>
-        /// Sets the caretPosition to the length of the text and caretSelectPos to 0.
-        /// </remarks>
+
         protected void SelectAll()
         {
             caretPositionInternal = text.Length;
             caretSelectPositionInternal = 0;
         }
 
-        /// <param name="shift">Only move the selection position to facilate selection</param>
+
         public void MoveTextEnd(bool shift)
         {
             int position = text.Length;
@@ -1105,10 +866,11 @@ namespace UnityEngine.UI
                 caretPositionInternal = position;
                 caretSelectPositionInternal = caretPositionInternal;
             }
+
             UpdateLabel();
         }
 
-        /// <param name="shift">Only move the selection position to facilate selection</param>
+
         public void MoveTextStart(bool shift)
         {
             int position = 0;
@@ -1128,14 +890,8 @@ namespace UnityEngine.UI
 
         static string clipboard
         {
-            get
-            {
-                return GUIUtility.systemCopyBuffer;
-            }
-            set
-            {
-                GUIUtility.systemCopyBuffer = value;
-            }
+            get { return GUIUtility.systemCopyBuffer; }
+            set { GUIUtility.systemCopyBuffer = value; }
         }
 
         // Returns true if the TouchScreenKeyboard should be used. On Android and Chrome OS, we only want to use the
@@ -1166,7 +922,8 @@ namespace UnityEngine.UI
         // This currently only happens on Chrome OS devices (that support laptop and tablet mode).
         private bool InPlaceEditingChanged()
         {
-            return !s_IsQuestDevice && m_TouchKeyboardAllowsInPlaceEditing != TouchScreenKeyboard.isInPlaceEditingAllowed;
+            return !s_IsQuestDevice &&
+                   m_TouchKeyboardAllowsInPlaceEditing != TouchScreenKeyboard.isInPlaceEditingAllowed;
         }
 
         RangeInt GetInternalSelection()
@@ -1332,7 +1089,8 @@ namespace UnityEngine.UI
             // On iOS/tvOS we always have TouchScreenKeyboard instance even when using external keyboard
             // so we keep track of the caret position there
             else if (m_HideMobileInput && m_Keyboard != null && m_Keyboard.canSetSelection &&
-                     Application.platform != RuntimePlatform.IPhonePlayer && Application.platform != RuntimePlatform.tvOS)
+                     Application.platform != RuntimePlatform.IPhonePlayer &&
+                     Application.platform != RuntimePlatform.tvOS)
             {
                 m_Keyboard.selection = GetInternalSelection();
             }
@@ -1387,8 +1145,7 @@ namespace UnityEngine.UI
             return generator.lineCount;
         }
 
-        /// <param name="pos">Mouse position.</param>
-        /// <returns>Character index with in value.</returns>
+
         protected int GetCharacterIndexFromPosition(Vector2 pos)
         {
             TextGenerator gen = m_TextComponent.cachedTextGenerator;
@@ -1425,13 +1182,13 @@ namespace UnityEngine.UI
         private bool MayDrag(PointerEventData eventData)
         {
             return IsActive() &&
-                IsInteractable() &&
-                eventData.button == PointerEventData.InputButton.Left &&
-                m_TextComponent != null &&
-                (InPlaceEditing() || m_HideMobileInput);
+                   IsInteractable() &&
+                   eventData.button == PointerEventData.InputButton.Left &&
+                   m_TextComponent != null &&
+                   (InPlaceEditing() || m_HideMobileInput);
         }
 
-        /// <param name="eventData">The data passed by the EventSystem</param>
+
         public virtual void OnBeginDrag(PointerEventData eventData)
         {
             if (!MayDrag(eventData))
@@ -1440,7 +1197,7 @@ namespace UnityEngine.UI
             m_UpdateDrag = true;
         }
 
-        /// <param name="eventData"></param>
+
         public virtual void OnDrag(PointerEventData eventData)
         {
             if (!MayDrag(eventData))
@@ -1451,12 +1208,14 @@ namespace UnityEngine.UI
                 return;
 
             Vector2 localMousePos;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(textComponent.rectTransform, position, eventData.pressEventCamera, out localMousePos);
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(textComponent.rectTransform, position,
+                eventData.pressEventCamera, out localMousePos);
             caretSelectPositionInternal = GetCharacterIndexFromPosition(localMousePos) + m_DrawStart;
 
             MarkGeometryAsDirty();
 
-            m_DragPositionOutOfBounds = !RectTransformUtility.RectangleContainsScreenPoint(textComponent.rectTransform, eventData.position, eventData.pressEventCamera);
+            m_DragPositionOutOfBounds = !RectTransformUtility.RectangleContainsScreenPoint(textComponent.rectTransform,
+                eventData.position, eventData.pressEventCamera);
             if (m_DragPositionOutOfBounds && m_DragCoroutine == null)
                 m_DragCoroutine = StartCoroutine(MouseDragOutsideRect(eventData));
 
@@ -1473,7 +1232,8 @@ namespace UnityEngine.UI
                     break;
 
                 Vector2 localMousePos;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(textComponent.rectTransform, position, eventData.pressEventCamera, out localMousePos);
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(textComponent.rectTransform, position,
+                    eventData.pressEventCamera, out localMousePos);
 
                 Rect rect = textComponent.rectTransform.rect;
 
@@ -1491,6 +1251,7 @@ namespace UnityEngine.UI
                     else if (localMousePos.x > rect.xMax)
                         MoveRight(true, false);
                 }
+
                 UpdateLabel();
                 float delay = multiLine ? kVScrollSpeed : kHScrollSpeed;
                 if (m_WaitForSecondsRealtime == null)
@@ -1499,10 +1260,11 @@ namespace UnityEngine.UI
                     m_WaitForSecondsRealtime.waitTime = delay;
                 yield return m_WaitForSecondsRealtime;
             }
+
             m_DragCoroutine = null;
         }
 
-        /// <param name="eventData">The eventData sent by the EventSystem.</param>
+
         public virtual void OnEndDrag(PointerEventData eventData)
         {
             if (!MayDrag(eventData))
@@ -1536,8 +1298,10 @@ namespace UnityEngine.UI
             {
                 Vector2 localMousePos;
 
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(textComponent.rectTransform, eventData.pointerPressRaycast.screenPosition, eventData.pressEventCamera, out localMousePos);
-                caretSelectPositionInternal = caretPositionInternal = GetCharacterIndexFromPosition(localMousePos) + m_DrawStart;
+                RectTransformUtility.ScreenPointToLocalPointInRectangle(textComponent.rectTransform,
+                    eventData.pointerPressRaycast.screenPosition, eventData.pressEventCamera, out localMousePos);
+                caretSelectPositionInternal =
+                    caretPositionInternal = GetCharacterIndexFromPosition(localMousePos) + m_DrawStart;
             }
 
             UpdateLabel();
@@ -1552,12 +1316,12 @@ namespace UnityEngine.UI
         }
 
 
-        /// <param name="evt">The Event that is currently being processed.</param>
-        /// <returns>If we should continue processing events or we have hit an end condition.</returns>
         protected EditState KeyPressed(Event evt)
         {
             var currentEventModifiers = evt.modifiers;
-            bool ctrl = SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX ? (currentEventModifiers & EventModifiers.Command) != 0 : (currentEventModifiers & EventModifiers.Control) != 0;
+            bool ctrl = SystemInfo.operatingSystemFamily == OperatingSystemFamily.MacOSX
+                ? (currentEventModifiers & EventModifiers.Command) != 0
+                : (currentEventModifiers & EventModifiers.Control) != 0;
             bool shift = (currentEventModifiers & EventModifiers.Shift) != 0;
             bool alt = (currentEventModifiers & EventModifiers.Alt) != 0;
             bool ctrlOnly = ctrl && !alt && !shift;
@@ -1597,6 +1361,7 @@ namespace UnityEngine.UI
                         SelectAll();
                         return EditState.Continue;
                     }
+
                     break;
                 }
 
@@ -1611,6 +1376,7 @@ namespace UnityEngine.UI
                             clipboard = "";
                         return EditState.Continue;
                     }
+
                     break;
                 }
 
@@ -1623,6 +1389,7 @@ namespace UnityEngine.UI
                         UpdateLabel();
                         return EditState.Continue;
                     }
+
                     break;
                 }
 
@@ -1641,6 +1408,7 @@ namespace UnityEngine.UI
                         SendOnValueChangedAndUpdateLabel();
                         return EditState.Continue;
                     }
+
                     break;
                 }
                 case KeyCode.Insert:
@@ -1661,6 +1429,7 @@ namespace UnityEngine.UI
                         UpdateLabel();
                         return EditState.Continue;
                     }
+
                     break;
                 }
 
@@ -1696,6 +1465,7 @@ namespace UnityEngine.UI
                     {
                         return EditState.Finish;
                     }
+
                     break;
                 }
 
@@ -1727,6 +1497,7 @@ namespace UnityEngine.UI
                     UpdateLabel();
                 }
             }
+
             return EditState.Continue;
         }
 
@@ -1747,13 +1518,13 @@ namespace UnityEngine.UI
 
         private Event m_ProcessingEvent = new Event();
 
-        /// <param name="e">The Event to process</param>
+
         public void ProcessEvent(Event e)
         {
             KeyPressed(e);
         }
 
-        /// <param name="eventData">The data on which to process.</param>
+
         public virtual void OnUpdateSelected(BaseEventData eventData)
         {
             if (!isFocused)
@@ -1785,6 +1556,7 @@ namespace UnityEngine.UI
                         DeactivateInputField();
                         continue;
                     }
+
                     UpdateLabel();
                 }
 
@@ -1799,6 +1571,7 @@ namespace UnityEngine.UI
                                 consumedEvent = true;
                                 break;
                         }
+
                         break;
                 }
             }
@@ -1849,7 +1622,8 @@ namespace UnityEngine.UI
             {
                 // By convention, if we have a selection and move right without holding shift,
                 // we just place the cursor at the end.
-                caretPositionInternal = caretSelectPositionInternal = Mathf.Max(caretPositionInternal, caretSelectPositionInternal);
+                caretPositionInternal = caretSelectPositionInternal =
+                    Mathf.Max(caretPositionInternal, caretSelectPositionInternal);
                 return;
             }
 
@@ -1886,7 +1660,8 @@ namespace UnityEngine.UI
             {
                 // By convention, if we have a selection and move left without holding shift,
                 // we just place the cursor at the start.
-                caretPositionInternal = caretSelectPositionInternal = Mathf.Min(caretPositionInternal, caretSelectPositionInternal);
+                caretPositionInternal = caretSelectPositionInternal =
+                    Mathf.Min(caretPositionInternal, caretSelectPositionInternal);
                 return;
             }
 
@@ -1933,6 +1708,7 @@ namespace UnityEngine.UI
                 if (cachedInputTextGenerator.characters[i].cursorPos.x >= originChar.cursorPos.x)
                     return i;
             }
+
             return endCharIdx;
         }
 
@@ -1957,6 +1733,7 @@ namespace UnityEngine.UI
                 if (cachedInputTextGenerator.characters[i].cursorPos.x >= originChar.cursorPos.x)
                     return i;
             }
+
             return endCharIdx;
         }
 
@@ -1971,10 +1748,13 @@ namespace UnityEngine.UI
             {
                 // If we have a selection and press down without shift,
                 // set caret position to end of selection before we move it down.
-                caretPositionInternal = caretSelectPositionInternal = Mathf.Max(caretPositionInternal, caretSelectPositionInternal);
+                caretPositionInternal = caretSelectPositionInternal =
+                    Mathf.Max(caretPositionInternal, caretSelectPositionInternal);
             }
 
-            int position = multiLine ? LineDownCharacterPosition(caretSelectPositionInternal, goToLastChar) : text.Length;
+            int position = multiLine
+                ? LineDownCharacterPosition(caretSelectPositionInternal, goToLastChar)
+                : text.Length;
 
             if (shift)
                 caretSelectPositionInternal = position;
@@ -1993,7 +1773,8 @@ namespace UnityEngine.UI
             {
                 // If we have a selection and press up without shift,
                 // set caret position to start of selection before we move it up.
-                caretPositionInternal = caretSelectPositionInternal = Mathf.Min(caretPositionInternal, caretSelectPositionInternal);
+                caretPositionInternal = caretSelectPositionInternal =
+                    Mathf.Min(caretPositionInternal, caretSelectPositionInternal);
             }
 
             int position = multiLine ? LineUpCharacterPosition(caretSelectPositionInternal, goToFirstChar) : 0;
@@ -2014,12 +1795,14 @@ namespace UnityEngine.UI
 
             if (caretPositionInternal < caretSelectPositionInternal)
             {
-                m_Text = text.Substring(0, caretPositionInternal) + text.Substring(caretSelectPositionInternal, text.Length - caretSelectPositionInternal);
+                m_Text = text.Substring(0, caretPositionInternal) + text.Substring(caretSelectPositionInternal,
+                    text.Length - caretSelectPositionInternal);
                 caretSelectPositionInternal = caretPositionInternal;
             }
             else
             {
-                m_Text = text.Substring(0, caretSelectPositionInternal) + text.Substring(caretPositionInternal, text.Length - caretPositionInternal);
+                m_Text = text.Substring(0, caretSelectPositionInternal) +
+                         text.Substring(caretPositionInternal, text.Length - caretPositionInternal);
                 caretPositionInternal = caretSelectPositionInternal;
             }
         }
@@ -2128,7 +1911,7 @@ namespace UnityEngine.UI
                 onSubmit.Invoke(m_Text);
         }
 
-        /// <param name="input">The String to append.</param>
+
         protected virtual void Append(string input)
         {
             if (m_ReadOnly)
@@ -2151,7 +1934,7 @@ namespace UnityEngine.UI
         // cf. TextGenerator.cpp
         private const int k_MaxTextLength = UInt16.MaxValue / 4 - 1;
 
-        /// <param name="input">Character to append.</param>
+
         protected virtual void Append(char input)
         {
             // We do not currently support surrogate pairs
@@ -2173,11 +1956,14 @@ namespace UnityEngine.UI
             {
                 if (caretPositionInternal < caretSelectPositionInternal)
                 {
-                    validateText = text.Substring(0, caretPositionInternal) + text.Substring(caretSelectPositionInternal, text.Length - caretSelectPositionInternal);
+                    validateText = text.Substring(0, caretPositionInternal) +
+                                   text.Substring(caretSelectPositionInternal,
+                                       text.Length - caretSelectPositionInternal);
                 }
                 else
                 {
-                    validateText = text.Substring(0, caretSelectPositionInternal) + text.Substring(caretPositionInternal, text.Length - caretPositionInternal);
+                    validateText = text.Substring(0, caretSelectPositionInternal) +
+                                   text.Substring(caretPositionInternal, text.Length - caretPositionInternal);
                 }
             }
 
@@ -2215,7 +2001,8 @@ namespace UnityEngine.UI
 
                 string fullText;
 
-                if (EventSystem.current != null && gameObject == EventSystem.current.currentSelectedGameObject && compositionString.Length > 0)
+                if (EventSystem.current != null && gameObject == EventSystem.current.currentSelectedGameObject &&
+                    compositionString.Length > 0)
                 {
                     m_IsCompositionActive = true;
                     fullText = text.Substring(0, m_CaretPosition) + compositionString + text.Substring(m_CaretPosition);
@@ -2268,6 +2055,7 @@ namespace UnityEngine.UI
 
                     SetCaretVisible();
                 }
+
                 m_TextComponent.text = processed;
                 MarkGeometryAsDirty();
                 m_PreventFontCallback = false;
@@ -2324,6 +2112,7 @@ namespace UnityEngine.UI
                         // Remove interline spacing on last line.
                         bottomY += lines[caretLine].leading;
                     }
+
                     int startLine = caretLine;
                     while (startLine > 0)
                     {
@@ -2332,6 +2121,7 @@ namespace UnityEngine.UI
                             break;
                         startLine--;
                     }
+
                     m_DrawStart = GetLineStartPosition(cachedInputTextGenerator, startLine);
                 }
                 else
@@ -2378,6 +2168,7 @@ namespace UnityEngine.UI
                             break;
                         startLine--;
                     }
+
                     m_DrawStart = GetLineStartPosition(cachedInputTextGenerator, startLine);
                 }
             }
@@ -2399,7 +2190,8 @@ namespace UnityEngine.UI
 
                         width += characters[m_DrawStart].charWidth;
                     }
-                    ++m_DrawStart;  // move right one to the last character we could fit on the left
+
+                    ++m_DrawStart; // move right one to the last character we could fit on the left
                 }
                 else
                 {
@@ -2434,7 +2226,7 @@ namespace UnityEngine.UI
             CanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
         }
 
-        /// <param name="update">Which update loop we are in.</param>
+
         public virtual void Rebuild(CanvasUpdate update)
         {
             switch (update)
@@ -2446,10 +2238,12 @@ namespace UnityEngine.UI
         }
 
         public virtual void LayoutComplete()
-        {}
+        {
+        }
 
         public virtual void GraphicUpdateComplete()
-        {}
+        {
+        }
 
         private void UpdateGeometry()
         {
@@ -2463,7 +2257,8 @@ namespace UnityEngine.UI
 
             if (m_CachedInputRenderer == null && m_TextComponent != null)
             {
-                GameObject go = new GameObject(transform.name + " Input Caret", typeof(RectTransform), typeof(CanvasRenderer));
+                GameObject go = new GameObject(transform.name + " Input Caret", typeof(RectTransform),
+                    typeof(CanvasRenderer));
                 go.hideFlags = HideFlags.DontSave;
                 go.transform.SetParent(m_TextComponent.transform.parent);
                 go.transform.SetAsFirstSibling();
@@ -2471,7 +2266,8 @@ namespace UnityEngine.UI
 
                 caretRectTrans = go.GetComponent<RectTransform>();
                 m_CachedInputRenderer = go.GetComponent<CanvasRenderer>();
-                m_CachedInputRenderer.SetMaterial(m_TextComponent.GetModifiedMaterial(Graphic.defaultGraphicMaterial), Texture2D.whiteTexture);
+                m_CachedInputRenderer.SetMaterial(m_TextComponent.GetModifiedMaterial(Graphic.defaultGraphicMaterial),
+                    Texture2D.whiteTexture);
 
                 // Needed as if any layout is present we want the caret to always be the same as the text area.
                 go.AddComponent<LayoutElement>().ignoreLayout = true;
@@ -2557,6 +2353,7 @@ namespace UnityEngine.UI
                 UICharInfo cursorChar = gen.characters[adjustedPos];
                 startPosition.x = cursorChar.cursorPos.x;
             }
+
             startPosition.x /= m_TextComponent.pixelsPerUnit;
 
             // TODO: Only clamp when Text uses horizontal word wrap.
@@ -2602,7 +2399,8 @@ namespace UnityEngine.UI
             else
                 cameraRef = m_TextComponent.canvas.worldCamera;
 
-            Vector3 cursorPosition = m_CachedInputRenderer.gameObject.transform.TransformPoint(m_CursorVerts[0].position);
+            Vector3 cursorPosition =
+                m_CachedInputRenderer.gameObject.transform.TransformPoint(m_CursorVerts[0].position);
             Vector2 screenPosition = RectTransformUtility.WorldToScreenPoint(cameraRef, cursorPosition);
             screenPosition.y = screenHeight - screenPosition.y;
 
@@ -2655,11 +2453,15 @@ namespace UnityEngine.UI
                 {
                     UICharInfo startCharInfo = gen.characters[startChar];
                     UICharInfo endCharInfo = gen.characters[currentChar];
-                    Vector2 startPosition = new Vector2(startCharInfo.cursorPos.x / m_TextComponent.pixelsPerUnit, gen.lines[currentLineIndex].topY / m_TextComponent.pixelsPerUnit);
-                    Vector2 endPosition = new Vector2((endCharInfo.cursorPos.x + endCharInfo.charWidth) / m_TextComponent.pixelsPerUnit, startPosition.y - gen.lines[currentLineIndex].height / m_TextComponent.pixelsPerUnit);
+                    Vector2 startPosition = new Vector2(startCharInfo.cursorPos.x / m_TextComponent.pixelsPerUnit,
+                        gen.lines[currentLineIndex].topY / m_TextComponent.pixelsPerUnit);
+                    Vector2 endPosition =
+                        new Vector2((endCharInfo.cursorPos.x + endCharInfo.charWidth) / m_TextComponent.pixelsPerUnit,
+                            startPosition.y - gen.lines[currentLineIndex].height / m_TextComponent.pixelsPerUnit);
 
                     // Checking xMin as well due to text generator not setting position if char is not rendered.
-                    if (endPosition.x > m_TextComponent.rectTransform.rect.xMax || endPosition.x < m_TextComponent.rectTransform.rect.xMin)
+                    if (endPosition.x > m_TextComponent.rectTransform.rect.xMax ||
+                        endPosition.x < m_TextComponent.rectTransform.rect.xMin)
                         endPosition.x = m_TextComponent.rectTransform.rect.xMax;
 
                     var startIndex = vbo.currentVertCount;
@@ -2683,33 +2485,36 @@ namespace UnityEngine.UI
 
                     lastCharInLineIndex = GetLineEndPosition(gen, currentLineIndex);
                 }
+
                 currentChar++;
             }
         }
 
-        /// <param name="text">The whole text string to validate.</param>
-        /// <param name="pos">The position at which the current character is being inserted.</param>
-        /// <param name="ch">The character that is being inserted</param>
-        /// <returns>The character that should be inserted.</returns>
+
         protected char Validate(string text, int pos, char ch)
         {
             // Validation is disabled
             if (characterValidation == CharacterValidation.None || !enabled)
                 return ch;
 
-            if (characterValidation == CharacterValidation.Integer || characterValidation == CharacterValidation.Decimal)
+            if (characterValidation == CharacterValidation.Integer ||
+                characterValidation == CharacterValidation.Decimal)
             {
                 // Integer and decimal
                 bool cursorBeforeDash = (pos == 0 && text.Length > 0 && text[0] == '-');
-                bool dashInSelection = text.Length > 0 && text[0] == '-' && ((caretPositionInternal == 0 && caretSelectPositionInternal > 0) || (caretSelectPositionInternal == 0 && caretPositionInternal > 0));
+                bool dashInSelection = text.Length > 0 && text[0] == '-' &&
+                                       ((caretPositionInternal == 0 && caretSelectPositionInternal > 0) ||
+                                        (caretSelectPositionInternal == 0 && caretPositionInternal > 0));
                 bool selectionAtStart = caretPositionInternal == 0 || caretSelectPositionInternal == 0;
                 if (!cursorBeforeDash || dashInSelection)
                 {
                     if (ch >= '0' && ch <= '9') return ch;
                     if (ch == '-' && (pos == 0 || selectionAtStart) && !text.Contains('-')) return ch;
-                    if ((ch == '.' || ch == ',') && characterValidation == CharacterValidation.Decimal && text.IndexOfAny(new[] { '.', ',' }) == -1) return ch;
+                    if ((ch == '.' || ch == ',') && characterValidation == CharacterValidation.Decimal &&
+                        text.IndexOfAny(new[] { '.', ',' }) == -1) return ch;
                     //Some keyboards including Samsung require double tapping a . to get a - this allows these keyboards to input negative integers
-                    if (characterValidation == CharacterValidation.Integer && ch == '.' && (pos == 0 || selectionAtStart) && !text.Contains('-')) return '-';
+                    if (characterValidation == CharacterValidation.Integer && ch == '.' &&
+                        (pos == 0 || selectionAtStart) && !text.Contains('-')) return '-';
                 }
             }
             else if (characterValidation == CharacterValidation.Alphanumeric)
@@ -2743,7 +2548,8 @@ namespace UnityEngine.UI
                     }
 
                     // Character not following a space or an apostrophe or a hyphen should be in lowercase.
-                    if (char.IsUpper(ch) && (pos > 0) && (text[pos - 1] != ' ') && (text[pos - 1] != '\'') && (text[pos - 1] != '-'))
+                    if (char.IsUpper(ch) && (pos > 0) && (text[pos - 1] != ' ') && (text[pos - 1] != '\'') &&
+                        (text[pos - 1] != '-'))
                     {
                         return char.ToLower(ch);
                     }
@@ -2756,8 +2562,10 @@ namespace UnityEngine.UI
                     // Don't allow more than one apostrophe
                     if (!text.Contains("'"))
                         // Don't allow consecutive spaces and apostrophes.
-                        if (!(((pos > 0) && ((text[pos - 1] == ' ') || (text[pos - 1] == '\'') || (text[pos - 1] == '-'))) ||
-                              ((pos < text.Length) && ((text[pos] == ' ') || (text[pos] == '\'') || (text[pos] == '-')))))
+                        if (!(((pos > 0) &&
+                               ((text[pos - 1] == ' ') || (text[pos - 1] == '\'') || (text[pos - 1] == '-'))) ||
+                              ((pos < text.Length) &&
+                               ((text[pos] == ' ') || (text[pos] == '\'') || (text[pos] == '-')))))
                             return ch;
                 }
 
@@ -2766,8 +2574,10 @@ namespace UnityEngine.UI
                     if (pos != 0) // Don't allow leading spaces and hyphens
                     {
                         // Don't allow consecutive spaces, apostrophes and hyphens.
-                        if (!(((pos > 0) && ((text[pos - 1] == ' ') || (text[pos - 1] == '\'') || (text[pos - 1] == '-'))) ||
-                              ((pos < text.Length) && ((text[pos] == ' ') || (text[pos] == '\'') || (text[pos - 1] == '-')))))
+                        if (!(((pos > 0) &&
+                               ((text[pos - 1] == ' ') || (text[pos - 1] == '\'') || (text[pos - 1] == '-'))) ||
+                              ((pos < text.Length) &&
+                               ((text[pos] == ' ') || (text[pos] == '\'') || (text[pos - 1] == '-')))))
                             return ch;
                     }
                 }
@@ -2794,32 +2604,13 @@ namespace UnityEngine.UI
                         return ch;
                 }
             }
+
             return (char)0;
         }
 
-        /// <remarks>
-        /// Will only activate if deactivated.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI;
+
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
         ///
-        ///     // Activate the main input field when the scene starts.
-        ///     void Start()
-        ///     {
-        ///         mainInputField.ActivateInputField();
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
         public void ActivateInputField()
         {
             if (m_TextComponent == null || m_TextComponent.font == null || !IsActive() || !IsInteractable())
@@ -2856,9 +2647,11 @@ namespace UnityEngine.UI
                 {
                     TouchScreenKeyboard.hideInput = shouldHideMobileInput;
                 }
-                m_Keyboard = (inputType == InputType.Password) ?
-                    TouchScreenKeyboard.Open(m_Text, keyboardType, false, multiLine, true, false, "", characterLimit) :
-                    TouchScreenKeyboard.Open(m_Text, keyboardType, inputType == InputType.AutoCorrect, multiLine, false, false, "", characterLimit);
+
+                m_Keyboard = (inputType == InputType.Password)
+                    ? TouchScreenKeyboard.Open(m_Text, keyboardType, false, multiLine, true, false, "", characterLimit)
+                    : TouchScreenKeyboard.Open(m_Text, keyboardType, inputType == InputType.AutoCorrect, multiLine,
+                        false, false, "", characterLimit);
 
                 // If TouchKeyboard doesn't support InPlaceEditing don't call OnFocus as mobile doesn't properly support select all
                 // Just set it to the end of the text (where it would move when typing starts)
@@ -2875,6 +2668,7 @@ namespace UnityEngine.UI
                     input.imeCompositionMode = IMECompositionMode.On;
                 OnFocus();
             }
+
             m_AllowInput = true;
             m_OriginalText = text;
             m_WasCanceled = false;
@@ -2882,7 +2676,7 @@ namespace UnityEngine.UI
             UpdateLabel();
         }
 
-        /// <param name="eventData">The data on which to process</param>
+
         public override void OnSelect(BaseEventData eventData)
         {
             base.OnSelect(eventData);
@@ -2891,7 +2685,7 @@ namespace UnityEngine.UI
                 ActivateInputField();
         }
 
-        /// <param name="eventData">The data on which to process</param>
+
         public virtual void OnPointerClick(PointerEventData eventData)
         {
             if (eventData.button != PointerEventData.InputButton.Left)
@@ -2900,26 +2694,9 @@ namespace UnityEngine.UI
             ActivateInputField();
         }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
+
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     public InputField mainInputField;
         ///
-        ///     // Deactivates the main input field when the scene starts.
-        ///     void Start()
-        ///     {
-        ///         mainInputField.DeactivateInputField();
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
         public void DeactivateInputField()
         {
             // Not activated do nothing.
@@ -2953,7 +2730,7 @@ namespace UnityEngine.UI
             MarkGeometryAsDirty();
         }
 
-        /// <param name="eventData">The data sent by the EventSystem</param>
+
         public override void OnDeselect(BaseEventData eventData)
         {
             DeactivateInputField();
@@ -3094,11 +2871,18 @@ namespace UnityEngine.UI
             base.DoStateTransition(state, instant);
         }
 
-        public virtual void CalculateLayoutInputHorizontal() {}
+        public virtual void CalculateLayoutInputHorizontal()
+        {
+        }
 
-        public virtual void CalculateLayoutInputVertical() {}
+        public virtual void CalculateLayoutInputVertical()
+        {
+        }
 
-        public virtual float minWidth { get { return 5; } }
+        public virtual float minWidth
+        {
+            get { return 5; }
+        }
 
         public virtual float preferredWidth
         {
@@ -3107,13 +2891,20 @@ namespace UnityEngine.UI
                 if (textComponent == null)
                     return 0;
                 var settings = textComponent.GetGenerationSettings(Vector2.zero);
-                return textComponent.cachedTextGeneratorForLayout.GetPreferredWidth(m_Text, settings) / textComponent.pixelsPerUnit;
+                return textComponent.cachedTextGeneratorForLayout.GetPreferredWidth(m_Text, settings) /
+                       textComponent.pixelsPerUnit;
             }
         }
 
-        public virtual float flexibleWidth { get { return -1; } }
+        public virtual float flexibleWidth
+        {
+            get { return -1; }
+        }
 
-        public virtual float minHeight { get { return 0; } }
+        public virtual float minHeight
+        {
+            get { return 0; }
+        }
 
         public virtual float preferredHeight
         {
@@ -3121,13 +2912,21 @@ namespace UnityEngine.UI
             {
                 if (textComponent == null)
                     return 0;
-                var settings = textComponent.GetGenerationSettings(new Vector2(textComponent.rectTransform.rect.size.x, 0.0f));
-                return textComponent.cachedTextGeneratorForLayout.GetPreferredHeight(m_Text, settings) / textComponent.pixelsPerUnit;
+                var settings =
+                    textComponent.GetGenerationSettings(new Vector2(textComponent.rectTransform.rect.size.x, 0.0f));
+                return textComponent.cachedTextGeneratorForLayout.GetPreferredHeight(m_Text, settings) /
+                       textComponent.pixelsPerUnit;
             }
         }
 
-        public virtual float flexibleHeight { get { return -1; } }
+        public virtual float flexibleHeight
+        {
+            get { return -1; }
+        }
 
-        public virtual int layoutPriority { get { return 1; } }
+        public virtual int layoutPriority
+        {
+            get { return 1; }
+        }
     }
 }

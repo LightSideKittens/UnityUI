@@ -20,9 +20,7 @@ namespace UnityEngine.UI
             All = 3,
         }
 
-        /// <returns>
-        /// The sortOrder priority.
-        /// </returns>
+
         public override int sortOrderPriority
         {
             get
@@ -35,9 +33,7 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <returns>
-        /// The renderOrder priority.
-        /// </returns>
+
         public override int renderOrderPriority
         {
             get
@@ -50,26 +46,37 @@ namespace UnityEngine.UI
             }
         }
 
-        [FormerlySerializedAs("ignoreReversedGraphics")]
-        [SerializeField]
+        [FormerlySerializedAs("ignoreReversedGraphics")] [SerializeField]
         private bool m_IgnoreReversedGraphics = true;
-        [FormerlySerializedAs("blockingObjects")]
-        [SerializeField]
+
+        [FormerlySerializedAs("blockingObjects")] [SerializeField]
         private BlockingObjects m_BlockingObjects = BlockingObjects.None;
 
-        public bool ignoreReversedGraphics { get {return m_IgnoreReversedGraphics; } set { m_IgnoreReversedGraphics = value; } }
+        public bool ignoreReversedGraphics
+        {
+            get { return m_IgnoreReversedGraphics; }
+            set { m_IgnoreReversedGraphics = value; }
+        }
 
-        public BlockingObjects blockingObjects { get {return m_BlockingObjects; } set { m_BlockingObjects = value; } }
+        public BlockingObjects blockingObjects
+        {
+            get { return m_BlockingObjects; }
+            set { m_BlockingObjects = value; }
+        }
 
-        [SerializeField]
-        protected LayerMask m_BlockingMask = kNoEventMaskSet;
+        [SerializeField] protected LayerMask m_BlockingMask = kNoEventMaskSet;
 
-        public LayerMask blockingMask { get { return m_BlockingMask; } set { m_BlockingMask = value; } }
+        public LayerMask blockingMask
+        {
+            get { return m_BlockingMask; }
+            set { m_BlockingMask = value; }
+        }
 
         private Canvas m_Canvas;
 
         protected GraphicRaycaster()
-        {}
+        {
+        }
 
         private Canvas canvas
         {
@@ -85,8 +92,7 @@ namespace UnityEngine.UI
 
         [NonSerialized] private List<Graphic> m_RaycastResults = new List<Graphic>();
 
-        /// <param name="eventData">Current event data</param>
-        /// <param name="resultAppendList">List of hit objects to append new results to.</param>
+
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
             if (canvas == null)
@@ -107,7 +113,7 @@ namespace UnityEngine.UI
             Vector3 eventPosition = MultipleDisplayUtilities.GetRelativeMousePositionForRaycast(eventData);
 
             // Discard events that are not part of this display so the user does not interact with multiple displays at once.
-            if ((int) eventPosition.z != displayIndex)
+            if ((int)eventPosition.z != displayIndex)
                 return;
 
             // Convert to view space
@@ -130,6 +136,7 @@ namespace UnityEngine.UI
                     h = Display.displays[displayIndex].systemHeight;
 #endif
                 }
+
                 pos = new Vector2(eventPosition.x / w, eventPosition.y / h);
             }
             else
@@ -155,7 +162,8 @@ namespace UnityEngine.UI
                     float projectionDirection = ray.direction.z;
                     distanceToClipPlane = Mathf.Approximately(0.0f, projectionDirection)
                         ? Mathf.Infinity
-                        : Mathf.Abs((currentEventCamera.farClipPlane - currentEventCamera.nearClipPlane) / projectionDirection);
+                        : Mathf.Abs((currentEventCamera.farClipPlane - currentEventCamera.nearClipPlane) /
+                                    projectionDirection);
                 }
 #if PACKAGE_PHYSICS
                 if (blockingObjects == BlockingObjects.ThreeD || blockingObjects == BlockingObjects.All)
@@ -163,7 +171,8 @@ namespace UnityEngine.UI
                     if (ReflectionMethodsCache.Singleton.raycast3D != null)
                     {
                         RaycastHit hit;
-                        if (ReflectionMethodsCache.Singleton.raycast3D(ray, out hit, distanceToClipPlane, (int)m_BlockingMask))
+                        if (ReflectionMethodsCache.Singleton.raycast3D(ray, out hit, distanceToClipPlane,
+                                (int)m_BlockingMask))
                         {
                             hitDistance = hit.distance;
                         }
@@ -175,7 +184,8 @@ namespace UnityEngine.UI
                 {
                     if (ReflectionMethodsCache.Singleton.raycast2D != null)
                     {
-                        var hits = ReflectionMethodsCache.Singleton.getRayIntersectionAll(ray, distanceToClipPlane, (int)m_BlockingMask);
+                        var hits = ReflectionMethodsCache.Singleton.getRayIntersectionAll(ray, distanceToClipPlane,
+                            (int)m_BlockingMask);
                         if (hits.Length > 0)
                             hitDistance = hits[0].distance;
                     }
@@ -204,8 +214,11 @@ namespace UnityEngine.UI
                     else
                     {
                         // If we have a camera compare the direction against the cameras forward.
-                        var cameraForward = currentEventCamera.transform.rotation * Vector3.forward * currentEventCamera.nearClipPlane;
-                        appendGraphic = Vector3.Dot(go.transform.position - currentEventCamera.transform.position - cameraForward, go.transform.forward) >= 0;
+                        var cameraForward = currentEventCamera.transform.rotation * Vector3.forward *
+                                            currentEventCamera.nearClipPlane;
+                        appendGraphic =
+                            Vector3.Dot(go.transform.position - currentEventCamera.transform.position - cameraForward,
+                                go.transform.forward) >= 0;
                     }
                 }
 
@@ -220,7 +233,8 @@ namespace UnityEngine.UI
                     else
                     {
                         // http://geomalgorithms.com/a06-_intersect-2.html
-                        distance = (Vector3.Dot(transForward, trans.position - ray.origin) / Vector3.Dot(transForward, ray.direction));
+                        distance = (Vector3.Dot(transForward, trans.position - ray.origin) /
+                                    Vector3.Dot(transForward, ray.direction));
 
                         // Check to see if the go is behind the camera.
                         if (distance < 0)
@@ -249,11 +263,7 @@ namespace UnityEngine.UI
             }
         }
 
-        /// <returns>
-        /// - Null if Camera mode is ScreenSpaceOverlay or ScreenSpaceCamera and has no camera.
-        /// - canvas.worldCanvas if not null
-        /// - Camera.main.
-        /// </returns>
+
         public override Camera eventCamera
         {
             get
@@ -269,7 +279,9 @@ namespace UnityEngine.UI
         }
 
         [NonSerialized] static readonly List<Graphic> s_SortedGraphics = new List<Graphic>();
-        private static void Raycast(Canvas canvas, Camera eventCamera, Vector2 pointerPosition, IList<Graphic> foundGraphics, List<Graphic> results)
+
+        private static void Raycast(Canvas canvas, Camera eventCamera, Vector2 pointerPosition,
+            IList<Graphic> foundGraphics, List<Graphic> results)
         {
             // Necessary for the event system
             int totalCount = foundGraphics.Count;
@@ -281,10 +293,12 @@ namespace UnityEngine.UI
                 if (!graphic.raycastTarget || graphic.canvasRenderer.cull || graphic.depth == -1)
                     continue;
 
-                if (!RectTransformUtility.RectangleContainsScreenPoint(graphic.rectTransform, pointerPosition, eventCamera, graphic.raycastPadding))
+                if (!RectTransformUtility.RectangleContainsScreenPoint(graphic.rectTransform, pointerPosition,
+                        eventCamera, graphic.raycastPadding))
                     continue;
 
-                if (eventCamera != null && eventCamera.WorldToScreenPoint(graphic.rectTransform.position).z > eventCamera.farClipPlane)
+                if (eventCamera != null && eventCamera.WorldToScreenPoint(graphic.rectTransform.position).z >
+                    eventCamera.farClipPlane)
                     continue;
 
                 if (graphic.Raycast(pointerPosition, eventCamera))

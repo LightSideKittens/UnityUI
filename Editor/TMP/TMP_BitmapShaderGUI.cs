@@ -56,7 +56,7 @@ namespace TMPro.EditorUtilities
                     EditorGUILayout.Space();
                     DoFloat("_Padding", "Padding");
                 }
-                
+
                 EditorGUILayout.Space();
                 DoFloat("_VertexOffsetX", "Offset X");
                 DoFloat("_VertexOffsetY", "Offset Y");

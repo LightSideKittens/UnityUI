@@ -80,7 +80,8 @@ namespace UnityEditor.UI
             if (EditorGUI.EndChangeCheck())
             {
                 // This could be made better to set all of the targets to their initial width, but mimizing code change for now
-                property.floatValue = (enabled ? defaultValue((target as LayoutElement).transform as RectTransform) : -1);
+                property.floatValue =
+                    (enabled ? defaultValue((target as LayoutElement).transform as RectTransform) : -1);
             }
 
             if (!property.hasMultipleDifferentValues && property.floatValue >= 0)
@@ -93,6 +94,7 @@ namespace UnityEditor.UI
                 {
                     property.floatValue = Mathf.Max(0, newValue);
                 }
+
                 EditorGUIUtility.labelWidth = 0;
             }
 

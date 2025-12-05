@@ -11,7 +11,8 @@ namespace TMPro
         FourCornersGradient
     }
 
-    [System.Serializable][ExcludeFromPresetAttribute]
+    [System.Serializable]
+    [ExcludeFromPresetAttribute]
     public class TMP_ColorGradient : ScriptableObject
     {
         public ColorMode colorMode = ColorMode.FourCornersGradient;
@@ -33,7 +34,7 @@ namespace TMPro
             bottomRight = k_DefaultColor;
         }
 
-        /// <param name="color"></param>
+
         public TMP_ColorGradient(Color color)
         {
             colorMode = k_DefaultColorMode;
@@ -43,10 +44,7 @@ namespace TMPro
             bottomRight = color;
         }
 
-        /// <param name="color0">Top left color.</param>
-        /// <param name="color1">Top right color.</param>
-        /// <param name="color2">Bottom left color.</param>
-        /// <param name="color3">Bottom right color.</param>
+
         public TMP_ColorGradient(Color color0, Color color1, Color color2, Color color3)
         {
             colorMode = k_DefaultColorMode;

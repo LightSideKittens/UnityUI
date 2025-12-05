@@ -5,7 +5,6 @@ namespace UnityEngine.UI
 {
     public class MaskUtilities
     {
-        /// <param name="mask">The object thats changed for whose children should be notified.</param>
         public static void Notify2DMaskStateChanged(Component mask)
         {
             var components = ListPool<Component>.Get();
@@ -19,10 +18,11 @@ namespace UnityEngine.UI
                 if (toNotify != null)
                     toNotify.RecalculateClipping();
             }
+
             ListPool<Component>.Release(components);
         }
 
-        /// <param name="mask">The object thats changed for whose children should be notified.</param>
+
         public static void NotifyStencilStateChanged(Component mask)
         {
             var components = ListPool<Component>.Get();
@@ -36,11 +36,11 @@ namespace UnityEngine.UI
                 if (toNotify != null)
                     toNotify.RecalculateMasking();
             }
+
             ListPool<Component>.Release(components);
         }
 
-        /// <param name="start">Transform to start the search at going up the hierarchy.</param>
-        /// <returns>Finds either the most root canvas, or the first canvas that overrides sorting.</returns>
+
         public static Transform FindRootSortOverrideCanvas(Transform start)
         {
             var canvasList = ListPool<Canvas>.Get();
@@ -55,14 +55,13 @@ namespace UnityEngine.UI
                 if (canvas.overrideSorting)
                     break;
             }
+
             ListPool<Canvas>.Release(canvasList);
 
             return canvas != null ? canvas.transform : null;
         }
 
-        /// <param name="transform">The starting transform to search.</param>
-        /// <param name="stopAfter">Where the search of parents should stop</param>
-        /// <returns>What the proper stencil buffer index should be.</returns>
+
         public static int GetStencilDepth(Transform transform, Transform stopAfter)
         {
             var depth = 0;
@@ -88,13 +87,12 @@ namespace UnityEngine.UI
 
                 t = t.parent;
             }
+
             ListPool<Mask>.Release(components);
             return depth;
         }
 
-        /// <param name="father">The transform to compare against.</param>
-        /// <param name="child">The starting transform to search up the hierarchy.</param>
-        /// <returns>Is child equal to father or is a descendant.</returns>
+
         public static bool IsDescendantOrSelf(Transform father, Transform child)
         {
             if (father == null || child == null)
@@ -114,8 +112,7 @@ namespace UnityEngine.UI
             return false;
         }
 
-        /// <param name="clippable">Clippable to search from.</param>
-        /// <returns>The Correct RectMask2D</returns>
+
         public static RectMask2D GetRectMaskForClippable(IClippable clippable)
         {
             List<RectMask2D> rectMaskComponents = ListPool<RectMask2D>.Get();
@@ -134,20 +131,24 @@ namespace UnityEngine.UI
                         componentToReturn = null;
                         continue;
                     }
+
                     if (!componentToReturn.isActiveAndEnabled)
                     {
                         componentToReturn = null;
                         continue;
                     }
+
                     clippable.gameObject.GetComponentsInParent(false, canvasComponents);
                     for (int i = canvasComponents.Count - 1; i >= 0; i--)
                     {
-                        if (!IsDescendantOrSelf(canvasComponents[i].transform, componentToReturn.transform) && canvasComponents[i].overrideSorting)
+                        if (!IsDescendantOrSelf(canvasComponents[i].transform, componentToReturn.transform) &&
+                            canvasComponents[i].overrideSorting)
                         {
                             componentToReturn = null;
                             break;
                         }
                     }
+
                     break;
                 }
             }
@@ -158,8 +159,7 @@ namespace UnityEngine.UI
             return componentToReturn;
         }
 
-        /// <param name="clipper">Starting clipping object.</param>
-        /// <param name="masks">The list of Rect masks</param>
+
         public static void GetRectMasksForClip(RectMask2D clipper, List<RectMask2D> masks)
         {
             masks.Clear();
@@ -178,12 +178,14 @@ namespace UnityEngine.UI
                     bool shouldAdd = true;
                     for (int j = canvasComponents.Count - 1; j >= 0; j--)
                     {
-                        if (!IsDescendantOrSelf(canvasComponents[j].transform, rectMaskComponents[i].transform) && canvasComponents[j].overrideSorting)
+                        if (!IsDescendantOrSelf(canvasComponents[j].transform, rectMaskComponents[i].transform) &&
+                            canvasComponents[j].overrideSorting)
                         {
                             shouldAdd = false;
                             break;
                         }
                     }
+
                     if (shouldAdd)
                         masks.Add(rectMaskComponents[i]);
                 }

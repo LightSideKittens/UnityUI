@@ -1,6 +1,5 @@
 ﻿namespace TMPro
 {
-
     public struct TMP_LineInfo
     {
         internal int controlCharacterCount;
@@ -28,7 +27,5 @@
 
         public HorizontalAlignmentOptions alignment;
         public Extents lineExtents;
-
-        /// <returns></returns>
     }
 }

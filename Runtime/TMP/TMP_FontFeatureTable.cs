@@ -34,17 +34,13 @@ namespace TMPro
             set { m_MarkToMarkAdjustmentRecords = value; }
         }
 
-        [SerializeField]
-        internal List<LigatureSubstitutionRecord> m_LigatureSubstitutionRecords;
+        [SerializeField] internal List<LigatureSubstitutionRecord> m_LigatureSubstitutionRecords;
 
-        [SerializeField]
-        internal List<GlyphPairAdjustmentRecord> m_GlyphPairAdjustmentRecords;
+        [SerializeField] internal List<GlyphPairAdjustmentRecord> m_GlyphPairAdjustmentRecords;
 
-        [SerializeField]
-        internal List<MarkToBaseAdjustmentRecord> m_MarkToBaseAdjustmentRecords;
+        [SerializeField] internal List<MarkToBaseAdjustmentRecord> m_MarkToBaseAdjustmentRecords;
 
-        [SerializeField]
-        internal List<MarkToMarkAdjustmentRecord> m_MarkToMarkAdjustmentRecords;
+        [SerializeField] internal List<MarkToMarkAdjustmentRecord> m_MarkToMarkAdjustmentRecords;
 
 
         internal Dictionary<uint, List<LigatureSubstitutionRecord>> m_LigatureSubstitutionRecordLookup;
@@ -73,19 +69,23 @@ namespace TMPro
         public void SortGlyphPairAdjustmentRecords()
         {
             if (m_GlyphPairAdjustmentRecords.Count > 0)
-                m_GlyphPairAdjustmentRecords = m_GlyphPairAdjustmentRecords.OrderBy(s => s.firstAdjustmentRecord.glyphIndex).ThenBy(s => s.secondAdjustmentRecord.glyphIndex).ToList();
+                m_GlyphPairAdjustmentRecords = m_GlyphPairAdjustmentRecords
+                    .OrderBy(s => s.firstAdjustmentRecord.glyphIndex).ThenBy(s => s.secondAdjustmentRecord.glyphIndex)
+                    .ToList();
         }
 
         public void SortMarkToBaseAdjustmentRecords()
         {
             if (m_MarkToBaseAdjustmentRecords.Count > 0)
-                m_MarkToBaseAdjustmentRecords = m_MarkToBaseAdjustmentRecords.OrderBy(s => s.baseGlyphID).ThenBy(s => s.markGlyphID).ToList();
+                m_MarkToBaseAdjustmentRecords = m_MarkToBaseAdjustmentRecords.OrderBy(s => s.baseGlyphID)
+                    .ThenBy(s => s.markGlyphID).ToList();
         }
 
         public void SortMarkToMarkAdjustmentRecords()
         {
             if (m_MarkToMarkAdjustmentRecords.Count > 0)
-                m_MarkToMarkAdjustmentRecords = m_MarkToMarkAdjustmentRecords.OrderBy(s => s.baseMarkGlyphID).ThenBy(s => s.combiningMarkGlyphID).ToList();
+                m_MarkToMarkAdjustmentRecords = m_MarkToMarkAdjustmentRecords.OrderBy(s => s.baseMarkGlyphID)
+                    .ThenBy(s => s.combiningMarkGlyphID).ToList();
         }
     }
 }

@@ -33,10 +33,16 @@ namespace TMPro.EditorUtilities
             if (GUI.enabled == false)
             {
                 int unicode = prop_Unicode.intValue;
-                EditorGUI.LabelField(new Rect(rect.x, rect.y, 120f, 18), new GUIContent("Unicode: <color=#FFFF80>0x" + unicode.ToString("X") + "</color>"), style);
-                EditorGUI.LabelField(new Rect(rect.x + 115, rect.y, 120f, 18), unicode <= 0xFFFF ? new GUIContent("UTF16: <color=#FFFF80>\\u" + unicode.ToString("X4") + "</color>") : new GUIContent("UTF32: <color=#FFFF80>\\U" + unicode.ToString("X8") + "</color>"), style);
-                EditorGUI.LabelField(new Rect(rect.x, rect.y + 18, 120, 18), new GUIContent("Glyph ID: <color=#FFFF80>" + prop_GlyphIndex.intValue + "</color>"), style);
-                EditorGUI.LabelField(new Rect(rect.x, rect.y + 36, 80, 18), new GUIContent("Scale: <color=#FFFF80>" + prop_Scale.floatValue + "</color>"), style);
+                EditorGUI.LabelField(new Rect(rect.x, rect.y, 120f, 18),
+                    new GUIContent("Unicode: <color=#FFFF80>0x" + unicode.ToString("X") + "</color>"), style);
+                EditorGUI.LabelField(new Rect(rect.x + 115, rect.y, 120f, 18),
+                    unicode <= 0xFFFF
+                        ? new GUIContent("UTF16: <color=#FFFF80>\\u" + unicode.ToString("X4") + "</color>")
+                        : new GUIContent("UTF32: <color=#FFFF80>\\U" + unicode.ToString("X8") + "</color>"), style);
+                EditorGUI.LabelField(new Rect(rect.x, rect.y + 18, 120, 18),
+                    new GUIContent("Glyph ID: <color=#FFFF80>" + prop_GlyphIndex.intValue + "</color>"), style);
+                EditorGUI.LabelField(new Rect(rect.x, rect.y + 36, 80, 18),
+                    new GUIContent("Scale: <color=#FFFF80>" + prop_Scale.floatValue + "</color>"), style);
 
                 DrawGlyph((uint)prop_GlyphIndex.intValue, new Rect(position.x, position.y, 48, 58), property);
             }
@@ -45,7 +51,8 @@ namespace TMPro.EditorUtilities
                 EditorGUIUtility.labelWidth = 55f;
                 GUI.SetNextControlName("Unicode Input");
                 EditorGUI.BeginChangeCheck();
-                string unicode = EditorGUI.TextField(new Rect(rect.x, rect.y, 120, 18), "Unicode:", prop_Unicode.intValue.ToString("X"));
+                string unicode = EditorGUI.TextField(new Rect(rect.x, rect.y, 120, 18), "Unicode:",
+                    prop_Unicode.intValue.ToString("X"));
 
                 if (GUI.GetNameOfFocusedControl() == "Unicode Input")
                 {
@@ -65,7 +72,8 @@ namespace TMPro.EditorUtilities
 
                 EditorGUIUtility.labelWidth = 59f;
                 EditorGUI.BeginChangeCheck();
-                EditorGUI.DelayedIntField(new Rect(rect.x, rect.y + 18, 100, 18), prop_GlyphIndex, new GUIContent("Glyph ID:"));
+                EditorGUI.DelayedIntField(new Rect(rect.x, rect.y + 18, 100, 18), prop_GlyphIndex,
+                    new GUIContent("Glyph ID:"));
                 if (EditorGUI.EndChangeCheck())
                 {
                     TMP_FontAsset fontAsset = property.serializedObject.targetObject as TMP_FontAsset;
@@ -110,8 +118,12 @@ namespace TMPro.EditorUtilities
                             SerializedProperty prop_GlyphRect = prop_Glyph.FindPropertyRelative("m_GlyphRect");
 
                             Rect newRect = EditorGUILayout.GetControlRect(false, 115);
-                            EditorGUI.DrawRect(new Rect(newRect.x + 52, newRect.y - 20, newRect.width - 52, newRect.height - 5), new Color(0.1f, 0.1f, 0.1f, 0.45f));
-                            EditorGUI.DrawRect(new Rect(newRect.x + 53, newRect.y - 19, newRect.width - 54, newRect.height - 7), new Color(0.3f, 0.3f, 0.3f, 0.8f));
+                            EditorGUI.DrawRect(
+                                new Rect(newRect.x + 52, newRect.y - 20, newRect.width - 52, newRect.height - 5),
+                                new Color(0.1f, 0.1f, 0.1f, 0.45f));
+                            EditorGUI.DrawRect(
+                                new Rect(newRect.x + 53, newRect.y - 19, newRect.width - 54, newRect.height - 7),
+                                new Color(0.3f, 0.3f, 0.3f, 0.8f));
 
                             newRect.x += 55;
                             newRect.y -= 18;
@@ -151,7 +163,8 @@ namespace TMPro.EditorUtilities
                 return;
 
             Texture2D atlasTexture;
-            if (TMP_PropertyDrawerUtilities.TryGetAtlasTextureFromSerializedObject(so, glyph.atlasIndex, out atlasTexture) == false)
+            if (TMP_PropertyDrawerUtilities.TryGetAtlasTextureFromSerializedObject(so, glyph.atlasIndex,
+                    out atlasTexture) == false)
                 return;
 
             Material mat;
@@ -172,7 +185,9 @@ namespace TMPro.EditorUtilities
             float normalizedHeight = ascentLine - descentLine;
             float scale = glyphDrawPosition.width / normalizedHeight;
 
-            Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width, (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width, (float)glyphHeight / atlasTexture.height);
+            Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width,
+                (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width,
+                (float)glyphHeight / atlasTexture.height);
 
             if (Event.current.type == EventType.Repaint)
             {
@@ -181,7 +196,8 @@ namespace TMPro.EditorUtilities
                 glyphDrawPosition.width = glyphWidth * scale;
                 glyphDrawPosition.height = glyphHeight * scale;
 
-                Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f), mat);
+                Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f),
+                    mat);
             }
         }
     }

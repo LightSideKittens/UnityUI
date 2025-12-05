@@ -13,181 +13,183 @@ public sealed class BidiConformanceRunner
         this.bidiEngine = bidiEngine ?? throw new ArgumentNullException(nameof(bidiEngine));
     }
 
-public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxFailuresToLog = 20)
-{
-    BidiConformanceSummary summary = new BidiConformanceSummary
+    public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxFailuresToLog = 20)
     {
-        totalEvaluatedTests = 0,
-        passedTests = 0,
-        failedTests = 0,
-        skippedTests = 0,
-        sampleFailures = string.Empty
-    };
-
-    if (string.IsNullOrEmpty(fileContent))
-    {
-        summary.sampleFailures = "BidiCharacterTest content is empty or null.";
-        return summary;
-    }
-
-    int totalEvaluated = 0;
-    int passed = 0;
-    int failed = 0;
-    int skipped = 0;
-
-    List<BidiConformanceFailure> failures = new List<BidiConformanceFailure>();
-
-    using (StringReader reader = new StringReader(fileContent))
-    {
-        string line;
-        int lineNumber = 0;
-
-        while ((line = reader.ReadLine()) != null)
+        BidiConformanceSummary summary = new BidiConformanceSummary
         {
-            lineNumber++;
+            totalEvaluatedTests = 0,
+            passedTests = 0,
+            failedTests = 0,
+            skippedTests = 0,
+            sampleFailures = string.Empty
+        };
 
-            int hashIndex = line.IndexOf('#');
-            if (hashIndex >= 0)
-                line = line.Substring(0, hashIndex);
+        if (string.IsNullOrEmpty(fileContent))
+        {
+            summary.sampleFailures = "BidiCharacterTest content is empty or null.";
+            return summary;
+        }
 
-            line = line.Trim();
-            if (line.Length == 0)
-                continue;
+        int totalEvaluated = 0;
+        int passed = 0;
+        int failed = 0;
+        int skipped = 0;
 
-            string[] fields = line.Split(';');
-            if (fields.Length < 5)
-            {
-                skipped++;
-                continue;
-            }
+        List<BidiConformanceFailure> failures = new List<BidiConformanceFailure>();
 
-            string codePointsField      = fields[0].Trim();
-            string paragraphDirField    = fields[1].Trim();
-            string paragraphLevelField  = fields[2].Trim();
-            string expectedLevelsField  = fields[3].Trim();
-            string expectedReorderField = fields[4].Trim();
+        using (StringReader reader = new StringReader(fileContent))
+        {
+            string line;
+            int lineNumber = 0;
 
-            if (!int.TryParse(paragraphDirField, NumberStyles.Integer, CultureInfo.InvariantCulture, out int paragraphDir))
+            while ((line = reader.ReadLine()) != null)
             {
-                skipped++;
-                continue;
-            }
+                lineNumber++;
 
-            if (paragraphDir != 0 && paragraphDir != 1 && paragraphDir != 2)
-            {
-                skipped++;
-                continue;
-            }
+                int hashIndex = line.IndexOf('#');
+                if (hashIndex >= 0)
+                    line = line.Substring(0, hashIndex);
 
-            int[] codePoints;
-            try
-            {
-                codePoints = ParseHexCodePoints(codePointsField);
-            }
-            catch (Exception ex)
-            {
-                skipped++;
-                AddFailure(failures, lineNumber, line,
-                    $"Failed to parse code points: {ex.Message}", maxFailuresToLog);
-                continue;
-            }
+                line = line.Trim();
+                if (line.Length == 0)
+                    continue;
 
-            int?[] expectedLevels;
-            try
-            {
-                expectedLevels = ParseExpectedLevels(expectedLevelsField);
-            }
-            catch (Exception ex)
-            {
-                skipped++;
-                AddFailure(failures, lineNumber, line,
-                    $"Failed to parse expected levels: {ex.Message}", maxFailuresToLog);
-                continue;
-            }
+                string[] fields = line.Split(';');
+                if (fields.Length < 5)
+                {
+                    skipped++;
+                    continue;
+                }
 
-            bool hasReorderExpectations;
-            int[] expectedReorder;
-            try
-            {
-                expectedReorder = ParseExpectedReorder(expectedReorderField, out hasReorderExpectations);
-            }
-            catch (Exception ex)
-            {
-                skipped++;
-                AddFailure(failures, lineNumber, line,
-                    $"Failed to parse expected reorder: {ex.Message}", maxFailuresToLog);
-                continue;
-            }
+                string codePointsField = fields[0].Trim();
+                string paragraphDirField = fields[1].Trim();
+                string paragraphLevelField = fields[2].Trim();
+                string expectedLevelsField = fields[3].Trim();
+                string expectedReorderField = fields[4].Trim();
 
-            if (expectedLevels.Length != codePoints.Length)
-            {
-                skipped++;
-                AddFailure(
-                    failures,
-                    lineNumber,
-                    line,
-                    $"Expected levels length mismatch: expected {codePoints.Length}, got {expectedLevels.Length}.",
-                    maxFailuresToLog);
-            }
+                if (!int.TryParse(paragraphDirField, NumberStyles.Integer, CultureInfo.InvariantCulture,
+                        out int paragraphDir))
+                {
+                    skipped++;
+                    continue;
+                }
 
-            totalEvaluated++;
+                if (paragraphDir != 0 && paragraphDir != 1 && paragraphDir != 2)
+                {
+                    skipped++;
+                    continue;
+                }
 
-            BidiResult bidiResult;
-            try
-            {
-                bidiResult = bidiEngine.Process(codePoints, paragraphDir);
-            }
-            catch (Exception ex)
-            {
-                failed++;
-                AddFailure(failures, lineNumber, line,
-                    $"BidiEngine.Process threw an exception: {ex.Message}", maxFailuresToLog);
-                continue;
-            }
+                int[] codePoints;
+                try
+                {
+                    codePoints = ParseHexCodePoints(codePointsField);
+                }
+                catch (Exception ex)
+                {
+                    skipped++;
+                    AddFailure(failures, lineNumber, line,
+                        $"Failed to parse code points: {ex.Message}", maxFailuresToLog);
+                    continue;
+                }
 
-            if (bidiResult.levels == null || bidiResult.levels.Length != codePoints.Length)
-            {
-                failed++;
-                AddFailure(
-                    failures,
-                    lineNumber,
-                    line,
-                    $"BidiEngine returned levels length {bidiResult.levels?.Length ?? -1}, expected {codePoints.Length}.",
-                    maxFailuresToLog);
-                continue;
-            }
+                int?[] expectedLevels;
+                try
+                {
+                    expectedLevels = ParseExpectedLevels(expectedLevelsField);
+                }
+                catch (Exception ex)
+                {
+                    skipped++;
+                    AddFailure(failures, lineNumber, line,
+                        $"Failed to parse expected levels: {ex.Message}", maxFailuresToLog);
+                    continue;
+                }
 
-            if (!CompareLevels(expectedLevels, bidiResult.levels, out string levelsErrorMessage))
-            {
-                failed++;
-                AddFailure(failures, lineNumber, line,
-                    $"Levels mismatch: {levelsErrorMessage}", maxFailuresToLog);
-                continue;
-            }
+                bool hasReorderExpectations;
+                int[] expectedReorder;
+                try
+                {
+                    expectedReorder = ParseExpectedReorder(expectedReorderField, out hasReorderExpectations);
+                }
+                catch (Exception ex)
+                {
+                    skipped++;
+                    AddFailure(failures, lineNumber, line,
+                        $"Failed to parse expected reorder: {ex.Message}", maxFailuresToLog);
+                    continue;
+                }
 
-            if (hasReorderExpectations)
-            {
-                if (!CompareReorder(expectedLevels, expectedReorder, bidiResult.levels, out string reorderErrorMessage))
+                if (expectedLevels.Length != codePoints.Length)
+                {
+                    skipped++;
+                    AddFailure(
+                        failures,
+                        lineNumber,
+                        line,
+                        $"Expected levels length mismatch: expected {codePoints.Length}, got {expectedLevels.Length}.",
+                        maxFailuresToLog);
+                }
+
+                totalEvaluated++;
+
+                BidiResult bidiResult;
+                try
+                {
+                    bidiResult = bidiEngine.Process(codePoints, paragraphDir);
+                }
+                catch (Exception ex)
                 {
                     failed++;
                     AddFailure(failures, lineNumber, line,
-                        $"Reorder mismatch: {reorderErrorMessage}", maxFailuresToLog);
+                        $"BidiEngine.Process threw an exception: {ex.Message}", maxFailuresToLog);
                     continue;
                 }
+
+                if (bidiResult.levels == null || bidiResult.levels.Length != codePoints.Length)
+                {
+                    failed++;
+                    AddFailure(
+                        failures,
+                        lineNumber,
+                        line,
+                        $"BidiEngine returned levels length {bidiResult.levels?.Length ?? -1}, expected {codePoints.Length}.",
+                        maxFailuresToLog);
+                    continue;
+                }
+
+                if (!CompareLevels(expectedLevels, bidiResult.levels, out string levelsErrorMessage))
+                {
+                    failed++;
+                    AddFailure(failures, lineNumber, line,
+                        $"Levels mismatch: {levelsErrorMessage}", maxFailuresToLog);
+                    continue;
+                }
+
+                if (hasReorderExpectations)
+                {
+                    if (!CompareReorder(expectedLevels, expectedReorder, bidiResult.levels,
+                            out string reorderErrorMessage))
+                    {
+                        failed++;
+                        AddFailure(failures, lineNumber, line,
+                            $"Reorder mismatch: {reorderErrorMessage}", maxFailuresToLog);
+                        continue;
+                    }
+                }
+
+                passed++;
             }
-
-            passed++;
         }
+
+        summary.totalEvaluatedTests = totalEvaluated;
+        summary.passedTests = passed;
+        summary.failedTests = failed;
+        summary.skippedTests = skipped;
+        summary.sampleFailures = BuildSampleFailuresText(failures, maxFailuresToLog);
+
+        return summary;
     }
-
-    summary.totalEvaluatedTests = totalEvaluated;
-    summary.passedTests = passed;
-    summary.failedTests = failed;
-    summary.skippedTests = skipped;
-    summary.sampleFailures = BuildSampleFailuresText(failures, maxFailuresToLog);
-
-    return summary;
-}
 
 
     private static int[] ParseHexCodePoints(string codePointsField)
@@ -209,11 +211,7 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
         return result;
     }
 
-    /// <summary>
-    /// Parses expected levels field from BidiCharacterTest.
-    /// Each entry is either an integer level, or 'x' indicating that the level
-    /// for this position is not specified and must be ignored in comparison.
-    /// </summary>
+
     private static int?[] ParseExpectedLevels(string expectedLevelsField)
     {
         if (string.IsNullOrWhiteSpace(expectedLevelsField))
@@ -242,12 +240,7 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
         return result;
     }
 
-    /// <summary>
-    /// Parses expected reorder field from BidiCharacterTest.
-    /// Returns:
-    ///  - hasReorderExpectations = false, if there is effectively no data (empty or all 'x').
-    ///  - otherwise, an array of logical indices in expected visual order.
-    /// </summary>
+
     private static int[] ParseExpectedReorder(string expectedReorderField, out bool hasReorderExpectations)
     {
         hasReorderExpectations = false;
@@ -283,10 +276,7 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
         return indices.ToArray();
     }
 
-    /// <summary>
-    /// Compares expected vs actual embedding levels.
-    /// Positions with expected level = null ('x' in test data) are ignored.
-    /// </summary>
+
     private static bool CompareLevels(int?[] expectedLevels, byte[] actualLevels, out string errorMessage)
     {
         errorMessage = string.Empty;
@@ -318,14 +308,7 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
         return true;
     }
 
-    /// <summary>
-    /// Compares expected vs actual visual order (permutation).
-    /// We emulate X9 by:
-    ///  - taking only positions where expected level is specified (not 'x'),
-    ///  - building a compact levels array for those positions,
-    ///  - calling BidiEngine.ReorderLine on that compact array,
-    ///  - projecting the result back to original logical indices.
-    /// </summary>
+
     private static bool CompareReorder(
         int?[] expectedLevels,
         int[] expectedReorder,
@@ -449,14 +432,14 @@ public BidiConformanceSummary RunBidiCharacterTests(string fileContent, int maxF
             BidiConformanceFailure failure = failures[i];
 
             sb.Append("- Line ")
-              .Append(failure.lineNumber)
-              .Append(": ")
-              .Append(failure.message)
-              .AppendLine();
+                .Append(failure.lineNumber)
+                .Append(": ")
+                .Append(failure.message)
+                .AppendLine();
 
             sb.Append("  Input: ")
-              .Append(failure.rawInput)
-              .AppendLine();
+                .Append(failure.rawInput)
+                .AppendLine();
         }
 
         return sb.ToString();

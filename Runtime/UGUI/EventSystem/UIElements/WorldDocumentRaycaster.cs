@@ -22,8 +22,7 @@ namespace UnityEngine.UIElements
 
         private static PhysicsDocumentPicker worldPicker = new();
 
-        /// <param name="eventData">Current event data.</param>
-        /// <param name="resultAppendList">List of hit Objects.</param>
+
         public override void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList)
         {
             var currentInputModule = EventSystem.current != null ? EventSystem.current.currentInputModule : null;
@@ -64,12 +63,9 @@ namespace UnityEngine.UIElements
             });
         }
 
-        /// <param name="eventData">Current event data.</param>
-        /// <param name="worldRay">The created ray.</param>
-        /// <param name="maxDistance">A distance constraint for the created ray.</param>
-        /// <param name="layerMask">A layer constraint for the created ray.</param>
-        /// <returns>Returns true if a valid ray could be created.</returns>
-        protected virtual bool GetWorldRay(PointerEventData eventData, out Ray worldRay, out float maxDistance, out int layerMask)
+
+        protected virtual bool GetWorldRay(PointerEventData eventData, out Ray worldRay, out float maxDistance,
+            out int layerMask)
         {
             var cam = m_EventCamera != null ? m_EventCamera : Camera.main;
             if (cam == null)

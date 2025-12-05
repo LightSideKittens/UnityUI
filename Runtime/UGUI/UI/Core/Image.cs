@@ -7,75 +7,46 @@ using UnityEngine.U2D;
 
 namespace UnityEngine.UI
 {
-
     [RequireComponent(typeof(CanvasRenderer))]
     [AddComponentMenu("UI/Image", 11)]
     public class Image : MaskableGraphic, ISerializationCallbackReceiver, ILayoutElement, ICanvasRaycastFilter
     {
         public enum Type
         {
-            /// <remarks>
-            /// This setting shows the entire image stretched across the Image's RectTransform
-            /// </remarks>
             Simple,
 
-            /// <remarks>
-            /// A 9-sliced image displays a central area stretched across the image surrounded by a border comprising of 4 corners and 4 stretched edges.
+
             ///
-            /// This has the effect of creating a resizable skinned rectangular element suitable for dialog boxes, windows, and general UI elements.
             ///
-            /// Note: For this method to work properly the Sprite assigned to Image.sprite needs to have Sprite.border defined.
-            /// </remarks>
             Sliced,
 
-            /// <remarks>
-            /// A Tiled image behaves similarly to a UI.Image.Type.Sliced|Sliced image, except that the resizable sections of the image are repeated instead of being stretched. This can be useful for detailed UI graphics that do not look good when stretched.
+
             ///
-            /// It uses the Sprite.border value to determine how each part (border and center) should be tiled.
             ///
-            /// The Image sections will repeat the corresponding section in the Sprite until the whole section is filled. The corner sections will be unaffected and will draw in the same way as a Sliced Image. The edges will repeat along their lengths. The center section will repeat across the whole central part of the Image.
             ///
-            /// The Image section will repeat the corresponding section in the Sprite until the whole section is filled.
             ///
-            /// Be aware that if you are tiling a Sprite with borders or a packed sprite, a mesh will be generated to create the tiles. The size of the mesh will be limited to 16250 quads; if your tiling would require more tiles, the size of the tiles will be enlarged to ensure that the number of generated quads stays below this limit.
             ///
-            /// For optimum efficiency, use a Sprite with no borders and with no packing, and make sure the Sprite.texture wrap mode is set to TextureWrapMode.Repeat.These settings will prevent the generation of additional geometry.If this is not possible, limit the number of tiles in your Image.
-            /// </remarks>
             Tiled,
 
-            /// <remarks>
-            /// A Filled Image will display a section of the Sprite, with the rest of the RectTransform left transparent. The Image.fillAmount determines how much of the Image to show, and Image.fillMethod controls the shape in which the Image will be cut.
+
             ///
-            /// This can be used for example to display circular or linear status information such as timers, health bars, and loading bars.
-            /// </remarks>
             Filled
         }
 
         public enum FillMethod
         {
-            /// <remarks>
-            /// The Image will be Cropped at either left or right size depending on Image.fillOriging at the Image.fillAmount
-            /// </remarks>
             Horizontal,
 
-            /// <remarks>
-            /// The Image will be Cropped at either top or Bottom size depending on Image.fillOrigin at the Image.fillAmount
-            /// </remarks>
+
             Vertical,
 
-            /// <remarks>
-            /// For this method the Image.fillAmount represents an angle between 0 and 90 degrees. The Image will be cut by a line passing at the Image.fillOrigin at the specified angle.
-            /// </remarks>
+
             Radial90,
 
-            /// <remarks>
-            /// For this method the Image.fillAmount represents an angle between 0 and 180 degrees. The Image will be cut by a line passing at the Image.fillOrigin at the specified angle.
-            /// </remarks>
+
             Radial180,
 
-            /// <remarks>
-            /// or this method the Image.fillAmount represents an angle between 0 and 360 degrees. The Arc defined by the center of the Image, the Image.fillOrigin and the angle will be cut from the Image.
-            /// </remarks>
+
             Radial360,
         }
 
@@ -129,46 +100,15 @@ namespace UnityEngine.UI
 
         static protected Material s_ETC1DefaultUI = null;
 
-        [FormerlySerializedAs("m_Frame")]
-        [SerializeField]
+        [FormerlySerializedAs("m_Frame")] [SerializeField]
         private Sprite m_Sprite;
 
-        /// <remarks>
-        /// This returns the source Sprite of an Image. This Sprite can also be viewed and changed in the Inspector as part of an Image component. This can also be used to change the Sprite using a script.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// //Attach this script to an Image GameObject and set its Source Image to the Sprite you would like.
-        /// //Press the space key to change the Sprite. Remember to assign a second Sprite in this script's section of the Inspector.
+
         ///
-        /// using UnityEngine;
-        /// using UnityEngine.UI;
         ///
-        /// public class Example : MonoBehaviour
-        /// {
-        ///     Image m_Image;
-        ///     //Set this in the Inspector
-        ///     public Sprite m_Sprite;
         ///
-        ///     void Start()
-        ///     {
-        ///         //Fetch the Image from the GameObject
-        ///         m_Image = GetComponent<Image>();
-        ///     }
         ///
-        ///     void Update()
-        ///     {
-        ///         //Press space to change the Sprite of the Image
-        ///         if (Input.GetKey(KeyCode.Space))
-        ///         {
-        ///             m_Image.sprite = m_Sprite;
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
 
         public Sprite sprite
         {
@@ -180,7 +120,8 @@ namespace UnityEngine.UI
                     if (m_Sprite != value)
                     {
                         m_SkipLayoutUpdate = m_Sprite.rect.size.Equals(value ? value.rect.size : Vector2.zero);
-                        m_SkipMaterialUpdate = (m_Sprite.texture == (value ? value.texture : null)) && !CheckSecondaryTexturesChanged(value);
+                        m_SkipMaterialUpdate = (m_Sprite.texture == (value ? value.texture : null)) &&
+                                               !CheckSecondaryTexturesChanged(value);
                         m_Sprite = value;
 
                         ResetAlphaHitThresholdIfNeeded();
@@ -203,22 +144,22 @@ namespace UnityEngine.UI
                 {
                     if (!SpriteSupportsAlphaHitTest() && m_AlphaHitTestMinimumThreshold > 0)
                     {
-                        Debug.LogWarning("Sprite was changed for one not readable or with Crunch Compression. Resetting the AlphaHitThreshold to 0.", this);
+                        Debug.LogWarning(
+                            "Sprite was changed for one not readable or with Crunch Compression. Resetting the AlphaHitThreshold to 0.",
+                            this);
                         m_AlphaHitTestMinimumThreshold = 0;
                     }
                 }
 
                 bool SpriteSupportsAlphaHitTest()
                 {
-                    return m_Sprite != null && m_Sprite.texture != null && !GraphicsFormatUtility.IsCrunchFormat(m_Sprite.texture.format) && m_Sprite.texture.isReadable;
+                    return m_Sprite != null && m_Sprite.texture != null &&
+                           !GraphicsFormatUtility.IsCrunchFormat(m_Sprite.texture.format) &&
+                           m_Sprite.texture.isReadable;
                 }
             }
         }
 
-
-        /// <remarks>
-        /// When a new Sprite is assigned update optimizations are automatically applied.
-        /// </remarks>
 
         public void DisableSpriteOptimizations()
         {
@@ -226,60 +167,16 @@ namespace UnityEngine.UI
             m_SkipMaterialUpdate = false;
         }
 
-        [NonSerialized]
-        private Sprite m_OverrideSprite;
+        [NonSerialized] private Sprite m_OverrideSprite;
 
-        /// <remarks>
-        /// The UI.Image-overrideSprite|overrideSprite variable allows a sprite to have the
-        /// sprite changed.This change happens immediately.When the changed
-        /// sprite is no longer needed the sprite can be reverted back to the
-        /// original version.This happens when the overrideSprite
-        /// is set to /null/.
-        /// </remarks>
-        /// <example>
-        /// Note: The script example below has two buttons.  The button textures are loaded from the
-        /// /Resources/ folder.  (They are not used in the shown example).  Two sprites are added to
-        /// the example code.  /Example1/ and /Example2/ are functions called by the button OnClick
-        /// functions.  Example1 calls overrideSprite and Example2 sets overrideSprite to null.
-        /// <code>
-        /// <![CDATA[
-        /// using System.Collections;
-        /// using System.Collections.Generic;
-        /// using UnityEngine;
-        /// using UnityEngine.UI;
+
         ///
-        /// public class ExampleClass : MonoBehaviour
-        /// {
-        ///     private Sprite sprite1;
-        ///     private Sprite sprite2;
-        ///     private Image i;
         ///
-        ///     public void Start()
-        ///     {
-        ///         i = GetComponent<Image>();
-        ///         sprite1 = Resources.Load<Sprite>("texture1");
-        ///         sprite2 = Resources.Load<Sprite>("texture2");
         ///
-        ///         i.sprite = sprite1;
-        ///     }
         ///
-        ///     // Called by a Button OnClick() with ExampleClass.Example1
-        ///     // Uses overrideSprite to make this change temporary
-        ///     public void Example1()
-        ///     {
-        ///         i.overrideSprite = sprite2;
-        ///     }
         ///
-        ///     // Called by a Button OnClick() with ExampleClass.Example2
-        ///     // Removes the overrideSprite which causes the original sprite to be used again.
-        ///     public void Example2()
-        ///     {
-        ///         i.overrideSprite = null;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
+
         public Sprite overrideSprite
         {
             get { return activeSprite; }
@@ -293,232 +190,160 @@ namespace UnityEngine.UI
             }
         }
 
-        private Sprite activeSprite { get { return m_OverrideSprite != null ? m_OverrideSprite : sprite; } }
+        private Sprite activeSprite
+        {
+            get { return m_OverrideSprite != null ? m_OverrideSprite : sprite; }
+        }
 
-        /// How the Image is drawn.
+
         [SerializeField] private Type m_Type = Type.Simple;
 
-        /// <remarks>
-        /// Unity can interpret an Image in various different ways depending on the intended purpose. This can be used to display:
-        /// - Whole images stretched to fit the RectTransform of the Image.
-        /// - A 9-sliced image useful for various decorated UI boxes and other rectangular elements.
-        /// - A tiled image with sections of the sprite repeated.
-        /// - As a partial image, useful for wipes, fades, timers, status bars etc.
-        /// </remarks>
-        public Type type { get { return m_Type; } set { if (SetPropertyUtility.SetStruct(ref m_Type, value)) SetVerticesDirty(); } }
+
+        public Type type
+        {
+            get { return m_Type; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_Type, value)) SetVerticesDirty();
+            }
+        }
 
         [SerializeField] private bool m_PreserveAspect = false;
 
-        public bool preserveAspect { get { return m_PreserveAspect; } set { if (SetPropertyUtility.SetStruct(ref m_PreserveAspect, value)) SetVerticesDirty(); } }
+        public bool preserveAspect
+        {
+            get { return m_PreserveAspect; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_PreserveAspect, value)) SetVerticesDirty();
+            }
+        }
 
         [SerializeField] private bool m_FillCenter = true;
 
-        /// <remarks>
-        /// This will only have any effect if the Image.sprite has borders.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI;
-        ///
-        /// public class FillCenterScript : MonoBehaviour
-        /// {
-        ///     public Image xmasCalenderDoor;
-        ///
-        ///     // removes the center of the image to reveal the image behind it
-        ///     void OpenCalendarDoor()
-        ///     {
-        ///         xmasCalenderDoor.fillCenter = false;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public bool fillCenter { get { return m_FillCenter; } set { if (SetPropertyUtility.SetStruct(ref m_FillCenter, value)) SetVerticesDirty(); } }
 
-        /// Filling method for filled sprites.
+        ///
+        ///
+
+
+        public bool fillCenter
+        {
+            get { return m_FillCenter; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_FillCenter, value)) SetVerticesDirty();
+            }
+        }
+
+
         [SerializeField] private FillMethod m_FillMethod = FillMethod.Radial360;
-        public FillMethod fillMethod { get { return m_FillMethod; } set { if (SetPropertyUtility.SetStruct(ref m_FillMethod, value)) { SetVerticesDirty(); m_FillOrigin = 0; } } }
 
-        /// Amount of the Image shown. 0-1 range with 0 being nothing shown, and 1 being the full Image.
-        [Range(0, 1)]
-        [SerializeField]
-        private float m_FillAmount = 1.0f;
+        public FillMethod fillMethod
+        {
+            get { return m_FillMethod; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_FillMethod, value))
+                {
+                    SetVerticesDirty();
+                    m_FillOrigin = 0;
+                }
+            }
+        }
 
-        /// <remarks>
-        /// 0-1 range with 0 being nothing shown, and 1 being the full Image.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
+
+        [Range(0, 1)] [SerializeField] private float m_FillAmount = 1.0f;
+
+
         ///
-        /// public class Cooldown : MonoBehaviour
-        /// {
-        ///     public Image cooldown;
-        ///     public bool coolingDown;
-        ///     public float waitTime = 30.0f;
         ///
-        ///     // Update is called once per frame
-        ///     void Update()
-        ///     {
-        ///         if (coolingDown == true)
-        ///         {
-        ///             //Reduce fill amount over 30 seconds
-        ///             cooldown.fillAmount -= 1.0f / waitTime * Time.deltaTime;
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public float fillAmount { get { return m_FillAmount; } set { if (SetPropertyUtility.SetStruct(ref m_FillAmount, Mathf.Clamp01(value))) SetVerticesDirty(); } }
 
-        /// Whether the Image should be filled clockwise (true) or counter-clockwise (false).
+
+        public float fillAmount
+        {
+            get { return m_FillAmount; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_FillAmount, Mathf.Clamp01(value))) SetVerticesDirty();
+            }
+        }
+
+
         [SerializeField] private bool m_FillClockwise = true;
 
-        /// <remarks>
-        /// This will only have any effect if the Image.type is set to Image.Type.Filled and Image.fillMethod is set to any of the Radial methods.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
-        ///
-        /// public class FillClockwiseScript : MonoBehaviour
-        /// {
-        ///     public Image healthCircle;
-        ///
-        ///     // This method sets the direction of the health circle.
-        ///     // Clockwise for the Player, Counter Clockwise for the opponent.
-        ///     void SetHealthDirection(GameObject target)
-        ///     {
-        ///         if (target.tag == "Player")
-        ///         {
-        ///             healthCircle.fillClockwise = true;
-        ///         }
-        ///         else if (target.tag == "Opponent")
-        ///         {
-        ///             healthCircle.fillClockwise = false;
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public bool fillClockwise { get { return m_FillClockwise; } set { if (SetPropertyUtility.SetStruct(ref m_FillClockwise, value)) SetVerticesDirty(); } }
 
-        /// Controls the origin point of the Fill process. Value means different things with each fill method.
+        ///
+        ///
+
+
+        public bool fillClockwise
+        {
+            get { return m_FillClockwise; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_FillClockwise, value)) SetVerticesDirty();
+            }
+        }
+
+
         [SerializeField] private int m_FillOrigin;
 
-        /// <remarks>
-        /// You should cast to the appropriate origin type: Image.OriginHorizontal, Image.OriginVertical, Image.Origin90, Image.Origin180 or Image.Origin360 depending on the Image.Fillmethod.
-        /// Note: This will only have any effect if the Image.type is set to Image.Type.Filled.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using UnityEngine.UI;
-        /// using System.Collections;
+
         ///
-        /// [RequireComponent(typeof(Image))]
-        /// public class ImageOriginCycle : MonoBehaviour
-        /// {
-        ///     void OnEnable()
-        ///     {
-        ///         Image image = GetComponent<Image>();
-        ///         string fillOriginName = "";
         ///
-        ///         switch ((Image.FillMethod)image.fillMethod)
-        ///         {
-        ///             case Image.FillMethod.Horizontal:
-        ///                 fillOriginName = ((Image.OriginHorizontal)image.fillOrigin).ToString();
-        ///                 break;
-        ///             case Image.FillMethod.Vertical:
-        ///                 fillOriginName = ((Image.OriginVertical)image.fillOrigin).ToString();
-        ///                 break;
-        ///             case Image.FillMethod.Radial90:
         ///
-        ///                 fillOriginName = ((Image.Origin90)image.fillOrigin).ToString();
-        ///                 break;
-        ///             case Image.FillMethod.Radial180:
         ///
-        ///                 fillOriginName = ((Image.Origin180)image.fillOrigin).ToString();
-        ///                 break;
-        ///             case Image.FillMethod.Radial360:
-        ///                 fillOriginName = ((Image.Origin360)image.fillOrigin).ToString();
-        ///                 break;
-        ///         }
-        ///         Debug.Log(string.Format("{0} is using {1} fill method with the origin on {2}", name, image.fillMethod, fillOriginName));
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public int fillOrigin { get { return m_FillOrigin; } set { if (SetPropertyUtility.SetStruct(ref m_FillOrigin, value)) SetVerticesDirty(); } }
+
+
+        public int fillOrigin
+        {
+            get { return m_FillOrigin; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_FillOrigin, value)) SetVerticesDirty();
+            }
+        }
 
         // Not serialized until we support read-enabled sprites better.
         private float m_AlphaHitTestMinimumThreshold = 0;
 
         // Whether this is being tracked for Atlas Binding.
         private bool m_Tracked = false;
-        
-        /// <remarks>
-        /// Alpha values less than the threshold will cause raycast events to pass through the Image. An value of 1 would cause only fully opaque pixels to register raycast events on the Image. The alpha tested is retrieved from the image sprite only, while the alpha of the Image [[UI.Graphic.color]] is disregarded.
+
+
         ///
-        /// alphaHitTestMinimumThreshold defaults to 0; all raycast events inside the Image rectangle are considered a hit. In order for greater than 0 to values to work, the sprite used by the Image must have readable pixels. This can be achieved by enabling Read/Write enabled in the advanced Texture Import Settings for the sprite and disabling atlassing for the sprite.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
         ///
-        /// public class ExampleClass : MonoBehaviour
-        /// {
-        ///     public Image theButton;
         ///
-        ///     // Use this for initialization
-        ///     void Start()
-        ///     {
-        ///         theButton.alphaHitTestMinimumThreshold = 0.5f;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public float alphaHitTestMinimumThreshold { get { return m_AlphaHitTestMinimumThreshold; }
+
+
+        public float alphaHitTestMinimumThreshold
+        {
+            get { return m_AlphaHitTestMinimumThreshold; }
             set
             {
-                if (sprite != null && (GraphicsFormatUtility.IsCrunchFormat(sprite.texture.format) || !sprite.texture.isReadable))
-                    throw new InvalidOperationException("alphaHitTestMinimumThreshold should not be modified on a texture not readeable or not using Crunch Compression.");
+                if (sprite != null && (GraphicsFormatUtility.IsCrunchFormat(sprite.texture.format) ||
+                                       !sprite.texture.isReadable))
+                    throw new InvalidOperationException(
+                        "alphaHitTestMinimumThreshold should not be modified on a texture not readeable or not using Crunch Compression.");
 
                 m_AlphaHitTestMinimumThreshold = value;
             }
         }
 
-        /// Controls whether or not to use the generated mesh from the sprite importer.
+
         [SerializeField] private bool m_UseSpriteMesh;
 
-        /// <remarks>
-        /// When this property is set to false, the UI Image uses a simple quad. When set to true, the UI Image uses the sprite mesh generated by the [[TextureImporter]]. You should set this to true if you want to use a tightly fitted sprite mesh based on the alpha values in your image.
-        /// Note: If the texture importer's SpriteMeshType property is set to SpriteMeshType.FullRect, it will only generate a quad, and not a tightly fitted sprite mesh, which means this UI image will be drawn using a quad regardless of the value of this property. Therefore, when enabling this property to use a tightly fitted sprite mesh, you must also ensure the texture importer's SpriteMeshType property is set to Tight.
-        /// </remarks>
-        public bool useSpriteMesh { get { return m_UseSpriteMesh; } set { if (SetPropertyUtility.SetStruct(ref m_UseSpriteMesh, value)) SetVerticesDirty(); } }
-        
 
-        /// <remarks>
-        /// Stores the ETC1 supported Canvas Material that is returned from GetETC1SupportedCanvasMaterial().
-        /// Note: Always specify the UI/DefaultETC1 Shader in the Always Included Shader list, to use the ETC1 and alpha Material.
-        /// </remarks>
+        public bool useSpriteMesh
+        {
+            get { return m_UseSpriteMesh; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_UseSpriteMesh, value)) SetVerticesDirty();
+            }
+        }
+
+
         static public Material defaultETC1GraphicMaterial
         {
             get
@@ -539,6 +364,7 @@ namespace UnityEngine.UI
                     {
                         return material.mainTexture;
                     }
+
                     return s_WhiteTexture;
                 }
 
@@ -556,13 +382,13 @@ namespace UnityEngine.UI
                     Vector4 v = activeSprite.border;
                     return v.sqrMagnitude > 0f;
                 }
+
                 return false;
             }
         }
 
 
-        [SerializeField]
-        private float m_PixelsPerUnitMultiplier = 1.0f;
+        [SerializeField] private float m_PixelsPerUnitMultiplier = 1.0f;
 
         public float pixelsPerUnitMultiplier
         {
@@ -607,7 +433,6 @@ namespace UnityEngine.UI
                 if (Application.isPlaying && activeSprite && activeSprite.associatedAlphaSplitTexture != null)
                     return defaultETC1GraphicMaterial;
 #else
-
                 if (activeSprite && activeSprite.associatedAlphaSplitTexture != null)
                     return defaultETC1GraphicMaterial;
 #endif
@@ -615,13 +440,12 @@ namespace UnityEngine.UI
                 return defaultMaterial;
             }
 
-            set
-            {
-                base.material = value;
-            }
+            set { base.material = value; }
         }
 
-        public virtual void OnBeforeSerialize() {}
+        public virtual void OnBeforeSerialize()
+        {
+        }
 
         public virtual void OnAfterDeserialize()
         {
@@ -656,11 +480,13 @@ namespace UnityEngine.UI
             }
         }
 
-        /// Image's dimensions used for drawing. X = left, Y = bottom, Z = right, W = top.
+
         private Vector4 GetDrawingDimensions(bool shouldPreserveAspect)
         {
             var padding = activeSprite == null ? Vector4.zero : Sprites.DataUtility.GetPadding(activeSprite);
-            var size = activeSprite == null ? Vector2.zero : new Vector2(activeSprite.rect.width, activeSprite.rect.height);
+            var size = activeSprite == null
+                ? Vector2.zero
+                : new Vector2(activeSprite.rect.width, activeSprite.rect.height);
 
             Rect r = GetPixelAdjustedRect();
             // Debug.Log(string.Format("r:{2}, size:{0}, padding:{1}", size, padding, r));
@@ -689,9 +515,7 @@ namespace UnityEngine.UI
             return v;
         }
 
-        /// <remarks>
-        /// This means setting the Images RectTransform.sizeDelta to be equal to the Sprite dimensions.
-        /// </remarks>
+
         public override void SetNativeSize()
         {
             if (activeSprite != null)
@@ -755,10 +579,10 @@ namespace UnityEngine.UI
                 UnTrackImage(this);
         }
 
-        static SecondarySpriteTexture[] s_TempNewSecondaryTextures = {};
-        SecondarySpriteTexture [] m_SecondaryTextures;
+        static SecondarySpriteTexture[] s_TempNewSecondaryTextures = { };
+        SecondarySpriteTexture[] m_SecondaryTextures;
 
-        internal SecondarySpriteTexture [] secondaryTextures => m_SecondaryTextures; // Internal for testing only
+        internal SecondarySpriteTexture[] secondaryTextures => m_SecondaryTextures; // Internal for testing only
 
         static void ClearArray(ref SecondarySpriteTexture[] array)
         {
@@ -772,7 +596,7 @@ namespace UnityEngine.UI
             return changed;
         }
 
-        bool CheckSecondaryTexturesChanged(Sprite sprite, ref SecondarySpriteTexture [] newSecondaryTextures)
+        bool CheckSecondaryTexturesChanged(Sprite sprite, ref SecondarySpriteTexture[] newSecondaryTextures)
         {
             newSecondaryTextures ??= new SecondarySpriteTexture[0];
 
@@ -837,7 +661,7 @@ namespace UnityEngine.UI
                 for (var i = 0; i < m_SecondaryTextures.Length; ++i)
                 {
                     var secondaryTex = m_SecondaryTextures[i];
-                
+
                     renderer.SetSecondaryTexture(i, secondaryTex.name, secondaryTex.texture);
                 }
             }
@@ -929,7 +753,10 @@ namespace UnityEngine.UI
             Vector2[] uvs = activeSprite.uv;
             for (int i = 0; i < vertices.Length; ++i)
             {
-                vh.AddVert(new Vector3((vertices[i].x / spriteBoundSize.x) * drawingSize.x - drawOffset.x, (vertices[i].y / spriteBoundSize.y) * drawingSize.y - drawOffset.y), color32, new Vector2(uvs[i].x, uvs[i].y));
+                vh.AddVert(
+                    new Vector3((vertices[i].x / spriteBoundSize.x) * drawingSize.x - drawOffset.x,
+                        (vertices[i].y / spriteBoundSize.y) * drawingSize.y - drawOffset.y), color32,
+                    new Vector2(uvs[i].x, uvs[i].y));
             }
 
             UInt16[] triangles = activeSprite.triangles;
@@ -1006,7 +833,8 @@ namespace UnityEngine.UI
                     int y2 = y + 1;
 
                     // Check for zero or negative dimensions to prevent invalid quads (UUM-71372)
-                    if ((s_VertScratch[x2].x - s_VertScratch[x].x <= 0) || (s_VertScratch[y2].y - s_VertScratch[y].y <= 0))
+                    if ((s_VertScratch[x2].x - s_VertScratch[x].x <= 0) ||
+                        (s_VertScratch[y2].y - s_VertScratch[y].y <= 0))
                         continue;
 
                     AddQuad(toFill,
@@ -1065,7 +893,8 @@ namespace UnityEngine.UI
             if (tileHeight <= 0)
                 tileHeight = yMax - yMin;
 
-            if (activeSprite != null && (hasBorder || activeSprite.packed || activeSprite.texture != null && activeSprite.texture.wrapMode != TextureWrapMode.Repeat))
+            if (activeSprite != null && (hasBorder || activeSprite.packed || activeSprite.texture != null &&
+                    activeSprite.texture.wrapMode != TextureWrapMode.Repeat))
             {
                 // Sprite has border, or is not in repeat mode, or cannot be repeated because of packing.
                 // We cannot use texture tiling so we will generate a mesh of quads to tile the texture.
@@ -1092,7 +921,10 @@ namespace UnityEngine.UI
 
                     if (nVertices > 65000.0)
                     {
-                        Debug.LogError("Too many sprite tiles on Image \"" + name + "\". The tile size will be increased. To remove the limit on the number of tiles, set the Wrap mode to Repeat in the Image Import Settings", this);
+                        Debug.LogError(
+                            "Too many sprite tiles on Image \"" + name +
+                            "\". The tile size will be increased. To remove the limit on the number of tiles, set the Wrap mode to Repeat in the Image Import Settings",
+                            this);
 
                         double maxTiles = 65000.0 / 4.0; // Max number of vertices is 65000; 4 vertices per tile.
                         double imageRatio;
@@ -1126,10 +958,14 @@ namespace UnityEngine.UI
                         // Texture on the border is repeated only in one direction.
                         nTilesW = (long)Math.Ceiling((xMax - xMin) / tileWidth);
                         nTilesH = (long)Math.Ceiling((yMax - yMin) / tileHeight);
-                        double nVertices = (nTilesH + nTilesW + 2.0 /*corners*/) * 2.0 /*sides*/ * 4.0 /*vertices per tile*/;
+                        double nVertices =
+                            (nTilesH + nTilesW + 2.0 /*corners*/) * 2.0 /*sides*/ * 4.0 /*vertices per tile*/;
                         if (nVertices > 65000.0)
                         {
-                            Debug.LogError("Too many sprite tiles on Image \"" + name + "\". The tile size will be increased. To remove the limit on the number of tiles, set the Wrap mode to Repeat in the Image Import Settings", this);
+                            Debug.LogError(
+                                "Too many sprite tiles on Image \"" + name +
+                                "\". The tile size will be increased. To remove the limit on the number of tiles, set the Wrap mode to Repeat in the Image Import Settings",
+                                this);
 
                             double maxTiles = 65000.0 / 4.0; // Max number of vertices is 65000; 4 vertices per tile.
                             double imageRatio = (double)nTilesW / nTilesH;
@@ -1160,6 +996,7 @@ namespace UnityEngine.UI
                             clipped.y = uvMin.y + (uvMax.y - uvMin.y) * (yMax - y1) / (y2 - y1);
                             y2 = yMax;
                         }
+
                         clipped.x = uvMax.x;
                         for (long i = 0; i < nTilesW; i++)
                         {
@@ -1170,10 +1007,13 @@ namespace UnityEngine.UI
                                 clipped.x = uvMin.x + (uvMax.x - uvMin.x) * (xMax - x1) / (x2 - x1);
                                 x2 = xMax;
                             }
-                            AddQuad(toFill, new Vector2(x1, y1) + rect.position, new Vector2(x2, y2) + rect.position, color, uvMin, clipped);
+
+                            AddQuad(toFill, new Vector2(x1, y1) + rect.position, new Vector2(x2, y2) + rect.position,
+                                color, uvMin, clipped);
                         }
                     }
                 }
+
                 if (hasBorder)
                 {
                     clipped = uvMax;
@@ -1186,6 +1026,7 @@ namespace UnityEngine.UI
                             clipped.y = uvMin.y + (uvMax.y - uvMin.y) * (yMax - y1) / (y2 - y1);
                             y2 = yMax;
                         }
+
                         AddQuad(toFill,
                             new Vector2(0, y1) + rect.position,
                             new Vector2(xMin, y2) + rect.position,
@@ -1211,6 +1052,7 @@ namespace UnityEngine.UI
                             clipped.x = uvMin.x + (uvMax.x - uvMin.x) * (xMax - x1) / (x2 - x1);
                             x2 = xMax;
                         }
+
                         AddQuad(toFill,
                             new Vector2(x1, 0) + rect.position,
                             new Vector2(x2, yMin) + rect.position,
@@ -1259,7 +1101,8 @@ namespace UnityEngine.UI
 
                 if (m_FillCenter)
                 {
-                    AddQuad(toFill, new Vector2(xMin, yMin) + rect.position, new Vector2(xMax, yMax) + rect.position, color, Vector2.Scale(uvMin, uvScale), Vector2.Scale(uvMax, uvScale));
+                    AddQuad(toFill, new Vector2(xMin, yMin) + rect.position, new Vector2(xMax, yMax) + rect.position,
+                        color, Vector2.Scale(uvMin, uvScale), Vector2.Scale(uvMax, uvScale));
                 }
             }
         }
@@ -1275,7 +1118,8 @@ namespace UnityEngine.UI
             vertexHelper.AddTriangle(startIndex + 2, startIndex + 3, startIndex);
         }
 
-        static void AddQuad(VertexHelper vertexHelper, Vector2 posMin, Vector2 posMax, Color32 color, Vector2 uvMin, Vector2 uvMax)
+        static void AddQuad(VertexHelper vertexHelper, Vector2 posMin, Vector2 posMax, Color32 color, Vector2 uvMin,
+            Vector2 uvMax)
         {
             int startIndex = vertexHelper.currentVertCount;
 
@@ -1317,6 +1161,7 @@ namespace UnityEngine.UI
                     border[axis + 2] *= borderScaleRatio;
                 }
             }
+
             return border;
         }
 
@@ -1453,7 +1298,8 @@ namespace UnityEngine.UI
 
                             float val = m_FillClockwise ? fillAmount * 2f - side : m_FillAmount * 2f - (1 - side);
 
-                            if (RadialCut(s_Xy, s_Uv, Mathf.Clamp01(val), m_FillClockwise, ((side + m_FillOrigin + 3) % 4)))
+                            if (RadialCut(s_Xy, s_Uv, Mathf.Clamp01(val), m_FillClockwise,
+                                    ((side + m_FillOrigin + 3) % 4)))
                             {
                                 AddQuad(toFill, s_Xy, color, s_Uv);
                             }
@@ -1507,9 +1353,9 @@ namespace UnityEngine.UI
                             s_Uv[2].y = s_Uv[1].y;
                             s_Uv[3].y = s_Uv[0].y;
 
-                            float val = m_FillClockwise ?
-                                m_FillAmount * 4f - ((corner + m_FillOrigin) % 4) :
-                                m_FillAmount * 4f - (3 - ((corner + m_FillOrigin) % 4));
+                            float val = m_FillClockwise
+                                ? m_FillAmount * 4f - ((corner + m_FillOrigin) % 4)
+                                : m_FillAmount * 4f - (3 - ((corner + m_FillOrigin) % 4));
 
                             if (RadialCut(s_Xy, s_Uv, Mathf.Clamp01(val), m_FillClockwise, ((corner + 2) % 4)))
                                 AddQuad(toFill, s_Xy, color, s_Uv);
@@ -1625,11 +1471,18 @@ namespace UnityEngine.UI
             }
         }
 
-        public virtual void CalculateLayoutInputHorizontal() {}
+        public virtual void CalculateLayoutInputHorizontal()
+        {
+        }
 
-        public virtual void CalculateLayoutInputVertical() {}
+        public virtual void CalculateLayoutInputVertical()
+        {
+        }
 
-        public virtual float minWidth { get { return 0; } }
+        public virtual float minWidth
+        {
+            get { return 0; }
+        }
 
         public virtual float preferredWidth
         {
@@ -1643,9 +1496,15 @@ namespace UnityEngine.UI
             }
         }
 
-        public virtual float flexibleWidth { get { return -1; } }
+        public virtual float flexibleWidth
+        {
+            get { return -1; }
+        }
 
-        public virtual float minHeight { get { return 0; } }
+        public virtual float minHeight
+        {
+            get { return 0; }
+        }
 
         public virtual float preferredHeight
         {
@@ -1659,14 +1518,17 @@ namespace UnityEngine.UI
             }
         }
 
-        public virtual float flexibleHeight { get { return -1; } }
+        public virtual float flexibleHeight
+        {
+            get { return -1; }
+        }
 
-        public virtual int layoutPriority { get { return 0; } }
+        public virtual int layoutPriority
+        {
+            get { return 0; }
+        }
 
-        /// <param name="screenPoint">The screen point to check against</param>
-        /// <param name="eventCamera">The camera in which to use to calculate the coordinating position</param>
-        /// <returns>If the location is a valid hit or not.</returns>
-        /// <remarks> Also see See:ICanvasRaycastFilter.</remarks>
+
         public virtual bool IsRaycastLocationValid(Vector2 screenPoint, Camera eventCamera)
         {
             if (alphaHitTestMinimumThreshold <= 0)
@@ -1679,13 +1541,15 @@ namespace UnityEngine.UI
                 return true;
 
             Vector2 local;
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, screenPoint, eventCamera, out local))
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, screenPoint, eventCamera,
+                    out local))
                 return false;
 
             Rect rect = GetPixelAdjustedRect();
 
             if (m_PreserveAspect)
-                PreserveSpriteAspectRatio(ref rect, new Vector2(activeSprite.texture.width, activeSprite.texture.height));
+                PreserveSpriteAspectRatio(ref rect,
+                    new Vector2(activeSprite.texture.width, activeSprite.texture.height));
 
             // Convert to have lower left corner as reference point.
             local.x += rectTransform.pivot.x * rect.width;
@@ -1709,7 +1573,9 @@ namespace UnityEngine.UI
             }
             catch (UnityException e)
             {
-                Debug.LogError("Using alphaHitTestMinimumThreshold greater than 0 on Image whose sprite texture cannot be read. " + e.Message + " Also make sure to disable sprite packing for this sprite.", this);
+                Debug.LogError(
+                    "Using alphaHitTestMinimumThreshold greater than 0 on Image whose sprite texture cannot be read. " +
+                    e.Message + " Also make sure to disable sprite packing for this sprite.", this);
                 return true;
             }
         }
@@ -1718,7 +1584,8 @@ namespace UnityEngine.UI
         {
             Rect spriteRect = activeSprite.rect;
             if (type == Type.Simple || type == Type.Filled)
-                return new Vector2(spriteRect.position.x + local.x * spriteRect.width / rect.width, spriteRect.position.y + local.y * spriteRect.height / rect.height);
+                return new Vector2(spriteRect.position.x + local.x * spriteRect.width / rect.width,
+                    spriteRect.position.y + local.y * spriteRect.height / rect.height);
 
             Vector4 border = activeSprite.border;
             Vector4 adjustedBorder = GetAdjustedBorders(border / pixelsPerUnit, rect);

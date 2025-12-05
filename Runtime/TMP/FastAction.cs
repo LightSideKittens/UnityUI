@@ -38,7 +38,7 @@ namespace TMPro
         }
     }
 
-    /// <typeparam name="A">The parameter of the method that this delegate encapsulates.</typeparam>
+
     public class FastAction<A>
     {
         private LinkedList<System.Action<A>> delegates = new();
@@ -72,8 +72,7 @@ namespace TMPro
         }
     }
 
-    /// <typeparam name="A">The first parameter of the method that this delegate encapsulates.</typeparam>
-    /// <typeparam name="B">The second parameter of the method that this delegate encapsulates.</typeparam>
+
     public class FastAction<A, B>
     {
         private LinkedList<System.Action<A, B>> delegates = new();
@@ -107,9 +106,7 @@ namespace TMPro
         }
     }
 
-    /// <typeparam name="A">The first parameter of the method that this delegate encapsulates.</typeparam>
-    /// <typeparam name="B">The second parameter of the method that this delegate encapsulates.</typeparam>
-    /// <typeparam name="C">The third parameter of the method that this delegate encapsulates.</typeparam>
+
     public class FastAction<A, B, C>
     {
         private LinkedList<System.Action<A, B, C>> delegates = new();

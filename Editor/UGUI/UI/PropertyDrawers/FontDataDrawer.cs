@@ -34,19 +34,26 @@ namespace UnityEditor.UI
 
                 // Horizontal Alignment Icons
                 m_LeftAlignText = EditorGUIUtility.IconContent(@"GUISystem/align_horizontally_left", "Left Align");
-                m_CenterAlignText = EditorGUIUtility.IconContent(@"GUISystem/align_horizontally_center", "Center Align");
+                m_CenterAlignText =
+                    EditorGUIUtility.IconContent(@"GUISystem/align_horizontally_center", "Center Align");
                 m_RightAlignText = EditorGUIUtility.IconContent(@"GUISystem/align_horizontally_right", "Right Align");
-                m_LeftAlignTextActive = EditorGUIUtility.IconContent(@"GUISystem/align_horizontally_left_active", "Left Align");
-                m_CenterAlignTextActive = EditorGUIUtility.IconContent(@"GUISystem/align_horizontally_center_active", "Center Align");
-                m_RightAlignTextActive = EditorGUIUtility.IconContent(@"GUISystem/align_horizontally_right_active", "Right Align");
+                m_LeftAlignTextActive =
+                    EditorGUIUtility.IconContent(@"GUISystem/align_horizontally_left_active", "Left Align");
+                m_CenterAlignTextActive =
+                    EditorGUIUtility.IconContent(@"GUISystem/align_horizontally_center_active", "Center Align");
+                m_RightAlignTextActive =
+                    EditorGUIUtility.IconContent(@"GUISystem/align_horizontally_right_active", "Right Align");
 
                 // Vertical Alignment Icons
                 m_TopAlignText = EditorGUIUtility.IconContent(@"GUISystem/align_vertically_top", "Top Align");
                 m_MiddleAlignText = EditorGUIUtility.IconContent(@"GUISystem/align_vertically_center", "Middle Align");
                 m_BottomAlignText = EditorGUIUtility.IconContent(@"GUISystem/align_vertically_bottom", "Bottom Align");
-                m_TopAlignTextActive = EditorGUIUtility.IconContent(@"GUISystem/align_vertically_top_active", "Top Align");
-                m_MiddleAlignTextActive = EditorGUIUtility.IconContent(@"GUISystem/align_vertically_center_active", "Middle Align");
-                m_BottomAlignTextActive = EditorGUIUtility.IconContent(@"GUISystem/align_vertically_bottom_active", "Bottom Align");
+                m_TopAlignTextActive =
+                    EditorGUIUtility.IconContent(@"GUISystem/align_vertically_top_active", "Top Align");
+                m_MiddleAlignTextActive =
+                    EditorGUIUtility.IconContent(@"GUISystem/align_vertically_center_active", "Middle Align");
+                m_BottomAlignTextActive =
+                    EditorGUIUtility.IconContent(@"GUISystem/align_vertically_bottom_active", "Bottom Align");
 
                 FixAlignmentButtonStyles(alignmentButtonLeft, alignmentButtonMid, alignmentButtonRight);
             }
@@ -124,10 +131,10 @@ namespace UnityEditor.UI
         {
             Init(property);
             m_FontFieldfHeight = EditorGUI.GetPropertyHeight(m_Font);
-            m_FontStyleHeight   = EditorGUI.GetPropertyHeight(m_FontStyle);
-            m_FontSizeHeight  = EditorGUI.GetPropertyHeight(m_FontSize);
-            m_LineSpacingHeight  = EditorGUI.GetPropertyHeight(m_LineSpacing);
-            m_EncodingHeight   = EditorGUI.GetPropertyHeight(m_SupportEncoding);
+            m_FontStyleHeight = EditorGUI.GetPropertyHeight(m_FontStyle);
+            m_FontSizeHeight = EditorGUI.GetPropertyHeight(m_FontSize);
+            m_LineSpacingHeight = EditorGUI.GetPropertyHeight(m_LineSpacing);
+            m_EncodingHeight = EditorGUI.GetPropertyHeight(m_SupportEncoding);
             m_ResizeTextForBestFitHeight = EditorGUI.GetPropertyHeight(m_ResizeTextForBestFit);
             m_ResizeTextMinSizeHeight = EditorGUI.GetPropertyHeight(m_ResizeTextMinSize);
             m_ResizeTextMaxSizeHeight = EditorGUI.GetPropertyHeight(m_ResizeTextMaxSize);
@@ -136,23 +143,24 @@ namespace UnityEditor.UI
             m_AlignByGeometryHeight = EditorGUI.GetPropertyHeight(m_AlignByGeometry);
 
             var height = m_FontFieldfHeight
-                + m_FontStyleHeight
-                + m_FontSizeHeight
-                + m_LineSpacingHeight
-                + m_EncodingHeight
-                + m_ResizeTextForBestFitHeight
-                + m_HorizontalOverflowHeight
-                + m_VerticalOverflowHeight
-                + EditorGUIUtility.singleLineHeight * 3
-                + EditorGUIUtility.standardVerticalSpacing * 10
-                + m_AlignByGeometryHeight;
+                         + m_FontStyleHeight
+                         + m_FontSizeHeight
+                         + m_LineSpacingHeight
+                         + m_EncodingHeight
+                         + m_ResizeTextForBestFitHeight
+                         + m_HorizontalOverflowHeight
+                         + m_VerticalOverflowHeight
+                         + EditorGUIUtility.singleLineHeight * 3
+                         + EditorGUIUtility.standardVerticalSpacing * 10
+                         + m_AlignByGeometryHeight;
 
             if (m_ResizeTextForBestFit.boolValue)
             {
                 height += m_ResizeTextMinSizeHeight
-                    + m_ResizeTextMaxSizeHeight
-                    + EditorGUIUtility.standardVerticalSpacing * 2;
+                          + m_ResizeTextMaxSizeHeight
+                          + EditorGUIUtility.standardVerticalSpacing * 2;
             }
+
             return height;
         }
 
@@ -253,7 +261,8 @@ namespace UnityEditor.UI
                 float spacing = Mathf.Clamp(controlArea.width - width * 2, 2, 10);
 
                 Rect horizontalAligment = new Rect(controlArea.x, controlArea.y, width, controlArea.height);
-                Rect verticalAligment = new Rect(horizontalAligment.xMax + spacing, controlArea.y, width, controlArea.height);
+                Rect verticalAligment = new Rect(horizontalAligment.xMax + spacing, controlArea.y, width,
+                    controlArea.height);
 
                 DoHorizontalAligmentControl(horizontalAligment, alignment);
                 DoVerticalAligmentControl(verticalAligment, alignment);
@@ -286,7 +295,8 @@ namespace UnityEditor.UI
             position.width = kAlignmentButtonWidth;
 
             EditorGUI.BeginChangeCheck();
-            EditorToggle(position, leftAlign, leftAlign ? Styles.m_LeftAlignTextActive : Styles.m_LeftAlignText, Styles.alignmentButtonLeft);
+            EditorToggle(position, leftAlign, leftAlign ? Styles.m_LeftAlignTextActive : Styles.m_LeftAlignText,
+                Styles.alignmentButtonLeft);
             if (EditorGUI.EndChangeCheck())
             {
                 SetHorizontalAlignment(alignment, HorizontalTextAligment.Left);
@@ -294,7 +304,8 @@ namespace UnityEditor.UI
 
             position.x += position.width;
             EditorGUI.BeginChangeCheck();
-            EditorToggle(position, centerAlign, centerAlign ? Styles.m_CenterAlignTextActive : Styles.m_CenterAlignText, Styles.alignmentButtonMid);
+            EditorToggle(position, centerAlign, centerAlign ? Styles.m_CenterAlignTextActive : Styles.m_CenterAlignText,
+                Styles.alignmentButtonMid);
             if (EditorGUI.EndChangeCheck())
             {
                 SetHorizontalAlignment(alignment, HorizontalTextAligment.Center);
@@ -302,7 +313,8 @@ namespace UnityEditor.UI
 
             position.x += position.width;
             EditorGUI.BeginChangeCheck();
-            EditorToggle(position, rightAlign, rightAlign ? Styles.m_RightAlignTextActive : Styles.m_RightAlignText, Styles.alignmentButtonRight);
+            EditorToggle(position, rightAlign, rightAlign ? Styles.m_RightAlignTextActive : Styles.m_RightAlignText,
+                Styles.alignmentButtonRight);
             if (EditorGUI.EndChangeCheck())
             {
                 SetHorizontalAlignment(alignment, HorizontalTextAligment.Right);
@@ -336,7 +348,8 @@ namespace UnityEditor.UI
 
             // position.x += position.width;
             EditorGUI.BeginChangeCheck();
-            EditorToggle(position, topAlign, topAlign ? Styles.m_TopAlignTextActive : Styles.m_TopAlignText, Styles.alignmentButtonLeft);
+            EditorToggle(position, topAlign, topAlign ? Styles.m_TopAlignTextActive : Styles.m_TopAlignText,
+                Styles.alignmentButtonLeft);
             if (EditorGUI.EndChangeCheck())
             {
                 SetVerticalAlignment(alignment, VerticalTextAligment.Top);
@@ -344,7 +357,8 @@ namespace UnityEditor.UI
 
             position.x += position.width;
             EditorGUI.BeginChangeCheck();
-            EditorToggle(position, middleAlign, middleAlign ? Styles.m_MiddleAlignTextActive : Styles.m_MiddleAlignText, Styles.alignmentButtonMid);
+            EditorToggle(position, middleAlign, middleAlign ? Styles.m_MiddleAlignTextActive : Styles.m_MiddleAlignText,
+                Styles.alignmentButtonMid);
             if (EditorGUI.EndChangeCheck())
             {
                 SetVerticalAlignment(alignment, VerticalTextAligment.Middle);
@@ -352,7 +366,8 @@ namespace UnityEditor.UI
 
             position.x += position.width;
             EditorGUI.BeginChangeCheck();
-            EditorToggle(position, bottomAlign, bottomAlign ? Styles.m_BottomAlignTextActive : Styles.m_BottomAlignText, Styles.alignmentButtonRight);
+            EditorToggle(position, bottomAlign, bottomAlign ? Styles.m_BottomAlignTextActive : Styles.m_BottomAlignText,
+                Styles.alignmentButtonRight);
             if (EditorGUI.EndChangeCheck())
             {
                 SetVerticalAlignment(alignment, VerticalTextAligment.Bottom);
@@ -366,14 +381,16 @@ namespace UnityEditor.UI
             Event evt = Event.current;
 
             // Toggle selected toggle on space or return key
-            if (EditorGUIUtility.keyboardControl == id && evt.type == EventType.KeyDown && (evt.keyCode == KeyCode.Space || evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter))
+            if (EditorGUIUtility.keyboardControl == id && evt.type == EventType.KeyDown &&
+                (evt.keyCode == KeyCode.Space || evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter))
             {
                 value = !value;
                 evt.Use();
                 GUI.changed = true;
             }
 
-            if (evt.type == EventType.KeyDown && Event.current.button == 0 && position.Contains(Event.current.mousePosition))
+            if (evt.type == EventType.KeyDown && Event.current.button == 0 &&
+                position.Contains(Event.current.mousePosition))
             {
                 GUIUtility.keyboardControl = id;
                 EditorGUIUtility.editingTextField = false;
@@ -432,7 +449,8 @@ namespace UnityEditor.UI
         }
 
         // We can't go through serialized properties here since we're showing two controls for a single SerializzedProperty.
-        private static void SetHorizontalAlignment(SerializedProperty alignment, HorizontalTextAligment horizontalAlignment)
+        private static void SetHorizontalAlignment(SerializedProperty alignment,
+            HorizontalTextAligment horizontalAlignment)
         {
             foreach (var obj in alignment.serializedObject.targetObjects)
             {
@@ -456,7 +474,8 @@ namespace UnityEditor.UI
             }
         }
 
-        private static TextAnchor GetAnchor(VerticalTextAligment verticalTextAligment, HorizontalTextAligment horizontalTextAligment)
+        private static TextAnchor GetAnchor(VerticalTextAligment verticalTextAligment,
+            HorizontalTextAligment horizontalTextAligment)
         {
             TextAnchor ac = TextAnchor.UpperLeft;
 
@@ -475,6 +494,7 @@ namespace UnityEditor.UI
                             ac = TextAnchor.UpperLeft;
                             break;
                     }
+
                     break;
                 case HorizontalTextAligment.Center:
                     switch (verticalTextAligment)
@@ -489,6 +509,7 @@ namespace UnityEditor.UI
                             ac = TextAnchor.UpperCenter;
                             break;
                     }
+
                     break;
                 default:
                     switch (verticalTextAligment)
@@ -503,8 +524,10 @@ namespace UnityEditor.UI
                             ac = TextAnchor.UpperRight;
                             break;
                     }
+
                     break;
             }
+
             return ac;
         }
     }

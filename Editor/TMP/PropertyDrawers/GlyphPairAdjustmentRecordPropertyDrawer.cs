@@ -7,7 +7,6 @@ using System.Collections.Generic;
 
 namespace TMPro.EditorUtilities
 {
-
     [CustomPropertyDrawer(typeof(GlyphPairAdjustmentRecord))]
     internal class GlyphPairAdjustmentRecordPropertyDrawer : PropertyDrawer
     {
@@ -20,7 +19,8 @@ namespace TMPro.EditorUtilities
         private string m_SecondCharacter = string.Empty;
         private string m_PreviousInput;
 
-        static GUIContent s_CharacterTextFieldLabel = new("Char:", "Enter the character or its UTF16 or UTF32 Unicode character escape sequence. For UTF16 use \"\\uFF00\" and for UTF32 use \"\\UFF00FF00\" representation.");
+        static GUIContent s_CharacterTextFieldLabel = new("Char:",
+            "Enter the character or its UTF16 or UTF32 Unicode character escape sequence. For UTF16 use \"\\uFF00\" and for UTF32 use \"\\UFF00FF00\" representation.");
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -28,10 +28,12 @@ namespace TMPro.EditorUtilities
             SerializedProperty prop_SecondAdjustmentRecord = property.FindPropertyRelative("m_SecondAdjustmentRecord");
 
             SerializedProperty prop_FirstGlyphIndex = prop_FirstAdjustmentRecord.FindPropertyRelative("m_GlyphIndex");
-            SerializedProperty prop_FirstGlyphValueRecord = prop_FirstAdjustmentRecord.FindPropertyRelative("m_GlyphValueRecord");
+            SerializedProperty prop_FirstGlyphValueRecord =
+                prop_FirstAdjustmentRecord.FindPropertyRelative("m_GlyphValueRecord");
 
             SerializedProperty prop_SecondGlyphIndex = prop_SecondAdjustmentRecord.FindPropertyRelative("m_GlyphIndex");
-            SerializedProperty prop_SecondGlyphValueRecord = prop_SecondAdjustmentRecord.FindPropertyRelative("m_GlyphValueRecord");
+            SerializedProperty prop_SecondGlyphValueRecord =
+                prop_SecondAdjustmentRecord.FindPropertyRelative("m_GlyphValueRecord");
 
             SerializedProperty prop_FontFeatureLookupFlags = property.FindPropertyRelative("m_FeatureLookupFlags");
 
@@ -62,19 +64,23 @@ namespace TMPro.EditorUtilities
                 rect = new Rect(position.x + 70, position.y, position.width, 49);
 
                 float labelWidth = GUI.skin.label.CalcSize(new GUIContent("ID: " + prop_FirstGlyphIndex.intValue)).x;
-                EditorGUI.LabelField(new Rect(position.x + (64 - labelWidth) / 2, position.y + 60, 64f, 18f), new GUIContent("ID: <color=#FFFF80>" + prop_FirstGlyphIndex.intValue + "</color>"), style);
+                EditorGUI.LabelField(new Rect(position.x + (64 - labelWidth) / 2, position.y + 60, 64f, 18f),
+                    new GUIContent("ID: <color=#FFFF80>" + prop_FirstGlyphIndex.intValue + "</color>"), style);
 
                 GUI.enabled = isEditingEnabled;
                 EditorGUIUtility.labelWidth = 25f;
 
                 rect = new Rect(position.x + 70, position.y + 10, (width - 70) - padding, 18);
-                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_XPlacement"), new GUIContent("OX:"));
+                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_XPlacement"),
+                    new GUIContent("OX:"));
 
                 rect.y += 20;
-                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_YPlacement"), new GUIContent("OY:"));
+                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_YPlacement"),
+                    new GUIContent("OY:"));
 
                 rect.y += 20;
-                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_XAdvance"), new GUIContent("AX:"));
+                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_XAdvance"),
+                    new GUIContent("AX:"));
 
                 DrawGlyph((uint)prop_FirstGlyphIndex.intValue, new Rect(position.x, position.y + 2, 64, 60), property);
             }
@@ -93,7 +99,8 @@ namespace TMPro.EditorUtilities
                     {
                         uint unicode = GetUnicodeCharacter(firstCharacter);
 
-                        TMP_SerializedPropertyHolder propertyHolder = property.serializedObject.targetObject as TMP_SerializedPropertyHolder;
+                        TMP_SerializedPropertyHolder propertyHolder =
+                            property.serializedObject.targetObject as TMP_SerializedPropertyHolder;
                         TMP_FontAsset fontAsset = propertyHolder.fontAsset;
                         if (fontAsset != null)
                         {
@@ -113,21 +120,23 @@ namespace TMPro.EditorUtilities
                 EditorGUI.PropertyField(rect, prop_FirstGlyphIndex, new GUIContent("ID:"));
                 if (EditorGUI.EndChangeCheck())
                 {
-
                 }
 
                 GUI.enabled = isEditingEnabled;
                 EditorGUIUtility.labelWidth = 25f;
 
                 rect = new Rect(position.x, position.y + 20, width * 0.5f - padding, 18);
-                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_XPlacement"), new GUIContent("OX"));
+                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_XPlacement"),
+                    new GUIContent("OX"));
 
                 rect.x += width * 0.5f;
-                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_YPlacement"), new GUIContent("OY"));
+                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_YPlacement"),
+                    new GUIContent("OY"));
 
                 rect.x = position.x;
                 rect.y += 20;
-                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_XAdvance"), new GUIContent("AX"));
+                EditorGUI.PropertyField(rect, prop_FirstGlyphValueRecord.FindPropertyRelative("m_XAdvance"),
+                    new GUIContent("AX"));
             }
 
 
@@ -135,21 +144,27 @@ namespace TMPro.EditorUtilities
             if (isSelectable)
             {
                 float labelWidth = GUI.skin.label.CalcSize(new GUIContent("ID: " + prop_SecondGlyphIndex.intValue)).x;
-                EditorGUI.LabelField(new Rect(position.width / 2 + 20 + (64 - labelWidth) / 2, position.y + 60, 64f, 18f), new GUIContent("ID: <color=#FFFF80>" + prop_SecondGlyphIndex.intValue + "</color>"), style);
+                EditorGUI.LabelField(
+                    new Rect(position.width / 2 + 20 + (64 - labelWidth) / 2, position.y + 60, 64f, 18f),
+                    new GUIContent("ID: <color=#FFFF80>" + prop_SecondGlyphIndex.intValue + "</color>"), style);
 
                 GUI.enabled = isEditingEnabled;
                 EditorGUIUtility.labelWidth = 25f;
 
                 rect = new Rect(position.width / 2 + 20 + 70, position.y + 10, (width - 70) - padding, 18);
-                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_XPlacement"), new GUIContent("OX:"));
+                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_XPlacement"),
+                    new GUIContent("OX:"));
 
                 rect.y += 20;
-                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_YPlacement"), new GUIContent("OY:"));
+                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_YPlacement"),
+                    new GUIContent("OY:"));
 
                 rect.y += 20;
-                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_XAdvance"), new GUIContent("AX:"));
+                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_XAdvance"),
+                    new GUIContent("AX:"));
 
-                DrawGlyph((uint)prop_SecondGlyphIndex.intValue, new Rect(position.width / 2 + 20, position.y + 2, 64, 60), property);
+                DrawGlyph((uint)prop_SecondGlyphIndex.intValue,
+                    new Rect(position.width / 2 + 20, position.y + 2, 64, 60), property);
             }
             else
             {
@@ -166,7 +181,8 @@ namespace TMPro.EditorUtilities
                     {
                         uint unicode = GetUnicodeCharacter(secondCharacter);
 
-                        TMP_SerializedPropertyHolder propertyHolder = property.serializedObject.targetObject as TMP_SerializedPropertyHolder;
+                        TMP_SerializedPropertyHolder propertyHolder =
+                            property.serializedObject.targetObject as TMP_SerializedPropertyHolder;
                         TMP_FontAsset fontAsset = propertyHolder.fontAsset;
                         if (fontAsset != null)
                         {
@@ -186,21 +202,23 @@ namespace TMPro.EditorUtilities
                 EditorGUI.PropertyField(rect, prop_SecondGlyphIndex, new GUIContent("ID:"));
                 if (EditorGUI.EndChangeCheck())
                 {
-
                 }
 
                 GUI.enabled = isEditingEnabled;
                 EditorGUIUtility.labelWidth = 25f;
 
                 rect = new Rect(position.width / 2 + 20, position.y + 20, width * 0.5f - padding, 18);
-                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_XPlacement"), new GUIContent("OX"));
+                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_XPlacement"),
+                    new GUIContent("OX"));
 
                 rect.x += width * 0.5f;
-                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_YPlacement"), new GUIContent("OY"));
+                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_YPlacement"),
+                    new GUIContent("OY"));
 
                 rect.x = position.width / 2 + 20;
                 rect.y += 20;
-                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_XAdvance"), new GUIContent("AX"));
+                EditorGUI.PropertyField(rect, prop_SecondGlyphValueRecord.FindPropertyRelative("m_XAdvance"),
+                    new GUIContent("AX"));
             }
 
             if (isSelectable)
@@ -275,7 +293,7 @@ namespace TMPro.EditorUtilities
             return false;
         }
 
-        uint GetUnicodeCharacter (string source)
+        uint GetUnicodeCharacter(string source)
         {
             uint unicode;
 
@@ -302,7 +320,8 @@ namespace TMPro.EditorUtilities
                 return;
 
             Texture2D atlasTexture;
-            if (TMP_PropertyDrawerUtilities.TryGetAtlasTextureFromSerializedObject(so, glyph.atlasIndex, out atlasTexture) == false)
+            if (TMP_PropertyDrawerUtilities.TryGetAtlasTextureFromSerializedObject(so, glyph.atlasIndex,
+                    out atlasTexture) == false)
                 return;
 
             Material mat;
@@ -323,7 +342,9 @@ namespace TMPro.EditorUtilities
             float normalizedHeight = ascentLine - descentLine;
             float scale = glyphDrawPosition.width / normalizedHeight;
 
-            Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width, (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width, (float)glyphHeight / atlasTexture.height);
+            Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width,
+                (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width,
+                (float)glyphHeight / atlasTexture.height);
 
             if (Event.current.type == EventType.Repaint)
             {
@@ -332,7 +353,8 @@ namespace TMPro.EditorUtilities
                 glyphDrawPosition.width = glyphWidth * scale;
                 glyphDrawPosition.height = glyphHeight * scale;
 
-                Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f), mat);
+                Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f),
+                    mat);
             }
         }
     }

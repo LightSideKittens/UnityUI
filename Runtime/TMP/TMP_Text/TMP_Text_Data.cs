@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace TMPro
 {
-    public abstract partial class TMPText
+    public abstract partial class TMP_Text
     {
         public Bounds bounds
         {
@@ -19,20 +19,17 @@ namespace TMPro
 
         public Bounds TextBounds => textBounds;
         private Bounds textBounds;
-        
+
         public static event Func<int, string, TMP_FontAsset> OnFontAssetRequest;
 
-        /// <param name="unicode">The Unicode of the missing character.</param>
-        /// <param name="stringIndex">The index of the missing character in the source string.</param>
-        /// <param name="text">The source text that contains the missing character.</param>
-        /// <param name="fontAsset">The font asset that is missing the requested characters.</param>
-        /// <param name="textComponent">The text component where the requested character is missing.</param>
-        public delegate void MissingCharacterEventCallback(int unicode, int stringIndex, string text, TMP_FontAsset fontAsset, TMPText textComponent);
+
+        public delegate void MissingCharacterEventCallback(int unicode, int stringIndex, string text,
+            TMP_FontAsset fontAsset, TMP_Text textComponent);
 
         public static event MissingCharacterEventCallback OnMissingCharacter;
 
         public virtual event Action<TMP_TextInfo> OnPreRenderText = delegate { };
-        
+
         public virtual Vector2 renderedSize => textBounds.size;
 
         public int layoutPriority => m_layoutPriority;
@@ -49,7 +46,7 @@ namespace TMPro
             public int index;
             public uint unicode;
 
-            public CharacterSubstitution (int index, uint unicode)
+            public CharacterSubstitution(int index, uint unicode)
             {
                 this.index = index;
                 this.unicode = unicode;
@@ -157,12 +154,12 @@ namespace TMPro
         protected float m_baselineOffset;
         protected TMP_TextProcessingStack<float> m_baselineOffsetStack = new(new float[16]);
         protected float m_xAdvance;
-        
+
         protected TMP_TextElement m_cached_TextElement;
 
         protected SpecialCharacter m_Ellipsis;
         protected SpecialCharacter m_Underline;
-        
+
         protected int m_spriteCount = 0;
         protected int m_spriteIndex;
         protected int m_spriteAnimationID;

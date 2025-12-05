@@ -26,8 +26,7 @@ namespace UnityEngine.EventSystems
             get { return Input.mousePresent; }
         }
 
-        /// <param name="button"></param>
-        /// <returns></returns>
+
         public virtual bool GetMouseButtonDown(int button)
         {
             return Input.GetMouseButtonDown(button);
@@ -68,19 +67,19 @@ namespace UnityEngine.EventSystems
             get { return Input.touchCount; }
         }
 
-        /// <param name="index">Touch index to get</param>
+
         public virtual Touch GetTouch(int index)
         {
             return Input.GetTouch(index);
         }
 
-        /// <param name="axisName">Axis name to check</param>
+
         public virtual float GetAxisRaw(string axisName)
         {
             return Input.GetAxisRaw(axisName);
         }
 
-        /// <param name="buttonName">Button name to get</param>
+
         public virtual bool GetButtonDown(string buttonName)
         {
             return Input.GetButtonDown(buttonName);

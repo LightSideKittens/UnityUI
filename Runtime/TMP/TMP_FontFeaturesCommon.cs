@@ -10,39 +10,47 @@ namespace TMPro
     [Flags]
     public enum FontFeatureLookupFlags
     {
-        None                        =     0x0,
-        IgnoreLigatures             =   0x004,
-        IgnoreSpacingAdjustments    =   0x100,
+        None = 0x0,
+        IgnoreLigatures = 0x004,
+        IgnoreSpacingAdjustments = 0x100,
     }
 
     [Serializable]
     public struct TMP_GlyphValueRecord
     {
-        public float xPlacement { get { return m_XPlacement; } set { m_XPlacement = value; } }
+        public float xPlacement
+        {
+            get { return m_XPlacement; }
+            set { m_XPlacement = value; }
+        }
 
-        public float yPlacement { get { return m_YPlacement; } set { m_YPlacement = value; } }
+        public float yPlacement
+        {
+            get { return m_YPlacement; }
+            set { m_YPlacement = value; }
+        }
 
-        public float xAdvance { get { return m_XAdvance; } set { m_XAdvance = value; } }
+        public float xAdvance
+        {
+            get { return m_XAdvance; }
+            set { m_XAdvance = value; }
+        }
 
-        public float yAdvance { get { return m_YAdvance; } set { m_YAdvance = value; } }
+        public float yAdvance
+        {
+            get { return m_YAdvance; }
+            set { m_YAdvance = value; }
+        }
 
-        [SerializeField]
-        internal float m_XPlacement;
+        [SerializeField] internal float m_XPlacement;
 
-        [SerializeField]
-        internal float m_YPlacement;
+        [SerializeField] internal float m_YPlacement;
 
-        [SerializeField]
-        internal float m_XAdvance;
+        [SerializeField] internal float m_XAdvance;
 
-        [SerializeField]
-        internal float m_YAdvance;
+        [SerializeField] internal float m_YAdvance;
 
 
-        /// <param name="xPlacement">The positional adjustment affecting the horizontal bearing X of the glyph.</param>
-        /// <param name="yPlacement">The positional adjustment affecting the horizontal bearing Y of the glyph.</param>
-        /// <param name="xAdvance">The positional adjustment affecting the horizontal advance of the glyph.</param>
-        /// <param name="yAdvance">The positional adjustment affecting the vertical advance of the glyph.</param>
         public TMP_GlyphValueRecord(float xPlacement, float yPlacement, float xAdvance, float yAdvance)
         {
             m_XPlacement = xPlacement;
@@ -82,18 +90,23 @@ namespace TMPro
     [Serializable]
     public struct TMP_GlyphAdjustmentRecord
     {
-        public uint glyphIndex { get { return m_GlyphIndex; } set { m_GlyphIndex = value; } }
+        public uint glyphIndex
+        {
+            get { return m_GlyphIndex; }
+            set { m_GlyphIndex = value; }
+        }
 
-        public TMP_GlyphValueRecord glyphValueRecord { get { return m_GlyphValueRecord; } set { m_GlyphValueRecord = value; } }
+        public TMP_GlyphValueRecord glyphValueRecord
+        {
+            get { return m_GlyphValueRecord; }
+            set { m_GlyphValueRecord = value; }
+        }
 
-        [SerializeField]
-        internal uint m_GlyphIndex;
+        [SerializeField] internal uint m_GlyphIndex;
 
-        [SerializeField]
-        internal TMP_GlyphValueRecord m_GlyphValueRecord;
+        [SerializeField] internal TMP_GlyphValueRecord m_GlyphValueRecord;
 
-        /// <param name="glyphIndex">The index of the glyph in the source font file.</param>
-        /// <param name="glyphValueRecord">The GlyphValueRecord contains the positional adjustments of the glyph.</param>
+
         public TMP_GlyphAdjustmentRecord(uint glyphIndex, TMP_GlyphValueRecord glyphValueRecord)
         {
             m_GlyphIndex = glyphIndex;
@@ -110,32 +123,40 @@ namespace TMPro
     [Serializable]
     public class TMP_GlyphPairAdjustmentRecord
     {
-        public TMP_GlyphAdjustmentRecord firstAdjustmentRecord { get { return m_FirstAdjustmentRecord; } set { m_FirstAdjustmentRecord = value; } }
+        public TMP_GlyphAdjustmentRecord firstAdjustmentRecord
+        {
+            get { return m_FirstAdjustmentRecord; }
+            set { m_FirstAdjustmentRecord = value; }
+        }
 
-        public TMP_GlyphAdjustmentRecord secondAdjustmentRecord { get { return m_SecondAdjustmentRecord; } set { m_SecondAdjustmentRecord = value; } }
+        public TMP_GlyphAdjustmentRecord secondAdjustmentRecord
+        {
+            get { return m_SecondAdjustmentRecord; }
+            set { m_SecondAdjustmentRecord = value; }
+        }
 
-        public FontFeatureLookupFlags featureLookupFlags { get { return m_FeatureLookupFlags; } set { m_FeatureLookupFlags = value; } }
+        public FontFeatureLookupFlags featureLookupFlags
+        {
+            get { return m_FeatureLookupFlags; }
+            set { m_FeatureLookupFlags = value; }
+        }
 
-        [SerializeField]
-        internal TMP_GlyphAdjustmentRecord m_FirstAdjustmentRecord;
+        [SerializeField] internal TMP_GlyphAdjustmentRecord m_FirstAdjustmentRecord;
 
-        [SerializeField]
-        internal TMP_GlyphAdjustmentRecord m_SecondAdjustmentRecord;
+        [SerializeField] internal TMP_GlyphAdjustmentRecord m_SecondAdjustmentRecord;
 
-        [SerializeField]
-        internal FontFeatureLookupFlags m_FeatureLookupFlags;
+        [SerializeField] internal FontFeatureLookupFlags m_FeatureLookupFlags;
 
-        /// <param name="firstAdjustmentRecord">First glyph adjustment record.</param>
-        /// <param name="secondAdjustmentRecord">Second glyph adjustment record.</param>
-        public TMP_GlyphPairAdjustmentRecord(TMP_GlyphAdjustmentRecord firstAdjustmentRecord, TMP_GlyphAdjustmentRecord secondAdjustmentRecord)
+
+        public TMP_GlyphPairAdjustmentRecord(TMP_GlyphAdjustmentRecord firstAdjustmentRecord,
+            TMP_GlyphAdjustmentRecord secondAdjustmentRecord)
         {
             m_FirstAdjustmentRecord = firstAdjustmentRecord;
             m_SecondAdjustmentRecord = secondAdjustmentRecord;
             m_FeatureLookupFlags = FontFeatureLookupFlags.None;
         }
 
-        /// <param name="firstAdjustmentRecord"></param>
-        /// <param name="secondAdjustmentRecord"></param>
+
         internal TMP_GlyphPairAdjustmentRecord(GlyphPairAdjustmentRecord glyphPairAdjustmentRecord)
         {
             m_FirstAdjustmentRecord = new(glyphPairAdjustmentRecord.firstAdjustmentRecord);

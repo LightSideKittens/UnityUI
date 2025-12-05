@@ -59,34 +59,15 @@ namespace UnityEngine.EventSystems
 
         public float clickTime { get; set; }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI;
-        /// using UnityEngine.EventSystems;// Required when using Event data.
+
         ///
-        /// public class ExampleClass : MonoBehaviour, IPointerDownHandler
-        /// {
-        ///     public void OnPointerDown(PointerEventData eventData)
-        ///     {
-        ///         //Grab the number of consecutive clicks and assign it to an integer varible.
-        ///         int i = eventData.clickCount;
-        ///         //Display the click count.
-        ///         Debug.Log(i);
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+
+
         public int clickCount { get; set; }
 
         public Vector2 scrollDelta { get; set; }
 
-        /// <remarks>
-        /// If you do not want a drag threshold set this to false in IInitializePotentialDragHandler.OnInitializePotentialDrag.
-        /// </remarks>
+
         public bool useDragThreshold { get; set; }
 
         public bool dragging { get; set; }
@@ -94,41 +75,30 @@ namespace UnityEngine.EventSystems
         public InputButton button { get; set; }
 
 
-        /// <remarks>
-        /// If the device does not report pressure, the value of this property is 1.0f.
-        /// </remarks>
-        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
         public float pressure { get; set; }
-        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
+
         public float tangentialPressure { get; set; }
-        /// <remarks>
-        /// A value of 0 indicates that the stylus is parallel to the surface. A value of pi/2 indicates that it is perpendicular to the surface.
-        /// </remarks>
-        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
+
+
         public float altitudeAngle { get; set; }
-        /// <remarks>
-        /// A value of 0 indicates that the stylus is pointed along the x-axis of the device.
-        /// </remarks>
-        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
+
+
         public float azimuthAngle { get; set; }
-        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
+
         public float twist { get; set; }
-        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
+
         public Vector2 tilt { get; set; }
-        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
+
         public PenStatus penStatus { get; set; }
-        /// <remarks>
-        /// Add `radiusVariance` to get the maximum touch radius, subtract it to get the minimum touch radius.
-        /// </remarks>
-        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
+
+
         public Vector2 radius { get; set; }
-        /// <remarks>
-        /// Add this value to the radius to get the maximum touch radius, subtract it to get the minimum touch radius.
-        /// </remarks>
+
+
         public Vector2 radiusVariance { get; set; }
         public bool fullyExited { get; set; }
         public bool reentered { get; set; }
-        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
+
 
         public PointerEventData(EventSystem eventSystem) : base(eventSystem)
         {

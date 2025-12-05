@@ -16,7 +16,8 @@ namespace TMPro.EditorUtilities
 
         private string m_PreviousInput;
 
-        static GUIContent s_CharacterTextFieldLabel = new("Char:", "Enter the character or its UTF16 or UTF32 Unicode character escape sequence. For UTF16 use \"\\uFF00\" and for UTF32 use \"\\UFF00FF00\" representation.");
+        static GUIContent s_CharacterTextFieldLabel = new("Char:",
+            "Enter the character or its UTF16 or UTF32 Unicode character escape sequence. For UTF16 use \"\\uFF00\" and for UTF32 use \"\\UFF00FF00\" representation.");
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -24,7 +25,8 @@ namespace TMPro.EditorUtilities
             SerializedProperty prop_BaseGlyphAnchorPoint = property.FindPropertyRelative("m_BaseMarkGlyphAnchorPoint");
 
             SerializedProperty prop_MarkGlyphID = property.FindPropertyRelative("m_CombiningMarkGlyphID");
-            SerializedProperty prop_MarkAdjustmentRecord = property.FindPropertyRelative("m_CombiningMarkPositionAdjustment");
+            SerializedProperty prop_MarkAdjustmentRecord =
+                property.FindPropertyRelative("m_CombiningMarkPositionAdjustment");
 
             if (TMP_PropertyDrawerUtilities.s_RefreshGlyphProxyLookup)
                 TMP_PropertyDrawerUtilities.RefreshGlyphProxyLookup(property.serializedObject);
@@ -44,7 +46,7 @@ namespace TMPro.EditorUtilities
             else
                 GUILayoutUtility.GetRect(position.width, 55);
 
-            GUIStyle style = new GUIStyle(EditorStyles.label) {richText = true};
+            GUIStyle style = new GUIStyle(EditorStyles.label) { richText = true };
 
             GUI.enabled = isEditingEnabled;
             if (isSelectable)
@@ -53,16 +55,17 @@ namespace TMPro.EditorUtilities
 
                 if (!isEditingEnabled)
                 {
-                    EditorGUI.LabelField(new Rect(position.x + (64 - labelWidth) / 2, position.y + 60, 64f, 18f), new GUIContent("ID: <color=#FFFF80>" + prop_BaseGlyphID.intValue + "</color>"), style);
+                    EditorGUI.LabelField(new Rect(position.x + (64 - labelWidth) / 2, position.y + 60, 64f, 18f),
+                        new GUIContent("ID: <color=#FFFF80>" + prop_BaseGlyphID.intValue + "</color>"), style);
                 }
                 else
                 {
                     EditorGUI.BeginChangeCheck();
                     EditorGUIUtility.labelWidth = 25f;
-                    EditorGUI.DelayedIntField(new Rect(position.x + (64 - labelWidth) / 2, position.y + 60, 64, 18), prop_BaseGlyphID, new GUIContent("ID:"));
+                    EditorGUI.DelayedIntField(new Rect(position.x + (64 - labelWidth) / 2, position.y + 60, 64, 18),
+                        prop_BaseGlyphID, new GUIContent("ID:"));
                     if (EditorGUI.EndChangeCheck())
                     {
-
                     }
                 }
 
@@ -70,10 +73,12 @@ namespace TMPro.EditorUtilities
                 EditorGUIUtility.labelWidth = 30f;
 
                 rect = new Rect(position.x + 70, position.y + 10, (width - 70) - padding, 18);
-                EditorGUI.PropertyField(rect, prop_BaseGlyphAnchorPoint.FindPropertyRelative("m_XCoordinate"), new GUIContent("X:"));
+                EditorGUI.PropertyField(rect, prop_BaseGlyphAnchorPoint.FindPropertyRelative("m_XCoordinate"),
+                    new GUIContent("X:"));
 
                 rect.y += 20;
-                EditorGUI.PropertyField(rect, prop_BaseGlyphAnchorPoint.FindPropertyRelative("m_YCoordinate"), new GUIContent("Y:"));
+                EditorGUI.PropertyField(rect, prop_BaseGlyphAnchorPoint.FindPropertyRelative("m_YCoordinate"),
+                    new GUIContent("Y:"));
 
                 DrawGlyph((uint)prop_BaseGlyphID.intValue, new Rect(position.x, position.y + 2, 64, 60), property);
             }
@@ -85,16 +90,19 @@ namespace TMPro.EditorUtilities
 
                 if (!isEditingEnabled)
                 {
-                    EditorGUI.LabelField(new Rect(position.width / 2 + 20 + (64 - labelWidth) / 2, position.y + 60, 64f, 18f), new GUIContent("ID: <color=#FFFF80>" + prop_MarkGlyphID.intValue + "</color>"), style);
+                    EditorGUI.LabelField(
+                        new Rect(position.width / 2 + 20 + (64 - labelWidth) / 2, position.y + 60, 64f, 18f),
+                        new GUIContent("ID: <color=#FFFF80>" + prop_MarkGlyphID.intValue + "</color>"), style);
                 }
                 else
                 {
                     EditorGUI.BeginChangeCheck();
                     EditorGUIUtility.labelWidth = 25f;
-                    EditorGUI.DelayedIntField(new Rect(position.width / 2 + 20 + (64 - labelWidth) / 2, position.y + 60, 64, 18), prop_MarkGlyphID, new GUIContent("ID:"));
+                    EditorGUI.DelayedIntField(
+                        new Rect(position.width / 2 + 20 + (64 - labelWidth) / 2, position.y + 60, 64, 18),
+                        prop_MarkGlyphID, new GUIContent("ID:"));
                     if (EditorGUI.EndChangeCheck())
                     {
-
                     }
                 }
 
@@ -102,12 +110,15 @@ namespace TMPro.EditorUtilities
                 EditorGUIUtility.labelWidth = 30f;
 
                 rect = new Rect(position.width / 2 + 20 + 70, position.y + 10, (width - 70) - padding, 18);
-                EditorGUI.PropertyField(rect, prop_MarkAdjustmentRecord.FindPropertyRelative("m_XPositionAdjustment"), new GUIContent("X:"));
+                EditorGUI.PropertyField(rect, prop_MarkAdjustmentRecord.FindPropertyRelative("m_XPositionAdjustment"),
+                    new GUIContent("X:"));
 
                 rect.y += 20;
-                EditorGUI.PropertyField(rect, prop_MarkAdjustmentRecord.FindPropertyRelative("m_YPositionAdjustment"), new GUIContent("Y:"));
+                EditorGUI.PropertyField(rect, prop_MarkAdjustmentRecord.FindPropertyRelative("m_YPositionAdjustment"),
+                    new GUIContent("Y:"));
 
-                DrawGlyph((uint)prop_MarkGlyphID.intValue, new Rect(position.width / 2 + 20, position.y + 2, 64, 60), property);
+                DrawGlyph((uint)prop_MarkGlyphID.intValue, new Rect(position.width / 2 + 20, position.y + 2, 64, 60),
+                    property);
             }
         }
 
@@ -164,7 +175,7 @@ namespace TMPro.EditorUtilities
             return false;
         }
 
-        uint GetUnicodeCharacter (string source)
+        uint GetUnicodeCharacter(string source)
         {
             uint unicode;
 
@@ -191,7 +202,8 @@ namespace TMPro.EditorUtilities
                 return;
 
             Texture2D atlasTexture;
-            if (TMP_PropertyDrawerUtilities.TryGetAtlasTextureFromSerializedObject(so, glyph.atlasIndex, out atlasTexture) == false)
+            if (TMP_PropertyDrawerUtilities.TryGetAtlasTextureFromSerializedObject(so, glyph.atlasIndex,
+                    out atlasTexture) == false)
                 return;
 
             Material mat;
@@ -212,7 +224,9 @@ namespace TMPro.EditorUtilities
             float normalizedHeight = ascentLine - descentLine;
             float scale = glyphDrawPosition.width / normalizedHeight;
 
-            Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width, (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width, (float)glyphHeight / atlasTexture.height);
+            Rect texCoords = new Rect((float)glyphOriginX / atlasTexture.width,
+                (float)glyphOriginY / atlasTexture.height, (float)glyphWidth / atlasTexture.width,
+                (float)glyphHeight / atlasTexture.height);
 
             if (Event.current.type == EventType.Repaint)
             {
@@ -221,7 +235,8 @@ namespace TMPro.EditorUtilities
                 glyphDrawPosition.width = glyphWidth * scale;
                 glyphDrawPosition.height = glyphHeight * scale;
 
-                Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f), mat);
+                Graphics.DrawTexture(glyphDrawPosition, atlasTexture, texCoords, 0, 0, 0, 0, new Color(1f, 1f, 1f),
+                    mat);
             }
         }
     }

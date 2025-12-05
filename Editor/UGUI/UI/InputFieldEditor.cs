@@ -127,6 +127,7 @@ namespace UnityEditor.UI
                 {
                     EditorGUILayout.PropertyField(m_CaretColor);
                 }
+
                 EditorGUILayout.EndFadeGroup();
 
                 EditorGUILayout.PropertyField(m_SelectionColor);

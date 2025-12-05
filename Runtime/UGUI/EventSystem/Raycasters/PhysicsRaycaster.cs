@@ -11,11 +11,9 @@ namespace UnityEngine.EventSystems
 
         protected Camera m_EventCamera;
 
-        [SerializeField]
-        protected LayerMask m_EventMask = kNoEventMaskSet;
+        [SerializeField] protected LayerMask m_EventMask = kNoEventMaskSet;
 
-        [SerializeField]
-        protected int m_MaxRayIntersections = 0;
+        [SerializeField] protected int m_MaxRayIntersections = 0;
         protected int m_LastMaxRayIntersections = 0;
 
 #if PACKAGE_PHYSICS
@@ -23,7 +21,8 @@ namespace UnityEngine.EventSystems
 #endif
 
         protected PhysicsRaycaster()
-        {}
+        {
+        }
 
         public override Camera eventCamera
         {
@@ -35,7 +34,7 @@ namespace UnityEngine.EventSystems
                 if (m_EventCamera == null)
                     return Camera.main;
 
-                return m_EventCamera ;
+                return m_EventCamera;
             }
         }
 
@@ -56,26 +55,22 @@ namespace UnityEngine.EventSystems
             set { m_EventMask = value; }
         }
 
-        /// <remarks>
-        /// A value of zero will represent using the allocating version of the raycast function where as any other value will use the non allocating version.
-        /// </remarks>
+
         public int maxRayIntersections
         {
             get { return m_MaxRayIntersections; }
             set { m_MaxRayIntersections = value; }
         }
 
-        /// <param name="eventData">The pointer event for which we will cast a ray.</param>
-        /// <param name="ray">The ray to use.</param>
-        /// <param name="eventDisplayIndex">The display index used.</param>
-        /// <param name="distanceToClipPlane">The distance between the near and far clipping planes along the ray.</param>
-        /// <returns>True if the operation was successful. false if it was not possible to compute, such as the eventPosition being outside of the view.</returns>
-        protected bool ComputeRayAndDistance(PointerEventData eventData, ref Ray ray, ref int eventDisplayIndex, ref float distanceToClipPlane)
+
+        protected bool ComputeRayAndDistance(PointerEventData eventData, ref Ray ray, ref int eventDisplayIndex,
+            ref float distanceToClipPlane)
         {
             if (eventCamera == null)
                 return false;
 
-            var eventPosition = MultipleDisplayUtilities.RelativeMouseAtScaled(eventData.position, eventData.displayIndex);
+            var eventPosition =
+                MultipleDisplayUtilities.RelativeMouseAtScaled(eventData.position, eventData.displayIndex);
             if (eventPosition != Vector3.zero)
             {
                 // We support multiple display and display identification based on event position.
@@ -134,7 +129,8 @@ namespace UnityEngine.EventSystems
                     m_LastMaxRayIntersections = m_MaxRayIntersections;
                 }
 
-                hitCount = ReflectionMethodsCache.Singleton.getRaycastNonAlloc(ray, m_Hits, distanceToClipPlane, finalEventMask);
+                hitCount = ReflectionMethodsCache.Singleton.getRaycastNonAlloc(ray, m_Hits, distanceToClipPlane,
+                    finalEventMask);
             }
 
             if (hitCount != 0)
@@ -167,6 +163,7 @@ namespace UnityEngine.EventSystems
         private class RaycastHitComparer : IComparer<RaycastHit>
         {
             public static RaycastHitComparer instance = new RaycastHitComparer();
+
             public int Compare(RaycastHit x, RaycastHit y)
             {
                 return x.distance.CompareTo(y.distance);

@@ -9,7 +9,9 @@ namespace TMPro
     {
         private static readonly TMP_FontAssetUtilities s_Instance = new();
 
-        static TMP_FontAssetUtilities() { }
+        static TMP_FontAssetUtilities()
+        {
+        }
 
 
         public static TMP_FontAssetUtilities instance
@@ -21,15 +23,8 @@ namespace TMPro
         private static HashSet<int> k_SearchedAssets;
 
 
-        /// <param name="unicode">The unicode value of the requested character</param>
-        /// <param name="sourceFontAsset">The font asset to be searched</param>
-        /// <param name="includeFallbacks">Include the fallback font assets in the search</param>
-        /// <param name="fontStyle">The font style</param>
-        /// <param name="fontWeight">The font weight</param>
-        /// <param name="isAlternativeTypeface">Indicates if the OUT font asset is an alternative typeface or fallback font asset</param>
-        /// <param name="fontAsset">The font asset that contains the requested character</param>
-        /// <returns></returns>
-        public static TMP_Character GetCharacterFromFontAsset(uint unicode, TMP_FontAsset sourceFontAsset, bool includeFallbacks, FontStyles fontStyle, FontWeight fontWeight, out bool isAlternativeTypeface)
+        public static TMP_Character GetCharacterFromFontAsset(uint unicode, TMP_FontAsset sourceFontAsset,
+            bool includeFallbacks, FontStyles fontStyle, FontWeight fontWeight, out bool isAlternativeTypeface)
         {
             if (includeFallbacks)
             {
@@ -39,11 +34,13 @@ namespace TMPro
                     k_SearchedAssets.Clear();
             }
 
-            return GetCharacterFromFontAsset_Internal(unicode, sourceFontAsset, includeFallbacks, fontStyle, fontWeight, out isAlternativeTypeface);
+            return GetCharacterFromFontAsset_Internal(unicode, sourceFontAsset, includeFallbacks, fontStyle, fontWeight,
+                out isAlternativeTypeface);
         }
 
 
-        private static TMP_Character GetCharacterFromFontAsset_Internal(uint unicode, TMP_FontAsset sourceFontAsset, bool includeFallbacks, FontStyles fontStyle, FontWeight fontWeight, out bool isAlternativeTypeface)
+        private static TMP_Character GetCharacterFromFontAsset_Internal(uint unicode, TMP_FontAsset sourceFontAsset,
+            bool includeFallbacks, FontStyles fontStyle, FontWeight fontWeight, out bool isAlternativeTypeface)
         {
             isAlternativeTypeface = false;
             TMP_Character character;
@@ -54,7 +51,8 @@ namespace TMPro
 
             if (isItalic || fontWeight != FontWeight.Regular)
             {
-                uint compositeUnicodeLookupKey = ((0x80u | ((uint)fontStyle << 4) | ((uint)fontWeight / 100)) << 24) | unicode;
+                uint compositeUnicodeLookupKey =
+                    ((0x80u | ((uint)fontStyle << 4) | ((uint)fontWeight / 100)) << 24) | unicode;
                 if (sourceFontAsset.characterLookupTable.TryGetValue(compositeUnicodeLookupKey, out character))
                 {
                     isAlternativeTypeface = true;
@@ -99,7 +97,9 @@ namespace TMPro
                         break;
                 }
 
-                TMP_FontAsset temp = isItalic ? fontWeights[fontWeightIndex].italicTypeface : fontWeights[fontWeightIndex].regularTypeface;
+                TMP_FontAsset temp = isItalic
+                    ? fontWeights[fontWeightIndex].italicTypeface
+                    : fontWeights[fontWeightIndex].regularTypeface;
 
                 if (temp != null)
                 {
@@ -114,7 +114,8 @@ namespace TMPro
                         temp.characterLookupTable.Remove(unicode);
                     }
 
-                    if (temp.atlasPopulationMode == AtlasPopulationMode.Dynamic || temp.atlasPopulationMode == AtlasPopulationMode.DynamicOS)
+                    if (temp.atlasPopulationMode == AtlasPopulationMode.Dynamic ||
+                        temp.atlasPopulationMode == AtlasPopulationMode.DynamicOS)
                     {
                         if (temp.TryAddCharacterInternal(unicode, out character))
                         {
@@ -126,10 +127,12 @@ namespace TMPro
                 }
 
                 if (includeFallbacks && sourceFontAsset.fallbackFontAssetTable != null)
-                    return SearchFallbacksForCharacter(unicode, sourceFontAsset, fontStyle, fontWeight, out isAlternativeTypeface);
+                    return SearchFallbacksForCharacter(unicode, sourceFontAsset, fontStyle, fontWeight,
+                        out isAlternativeTypeface);
 
                 return null;
             }
+
             #endregion
 
             if (sourceFontAsset.characterLookupTable.TryGetValue(unicode, out character))
@@ -140,19 +143,22 @@ namespace TMPro
                 sourceFontAsset.characterLookupTable.Remove(unicode);
             }
 
-            if (sourceFontAsset.atlasPopulationMode == AtlasPopulationMode.Dynamic || sourceFontAsset.atlasPopulationMode == AtlasPopulationMode.DynamicOS)
+            if (sourceFontAsset.atlasPopulationMode == AtlasPopulationMode.Dynamic ||
+                sourceFontAsset.atlasPopulationMode == AtlasPopulationMode.DynamicOS)
             {
                 if (sourceFontAsset.TryAddCharacterInternal(unicode, out character))
                     return character;
             }
 
             if (includeFallbacks && sourceFontAsset.fallbackFontAssetTable != null)
-                return SearchFallbacksForCharacter(unicode, sourceFontAsset, fontStyle, fontWeight, out isAlternativeTypeface);
+                return SearchFallbacksForCharacter(unicode, sourceFontAsset, fontStyle, fontWeight,
+                    out isAlternativeTypeface);
 
             return null;
         }
 
-        private static TMP_Character SearchFallbacksForCharacter(uint unicode, TMP_FontAsset sourceFontAsset, FontStyles fontStyle, FontWeight fontWeight, out bool isAlternativeTypeface)
+        private static TMP_Character SearchFallbacksForCharacter(uint unicode, TMP_FontAsset sourceFontAsset,
+            FontStyles fontStyle, FontWeight fontWeight, out bool isAlternativeTypeface)
         {
             isAlternativeTypeface = false;
 
@@ -174,7 +180,8 @@ namespace TMPro
                 if (!k_SearchedAssets.Add(id))
                     continue;
 
-                TMP_Character character = GetCharacterFromFontAsset_Internal(unicode, temp, true, fontStyle, fontWeight, out isAlternativeTypeface);
+                TMP_Character character = GetCharacterFromFontAsset_Internal(unicode, temp, true, fontStyle, fontWeight,
+                    out isAlternativeTypeface);
 
                 if (character != null)
                     return character;
@@ -184,15 +191,9 @@ namespace TMPro
         }
 
 
-        /// <param name="unicode">The unicode value of the requested character</param>
-        /// <param name="sourceFontAsset">The font asset originating the search query</param>
-        /// <param name="fontAssets">The list of font assets to search</param>
-        /// <param name="includeFallbacks">Determines if the fallback of each font assets on the list will be searched</param>
-        /// <param name="fontStyle">The font style</param>
-        /// <param name="fontWeight">The font weight</param>
-        /// <param name="isAlternativeTypeface">Determines if the OUT font asset is an alternative typeface or fallback font asset</param>
-        /// <returns></returns>
-        public static TMP_Character GetCharacterFromFontAssets(uint unicode, TMP_FontAsset sourceFontAsset, List<TMP_FontAsset> fontAssets, bool includeFallbacks, FontStyles fontStyle, FontWeight fontWeight, out bool isAlternativeTypeface)
+        public static TMP_Character GetCharacterFromFontAssets(uint unicode, TMP_FontAsset sourceFontAsset,
+            List<TMP_FontAsset> fontAssets, bool includeFallbacks, FontStyles fontStyle, FontWeight fontWeight,
+            out bool isAlternativeTypeface)
         {
             isAlternativeTypeface = false;
 
@@ -215,7 +216,8 @@ namespace TMPro
 
                 if (fontAsset == null) continue;
 
-                TMP_Character character = GetCharacterFromFontAsset_Internal(unicode, fontAsset, includeFallbacks, fontStyle, fontWeight, out isAlternativeTypeface);
+                TMP_Character character = GetCharacterFromFontAsset_Internal(unicode, fontAsset, includeFallbacks,
+                    fontStyle, fontWeight, out isAlternativeTypeface);
 
                 if (character != null)
                     return character;
@@ -224,7 +226,9 @@ namespace TMPro
             return null;
         }
 
-        internal static TMP_TextElement GetTextElementFromTextAssets(uint unicode, TMP_FontAsset sourceFontAsset, List<TMP_Asset> textAssets, bool includeFallbacks, FontStyles fontStyle, FontWeight fontWeight, out bool isAlternativeTypeface)
+        internal static TMP_TextElement GetTextElementFromTextAssets(uint unicode, TMP_FontAsset sourceFontAsset,
+            List<TMP_Asset> textAssets, bool includeFallbacks, FontStyles fontStyle, FontWeight fontWeight,
+            out bool isAlternativeTypeface)
         {
             isAlternativeTypeface = false;
 
@@ -248,7 +252,8 @@ namespace TMPro
                 if (textAsset == null) continue;
 
                 TMP_FontAsset fontAsset = textAsset as TMP_FontAsset;
-                TMP_Character character = GetCharacterFromFontAsset_Internal(unicode, fontAsset, includeFallbacks, fontStyle, fontWeight, out isAlternativeTypeface);
+                TMP_Character character = GetCharacterFromFontAsset_Internal(unicode, fontAsset, includeFallbacks,
+                    fontStyle, fontWeight, out isAlternativeTypeface);
 
                 if (character != null)
                     return character;
@@ -256,10 +261,8 @@ namespace TMPro
 
             return null;
         }
-        
-        /// <param name="text">The input string containing the characters to process.</param>
-        /// <param name="index">The current index in the string. This will be incremented if a surrogate pair is found.</param>
-        /// <returns>The Unicode code point at the specified index.</returns>
+
+
         internal static uint GetCodePoint(string text, ref int index)
         {
             char c = text[index];
@@ -275,9 +278,7 @@ namespace TMPro
             return c;
         }
 
-        /// <param name="codesPoints">The array of uint values representing characters to process.</param>
-        /// <param name="index">The current index in the array. This will be incremented if a surrogate pair is found.</param>
-        /// <returns>The Unicode code point at the specified index.</returns>
+
         internal static uint GetCodePoint(uint[] codesPoints, ref int index)
         {
             char c = (char)codesPoints[index];

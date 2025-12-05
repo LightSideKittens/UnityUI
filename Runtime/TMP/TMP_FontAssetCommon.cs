@@ -47,8 +47,6 @@ namespace TMPro
     [Serializable]
     public class TMP_Glyph : TMP_TextElement_Legacy
     {
-        /// <param name="source"></param>
-        /// <returns></returns>
         public static TMP_Glyph Clone(TMP_Glyph source)
         {
             TMP_Glyph copy = new();
@@ -90,7 +88,9 @@ namespace TMPro
         public int renderMode;
         public bool includeFontFeatures;
 
-        internal FontAssetCreationSettings(string sourceFontFileGUID, int pointSize, int pointSizeSamplingMode, int padding, int packingMode, int atlasWidth, int atlasHeight, int characterSelectionMode, string characterSet, int renderMode)
+        internal FontAssetCreationSettings(string sourceFontFileGUID, int pointSize, int pointSizeSamplingMode,
+            int padding, int packingMode, int atlasWidth, int atlasHeight, int characterSelectionMode,
+            string characterSet, int renderMode)
         {
             sourceFontFileName = string.Empty;
             this.sourceFontFileGUID = sourceFontFileGUID;
@@ -172,32 +172,32 @@ namespace TMPro
             get { return m_FirstGlyph; }
             set { m_FirstGlyph = value; }
         }
-        [FormerlySerializedAs("AscII_Left")]
-        [SerializeField]
+
+        [FormerlySerializedAs("AscII_Left")] [SerializeField]
         private uint m_FirstGlyph;
 
         public GlyphValueRecord_Legacy firstGlyphAdjustments
         {
             get { return m_FirstGlyphAdjustments; }
         }
-        [SerializeField]
-        private GlyphValueRecord_Legacy m_FirstGlyphAdjustments;
+
+        [SerializeField] private GlyphValueRecord_Legacy m_FirstGlyphAdjustments;
 
         public uint secondGlyph
         {
             get { return m_SecondGlyph; }
             set { m_SecondGlyph = value; }
         }
-        [FormerlySerializedAs("AscII_Right")]
-        [SerializeField]
+
+        [FormerlySerializedAs("AscII_Right")] [SerializeField]
         private uint m_SecondGlyph;
 
         public GlyphValueRecord_Legacy secondGlyphAdjustments
         {
             get { return m_SecondGlyphAdjustments; }
         }
-        [SerializeField]
-        private GlyphValueRecord_Legacy m_SecondGlyphAdjustments;
+
+        [SerializeField] private GlyphValueRecord_Legacy m_SecondGlyphAdjustments;
 
         [FormerlySerializedAs("XadvanceOffset")]
         public float xOffset;
@@ -208,8 +208,8 @@ namespace TMPro
         {
             get { return m_IgnoreSpacingAdjustments; }
         }
-        [SerializeField]
-        private bool m_IgnoreSpacingAdjustments;
+
+        [SerializeField] private bool m_IgnoreSpacingAdjustments;
 
         public KerningPair()
         {
@@ -227,7 +227,8 @@ namespace TMPro
             xOffset = offset;
         }
 
-        public KerningPair(uint firstGlyph, GlyphValueRecord_Legacy firstGlyphAdjustments, uint secondGlyph, GlyphValueRecord_Legacy secondGlyphAdjustments)
+        public KerningPair(uint firstGlyph, GlyphValueRecord_Legacy firstGlyphAdjustments, uint secondGlyph,
+            GlyphValueRecord_Legacy secondGlyphAdjustments)
         {
             m_FirstGlyph = firstGlyph;
             m_FirstGlyphAdjustments = firstGlyphAdjustments;
@@ -239,7 +240,6 @@ namespace TMPro
         {
             m_FirstGlyphAdjustments.xAdvance = xOffset;
         }
-
     }
 
     [Serializable]
@@ -270,10 +270,6 @@ namespace TMPro
         }
 
 
-        /// <param name="first">First glyph</param>
-        /// <param name="second">Second glyph</param>
-        /// <param name="offset">xAdvance value</param>
-        /// <returns></returns>
         public int AddKerningPair(uint first, uint second, float offset)
         {
             int index = kerningPairs.FindIndex(item => item.firstGlyph == first && item.secondGlyph == second);
@@ -287,12 +283,9 @@ namespace TMPro
             return -1;
         }
 
-        /// <param name="firstGlyph">The first glyph</param>
-        /// <param name="firstGlyphAdjustments">Adjustment record for the first glyph</param>
-        /// <param name="secondGlyph">The second glyph</param>
-        /// <param name="secondGlyphAdjustments">Adjustment record for the second glyph</param>
-        /// <returns></returns>
-        public int AddGlyphPairAdjustmentRecord(uint first, GlyphValueRecord_Legacy firstAdjustments, uint second, GlyphValueRecord_Legacy secondAdjustments)
+
+        public int AddGlyphPairAdjustmentRecord(uint first, GlyphValueRecord_Legacy firstAdjustments, uint second,
+            GlyphValueRecord_Legacy secondAdjustments)
         {
             int index = kerningPairs.FindIndex(item => item.firstGlyph == first && item.secondGlyph == second);
 
@@ -332,10 +325,7 @@ namespace TMPro
     {
         private static List<int> k_searchedFontAssets;
 
-        /// <param name="font">The font asset to search for the given character.</param>
-        /// <param name="unicode">The character to find.</param>
-        /// <param name="character">out parameter containing the glyph for the specified character (if found).</param>
-        /// <returns></returns>
+
         public static TMP_FontAsset SearchForCharacter(TMP_FontAsset font, uint unicode, out TMP_Character character)
         {
             if (k_searchedFontAssets == null)
@@ -347,17 +337,15 @@ namespace TMPro
         }
 
 
-        /// <param name="fonts"></param>
-        /// <param name="unicode"></param>
-        /// <param name="character"></param>
-        /// <returns></returns>
-        public static TMP_FontAsset SearchForCharacter(List<TMP_FontAsset> fonts, uint unicode, out TMP_Character character)
+        public static TMP_FontAsset SearchForCharacter(List<TMP_FontAsset> fonts, uint unicode,
+            out TMP_Character character)
         {
             return SearchForCharacterInternal(fonts, unicode, out character);
         }
 
 
-        private static TMP_FontAsset SearchForCharacterInternal(TMP_FontAsset font, uint unicode, out TMP_Character character)
+        private static TMP_FontAsset SearchForCharacterInternal(TMP_FontAsset font, uint unicode,
+            out TMP_Character character)
         {
             character = null;
 
@@ -395,7 +383,8 @@ namespace TMPro
         }
 
 
-        private static TMP_FontAsset SearchForCharacterInternal(List<TMP_FontAsset> fonts, uint unicode, out TMP_Character character)
+        private static TMP_FontAsset SearchForCharacterInternal(List<TMP_FontAsset> fonts, uint unicode,
+            out TMP_Character character)
         {
             character = null;
 

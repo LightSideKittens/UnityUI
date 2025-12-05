@@ -5,7 +5,6 @@ using System.Collections;
 
 namespace TMPro
 {
-
     [Serializable]
     public class TMP_TextElement_Legacy
     {

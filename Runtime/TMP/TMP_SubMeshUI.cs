@@ -18,8 +18,8 @@ namespace TMPro
             get => m_fontAsset;
             set => m_fontAsset = value;
         }
-        [SerializeField]
-        private TMP_FontAsset m_fontAsset;
+
+        [SerializeField] private TMP_FontAsset m_fontAsset;
 
 
         public override Texture mainTexture
@@ -51,8 +51,8 @@ namespace TMPro
                 SetMaterialDirty();
             }
         }
-        [SerializeField]
-        private Material m_material;
+
+        [SerializeField] private Material m_material;
 
 
         public Material sharedMaterial
@@ -60,8 +60,8 @@ namespace TMPro
             get => m_sharedMaterial;
             set => SetSharedMaterial(value);
         }
-        [SerializeField]
-        private Material m_sharedMaterial;
+
+        [SerializeField] private Material m_sharedMaterial;
 
 
         public Material fallbackMaterial
@@ -80,6 +80,7 @@ namespace TMPro
                 SetSharedMaterial(m_fallbackMaterial);
             }
         }
+
         private Material m_fallbackMaterial;
 
 
@@ -88,10 +89,12 @@ namespace TMPro
             get => m_fallbackSourceMaterial;
             set => m_fallbackSourceMaterial = value;
         }
+
         private Material m_fallbackSourceMaterial;
 
 
-        public override Material materialForRendering => TMP_MaterialManager.GetMaterialForRendering(this, m_sharedMaterial);
+        public override Material materialForRendering =>
+            TMP_MaterialManager.GetMaterialForRendering(this, m_sharedMaterial);
 
 
         public bool isDefaultMaterial
@@ -99,8 +102,8 @@ namespace TMPro
             get => m_isDefaultMaterial;
             set => m_isDefaultMaterial = value;
         }
-        [SerializeField]
-        private bool m_isDefaultMaterial;
+
+        [SerializeField] private bool m_isDefaultMaterial;
 
 
         public float padding
@@ -108,8 +111,8 @@ namespace TMPro
             get => m_padding;
             set => m_padding = value;
         }
-        [SerializeField]
-        private float m_padding;
+
+        [SerializeField] private float m_padding;
 
 
         public Mesh mesh
@@ -126,10 +129,11 @@ namespace TMPro
             }
             set => m_mesh = value;
         }
+
         private Mesh m_mesh;
 
 
-        public TMPText textComponent
+        public TMP_Text textComponent
         {
             get
             {
@@ -139,18 +143,15 @@ namespace TMPro
                 return m_TextComponent;
             }
         }
-        [SerializeField]
-        private TMPText m_TextComponent;
+
+        [SerializeField] private TMP_Text m_TextComponent;
 
 
-        [System.NonSerialized]
-        private bool m_isRegisteredForEvents;
+        [System.NonSerialized] private bool m_isRegisteredForEvents;
         private bool m_materialDirty;
 
-        /// <param name="textComponent"></param>
-        /// <param name="materialReference"></param>
-        /// <returns></returns>
-        public static TMP_SubMeshUI AddSubTextObject(TMPText textComponent, MaterialReference materialReference)
+
+        public static TMP_SubMeshUI AddSubTextObject(TMP_Text textComponent, MaterialReference materialReference)
         {
             GameObject go = new();
             go.hideFlags = TMP_Settings.hideSubTextObjects ? HideFlags.HideAndDontSave : HideFlags.DontSave;
@@ -159,9 +160,11 @@ namespace TMPro
             go.transform.SetAsFirstSibling();
             go.layer = textComponent.gameObject.layer;
 
-            #if UNITY_EDITOR
-            go.name = materialReference.material == null ? "TMP SubMesh" : "TMP SubMesh [" + materialReference.material.name + "]";
-            #endif
+#if UNITY_EDITOR
+            go.name = materialReference.material == null
+                ? "TMP SubMesh"
+                : "TMP SubMesh [" + materialReference.material.name + "]";
+#endif
 
             RectTransform rectTransform = go.AddComponent<RectTransform>();
             rectTransform.anchorMin = Vector2.zero;
@@ -183,13 +186,11 @@ namespace TMPro
         }
 
 
-
         protected override void OnEnable()
         {
             if (!m_isRegisteredForEvents)
             {
-
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
                 TMPro_EventManager.MATERIAL_PROPERTY_EVENT.Add(ON_MATERIAL_PROPERTY_CHANGED);
                 TMPro_EventManager.FONT_PROPERTY_EVENT.Add(ON_FONT_PROPERTY_CHANGED);
                 TMPro_EventManager.DRAG_AND_DROP_MATERIAL_EVENT.Add(ON_DRAG_AND_DROP_MATERIAL);
@@ -233,7 +234,7 @@ namespace TMPro
                 m_fallbackMaterial = null;
             }
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             TMPro_EventManager.MATERIAL_PROPERTY_EVENT.Remove(ON_MATERIAL_PROPERTY_CHANGED);
             TMPro_EventManager.FONT_PROPERTY_EVENT.Remove(ON_FONT_PROPERTY_CHANGED);
             TMPro_EventManager.DRAG_AND_DROP_MATERIAL_EVENT.Remove(ON_DRAG_AND_DROP_MATERIAL);
@@ -252,7 +253,7 @@ namespace TMPro
         }
 
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         private void ON_MATERIAL_PROPERTY_CHANGED(bool isChanged, Material mat)
         {
             if (m_sharedMaterial == null)
@@ -261,7 +262,8 @@ namespace TMPro
             int targetMaterialID = mat.GetInstanceID();
             int sharedMaterialID = m_sharedMaterial.GetInstanceID();
             int maskingMaterialID = m_MaskMaterial == null ? 0 : m_MaskMaterial.GetInstanceID();
-            int fallbackSourceMaterialID = m_fallbackSourceMaterial == null ? 0 : m_fallbackSourceMaterial.GetInstanceID();
+            int fallbackSourceMaterialID =
+                m_fallbackSourceMaterial == null ? 0 : m_fallbackSourceMaterial.GetInstanceID();
 
             bool hasCullModeProperty = m_sharedMaterial.HasProperty(ShaderUtilities.ShaderTag_CullMode);
             float cullMode = 0;
@@ -272,7 +274,8 @@ namespace TMPro
                 m_sharedMaterial.SetFloat(ShaderUtilities.ShaderTag_CullMode, cullMode);
             }
 
-            if (m_fallbackMaterial != null && fallbackSourceMaterialID == targetMaterialID && TMP_Settings.matchMaterialPreset)
+            if (m_fallbackMaterial != null && fallbackSourceMaterialID == targetMaterialID &&
+                TMP_Settings.matchMaterialPreset)
             {
                 TMP_MaterialManager.CopyMaterialPresetProperties(mat, m_fallbackMaterial);
 
@@ -367,7 +370,7 @@ namespace TMPro
         private void ON_TMP_SETTINGS_CHANGED()
         {
         }
-        #endif
+#endif
 
         protected override void OnTransformParentChanged()
         {
@@ -380,8 +383,6 @@ namespace TMPro
         }
 
 
-        /// <param name="baseMaterial"></param>
-        /// <returns></returns>
         public override Material GetModifiedMaterial(Material baseMaterial)
         {
             Material mat = baseMaterial;
@@ -395,7 +396,8 @@ namespace TMPro
 
             if (m_StencilValue > 0)
             {
-                var maskMat = StencilMaterial.Add(mat, (1 << m_StencilValue) - 1, StencilOp.Keep, CompareFunction.Equal, ColorWriteMask.All, (1 << m_StencilValue) - 1, 0);
+                var maskMat = StencilMaterial.Add(mat, (1 << m_StencilValue) - 1, StencilOp.Keep, CompareFunction.Equal,
+                    ColorWriteMask.All, (1 << m_StencilValue) - 1, 0);
                 StencilMaterial.Remove(m_MaskMaterial);
                 m_MaskMaterial = maskMat;
                 mat = m_MaskMaterial;
@@ -405,16 +407,15 @@ namespace TMPro
         }
 
 
-        /// <returns></returns>
         public float GetPaddingForMaterial()
         {
-            float padding = ShaderUtilities.GetPadding(m_sharedMaterial, m_TextComponent.extraPadding, m_TextComponent.isUsingBold);
+            float padding = ShaderUtilities.GetPadding(m_sharedMaterial, m_TextComponent.extraPadding,
+                m_TextComponent.isUsingBold);
 
             return padding;
         }
 
 
-        /// <returns></returns>
         public float GetPaddingForMaterial(Material mat)
         {
             float padding = ShaderUtilities.GetPadding(mat, m_TextComponent.extraPadding, m_TextComponent.isUsingBold);
@@ -423,8 +424,6 @@ namespace TMPro
         }
 
 
-        /// <param name="isExtraPadding"></param>
-        /// <param name="isBold"></param>
         public void UpdateMeshPadding(bool isExtraPadding, bool isUsingBold)
         {
             m_padding = ShaderUtilities.GetPadding(m_sharedMaterial, isExtraPadding, isUsingBold);
@@ -443,7 +442,6 @@ namespace TMPro
 
         public override void SetLayoutDirty()
         {
-
         }
 
 
@@ -473,10 +471,10 @@ namespace TMPro
 
             return m_RootCanvasTransform;
         }
+
         private Transform m_RootCanvasTransform;
 
-        /// <param name="clipRect"></param>
-        /// <param name="validRect"></param>
+
         public override void Cull(Rect clipRect, bool validRect)
         {
         }
@@ -487,7 +485,6 @@ namespace TMPro
         }
 
 
-        /// <param name="update"></param>
         public override void Rebuild(CanvasUpdate update)
         {
             if (update == CanvasUpdate.PreRender)
@@ -511,7 +508,8 @@ namespace TMPro
             if (m_sharedMaterial == null)
                 return;
 
-            if (m_sharedMaterial.HasProperty(ShaderUtilities.ShaderTag_CullMode) && textComponent.fontSharedMaterial != null)
+            if (m_sharedMaterial.HasProperty(ShaderUtilities.ShaderTag_CullMode) &&
+                textComponent.fontSharedMaterial != null)
             {
                 float cullMode = textComponent.fontSharedMaterial.GetFloat(ShaderUtilities.ShaderTag_CullMode);
                 m_sharedMaterial.SetFloat(ShaderUtilities.ShaderTag_CullMode, cullMode);
@@ -523,7 +521,7 @@ namespace TMPro
 #if UNITY_EDITOR
             if (m_sharedMaterial != null && gameObject.name != "TMP SubMeshUI [" + m_sharedMaterial.name + "]")
                 gameObject.name = "TMP SubMeshUI [" + m_sharedMaterial.name + "]";
-            #endif
+#endif
         }
 
 
@@ -533,9 +531,6 @@ namespace TMPro
         }
 
 
-
-
-        /// <returns></returns>
         private Material GetMaterial()
         {
             return m_sharedMaterial;
@@ -558,8 +553,6 @@ namespace TMPro
         }
 
 
-        /// <param name="source"></param>
-        /// <returns></returns>
         private Material CreateMaterialInstance(Material source)
         {
             Material mat = new(source);
@@ -570,14 +563,12 @@ namespace TMPro
         }
 
 
-        /// <returns></returns>
         private Material GetSharedMaterial()
         {
             return canvasRenderer.GetMaterial();
         }
 
 
-        /// <param name="mat"></param>
         private void SetSharedMaterial(Material mat)
         {
             m_sharedMaterial = mat;
@@ -587,7 +578,7 @@ namespace TMPro
 
             SetMaterialDirty();
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
 #endif
         }
     }

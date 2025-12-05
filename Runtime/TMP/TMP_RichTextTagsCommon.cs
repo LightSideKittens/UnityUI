@@ -102,7 +102,7 @@ namespace TMPro
         WHITE = 105680263,
         PURPLE = -1250222130,
         GREY = 2638345,
-        LIGHTBLUE= 341063360,
+        LIGHTBLUE = 341063360,
         BR = 2256,
         CR = 2289,
         ZWSP = 3288238,

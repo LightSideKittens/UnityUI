@@ -4,42 +4,20 @@ using System.Collections.Generic;
 namespace UnityEngine.EventSystems
 {
     [RequireComponent(typeof(EventSystem))]
-    /// <remarks>
-    /// An Input Module is a component of the EventSystem that is responsible for raising events and sending them to GameObjects for handling. The BaseInputModule is a class that all Input Modules in the EventSystem inherit from. Examples of provided modules are TouchInputModule and StandaloneInputModule, if these are inadequate for your project you can create your own by extending from the BaseInputModule.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// <![CDATA[
-    /// using UnityEngine;
-    /// using UnityEngine.EventSystems;
     ///
-    /// /**
-    ///  * Create a module that every tick sends a 'Move' event to
-    ///  * the target object
-    ///  */
-    /// public class MyInputModule : BaseInputModule
-    /// {
-    ///     public GameObject m_TargetObject;
     ///
-    ///     public override void Process()
-    ///     {
-    ///         if (m_TargetObject == null)
-    ///             return;
-    ///         ExecuteEvents.Execute (m_TargetObject, new BaseEventData (eventSystem), ExecuteEvents.moveHandler);
-    ///     }
-    /// }
-    /// ]]>
-    ///</code>
-    /// </example>
     public abstract class BaseInputModule : UIBehaviour
     {
-        [NonSerialized]
-        protected List<RaycastResult> m_RaycastResultCache = new List<RaycastResult>();
+        [NonSerialized] protected List<RaycastResult> m_RaycastResultCache = new List<RaycastResult>();
 
         [SerializeField] private bool m_SendPointerHoverToParent = true;
 
         //This is needed for testing
-        protected internal bool sendPointerHoverToParent { get { return m_SendPointerHoverToParent; } set { m_SendPointerHoverToParent = value; } }
+        protected internal bool sendPointerHoverToParent
+        {
+            get { return m_SendPointerHoverToParent; }
+            set { m_SendPointerHoverToParent = value; }
+        }
 
         private AxisEventData m_AxisEventData;
 
@@ -77,9 +55,7 @@ namespace UnityEngine.EventSystems
             }
         }
 
-        /// <remarks>
-        /// With this it is possible to bypass the Input system with your own but still use the same InputModule. For example this can be used to feed fake input into the UI or interface with a different input system.
-        /// </remarks>
+
         public BaseInput inputOverride
         {
             get { return m_InputOverride; }
@@ -116,19 +92,17 @@ namespace UnityEngine.EventSystems
 
                 return candidates[i];
             }
+
             return new RaycastResult();
         }
 
-        /// <param name="x">X movement.</param>
-        /// <param name="y">Y movement.</param>
+
         protected static MoveDirection DetermineMoveDirection(float x, float y)
         {
             return DetermineMoveDirection(x, y, 0.6f);
         }
 
-        /// <param name="x">X movement.</param>
-        /// <param name="y">Y movement.</param>
-        /// <param name="deadZone">Dead zone.</param>
+
         protected static MoveDirection DetermineMoveDirection(float x, float y, float deadZone)
         {
             // if vector is too small... just return
@@ -143,9 +117,7 @@ namespace UnityEngine.EventSystems
             return y > 0 ? MoveDirection.Up : MoveDirection.Down;
         }
 
-        /// <param name="g1">GameObject to compare</param>
-        /// <param name="g2">GameObject to compare</param>
-        /// <returns></returns>
+
         protected static GameObject FindCommonRoot(GameObject g1, GameObject g2)
         {
             if (g1 == null || g2 == null)
@@ -161,8 +133,10 @@ namespace UnityEngine.EventSystems
                         return t1.gameObject;
                     t2 = t2.parent;
                 }
+
                 t1 = t1.parent;
             }
+
             return null;
         }
 
@@ -181,8 +155,10 @@ namespace UnityEngine.EventSystems
                 for (var i = 0; i < hoveredCount; ++i)
                 {
                     currentPointerData.fullyExited = true;
-                    ExecuteEvents.Execute(currentPointerData.hovered[i], currentPointerData, ExecuteEvents.pointerMoveHandler);
-                    ExecuteEvents.Execute(currentPointerData.hovered[i], currentPointerData, ExecuteEvents.pointerExitHandler);
+                    ExecuteEvents.Execute(currentPointerData.hovered[i], currentPointerData,
+                        ExecuteEvents.pointerMoveHandler);
+                    ExecuteEvents.Execute(currentPointerData.hovered[i], currentPointerData,
+                        ExecuteEvents.pointerExitHandler);
                 }
 
                 currentPointerData.hovered.Clear();
@@ -201,13 +177,16 @@ namespace UnityEngine.EventSystems
                 {
                     var hoveredCount = currentPointerData.hovered.Count;
                     for (var i = 0; i < hoveredCount; ++i)
-                        ExecuteEvents.Execute(currentPointerData.hovered[i], currentPointerData, ExecuteEvents.pointerMoveHandler);
+                        ExecuteEvents.Execute(currentPointerData.hovered[i], currentPointerData,
+                            ExecuteEvents.pointerMoveHandler);
                 }
+
                 return;
             }
 
             GameObject commonRoot = FindCommonRoot(currentPointerData.pointerEnter, newEnterTarget);
-            GameObject pointerParent = ((Component)newEnterTarget.GetComponentInParent<IPointerExitHandler>())?.gameObject;
+            GameObject pointerParent =
+                ((Component)newEnterTarget.GetComponentInParent<IPointerExitHandler>())?.gameObject;
 
             // and we already an entered object from last time
             if (currentPointerData.pointerEnter != null)
@@ -227,7 +206,8 @@ namespace UnityEngine.EventSystems
                     if (!m_SendPointerHoverToParent && pointerParent == t.gameObject)
                         break;
 
-                    currentPointerData.fullyExited = t.gameObject != commonRoot && currentPointerData.pointerEnter != newEnterTarget;
+                    currentPointerData.fullyExited =
+                        t.gameObject != commonRoot && currentPointerData.pointerEnter != newEnterTarget;
                     ExecuteEvents.Execute(t.gameObject, currentPointerData, ExecuteEvents.pointerMoveHandler);
                     ExecuteEvents.Execute(t.gameObject, currentPointerData, ExecuteEvents.pointerExitHandler);
                     currentPointerData.hovered.Remove(t.gameObject);
@@ -275,9 +255,7 @@ namespace UnityEngine.EventSystems
             }
         }
 
-        /// <param name="x">X movement.</param>
-        /// <param name="y">Y movement.</param>
-        /// <param name="deadZone">Dead zone.</param>
+
         protected virtual AxisEventData GetAxisEventData(float x, float y, float moveDeadZone)
         {
             if (m_AxisEventData == null)
@@ -298,8 +276,7 @@ namespace UnityEngine.EventSystems
             return m_BaseEventData;
         }
 
-        /// <param name="pointerId">Pointer ID</param>
-        /// <returns>Is the given pointer over an event system object?</returns>
+
         public virtual bool IsPointerOverGameObject(int pointerId)
         {
             return false;
@@ -311,79 +288,59 @@ namespace UnityEngine.EventSystems
         }
 
         public virtual void DeactivateModule()
-        {}
+        {
+        }
 
         public virtual void ActivateModule()
-        {}
+        {
+        }
 
         public virtual void UpdateModule()
-        {}
+        {
+        }
 
-        /// <returns>Is the module supported.</returns>
+
         public virtual bool IsModuleSupported()
         {
             return true;
         }
 
-        /// <param name="sourcePointerData">PointerEventData whose pointerId will be converted to UI Toolkit pointer convention.</param>
-        /// <seealso cref="UnityEngine.UIElements.IPointerEvent" />
+
         public virtual int ConvertUIToolkitPointerId(PointerEventData sourcePointerData)
         {
 #if PACKAGE_UITOOLKIT
-            return sourcePointerData.pointerId < 0 ?
-                UIElements.PointerId.mousePointerId :
-                UIElements.PointerId.touchPointerIdBase + sourcePointerData.pointerId;
+            return sourcePointerData.pointerId < 0
+                ? UIElements.PointerId.mousePointerId
+                : UIElements.PointerId.touchPointerIdBase + sourcePointerData.pointerId;
 #else
             return -1;
 #endif
         }
 
-        /// <remarks>
-        /// Input Module implementations are free to apply a scaling factor to their PointerEventData's scrollDelta.
-        /// This method can be used when a system needs to treat scaling-independent input values.
-        /// </remarks>
+
         public virtual Vector2 ConvertPointerEventScrollDeltaToTicks(Vector2 scrollDelta)
         {
             return scrollDelta / input.mouseScrollDeltaPerTick;
         }
 
-        /// <remarks>
-        /// This method is used by UI Toolkit's TextField to allow navigation in and out
-        /// of the TextField when using a device other than a keyboard.
+
         ///
-        /// If we don't know what the source of the event is, this method should return Unknown.
-        /// Input Modules with more information on the event source should override this method
-        /// to reflect that information.
         ///
-        /// This method's behavior is undefined for events other than Move, Submit, or Cancel.
-        /// </remarks>
-        /// <param name="eventData">An event generated by this input module.</param>
-        /// <returns>The type of device that generated this event.</returns>
         public virtual NavigationDeviceType GetNavigationEventDeviceType(BaseEventData eventData)
         {
             return NavigationDeviceType.Unknown;
         }
     }
 
-    /// <remarks>
-    /// This can help avoid duplicated treatment of events when some controls react to keyboard input
-    /// and navigation events at the same time.
-    /// </remarks>
+
     public enum NavigationDeviceType
     {
-        /// <remarks>
-        /// Controls reacting to navigation events from an unknown device should react conservatively.
-        /// For example, if there is a conflict between a keyboard event and a subsequent navigation event,
-        /// a control could assume that the device type is a keyboard and conservatively block the navigation event.
-        /// </remarks>
         Unknown = 0,
-        /// <remarks>
-        /// This device sends keyboard events along with any navigation event it generates.
-        /// </remarks>
+
+
         Keyboard,
-        /// <remarks>
-        /// This device never sends keyboard events along with any navigation event it generates.
-        /// </remarks>
+
+
         NonKeyboard
     }
 }

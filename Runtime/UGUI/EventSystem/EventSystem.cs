@@ -10,17 +10,13 @@ namespace UnityEngine.EventSystems
 {
     [AddComponentMenu("Event/Event System")]
     [DisallowMultipleComponent]
-    /// <remarks>
-    /// The EventSystem is responsible for processing and handling events in a Unity scene. A scene should only contain one EventSystem. The EventSystem works in conjunction with a number of modules and mostly just holds state and delegates functionality to specific, overrideable components.
-    /// When the EventSystem is started it searches for any BaseInputModules attached to the same GameObject and adds them to an internal list. On update each attached module receives an UpdateModules call, where the module can modify internal state. After each module has been Updated the active module has the Process call executed.This is where custom module processing can take place.
-    /// </remarks>
     public class EventSystem : UIBehaviour
     {
         private List<BaseInputModule> m_SystemInputModules = new List<BaseInputModule>();
 
         private BaseInputModule m_CurrentInputModule;
 
-        private  static List<EventSystem> m_EventSystems = new List<EventSystem>();
+        private static List<EventSystem> m_EventSystems = new List<EventSystem>();
 
         public static EventSystem current
         {
@@ -41,12 +37,10 @@ namespace UnityEngine.EventSystems
             }
         }
 
-        [SerializeField]
-        [FormerlySerializedAs("m_Selected")]
+        [SerializeField] [FormerlySerializedAs("m_Selected")]
         private GameObject m_FirstSelected;
 
-        [SerializeField]
-        private bool m_sendNavigationEvents = true;
+        [SerializeField] private bool m_sendNavigationEvents = true;
 
         public bool sendNavigationEvents
         {
@@ -54,8 +48,7 @@ namespace UnityEngine.EventSystems
             set { m_sendNavigationEvents = value; }
         }
 
-        [SerializeField]
-        private int m_DragThreshold = 10;
+        [SerializeField] private int m_DragThreshold = 10;
 
         public int pixelDragThreshold
         {
@@ -83,16 +76,15 @@ namespace UnityEngine.EventSystems
 
         private bool m_HasFocus = true;
 
-        /// <remarks>
-        /// Used to determine inside the individual InputModules if the module should be ticked while the application doesnt have focus.
-        /// </remarks>
+
         public bool isFocused
         {
             get { return m_HasFocus; }
         }
 
         protected EventSystem()
-        {}
+        {
+        }
 
         public void UpdateModules()
         {
@@ -114,13 +106,12 @@ namespace UnityEngine.EventSystems
             get { return m_SelectionGuard; }
         }
 
-        /// <param name="selected">GameObject to select.</param>
-        /// <param name="pointer">Associated EventData.</param>
+
         public void SetSelectedGameObject(GameObject selected, BaseEventData pointer)
         {
             if (m_SelectionGuard)
             {
-                Debug.LogError("Attempting to select " + selected +  "while already selecting an object.");
+                Debug.LogError("Attempting to select " + selected + "while already selecting an object.");
                 return;
             }
 
@@ -139,6 +130,7 @@ namespace UnityEngine.EventSystems
         }
 
         private BaseEventData m_DummyData;
+
         private BaseEventData baseEventDataCache
         {
             get
@@ -150,7 +142,7 @@ namespace UnityEngine.EventSystems
             }
         }
 
-        /// <param name="selected">GameObject to select.</param>
+
         public void SetSelectedGameObject(GameObject selected)
         {
             SetSelectedGameObject(selected, baseEventDataCache);
@@ -199,24 +191,24 @@ namespace UnityEngine.EventSystems
             if (lhs.distance != rhs.distance)
                 return lhs.distance.CompareTo(rhs.distance);
 
-            #if PACKAGE_PHYSICS2D
-			// Sorting group
-            if (lhs.sortingGroupID != SortingGroup.invalidSortingGroupID && rhs.sortingGroupID != SortingGroup.invalidSortingGroupID)
+#if PACKAGE_PHYSICS2D
+            // Sorting group
+            if (lhs.sortingGroupID != SortingGroup.invalidSortingGroupID &&
+                rhs.sortingGroupID != SortingGroup.invalidSortingGroupID)
             {
                 if (lhs.sortingGroupID != rhs.sortingGroupID)
                     return lhs.sortingGroupID.CompareTo(rhs.sortingGroupID);
                 if (lhs.sortingGroupOrder != rhs.sortingGroupOrder)
                     return rhs.sortingGroupOrder.CompareTo(lhs.sortingGroupOrder);
             }
-            #endif
+#endif
 
             return lhs.index.CompareTo(rhs.index);
         }
 
         private static readonly Comparison<RaycastResult> s_RaycastComparer = RaycastComparer;
 
-        /// <param name="eventData">Current pointer data.</param>
-        /// <param name="raycastResults">List of 'hits' to populate.</param>
+
         public void RaycastAll(PointerEventData eventData, List<RaycastResult> raycastResults)
         {
             raycastResults.Clear();
@@ -239,35 +231,8 @@ namespace UnityEngine.EventSystems
             return IsPointerOverGameObject(PointerInputModule.kMouseLeftId);
         }
 
-        /// <remarks>
-        /// If you use IsPointerOverGameObject() without a parameter, it points to the "left mouse button" (pointerId = -1); therefore when you use IsPointerOverGameObject for touch, you should consider passing a pointerId to it
-        /// Note that for touch, IsPointerOverGameObject should be used with ''OnMouseDown()'' or ''Input.GetMouseButtonDown(0)'' or ''Input.GetTouch(0).phase == TouchPhase.Began''.
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.EventSystems;
+
         ///
-        /// public class MouseExample : MonoBehaviour
-        /// {
-        ///     void Update()
-        ///     {
-        ///         // Check if the left mouse button was clicked
-        ///         if (Input.GetMouseButtonDown(0))
-        ///         {
-        ///             // Check if the mouse was clicked over a UI element
-        ///             if (EventSystem.current.IsPointerOverGameObject())
-        ///             {
-        ///                 Debug.Log("Clicked on the UI");
-        ///             }
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
         public bool IsPointerOverGameObject(int pointerId)
         {
             return m_CurrentInputModule != null && m_CurrentInputModule.IsPointerOverGameObject(pointerId);
@@ -276,7 +241,7 @@ namespace UnityEngine.EventSystems
         // This code is disabled unless the com.unity.modules.uielements module is present.
         // The UIElements module is always present in the Editor but it can be stripped from a project build if unused.
 #if PACKAGE_UITOOLKIT
-        [SerializeField, HideInInspector] private UIToolkitInteroperabilityBridge m_UIToolkitInterop = new ();
+        [SerializeField, HideInInspector] private UIToolkitInteroperabilityBridge m_UIToolkitInterop = new();
 
         internal UIToolkitInteroperabilityBridge uiToolkitInterop => m_UIToolkitInterop;
 #endif
@@ -300,6 +265,7 @@ namespace UnityEngine.EventSystems
             public bool sendEvents;
             public bool createPanelGameObjectsOnStart;
         }
+
         private static UIToolkitOverrideConfigOld? s_UIToolkitOverrideConfigOld = null;
 #endif
 
@@ -367,6 +333,7 @@ namespace UnityEngine.EventSystems
         }
 
         public static event Action Updated;
+
         protected virtual void Update()
         {
 #if PACKAGE_UITOOLKIT
@@ -390,6 +357,7 @@ namespace UnityEngine.EventSystems
                         ChangeEventModule(module);
                         changedModule = true;
                     }
+
                     break;
                 }
             }
@@ -423,7 +391,8 @@ namespace UnityEngine.EventSystems
                 }
 
                 if (eventSystemCount > 1)
-                    Debug.LogWarning("There are " + eventSystemCount + " event systems in the scene. Please ensure there is always exactly one event system in the scene");
+                    Debug.LogWarning("There are " + eventSystemCount +
+                                     " event systems in the scene. Please ensure there is always exactly one event system in the scene");
             }
 #endif
             Updated?.Invoke();

@@ -12,6 +12,7 @@ using TMPro.EditorUtilities;
 
 #if UNITY_2023_3_OR_NEWER
 using PhysicsMaterialAsset = UnityEngine.PhysicsMaterial;
+
 #else
 using PhysicsMaterialAsset = UnityEngine.PhysicMaterial;
 #endif
@@ -65,6 +66,7 @@ namespace TMPro
         [SerializeField] private string m_ProjectFolderToScan;
         private static bool m_IsAlreadyScanningProject;
         private static bool m_CancelScanProcess;
+
         private static string k_ProjectScanReportDefaultText = "<color=#FFFF80><b>" +
                                                                "                                                                                                             Character           Word                Line                Paragraph\n" +
                                                                "Project Scan Results                                                                                         Spacing             Spacing             Spacing             Spacing</b></color>\n" +
@@ -81,8 +83,11 @@ namespace TMPro
         private static int m_ScanningCurrentFileIndex;
         private static string m_ScanningCurrentFileName;
 
-        private static string k_TextMeshProScriptID = "m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}";
-        private static string k_TextMeshProUGUIScriptID = "m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}";
+        private static string k_TextMeshProScriptID =
+            "m_Script: {fileID: 11500000, guid: 9541d86e2fd84c1d9990edf0852d74ab, type: 3}";
+
+        private static string k_TextMeshProUGUIScriptID =
+            "m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}";
 
         private static string k_FontAssetProperty = "m_fontAsset: ";
         private static string k_FontSizeProperty = "m_fontSize: ";
@@ -108,7 +113,7 @@ namespace TMPro
 
                 if (m_OutputWindowStyle == null)
                 {
-                    m_OutputWindowStyle = new GUIStyle() {font = m_OutputWindowMonospacedFont, richText = true};
+                    m_OutputWindowStyle = new GUIStyle() { font = m_OutputWindowMonospacedFont, richText = true };
                     m_OutputWindowStyle.normal.textColor = new Color(0.95f, 0.95f, 0.95f, 1f);
                 }
                 else
@@ -127,7 +132,7 @@ namespace TMPro
 
                 if (m_OutputWindowStyle == null)
                 {
-                    m_OutputWindowStyle = new GUIStyle() {font = m_OutputWindowMonospacedFont, richText = true};
+                    m_OutputWindowStyle = new GUIStyle() { font = m_OutputWindowMonospacedFont, richText = true };
                     m_OutputWindowStyle.normal.textColor = new Color(0.95f, 0.95f, 0.95f, 1f);
                 }
                 else
@@ -141,10 +146,13 @@ namespace TMPro
                 GUILayout.BeginVertical(EditorStyles.helpBox);
                 {
                     GUILayout.Label("Scan Project Files", EditorStyles.boldLabel);
-                    GUILayout.Label("Press the <i>Scan Project Files</i> button to begin scanning your project for Scenes and Prefabs containing text objects whose line spacing values might need to be converted to the new (em) line spacing values.", TMP_UIStyleManager.label);
+                    GUILayout.Label(
+                        "Press the <i>Scan Project Files</i> button to begin scanning your project for Scenes and Prefabs containing text objects whose line spacing values might need to be converted to the new (em) line spacing values.",
+                        TMP_UIStyleManager.label);
                     GUILayout.Space(10f);
                     GUILayout.Label("Project folder to be scanned. Example \"Assets/TextMesh Pro\"");
-                    m_ProjectFolderToScan = EditorGUILayout.TextField("Folder Path:      Assets/", m_ProjectFolderToScan);
+                    m_ProjectFolderToScan =
+                        EditorGUILayout.TextField("Folder Path:      Assets/", m_ProjectFolderToScan);
                     GUILayout.Space(5f);
 
                     GUI.enabled = m_IsAlreadyScanningProject == false ? true : false;
@@ -159,13 +167,17 @@ namespace TMPro
                         }
                         else
                         {
-                            EditorUtility.DisplayDialog("Project Settings Change Required", "In menu options \"Edit - Project Settings - Editor\", please change Asset Serialization Mode to ForceText and Source Control Mode to Visible Meta Files.", "OK", string.Empty);
+                            EditorUtility.DisplayDialog("Project Settings Change Required",
+                                "In menu options \"Edit - Project Settings - Editor\", please change Asset Serialization Mode to ForceText and Source Control Mode to Visible Meta Files.",
+                                "OK", string.Empty);
                         }
                     }
+
                     GUI.enabled = true;
 
                     Rect rect = GUILayoutUtility.GetRect(0f, 20f, GUILayout.ExpandWidth(true));
-                    EditorGUI.ProgressBar(rect, m_ProgressPercentage, "Scan Progress (" + m_ScanningCurrentFileIndex + "/" + m_ScanningTotalFiles + ")");
+                    EditorGUI.ProgressBar(rect, m_ProgressPercentage,
+                        "Scan Progress (" + m_ScanningCurrentFileIndex + "/" + m_ScanningTotalFiles + ")");
 
                     if (m_IsAlreadyScanningProject)
                     {
@@ -174,6 +186,7 @@ namespace TMPro
                         {
                             m_CancelScanProcess = true;
                         }
+
                         GUILayout.Label(k_ProjectScanLabelPrefix + m_ScanningCurrentFileName, TMP_UIStyleManager.label);
                     }
                     else
@@ -183,7 +196,9 @@ namespace TMPro
 
                     GUILayout.BeginVertical(TMP_UIStyleManager.textAreaBoxWindow, GUILayout.ExpandHeight(true));
                     {
-                        m_ProjectScanResultScrollPosition = EditorGUILayout.BeginScrollView(m_ProjectScanResultScrollPosition, GUILayout.ExpandHeight(true));
+                        m_ProjectScanResultScrollPosition =
+                            EditorGUILayout.BeginScrollView(m_ProjectScanResultScrollPosition,
+                                GUILayout.ExpandHeight(true));
                         GUILayout.Label(m_ProjectScanResults, m_OutputWindowStyle);
                         EditorGUILayout.EndScrollView();
                     }
@@ -195,7 +210,9 @@ namespace TMPro
                 GUILayout.BeginVertical(EditorStyles.helpBox);
                 {
                     GUILayout.Label("Save Modified Project Files", EditorStyles.boldLabel);
-                    GUILayout.Label("Pressing the <i>Save Modified Project Files</i> button will update the files in the <i>Project Scan Results</i> listed above. <color=#FFFF80>Please make sure that you have created a backup of your project first</color> as these file modifications are permanent and cannot be undone.", TMP_UIStyleManager.label);
+                    GUILayout.Label(
+                        "Pressing the <i>Save Modified Project Files</i> button will update the files in the <i>Project Scan Results</i> listed above. <color=#FFFF80>Please make sure that you have created a backup of your project first</color> as these file modifications are permanent and cannot be undone.",
+                        TMP_UIStyleManager.label);
                     GUILayout.Space(5f);
 
                     GUI.enabled = m_IsAlreadyScanningProject == false && m_ModifiedAssetList.Count > 0 ? true : false;
@@ -203,10 +220,10 @@ namespace TMPro
                     {
                         UpdateProjectFiles();
                     }
+
                     GUILayout.Space(10f);
                 }
                 GUILayout.EndVertical();
-
             }
             GUILayout.EndVertical();
             GUILayout.Space(5f);
@@ -224,7 +241,8 @@ namespace TMPro
 
             Vector2 currentWindowSize = editorWindow.minSize;
 
-            editorWindow.minSize = new Vector2(Mathf.Max(1024, currentWindowSize.x), Mathf.Max(420, currentWindowSize.y));
+            editorWindow.minSize =
+                new Vector2(Mathf.Max(1024, currentWindowSize.x), Mathf.Max(420, currentWindowSize.y));
         }
 
         private IEnumerator ScanProjectFiles()
@@ -236,7 +254,9 @@ namespace TMPro
             m_ModifiedAssetList.Clear();
             m_ProgressPercentage = 0;
 
-            string searchFolder = string.IsNullOrEmpty(m_ProjectFolderToScan) ? "Assets" : ("Assets/" + m_ProjectFolderToScan);
+            string searchFolder = string.IsNullOrEmpty(m_ProjectFolderToScan)
+                ? "Assets"
+                : ("Assets/" + m_ProjectFolderToScan);
             string[] guids = AssetDatabase.FindAssets("t:Object", new string[] { searchFolder }).Distinct().ToArray();
 
             k_ProjectScanLabelPrefix = "<b>Phase 1 - Filtering:</b> ";
@@ -259,7 +279,8 @@ namespace TMPro
                 string fileExtension = Path.GetExtension(assetFilePath);
                 Type fileType = AssetDatabase.GetMainAssetTypeAtPath(assetFilePath);
 
-                if ((fileType == typeof(SceneAsset) || (fileType == typeof(GameObject) && fileExtension.ToLower() == ".prefab")) == false)
+                if ((fileType == typeof(SceneAsset) ||
+                     (fileType == typeof(GameObject) && fileExtension.ToLower() == ".prefab")) == false)
                     continue;
 
                 string assetMetaFilePath = AssetDatabase.GetTextMetaFilePathFromAssetPath(assetFilePath);
@@ -343,7 +364,8 @@ namespace TMPro
                         continue;
                     }
 
-                    if (readingFlag == 0 && (line.Contains(k_TextMeshProScriptID) || line.Contains(k_TextMeshProUGUIScriptID)))
+                    if (readingFlag == 0 &&
+                        (line.Contains(k_TextMeshProScriptID) || line.Contains(k_TextMeshProUGUIScriptID)))
                     {
                         if (lines[serializedVersionInsertionIndex].Contains("  m_SerializedVersion: 1"))
                         {
@@ -364,7 +386,8 @@ namespace TMPro
                             if (guidIndex != -1)
                             {
                                 string guid = line.Substring(guidIndex + 6, 32);
-                                TMP_FontAsset fontAsset = AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(AssetDatabase.GUIDToAssetPath(guid));
+                                TMP_FontAsset fontAsset =
+                                    AssetDatabase.LoadAssetAtPath<TMP_FontAsset>(AssetDatabase.GUIDToAssetPath(guid));
                                 if (fontAsset != null)
                                 {
                                     samplingPointSize = fontAsset.faceInfo.pointSize;
@@ -381,7 +404,8 @@ namespace TMPro
                     {
                         if (line.Contains(k_FontSizeProperty))
                         {
-                            fontSize = float.Parse(line.Split(':')[1], NumberStyles.Float, CultureInfo.InvariantCulture);
+                            fontSize = float.Parse(line.Split(':')[1], NumberStyles.Float,
+                                CultureInfo.InvariantCulture);
                             readingFlag = 3;
                             continue;
                         }
@@ -391,50 +415,64 @@ namespace TMPro
                     {
                         if (line.Contains(k_CharacterSpacingProperty))
                         {
-                            characterSpacingValue = float.Parse(line.Split(':')[1], NumberStyles.Float, CultureInfo.InvariantCulture);
+                            characterSpacingValue = float.Parse(line.Split(':')[1], NumberStyles.Float,
+                                CultureInfo.InvariantCulture);
                             if (characterSpacingValue != 0)
                             {
-                                newCharacterSpacingValue = characterSpacingValue * faceScale / (samplingPointSize * 0.01f);
-                                lines[i] = lines[i].Replace(k_CharacterSpacingProperty + characterSpacingValue, k_CharacterSpacingProperty + newCharacterSpacingValue);
+                                newCharacterSpacingValue =
+                                    characterSpacingValue * faceScale / (samplingPointSize * 0.01f);
+                                lines[i] = lines[i].Replace(k_CharacterSpacingProperty + characterSpacingValue,
+                                    k_CharacterSpacingProperty + newCharacterSpacingValue);
 
                                 hasDataFileChanged = true;
                             }
+
                             continue;
                         }
 
                         if (line.Contains(k_WordSpacingProperty))
                         {
-                            wordSpacingValue = float.Parse(line.Split(':')[1], NumberStyles.Float, CultureInfo.InvariantCulture);
+                            wordSpacingValue = float.Parse(line.Split(':')[1], NumberStyles.Float,
+                                CultureInfo.InvariantCulture);
                             if (wordSpacingValue != 0)
                             {
                                 newWordSpacingValue = wordSpacingValue * faceScale / (samplingPointSize * 0.01f);
-                                lines[i] = lines[i].Replace(k_WordSpacingProperty + wordSpacingValue, k_WordSpacingProperty + newWordSpacingValue);
+                                lines[i] = lines[i].Replace(k_WordSpacingProperty + wordSpacingValue,
+                                    k_WordSpacingProperty + newWordSpacingValue);
 
                                 hasDataFileChanged = true;
                             }
+
                             continue;
                         }
 
                         if (line.Contains(k_LineSpacingProperty))
                         {
-                            lineSpacingValue = float.Parse(line.Split(':')[1], NumberStyles.Float, CultureInfo.InvariantCulture);
+                            lineSpacingValue = float.Parse(line.Split(':')[1], NumberStyles.Float,
+                                CultureInfo.InvariantCulture);
                             if (lineSpacingValue != 0)
                             {
-                                newLineSpacingValue = lineSpacingValue / (fontSize * 0.01f) * fontSize / samplingPointSize * faceScale;
-                                lines[i] = lines[i].Replace(k_LineSpacingProperty + lineSpacingValue, k_LineSpacingProperty + newLineSpacingValue);
+                                newLineSpacingValue = lineSpacingValue / (fontSize * 0.01f) * fontSize /
+                                    samplingPointSize * faceScale;
+                                lines[i] = lines[i].Replace(k_LineSpacingProperty + lineSpacingValue,
+                                    k_LineSpacingProperty + newLineSpacingValue);
 
                                 hasDataFileChanged = true;
                             }
+
                             continue;
                         }
 
                         if (line.Contains(k_ParagraphSpacingProperty))
                         {
-                            paragraphSpacingValue = float.Parse(line.Split(':')[1], NumberStyles.Float, CultureInfo.InvariantCulture);
+                            paragraphSpacingValue = float.Parse(line.Split(':')[1], NumberStyles.Float,
+                                CultureInfo.InvariantCulture);
                             if (paragraphSpacingValue != 0)
                             {
-                                newParagraphSpacingValue = paragraphSpacingValue / (fontSize * 0.01f) * fontSize / samplingPointSize * faceScale;
-                                lines[i] = lines[i].Replace(k_ParagraphSpacingProperty + paragraphSpacingValue, k_ParagraphSpacingProperty + newParagraphSpacingValue);
+                                newParagraphSpacingValue = paragraphSpacingValue / (fontSize * 0.01f) * fontSize /
+                                    samplingPointSize * faceScale;
+                                lines[i] = lines[i].Replace(k_ParagraphSpacingProperty + paragraphSpacingValue,
+                                    k_ParagraphSpacingProperty + newParagraphSpacingValue);
 
                                 hasDataFileChanged = true;
                             }
@@ -448,13 +486,19 @@ namespace TMPro
                     {
                         readingFlag = 0;
 
-                        string characterSpacingFormat = $"{(characterSpacingValue == 0 ? "                    " : $"{characterSpacingValue,10:F}{newCharacterSpacingValue,10:F}")}";
-                        string wordSpacingFormat = $"{(wordSpacingValue == 0 ? "                    " : $"{wordSpacingValue,10:F}{newWordSpacingValue,10:F}")}";
-                        string lineSpacingFormat = $"{(lineSpacingValue == 0 ? "                    " : $"{lineSpacingValue,10:F}{newLineSpacingValue,10:F}")}";
-                        string paragraphSpacingFormat = $"{(paragraphSpacingValue == 0 ? "                    " : $"{paragraphSpacingValue,10:F}{newParagraphSpacingValue,10:F}")}";
+                        string characterSpacingFormat =
+                            $"{(characterSpacingValue == 0 ? "                    " : $"{characterSpacingValue,10:F}{newCharacterSpacingValue,10:F}")}";
+                        string wordSpacingFormat =
+                            $"{(wordSpacingValue == 0 ? "                    " : $"{wordSpacingValue,10:F}{newWordSpacingValue,10:F}")}";
+                        string lineSpacingFormat =
+                            $"{(lineSpacingValue == 0 ? "                    " : $"{lineSpacingValue,10:F}{newLineSpacingValue,10:F}")}";
+                        string paragraphSpacingFormat =
+                            $"{(paragraphSpacingValue == 0 ? "                    " : $"{paragraphSpacingValue,10:F}{newParagraphSpacingValue,10:F}")}";
 
                         if (characterSpacingValue != 0 || lineSpacingValue != 0)
-                            m_ProjectScanResults += $"{fileRecord.assetFilePath,-100}" + characterSpacingFormat + wordSpacingFormat + lineSpacingFormat + paragraphSpacingFormat + "\n";
+                            m_ProjectScanResults += $"{fileRecord.assetFilePath,-100}" + characterSpacingFormat +
+                                                    wordSpacingFormat + lineSpacingFormat + paragraphSpacingFormat +
+                                                    "\n";
 
                         assetDataFile = string.Join("\n", lines);
 
@@ -492,11 +536,13 @@ namespace TMPro
 
             string projectPath = Path.GetFullPath("Assets/..");
 
-            if (EditorUtility.DisplayDialog("Save Modified Asset(s)?", "Are you sure you want to save all modified assets?", "YES", "NO"))
+            if (EditorUtility.DisplayDialog("Save Modified Asset(s)?",
+                    "Are you sure you want to save all modified assets?", "YES", "NO"))
             {
                 for (int i = 0; i < m_ModifiedAssetList.Count; i++)
                 {
-                    File.WriteAllText(projectPath + "/" + m_ModifiedAssetList[i].assetFilePath, m_ModifiedAssetList[i].assetDataFile);
+                    File.WriteAllText(projectPath + "/" + m_ModifiedAssetList[i].assetFilePath,
+                        m_ModifiedAssetList[i].assetDataFile);
                 }
             }
 
@@ -509,7 +555,8 @@ namespace TMPro
 
         private static bool CheckProjectSerializationAndSourceControlModes()
         {
-            if (EditorSettings.serializationMode != SerializationMode.ForceText || VersionControlSettings.mode != "Visible Meta Files")
+            if (EditorSettings.serializationMode != SerializationMode.ForceText ||
+                VersionControlSettings.mode != "Visible Meta Files")
             {
                 return false;
             }
@@ -612,10 +659,13 @@ namespace TMPro
                 GUILayout.BeginVertical(EditorStyles.helpBox);
                 {
                     GUILayout.Label("Scan Project Files", EditorStyles.boldLabel);
-                    GUILayout.Label("Press the <i>Scan Project Files</i> button to begin scanning your project for files & resources that were created with a previous version of TextMesh Pro.", TMP_UIStyleManager.label);
+                    GUILayout.Label(
+                        "Press the <i>Scan Project Files</i> button to begin scanning your project for files & resources that were created with a previous version of TextMesh Pro.",
+                        TMP_UIStyleManager.label);
                     GUILayout.Space(10f);
                     GUILayout.Label("Project folder to be scanned. Example \"Assets/TextMesh Pro\"");
-                    m_ProjectFolderToScan = EditorGUILayout.TextField("Folder Path:      Assets/", m_ProjectFolderToScan);
+                    m_ProjectFolderToScan =
+                        EditorGUILayout.TextField("Folder Path:      Assets/", m_ProjectFolderToScan);
                     GUILayout.Space(5f);
 
                     GUI.enabled = m_IsAlreadyScanningProject == false ? true : false;
@@ -630,13 +680,17 @@ namespace TMPro
                         }
                         else
                         {
-                            EditorUtility.DisplayDialog("Project Settings Change Required", "In menu options \"Edit - Project Settings - Editor\", please change Asset Serialization Mode to ForceText and Source Control Mode to Visible Meta Files.", "OK", string.Empty);
+                            EditorUtility.DisplayDialog("Project Settings Change Required",
+                                "In menu options \"Edit - Project Settings - Editor\", please change Asset Serialization Mode to ForceText and Source Control Mode to Visible Meta Files.",
+                                "OK", string.Empty);
                         }
                     }
+
                     GUI.enabled = true;
 
                     Rect rect = GUILayoutUtility.GetRect(0f, 20f, GUILayout.ExpandWidth(true));
-                    EditorGUI.ProgressBar(rect, m_ProgressPercentage, "Scan Progress (" + m_ScanningCurrentFileIndex + "/" + m_ScanningTotalFiles + ")");
+                    EditorGUI.ProgressBar(rect, m_ProgressPercentage,
+                        "Scan Progress (" + m_ScanningCurrentFileIndex + "/" + m_ScanningTotalFiles + ")");
 
                     if (m_IsAlreadyScanningProject)
                     {
@@ -645,6 +699,7 @@ namespace TMPro
                         {
                             m_CancelScanProcess = true;
                         }
+
                         GUILayout.Label(k_ProjectScanLabelPrefix + m_ScanningCurrentFileName, TMP_UIStyleManager.label);
                     }
                     else
@@ -654,7 +709,9 @@ namespace TMPro
 
                     GUILayout.BeginVertical(TMP_UIStyleManager.textAreaBoxWindow, GUILayout.ExpandHeight(true));
                     {
-                        m_ProjectScanResultScrollPosition = EditorGUILayout.BeginScrollView(m_ProjectScanResultScrollPosition, GUILayout.ExpandHeight(true));
+                        m_ProjectScanResultScrollPosition =
+                            EditorGUILayout.BeginScrollView(m_ProjectScanResultScrollPosition,
+                                GUILayout.ExpandHeight(true));
                         GUILayout.Label(m_ProjectScanResults, TMP_UIStyleManager.label);
                         EditorGUILayout.EndScrollView();
                     }
@@ -666,7 +723,9 @@ namespace TMPro
                 GUILayout.BeginVertical(EditorStyles.helpBox);
                 {
                     GUILayout.Label("Save Modified Project Files", EditorStyles.boldLabel);
-                    GUILayout.Label("Pressing the <i>Save Modified Project Files</i> button will update the files in the <i>Project Scan Results</i> listed above. <color=#FFFF80>Please make sure that you have created a backup of your project first</color> as these file modifications are permanent and cannot be undone.", TMP_UIStyleManager.label);
+                    GUILayout.Label(
+                        "Pressing the <i>Save Modified Project Files</i> button will update the files in the <i>Project Scan Results</i> listed above. <color=#FFFF80>Please make sure that you have created a backup of your project first</color> as these file modifications are permanent and cannot be undone.",
+                        TMP_UIStyleManager.label);
                     GUILayout.Space(5f);
 
                     GUI.enabled = m_IsAlreadyScanningProject == false && m_ModifiedAssetList.Count > 0 ? true : false;
@@ -674,10 +733,10 @@ namespace TMPro
                     {
                         UpdateProjectFiles();
                     }
+
                     GUILayout.Space(10f);
                 }
                 GUILayout.EndVertical();
-
             }
             GUILayout.EndVertical();
             GUILayout.Space(5f);
@@ -695,12 +754,11 @@ namespace TMPro
 
             Vector2 currentWindowSize = editorWindow.minSize;
 
-            editorWindow.minSize = new Vector2(Mathf.Max(640, currentWindowSize.x), Mathf.Max(420, currentWindowSize.y));
+            editorWindow.minSize =
+                new Vector2(Mathf.Max(640, currentWindowSize.x), Mathf.Max(420, currentWindowSize.y));
         }
 
 
-        /// <param name="filePath"></param>
-        /// <returns></returns>
         private static bool ShouldIgnoreFile(string filePath)
         {
             string fileExtension = Path.GetExtension(filePath);
@@ -709,7 +767,8 @@ namespace TMPro
             if (m_IgnoreAssetTypes.Contains(fileType))
                 return true;
 
-            if (fileType == typeof(GameObject) && (fileExtension.ToLower() == ".fbx" || fileExtension.ToLower() == ".blend"))
+            if (fileType == typeof(GameObject) &&
+                (fileExtension.ToLower() == ".fbx" || fileExtension.ToLower() == ".blend"))
                 return true;
 
             return false;
@@ -726,9 +785,13 @@ namespace TMPro
             m_ProgressPercentage = 0;
 
             if (m_ConversionData == null)
-                m_ConversionData = JsonUtility.FromJson<AssetConversionData>(File.ReadAllText(packageFullPath + "/PackageConversionData.json"));
+                m_ConversionData =
+                    JsonUtility.FromJson<AssetConversionData>(
+                        File.ReadAllText(packageFullPath + "/PackageConversionData.json"));
 
-            string searchFolder = string.IsNullOrEmpty(m_ProjectFolderToScan) ? "Assets" : ("Assets/" + m_ProjectFolderToScan);
+            string searchFolder = string.IsNullOrEmpty(m_ProjectFolderToScan)
+                ? "Assets"
+                : ("Assets/" + m_ProjectFolderToScan);
             string[] guids = AssetDatabase.FindAssets("t:Object", new string[] { searchFolder }).Distinct().ToArray();
 
             k_ProjectScanLabelPrefix = "<b>Phase 1 - Filtering:</b> ";
@@ -783,7 +846,6 @@ namespace TMPro
 
                 if (i % 64 == 0)
                     yield return new WaitForSeconds(2.0f);
-
             }
 
             while (m_RemainingFilesToScan > 0 && !m_CancelScanProcess)
@@ -871,11 +933,13 @@ namespace TMPro
 
             string projectPath = Path.GetFullPath("Assets/..");
 
-            if (EditorUtility.DisplayDialog("Save Modified Asset(s)?", "Are you sure you want to save all modified assets?", "YES", "NO"))
+            if (EditorUtility.DisplayDialog("Save Modified Asset(s)?",
+                    "Are you sure you want to save all modified assets?", "YES", "NO"))
             {
                 for (int i = 0; i < m_ModifiedAssetList.Count; i++)
                 {
-                    File.WriteAllText(projectPath + "/" + m_ModifiedAssetList[i].assetFilePath, m_ModifiedAssetList[i].assetDataFile);
+                    File.WriteAllText(projectPath + "/" + m_ModifiedAssetList[i].assetFilePath,
+                        m_ModifiedAssetList[i].assetDataFile);
                 }
             }
 
@@ -888,7 +952,8 @@ namespace TMPro
 
         private static bool CheckProjectSerializationAndSourceControlModes()
         {
-            if (EditorSettings.serializationMode != SerializationMode.ForceText || VersionControlSettings.mode != "Visible Meta Files")
+            if (EditorSettings.serializationMode != SerializationMode.ForceText ||
+                VersionControlSettings.mode != "Visible Meta Files")
             {
                 return false;
             }
@@ -916,7 +981,8 @@ namespace TMPro
         {
             string packageFullPath = TMP_EditorUtility.packageFullPath;
 
-            AssetDatabase.ImportPackage(packageFullPath + "/Package Resources/TMP Examples & Extras.unitypackage", true);
+            AssetDatabase.ImportPackage(packageFullPath + "/Package Resources/TMP Examples & Extras.unitypackage",
+                true);
         }
 
         private static string k_SettingsFilePath;
@@ -938,7 +1004,8 @@ namespace TMPro
 
             string packageFullPath = TMP_EditorUtility.packageFullPath;
 
-            AssetDatabase.ImportPackage(packageFullPath + "/Package Resources/TMP Essential Resources.unitypackage", true);
+            AssetDatabase.ImportPackage(packageFullPath + "/Package Resources/TMP Essential Resources.unitypackage",
+                true);
         }
 
         internal static void RegisterResourceImportCallback()

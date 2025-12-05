@@ -8,12 +8,8 @@ namespace UnityEngine.UI
     [AddComponentMenu("UI/Scrollbar", 36)]
     [ExecuteAlways]
     [RequireComponent(typeof(RectTransform))]
-    /// <remarks>
-    /// The slider component is a Selectable that controls a handle which follow the current value and is sized according to the size property.
-    /// The anchors of the handle RectTransforms are driven by the Scrollbar. The handle can be a direct child of the GameObject with the Scrollbar, or intermediary RectTransforms can be placed in between for additional control.
-    /// When a change to the scrollbar value occurs, a callback is sent to any registered listeners of onValueChanged.
-    /// </remarks>
-    public class Scrollbar : Selectable, IBeginDragHandler, IDragHandler, IInitializePotentialDragHandler, ICanvasElement
+    public class Scrollbar : Selectable, IBeginDragHandler, IDragHandler, IInitializePotentialDragHandler,
+        ICanvasElement
     {
         public enum Direction
         {
@@ -27,25 +23,42 @@ namespace UnityEngine.UI
         }
 
         [Serializable]
-        public class ScrollEvent : UnityEvent<float> {}
+        public class ScrollEvent : UnityEvent<float>
+        {
+        }
 
-        [SerializeField]
-        private RectTransform m_HandleRect;
+        [SerializeField] private RectTransform m_HandleRect;
 
-        public RectTransform handleRect { get { return m_HandleRect; } set { if (SetPropertyUtility.SetClass(ref m_HandleRect, value)) { UpdateCachedReferences(); UpdateVisuals(); } } }
+        public RectTransform handleRect
+        {
+            get { return m_HandleRect; }
+            set
+            {
+                if (SetPropertyUtility.SetClass(ref m_HandleRect, value))
+                {
+                    UpdateCachedReferences();
+                    UpdateVisuals();
+                }
+            }
+        }
 
         // Direction of movement.
-        [SerializeField]
-        private Direction m_Direction = Direction.LeftToRight;
+        [SerializeField] private Direction m_Direction = Direction.LeftToRight;
 
-        public Direction direction { get { return m_Direction; } set { if (SetPropertyUtility.SetStruct(ref m_Direction, value)) UpdateVisuals(); } }
+        public Direction direction
+        {
+            get { return m_Direction; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_Direction, value)) UpdateVisuals();
+            }
+        }
 
         protected Scrollbar()
-        {}
+        {
+        }
 
-        [Range(0f, 1f)]
-        [SerializeField]
-        private float m_Value;
+        [Range(0f, 1f)] [SerializeField] private float m_Value;
 
         public float value
         {
@@ -56,39 +69,49 @@ namespace UnityEngine.UI
                     val = Mathf.Round(val * (m_NumberOfSteps - 1)) / (m_NumberOfSteps - 1);
                 return val;
             }
-            set
-            {
-                Set(value);
-            }
+            set { Set(value); }
         }
 
-        /// <param name="input">The new value for the scrollbar.</param>
+
         public virtual void SetValueWithoutNotify(float input)
         {
             Set(input, false);
         }
 
-        [Range(0f, 1f)]
-        [SerializeField]
-        private float m_Size = 0.2f;
+        [Range(0f, 1f)] [SerializeField] private float m_Size = 0.2f;
 
-        public float size { get { return m_Size; } set { if (SetPropertyUtility.SetStruct(ref m_Size, Mathf.Clamp01(value))) UpdateVisuals(); } }
+        public float size
+        {
+            get { return m_Size; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_Size, Mathf.Clamp01(value))) UpdateVisuals();
+            }
+        }
 
-        [Range(0, 11)]
-        [SerializeField]
-        private int m_NumberOfSteps = 0;
+        [Range(0, 11)] [SerializeField] private int m_NumberOfSteps = 0;
 
-        public int numberOfSteps { get { return m_NumberOfSteps; } set { if (SetPropertyUtility.SetStruct(ref m_NumberOfSteps, value)) { Set(m_Value); UpdateVisuals(); } } }
+        public int numberOfSteps
+        {
+            get { return m_NumberOfSteps; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_NumberOfSteps, value))
+                {
+                    Set(m_Value);
+                    UpdateVisuals();
+                }
+            }
+        }
 
-        [Space(6)]
+        [Space(6)] [SerializeField] private ScrollEvent m_OnValueChanged = new ScrollEvent();
 
-        [SerializeField]
-        private ScrollEvent m_OnValueChanged = new ScrollEvent();
 
-        /// <remarks>
-        /// Allow for delegate-based subscriptions for faster events than 'eventReceiver', and allowing for multiple receivers.
-        /// </remarks>
-        public ScrollEvent onValueChanged { get { return m_OnValueChanged; } set { m_OnValueChanged = value; } }
+        public ScrollEvent onValueChanged
+        {
+            get { return m_OnValueChanged; }
+            set { m_OnValueChanged = value; }
+        }
 
         // Private fields
 
@@ -98,12 +121,15 @@ namespace UnityEngine.UI
         private Vector2 m_Offset = Vector2.zero;
 
         // Size of each step.
-        float stepSize { get { return (m_NumberOfSteps > 1) ? 1f / (m_NumberOfSteps - 1) : 0.1f; } }
+        float stepSize
+        {
+            get { return (m_NumberOfSteps > 1) ? 1f / (m_NumberOfSteps - 1) : 0.1f; }
+        }
 
         // field is never assigned warning
-        #pragma warning disable 649
+#pragma warning disable 649
         private DrivenRectTransformTracker m_Tracker;
-        #pragma warning restore 649
+#pragma warning restore 649
         private Coroutine m_PointerDownRepeat;
         private bool isPointerDownAndNotDragging = false;
 
@@ -141,10 +167,12 @@ namespace UnityEngine.UI
         }
 
         public virtual void LayoutComplete()
-        {}
+        {
+        }
 
         public virtual void GraphicUpdateComplete()
-        {}
+        {
+        }
 
         protected override void OnEnable()
         {
@@ -214,8 +242,20 @@ namespace UnityEngine.UI
             Vertical = 1
         }
 
-        Axis axis { get { return (m_Direction == Direction.LeftToRight || m_Direction == Direction.RightToLeft) ? Axis.Horizontal : Axis.Vertical; } }
-        bool reverseValue { get { return m_Direction == Direction.RightToLeft || m_Direction == Direction.TopToBottom; } }
+        Axis axis
+        {
+            get
+            {
+                return (m_Direction == Direction.LeftToRight || m_Direction == Direction.RightToLeft)
+                    ? Axis.Horizontal
+                    : Axis.Vertical;
+            }
+        }
+
+        bool reverseValue
+        {
+            get { return m_Direction == Direction.RightToLeft || m_Direction == Direction.TopToBottom; }
+        }
 
         // Force-update the scroll bar. Useful if you've changed the properties and want it to update visually.
         private void UpdateVisuals()
@@ -267,11 +307,13 @@ namespace UnityEngine.UI
 
         void UpdateDrag(RectTransform containerRect, Vector2 position, Camera camera)
         {
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(containerRect, position, camera, out var localCursor))
+            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(containerRect, position, camera,
+                    out var localCursor))
                 return;
 
             var handleCenterRelativeToContainerCorner = localCursor - m_Offset - m_ContainerRect.rect.position;
-            var handleCorner = handleCenterRelativeToContainerCorner - (m_HandleRect.rect.size - m_HandleRect.sizeDelta) * 0.5f;
+            var handleCorner = handleCenterRelativeToContainerCorner -
+                               (m_HandleRect.rect.size - m_HandleRect.sizeDelta) * 0.5f;
 
             float parentSize = axis == 0 ? m_ContainerRect.rect.width : m_ContainerRect.rect.height;
             float remainingSize = parentSize * (1 - size);
@@ -317,10 +359,12 @@ namespace UnityEngine.UI
                 return;
 
             m_Offset = Vector2.zero;
-            if (RectTransformUtility.RectangleContainsScreenPoint(m_HandleRect, eventData.pointerPressRaycast.screenPosition, eventData.enterEventCamera))
+            if (RectTransformUtility.RectangleContainsScreenPoint(m_HandleRect,
+                    eventData.pointerPressRaycast.screenPosition, eventData.enterEventCamera))
             {
                 Vector2 localMousePos;
-                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(m_HandleRect, eventData.pointerPressRaycast.screenPosition, eventData.pressEventCamera, out localMousePos))
+                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(m_HandleRect,
+                        eventData.pointerPressRaycast.screenPosition, eventData.pressEventCamera, out localMousePos))
                     m_Offset = localMousePos - m_HandleRect.rect.center;
             }
         }
@@ -341,7 +385,8 @@ namespace UnityEngine.UI
 
             base.OnPointerDown(eventData);
             isPointerDownAndNotDragging = true;
-            m_PointerDownRepeat = StartCoroutine(ClickRepeat(eventData.pointerPressRaycast.screenPosition, eventData.enterEventCamera));
+            m_PointerDownRepeat =
+                StartCoroutine(ClickRepeat(eventData.pointerPressRaycast.screenPosition, eventData.enterEventCamera));
         }
 
         protected IEnumerator ClickRepeat(PointerEventData eventData)
@@ -357,8 +402,10 @@ namespace UnityEngine.UI
                 {
                     UpdateDrag(m_ContainerRect, screenPosition, camera);
                 }
+
                 yield return new WaitForEndOfFrame();
             }
+
             StopCoroutine(m_PointerDownRepeat);
         }
 
@@ -438,8 +485,7 @@ namespace UnityEngine.UI
             eventData.useDragThreshold = false;
         }
 
-        /// <param name="direction">The direction of the scrollbar.</param>
-        /// <param name="includeRectLayouts">Should the layout be flipped together with the direction?</param>
+
         public void SetDirection(Direction direction, bool includeRectLayouts)
         {
             Axis oldAxis = axis;

@@ -9,7 +9,6 @@ using UnityEditor;
 
 namespace TMPro
 {
-
     public static class TMP_DefaultControls
     {
         public struct Resources
@@ -38,15 +37,15 @@ namespace TMPro
         {
             GameObject root;
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             root = ObjectFactory.CreateGameObject(name, typeof(RectTransform));
             var rt = root.GetComponent<RectTransform>();
             rt.sizeDelta = size;
-            #else
+#else
             root = new GameObject(name);
             RectTransform rectTransform = root.AddComponent<RectTransform>();
             rectTransform.sizeDelta = size;
-            #endif
+#endif
 
             return root;
         }
@@ -54,17 +53,17 @@ namespace TMPro
         private static GameObject CreateUIObject(string name, GameObject parent)
         {
             GameObject go;
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             go = ObjectFactory.CreateGameObject(name, typeof(RectTransform));
-            #else
+#else
             go = new GameObject(name);
             go.AddComponent<RectTransform>();
-            #endif
+#endif
             SetParentAndAlign(go, parent);
             return go;
         }
 
-        private static void SetDefaultTextValues(TMPText lbl)
+        private static void SetDefaultTextValues(TMP_Text lbl)
         {
             lbl.color = s_TextColor;
             lbl.fontSize = 14;
@@ -171,12 +170,12 @@ namespace TMPro
         {
             GameObject go = null;
 
-            #if UNITY_EDITOR
-                go = ObjectFactory.CreateGameObject("Text (TMP)", typeof(TextMeshProUGUI));
-            #else
+#if UNITY_EDITOR
+            go = ObjectFactory.CreateGameObject("Text (TMP)", typeof(TextMeshProUGUI));
+#else
                 go = CreateUIElementRoot("Text (TMP)", s_TextElementSize);
                 go.AddComponent<TextMeshProUGUI>();
-            #endif
+#endif
 
             return go;
         }

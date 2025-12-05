@@ -12,236 +12,119 @@ namespace UnityEngine.UI
          * and verical mode combined
          */
         [Flags]
-        /// <remarks>
-        /// This looks like it's not flags, but it is flags, the reason is that Automatic is considered horizontal and vertical mode combined
-        /// </remarks>
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
         ///
-        /// public class ExampleClass : MonoBehaviour
-        /// {
-        ///     public Button button;
         ///
-        ///     void Start()
-        ///     {
-        ///         //Set the navigation to the mode "Vertical".
-        ///         if (button.navigation.mode == Navigation.Mode.Vertical)
-        ///         {
-        ///             Debug.Log("The button's navigation mode is Vertical");
-        ///         }
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
         public enum Mode
         {
-            None        = 0,
+            None = 0,
 
-            /// <remarks>
-            /// Navigation should only be allowed when left / right move events happen.
-            /// </remarks>
-            Horizontal  = 1,
 
-            /// <remarks>
-            /// Navigation should only be allowed when up / down move events happen.
-            /// </remarks>
-            Vertical    = 2,
+            Horizontal = 1,
 
-            /// <remarks>
-            /// Attempt to find the 'best' next object to select. This should be based on a sensible heuristic.
-            /// </remarks>
-            Automatic   = 3,
 
-            /// <remarks>
-            /// User should explicitly specify what is selected by each move event.
-            /// </remarks>
-            Explicit    = 4,
+            Vertical = 2,
+
+
+            Automatic = 3,
+
+
+            Explicit = 4,
         }
 
         // Which method of navigation will be used.
-        [SerializeField]
-        private Mode m_Mode;
+        [SerializeField] private Mode m_Mode;
 
-        [Tooltip("Enables navigation to wrap around from last to first or first to last element. Does not work for automatic grid navigation")]
+        [Tooltip(
+            "Enables navigation to wrap around from last to first or first to last element. Does not work for automatic grid navigation")]
         [SerializeField]
         private bool m_WrapAround;
 
         // Game object selected when the joystick moves up. Used when navigation is set to "Explicit".
-        [SerializeField]
-        private Selectable m_SelectOnUp;
+        [SerializeField] private Selectable m_SelectOnUp;
 
         // Game object selected when the joystick moves down. Used when navigation is set to "Explicit".
-        [SerializeField]
-        private Selectable m_SelectOnDown;
+        [SerializeField] private Selectable m_SelectOnDown;
 
         // Game object selected when the joystick moves left. Used when navigation is set to "Explicit".
-        [SerializeField]
-        private Selectable m_SelectOnLeft;
+        [SerializeField] private Selectable m_SelectOnLeft;
 
         // Game object selected when the joystick moves right. Used when navigation is set to "Explicit".
-        [SerializeField]
-        private Selectable m_SelectOnRight;
+        [SerializeField] private Selectable m_SelectOnRight;
 
-        public Mode       mode           { get { return m_Mode; } set { m_Mode = value; } }
+        public Mode mode
+        {
+            get { return m_Mode; }
+            set { m_Mode = value; }
+        }
 
-        /// <example>
-        /// Note: If you have a grid of elements and you are on the last element in a row it will not wrap over to the next row it will pick the furthest element in the opposite direction.
-        /// </example>
-        public bool wrapAround { get { return m_WrapAround; } set { m_WrapAround = value; } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI;  // Required when Using UI elements.
-        ///
-        /// public class HighlightOnKey : MonoBehaviour
-        /// {
-        ///     public Button btnSave;
-        ///     public Button btnLoad;
-        ///
-        ///     public void Start()
-        ///     {
-        ///         // get the Navigation data
-        ///         Navigation navigation = btnLoad.navigation;
-        ///
-        ///         // switch mode to Explicit to allow for custom assigned behavior
-        ///         navigation.mode = Navigation.Mode.Explicit;
-        ///
-        ///         // highlight the Save button if the up arrow key is pressed
-        ///         navigation.selectOnUp = btnSave;
-        ///
-        ///         // reassign the struct data to the button
-        ///         btnLoad.navigation = navigation;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public Selectable selectOnUp     { get { return m_SelectOnUp; } set { m_SelectOnUp = value; } }
+        public bool wrapAround
+        {
+            get { return m_WrapAround; }
+            set { m_WrapAround = value; }
+        }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI;  // Required when Using UI elements.
-        ///
-        /// public class HighlightOnKey : MonoBehaviour
-        /// {
-        ///     public Button btnSave;
-        ///     public Button btnLoad;
-        ///
-        ///     public void Start()
-        ///     {
-        ///         // get the Navigation data
-        ///         Navigation navigation = btnLoad.navigation;
-        ///
-        ///         // switch mode to Explicit to allow for custom assigned behavior
-        ///         navigation.mode = Navigation.Mode.Explicit;
-        ///
-        ///         // highlight the Save button if the down arrow key is pressed
-        ///         navigation.selectOnDown = btnSave;
-        ///
-        ///         // reassign the struct data to the button
-        ///         btnLoad.navigation = navigation;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public Selectable selectOnDown   { get { return m_SelectOnDown; } set { m_SelectOnDown = value; } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI;  // Required when Using UI elements.
         ///
-        /// public class HighlightOnKey : MonoBehaviour
-        /// {
-        ///     public Button btnSave;
-        ///     public Button btnLoad;
         ///
-        ///     public void Start()
-        ///     {
-        ///         // get the Navigation data
-        ///         Navigation navigation = btnLoad.navigation;
         ///
-        ///         // switch mode to Explicit to allow for custom assigned behavior
-        ///         navigation.mode = Navigation.Mode.Explicit;
         ///
-        ///         // highlight the Save button if the left arrow key is pressed
-        ///         navigation.selectOnLeft = btnSave;
         ///
-        ///         // reassign the struct data to the button
-        ///         btnLoad.navigation = navigation;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public Selectable selectOnLeft   { get { return m_SelectOnLeft; } set { m_SelectOnLeft = value; } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI;  // Required when Using UI elements.
-        ///
-        /// public class HighlightOnKey : MonoBehaviour
-        /// {
-        ///     public Button btnSave;
-        ///     public Button btnLoad;
-        ///
-        ///     public void Start()
-        ///     {
-        ///         // get the Navigation data
-        ///         Navigation navigation = btnLoad.navigation;
-        ///
-        ///         // switch mode to Explicit to allow for custom assigned behavior
-        ///         navigation.mode = Navigation.Mode.Explicit;
-        ///
-        ///         // highlight the Save button if the right arrow key is pressed
-        ///         navigation.selectOnRight = btnSave;
-        ///
-        ///         // reassign the struct data to the button
-        ///         btnLoad.navigation = navigation;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
-        public Selectable selectOnRight  { get { return m_SelectOnRight; } set { m_SelectOnRight = value; } }
 
-        /// <example>
-        /// <code>
-        /// <![CDATA[
-        /// using UnityEngine;
-        /// using System.Collections;
-        /// using UnityEngine.UI; // Required when Using UI elements.
+        public Selectable selectOnUp
+        {
+            get { return m_SelectOnUp; }
+            set { m_SelectOnUp = value; }
+        }
+
+
         ///
-        /// public class ExampleClass : MonoBehaviour
-        /// {
-        ///     public Button button;
         ///
-        ///     void Start()
-        ///     {
-        ///         //Set the navigation to the default value. ("Automatic" is the default value).
-        ///         button.navigation = Navigation.defaultNavigation;
-        ///     }
-        /// }
-        /// ]]>
-        ///</code>
-        /// </example>
+        ///
+        ///
+        ///
+
+
+        public Selectable selectOnDown
+        {
+            get { return m_SelectOnDown; }
+            set { m_SelectOnDown = value; }
+        }
+
+
+        ///
+        ///
+        ///
+        ///
+        ///
+
+
+        public Selectable selectOnLeft
+        {
+            get { return m_SelectOnLeft; }
+            set { m_SelectOnLeft = value; }
+        }
+
+
+        ///
+        ///
+        ///
+        ///
+        ///
+
+
+        public Selectable selectOnRight
+        {
+            get { return m_SelectOnRight; }
+            set { m_SelectOnRight = value; }
+        }
+
+
+        ///
+        ///
+
+
         static public Navigation defaultNavigation
         {
             get
@@ -256,10 +139,10 @@ namespace UnityEngine.UI
         public bool Equals(Navigation other)
         {
             return mode == other.mode &&
-                selectOnUp == other.selectOnUp &&
-                selectOnDown == other.selectOnDown &&
-                selectOnLeft == other.selectOnLeft &&
-                selectOnRight == other.selectOnRight;
+                   selectOnUp == other.selectOnUp &&
+                   selectOnDown == other.selectOnDown &&
+                   selectOnLeft == other.selectOnLeft &&
+                   selectOnRight == other.selectOnRight;
         }
     }
 }

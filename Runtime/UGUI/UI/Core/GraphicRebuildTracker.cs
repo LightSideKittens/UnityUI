@@ -9,7 +9,7 @@ namespace UnityEngine.UI
         static IndexedSet<Graphic> m_Tracked = new IndexedSet<Graphic>();
         static bool s_Initialized;
 
-        /// <param name="g">The graphic to track</param>
+
         public static void TrackGraphic(Graphic g)
         {
             if (!s_Initialized)
@@ -21,13 +21,13 @@ namespace UnityEngine.UI
             m_Tracked.AddUnique(g);
         }
 
-        /// <param name="g">The graphic to remove from tracking.</param>
+
         public static void UnTrackGraphic(Graphic g)
         {
             m_Tracked.Remove(g);
         }
 
-        /// <param name="g">The graphic to remove from tracking.</param>
+
         public static void DisableTrackGraphic(Graphic g)
         {
             m_Tracked.DisableItem(g);
