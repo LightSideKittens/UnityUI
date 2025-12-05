@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 using System;
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -10,7 +9,7 @@ public class UnicodeDataGeneratorWindow : EditorWindow
     [Serializable]
     private class TestData
     {
-        [SerializeField] private int maxFailuresToLog;
+        [SerializeField] private int maxFailuresToLog = 10;
         [SerializeField] private TextAsset unicodeDataAsset;
         [SerializeField] private TextAsset bidiCharacterTestAsset;
 
@@ -67,24 +66,29 @@ public class UnicodeDataGeneratorWindow : EditorWindow
         }
     }
 
+    [Header("Source Files")]
     [SerializeField] private TextAsset derivedBidiClassAsset;
     [SerializeField] private TextAsset derivedJoiningTypeAsset;
     [SerializeField] private TextAsset arabicShapingAsset;
     [SerializeField] private TextAsset bidiBracketsAsset;
     [SerializeField] private TextAsset bidiMirroringAsset;
+    [SerializeField] private TextAsset scriptsAsset;
+    [SerializeField] private TextAsset lineBreakAsset;
 
-    [SerializeField] private TestData testing = new();
-
+    [Header("Output")]
     [SerializeField] private DefaultAsset outputFolder;
-
     [SerializeField] private string outputFileName = "UnicodeData.bytes";
+    [SerializeField] private bool useFormatV2 = true;
+
+    [Header("Testing")]
+    [SerializeField] private TestData testing = new();
 
     [MenuItem("Tools/RTL/Unicode Data Generator")]
     public static void ShowWindow()
     {
         UnicodeDataGeneratorWindow window = GetWindow<UnicodeDataGeneratorWindow>();
         window.titleContent = new GUIContent("Unicode Data Generator");
-        window.minSize = new Vector2(450, 200);
+        window.minSize = new Vector2(500, 400);
     }
 
     private void OnGUI()
@@ -92,10 +96,10 @@ public class UnicodeDataGeneratorWindow : EditorWindow
         EditorGUILayout.LabelField("Unicode Data Generator", EditorStyles.boldLabel);
         EditorGUILayout.Space();
 
-        EditorGUILayout.Space();
-
         EditorGUI.BeginChangeCheck();
 
+        EditorGUILayout.LabelField("Source Files (Required)", EditorStyles.boldLabel);
+        
         derivedBidiClassAsset = (TextAsset)EditorGUILayout.ObjectField(
             "DerivedBidiClass.txt",
             derivedBidiClassAsset,
@@ -126,169 +130,147 @@ public class UnicodeDataGeneratorWindow : EditorWindow
             typeof(TextAsset),
             false);
 
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Source Files (Format V2)", EditorStyles.boldLabel);
+
+        scriptsAsset = (TextAsset)EditorGUILayout.ObjectField(
+            "Scripts.txt",
+            scriptsAsset,
+            typeof(TextAsset),
+            false);
+
+        lineBreakAsset = (TextAsset)EditorGUILayout.ObjectField(
+            "LineBreak.txt",
+            lineBreakAsset,
+            typeof(TextAsset),
+            false);
 
         EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Output", EditorStyles.boldLabel);
 
         outputFolder = (DefaultAsset)EditorGUILayout.ObjectField(
-            "Output Folder (Assets/*)",
+            "Output Folder",
             outputFolder,
             typeof(DefaultAsset),
             false);
 
         outputFileName = EditorGUILayout.TextField("Output File Name", outputFileName);
+        useFormatV2 = EditorGUILayout.Toggle("Use Format V2 (Script + LineBreak)", useFormatV2);
 
-        if (string.IsNullOrWhiteSpace(outputFileName))
+        if (EditorGUI.EndChangeCheck())
         {
-            outputFileName = "UnicodeData.bin";
+            EditorUtility.SetDirty(this);
         }
 
         EditorGUILayout.Space();
-        EditorGUILayout.BeginFoldoutHeaderGroup(true, "Testing");
-        testing ??= new();
+
+        bool canGenerate = derivedBidiClassAsset != null &&
+                          derivedJoiningTypeAsset != null &&
+                          arabicShapingAsset != null &&
+                          bidiBracketsAsset != null &&
+                          bidiMirroringAsset != null &&
+                          outputFolder != null;
+
+        if (useFormatV2)
+        {
+            canGenerate = canGenerate && scriptsAsset != null && lineBreakAsset != null;
+        }
+
+        EditorGUI.BeginDisabledGroup(!canGenerate);
+        if (GUILayout.Button("Generate Unicode Data", GUILayout.Height(30)))
+        {
+            GenerateUnicodeData();
+        }
+        EditorGUI.EndDisabledGroup();
+
+        if (!canGenerate)
+        {
+            EditorGUILayout.HelpBox(
+                useFormatV2 
+                    ? "Assign all required source files and output folder to generate."
+                    : "Assign all required source files (excluding Scripts.txt and LineBreak.txt) and output folder.",
+                MessageType.Warning);
+        }
+
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Testing", EditorStyles.boldLabel);
         testing.OnGui();
-        EditorGUILayout.EndFoldoutHeaderGroup();
-        EditorGUILayout.Space();
-
-        GUI.enabled = derivedBidiClassAsset != null &&
-                      derivedJoiningTypeAsset != null &&
-                      arabicShapingAsset != null &&
-                      bidiBracketsAsset != null &&
-                      bidiMirroringAsset != null;
-
-        if (GUILayout.Button("Generate Unicode Binary", GUILayout.Height(30)))
-        {
-            Generate();
-        }
-
-        GUI.enabled = true;
     }
 
-    private void Generate()
+    private void GenerateUnicodeData()
     {
         try
         {
-            string projectRoot = GetProjectRootPath();
+            string folderPath = AssetDatabase.GetAssetPath(outputFolder);
+            string outputPath = Path.Combine(folderPath, outputFileName);
 
-            string derivedBidiClassPath = GetAbsolutePathFromTextAsset(derivedBidiClassAsset, projectRoot);
-            string derivedJoiningTypePath = GetAbsolutePathFromTextAsset(derivedJoiningTypeAsset, projectRoot);
-            string arabicShapingPath = GetAbsolutePathFromTextAsset(arabicShapingAsset, projectRoot);
+            // Create temp files
+            string tempDir = Path.Combine(Application.temporaryCachePath, "UnicodeGen");
+            Directory.CreateDirectory(tempDir);
 
-            string bidiBracketsPath = GetAbsolutePathFromTextAsset(bidiBracketsAsset, projectRoot);
-            string bidiMirroringPath = GetAbsolutePathFromTextAsset(bidiMirroringAsset, projectRoot);
+            string derivedBidiPath = SaveTempFile(tempDir, "DerivedBidiClass.txt", derivedBidiClassAsset);
+            string derivedJoiningPath = SaveTempFile(tempDir, "DerivedJoiningType.txt", derivedJoiningTypeAsset);
+            string arabicShapingPath = SaveTempFile(tempDir, "ArabicShaping.txt", arabicShapingAsset);
+            string bidiBracketsPath = SaveTempFile(tempDir, "BidiBrackets.txt", bidiBracketsAsset);
+            string bidiMirroringPath = SaveTempFile(tempDir, "BidiMirroring.txt", bidiMirroringAsset);
 
-            if (string.IsNullOrEmpty(derivedBidiClassPath) ||
-                string.IsNullOrEmpty(derivedJoiningTypePath) ||
-                string.IsNullOrEmpty(arabicShapingPath) ||
-                string.IsNullOrEmpty(bidiBracketsPath) ||
-                string.IsNullOrEmpty(bidiMirroringPath))
-            {
-                Debug.LogError("UnicodeDataGenerator: one or more TextAssets do not have valid asset paths.");
-                return;
-            }
-
-
-            string outputFolderAssetPath = GetOutputFolderAssetPath();
-            if (string.IsNullOrEmpty(outputFolderAssetPath))
-            {
-                Debug.LogError("UnicodeDataGenerator: output folder is invalid.");
-                return;
-            }
-
-            string outputAbsoluteFolder = Path.Combine(projectRoot, outputFolderAssetPath.Replace('\\', '/'));
-            if (!Directory.Exists(outputAbsoluteFolder))
-            {
-                Directory.CreateDirectory(outputAbsoluteFolder);
-            }
-
-            string safeFileName = outputFileName.Trim();
-            if (string.IsNullOrEmpty(safeFileName))
-            {
-                safeFileName = "UnicodeData.bin";
-            }
-
-            string outputPath = Path.Combine(outputAbsoluteFolder, safeFileName);
-
-            UnicodeDataBuilder builder = new UnicodeDataBuilder();
-            builder.LoadDerivedBidiClass(derivedBidiClassPath);
-            builder.LoadDerivedJoiningType(derivedJoiningTypePath);
+            // Build data
+            var builder = new UnicodeDataBuilder();
+            builder.LoadDerivedBidiClass(derivedBidiPath);
+            builder.LoadDerivedJoiningType(derivedJoiningPath);
             builder.LoadArabicShaping(arabicShapingPath);
 
-            List<RangeEntry> ranges = builder.BuildRangeEntries();
+            var ranges = builder.BuildRangeEntries();
+            var mirrors = UnicodeDataBuilder.BuildMirrorEntries(bidiMirroringPath);
+            var brackets = UnicodeDataBuilder.BuildBracketEntries(bidiBracketsPath);
 
-            List<MirrorEntry> mirrors = UnicodeDataBuilder.BuildMirrorEntries(bidiMirroringPath);
-            List<BracketEntry> brackets = UnicodeDataBuilder.BuildBracketEntries(bidiBracketsPath);
+            // Unicode version (17.0.0 = 0x110000)
+            int unicodeVersion = 0x110000;
 
-            UnicodeBinaryWriter.WriteBinary(
-                outputPath,
-                ranges,
-                mirrors,
-                brackets,
-                unicodeVersionRaw: 0);
+            if (useFormatV2 && scriptsAsset != null && lineBreakAsset != null)
+            {
+                string scriptsPath = SaveTempFile(tempDir, "Scripts.txt", scriptsAsset);
+                string lineBreakPath = SaveTempFile(tempDir, "LineBreak.txt", lineBreakAsset);
 
-            Debug.Log(
-                $"UnicodeDataGenerator: binary generated.\n" +
-                $"Output: {outputPath}\n" +
-                $"Ranges: {ranges.Count}");
+                builder.LoadScripts(scriptsPath);
+                builder.LoadLineBreak(lineBreakPath);
+
+                var scripts = builder.BuildScriptRangeEntries();
+                var lineBreaks = builder.BuildLineBreakRangeEntries();
+
+                UnicodeBinaryWriter.WriteBinary(
+                    outputPath, ranges, mirrors, brackets, scripts, lineBreaks, unicodeVersion);
+
+                Debug.Log($"Generated Unicode data (Format V2) with {ranges.Count} ranges, " +
+                          $"{mirrors.Count} mirrors, {brackets.Count} brackets, " +
+                          $"{scripts.Count} script ranges, {lineBreaks.Count} line break ranges.");
+            }
+            else
+            {
+                UnicodeBinaryWriter.WriteBinaryV1(
+                    outputPath, ranges, mirrors, brackets, unicodeVersion);
+
+                Debug.Log($"Generated Unicode data (Format V1) with {ranges.Count} ranges, " +
+                          $"{mirrors.Count} mirrors, {brackets.Count} brackets.");
+            }
+
+            // Cleanup temp files
+            Directory.Delete(tempDir, true);
 
             AssetDatabase.Refresh();
+            Debug.Log($"Unicode data saved to: {outputPath}");
         }
         catch (Exception ex)
         {
-            Debug.LogError($"UnicodeDataGenerator: failed to generate Unicode binary.\n{ex}");
+            Debug.LogError($"Failed to generate Unicode data: {ex}");
         }
     }
 
-    private static string GetProjectRootPath()
+    private string SaveTempFile(string dir, string name, TextAsset asset)
     {
-        string dataPath = Application.dataPath.Replace('\\', '/');
-        const string assetsFolderName = "Assets";
-
-        if (dataPath.EndsWith(assetsFolderName, StringComparison.Ordinal))
-        {
-            return dataPath.Substring(0, dataPath.Length - assetsFolderName.Length);
-        }
-
-        return Directory.GetParent(dataPath)?.FullName?.Replace('\\', '/') ?? dataPath;
-    }
-
-    private static string GetAbsolutePathFromTextAsset(TextAsset asset, string projectRoot)
-    {
-        if (asset == null)
-        {
-            return string.Empty;
-        }
-
-        string assetPath = AssetDatabase.GetAssetPath(asset);
-        if (string.IsNullOrEmpty(assetPath))
-        {
-            return string.Empty;
-        }
-
-        assetPath = assetPath.Replace('\\', '/');
-        return Path.Combine(projectRoot, assetPath);
-    }
-
-    private string GetOutputFolderAssetPath()
-    {
-        if (outputFolder == null)
-        {
-            return "Assets";
-        }
-
-        string assetPath = AssetDatabase.GetAssetPath(outputFolder);
-        if (string.IsNullOrEmpty(assetPath))
-        {
-            return "Assets";
-        }
-
-        if (!AssetDatabase.IsValidFolder(assetPath))
-        {
-            Debug.LogWarning(
-                $"UnicodeDataGenerator: selected output asset is not a folder, using 'Assets' instead. ({assetPath})");
-            return "Assets";
-        }
-
-        return assetPath;
+        string path = Path.Combine(dir, name);
+        File.WriteAllText(path, asset.text);
+        return path;
     }
 }
 #endif

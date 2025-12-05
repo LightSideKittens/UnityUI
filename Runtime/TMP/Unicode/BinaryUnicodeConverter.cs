@@ -10,6 +10,8 @@ struct UnicodeProps
     public BidiClass bidiClass;
     public JoiningType joiningType;
     public JoiningGroup joiningGroup;
+    public UnicodeScript script;
+    public LineBreakClass lineBreakClass;
 }
 
 public class UnicodeDataBuilder
@@ -32,6 +34,8 @@ public class UnicodeDataBuilder
             props[cp].bidiClass = BidiClass.LeftToRight;
             props[cp].joiningType = JoiningType.NonJoining;
             props[cp].joiningGroup = JoiningGroup.NoJoiningGroup;
+            props[cp].script = UnicodeScript.Unknown;
+            props[cp].lineBreakClass = LineBreakClass.XX;
         }
     }
 
@@ -58,34 +62,7 @@ public class UnicodeDataBuilder
 
             BidiClass bidiClass = ParseBidiClass(classPart);
 
-            int rangeStart;
-            int rangeEnd;
-
-            int dotsIndex = codeRangePart.IndexOf("..", StringComparison.Ordinal);
-            if (dotsIndex >= 0)
-            {
-                string startHex = codeRangePart.Substring(0, dotsIndex);
-                string endHex = codeRangePart.Substring(dotsIndex + 2);
-
-                rangeStart = ParseHexCodePoint(startHex);
-                rangeEnd = ParseHexCodePoint(endHex);
-            }
-            else
-            {
-                rangeStart = ParseHexCodePoint(codeRangePart);
-                rangeEnd = rangeStart;
-            }
-
-            if (rangeStart < 0 || rangeEnd < 0 || rangeStart > rangeEnd)
-                continue;
-
-            if (rangeEnd > MaxCodePoint)
-                rangeEnd = MaxCodePoint;
-
-            for (int cp = rangeStart; cp <= rangeEnd; cp++)
-            {
-                props[cp].bidiClass = bidiClass;
-            }
+            ParseRangeAndApply(codeRangePart, cp => props[cp].bidiClass = bidiClass);
         }
     }
 
@@ -147,34 +124,92 @@ public class UnicodeDataBuilder
 
             JoiningType joiningType = ParseJoiningType(typePart);
 
-            int rangeStart;
-            int rangeEnd;
+            ParseRangeAndApply(codeRangePart, cp => props[cp].joiningType = joiningType);
+        }
+    }
 
-            int dotsIndex = codeRangePart.IndexOf("..", StringComparison.Ordinal);
-            if (dotsIndex >= 0)
-            {
-                string startHex = codeRangePart.Substring(0, dotsIndex);
-                string endHex = codeRangePart.Substring(dotsIndex + 2);
+    public void LoadScripts(string path)
+    {
+        using var reader = new StreamReader(path);
 
-                rangeStart = ParseHexCodePoint(startHex);
-                rangeEnd = ParseHexCodePoint(endHex);
-            }
-            else
-            {
-                rangeStart = ParseHexCodePoint(codeRangePart);
-                rangeEnd = rangeStart;
-            }
-
-            if (rangeStart < 0 || rangeEnd < 0 || rangeStart > rangeEnd)
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            line = StripComment(line);
+            if (string.IsNullOrWhiteSpace(line))
                 continue;
 
-            if (rangeEnd > MaxCodePoint)
-                rangeEnd = MaxCodePoint;
+            string[] semi = line.Split(';');
+            if (semi.Length < 2)
+                continue;
 
-            for (int cp = rangeStart; cp <= rangeEnd; cp++)
-            {
-                props[cp].joiningType = joiningType;
-            }
+            string codeRangePart = semi[0].Trim();
+            string scriptPart = semi[1].Trim();
+
+            if (codeRangePart.Length == 0 || scriptPart.Length == 0)
+                continue;
+
+            UnicodeScript script = ParseScript(scriptPart);
+
+            ParseRangeAndApply(codeRangePart, cp => props[cp].script = script);
+        }
+    }
+
+    public void LoadLineBreak(string path)
+    {
+        using var reader = new StreamReader(path);
+
+        string? line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            line = StripComment(line);
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            string[] semi = line.Split(';');
+            if (semi.Length < 2)
+                continue;
+
+            string codeRangePart = semi[0].Trim();
+            string lbcPart = semi[1].Trim();
+
+            if (codeRangePart.Length == 0 || lbcPart.Length == 0)
+                continue;
+
+            LineBreakClass lbc = ParseLineBreakClass(lbcPart);
+
+            ParseRangeAndApply(codeRangePart, cp => props[cp].lineBreakClass = lbc);
+        }
+    }
+
+    private void ParseRangeAndApply(string codeRangePart, Action<int> apply)
+    {
+        int rangeStart, rangeEnd;
+
+        int dotsIndex = codeRangePart.IndexOf("..", StringComparison.Ordinal);
+        if (dotsIndex >= 0)
+        {
+            string startHex = codeRangePart.Substring(0, dotsIndex);
+            string endHex = codeRangePart.Substring(dotsIndex + 2);
+
+            rangeStart = ParseHexCodePoint(startHex);
+            rangeEnd = ParseHexCodePoint(endHex);
+        }
+        else
+        {
+            rangeStart = ParseHexCodePoint(codeRangePart);
+            rangeEnd = rangeStart;
+        }
+
+        if (rangeStart < 0 || rangeEnd < 0 || rangeStart > rangeEnd)
+            return;
+
+        if (rangeEnd > MaxCodePoint)
+            rangeEnd = MaxCodePoint;
+
+        for (int cp = rangeStart; cp <= rangeEnd; cp++)
+        {
+            apply(cp);
         }
     }
 
@@ -195,102 +230,114 @@ public class UnicodeDataBuilder
 
     static BidiClass ParseBidiClass(string value)
     {
-        switch (value)
+        return value switch
         {
-            case "L": return BidiClass.LeftToRight;
-            case "R": return BidiClass.RightToLeft;
-            case "AL": return BidiClass.ArabicLetter;
-
-            case "EN": return BidiClass.EuropeanNumber;
-            case "ES": return BidiClass.EuropeanSeparator;
-            case "ET": return BidiClass.EuropeanTerminator;
-            case "AN": return BidiClass.ArabicNumber;
-            case "CS": return BidiClass.CommonSeparator;
-            case "NSM": return BidiClass.NonspacingMark;
-
-            case "BN": return BidiClass.BoundaryNeutral;
-            case "B": return BidiClass.ParagraphSeparator;
-            case "S": return BidiClass.SegmentSeparator;
-            case "WS": return BidiClass.WhiteSpace;
-            case "ON": return BidiClass.OtherNeutral;
-
-            case "LRE": return BidiClass.LeftToRightEmbedding;
-            case "LRO": return BidiClass.LeftToRightOverride;
-            case "RLE": return BidiClass.RightToLeftEmbedding;
-            case "RLO": return BidiClass.RightToLeftOverride;
-            case "PDF": return BidiClass.PopDirectionalFormat;
-
-            case "LRI": return BidiClass.LeftToRightIsolate;
-            case "RLI": return BidiClass.RightToLeftIsolate;
-            case "FSI": return BidiClass.FirstStrongIsolate;
-            case "PDI": return BidiClass.PopDirectionalIsolate;
-
-            default:
-                throw new InvalidDataException($"Unknown Bidi_Class value '{value}' in DerivedBidiClass.txt.");
-        }
+            "L" => BidiClass.LeftToRight,
+            "R" => BidiClass.RightToLeft,
+            "AL" => BidiClass.ArabicLetter,
+            "EN" => BidiClass.EuropeanNumber,
+            "ES" => BidiClass.EuropeanSeparator,
+            "ET" => BidiClass.EuropeanTerminator,
+            "AN" => BidiClass.ArabicNumber,
+            "CS" => BidiClass.CommonSeparator,
+            "NSM" => BidiClass.NonspacingMark,
+            "BN" => BidiClass.BoundaryNeutral,
+            "B" => BidiClass.ParagraphSeparator,
+            "S" => BidiClass.SegmentSeparator,
+            "WS" => BidiClass.WhiteSpace,
+            "ON" => BidiClass.OtherNeutral,
+            "LRE" => BidiClass.LeftToRightEmbedding,
+            "LRO" => BidiClass.LeftToRightOverride,
+            "RLE" => BidiClass.RightToLeftEmbedding,
+            "RLO" => BidiClass.RightToLeftOverride,
+            "PDF" => BidiClass.PopDirectionalFormat,
+            "LRI" => BidiClass.LeftToRightIsolate,
+            "RLI" => BidiClass.RightToLeftIsolate,
+            "FSI" => BidiClass.FirstStrongIsolate,
+            "PDI" => BidiClass.PopDirectionalIsolate,
+            _ => throw new InvalidDataException($"Unknown Bidi_Class value '{value}'.")
+        };
     }
 
-    private static JoiningGroup ParseJoiningGroup(string value)
+    static JoiningType ParseJoiningType(string value)
+    {
+        return value switch
+        {
+            "U" => JoiningType.NonJoining,
+            "T" => JoiningType.Transparent,
+            "C" => JoiningType.JoinCausing,
+            "L" => JoiningType.LeftJoining,
+            "R" => JoiningType.RightJoining,
+            "D" => JoiningType.DualJoining,
+            _ => JoiningType.NonJoining
+        };
+    }
+
+    static JoiningGroup ParseJoiningGroup(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new InvalidDataException("Joining_Group value is empty in ArabicShaping.txt.");
+            return JoiningGroup.NoJoiningGroup;
 
+        // Convert to PascalCase
         string[] parts = value.Trim().Split(new[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries);
+        var sb = new System.Text.StringBuilder();
 
-        if (parts.Length == 0)
-            throw new InvalidDataException($"Joining_Group value '{value}' cannot be parsed (no tokens).");
-
-        System.Text.StringBuilder sb = new System.Text.StringBuilder();
-
-        for (int i = 0; i < parts.Length; i++)
+        foreach (string part in parts)
         {
-            string part = parts[i].ToLowerInvariant();
-            if (part.Length == 0)
-                continue;
-
-            char first = char.ToUpperInvariant(part[0]);
-            sb.Append(first);
+            if (part.Length == 0) continue;
+            sb.Append(char.ToUpperInvariant(part[0]));
             if (part.Length > 1)
-                sb.Append(part, 1, part.Length - 1);
+                sb.Append(part.Substring(1).ToLowerInvariant());
         }
 
         string enumName = sb.ToString();
 
-        if (Enum.TryParse(enumName, ignoreCase: false, out JoiningGroup result))
+        if (Enum.TryParse<JoiningGroup>(enumName, out var result))
             return result;
 
-        throw new InvalidDataException(
-            $"Unknown Joining_Group value '{value}' in ArabicShaping.txt (normalized to '{enumName}').");
+        return JoiningGroup.NoJoiningGroup;
     }
 
-
-    static JoiningType ParseJoiningType(string value)
+    static UnicodeScript ParseScript(string value)
     {
-        switch (value)
-        {
-            case "U": return JoiningType.NonJoining;
-            case "T": return JoiningType.Transparent;
-            case "C": return JoiningType.JoinCausing;
-            case "L": return JoiningType.LeftJoining;
-            case "R": return JoiningType.RightJoining;
-            case "D": return JoiningType.DualJoining;
+        // Convert to PascalCase (e.g., "Old_Italic" -> "OldItalic")
+        string[] parts = value.Trim().Split(new[] { '_' }, StringSplitOptions.RemoveEmptyEntries);
+        var sb = new System.Text.StringBuilder();
 
-            default:
-                throw new InvalidDataException($"Unknown Joining_Type value '{value}' in DerivedJoiningType.txt.");
+        foreach (string part in parts)
+        {
+            if (part.Length == 0) continue;
+            sb.Append(char.ToUpperInvariant(part[0]));
+            if (part.Length > 1)
+                sb.Append(part.Substring(1).ToLowerInvariant());
         }
+
+        string enumName = sb.ToString();
+
+        if (Enum.TryParse<UnicodeScript>(enumName, out var result))
+            return result;
+
+        return UnicodeScript.Unknown;
     }
 
+    static LineBreakClass ParseLineBreakClass(string value)
+    {
+        if (Enum.TryParse<LineBreakClass>(value.Trim(), out var result))
+            return result;
+
+        return LineBreakClass.XX;
+    }
 
     public List<RangeEntry> BuildRangeEntries()
     {
         var result = new List<RangeEntry>();
 
         int currentStart = 0;
-        UnicodeProps current = props[0];
+        var current = props[0];
 
         for (int cp = 1; cp <= MaxCodePoint; cp++)
         {
-            UnicodeProps p = props[cp];
+            var p = props[cp];
 
             bool same =
                 p.bidiClass == current.bidiClass &&
@@ -317,6 +364,54 @@ public class UnicodeDataBuilder
             bidiClass: current.bidiClass,
             joiningType: current.joiningType,
             joiningGroup: current.joiningGroup));
+
+        return result;
+    }
+
+    public List<ScriptRangeEntry> BuildScriptRangeEntries()
+    {
+        var result = new List<ScriptRangeEntry>();
+
+        int currentStart = 0;
+        var currentScript = props[0].script;
+
+        for (int cp = 1; cp <= MaxCodePoint; cp++)
+        {
+            var script = props[cp].script;
+
+            if (script != currentScript)
+            {
+                result.Add(new ScriptRangeEntry(currentStart, cp - 1, currentScript));
+                currentStart = cp;
+                currentScript = script;
+            }
+        }
+
+        result.Add(new ScriptRangeEntry(currentStart, MaxCodePoint, currentScript));
+
+        return result;
+    }
+
+    public List<LineBreakRangeEntry> BuildLineBreakRangeEntries()
+    {
+        var result = new List<LineBreakRangeEntry>();
+
+        int currentStart = 0;
+        var currentLbc = props[0].lineBreakClass;
+
+        for (int cp = 1; cp <= MaxCodePoint; cp++)
+        {
+            var lbc = props[cp].lineBreakClass;
+
+            if (lbc != currentLbc)
+            {
+                result.Add(new LineBreakRangeEntry(currentStart, cp - 1, currentLbc));
+                currentStart = cp;
+                currentLbc = lbc;
+            }
+        }
+
+        result.Add(new LineBreakRangeEntry(currentStart, MaxCodePoint, currentLbc));
 
         return result;
     }
@@ -408,29 +503,13 @@ public class UnicodeDataBuilder
                     continue;
             }
 
-            BidiPairedBracketType bracketType;
-
-            switch (typePart)
+            BidiPairedBracketType bracketType = typePart.ToUpperInvariant() switch
             {
-                case "o":
-                case "O":
-                    bracketType = BidiPairedBracketType.Open;
-                    break;
-
-                case "c":
-                case "C":
-                    bracketType = BidiPairedBracketType.Close;
-                    break;
-
-                case "n":
-                case "N":
-                    bracketType = BidiPairedBracketType.None;
-                    break;
-
-                default:
-                    throw new InvalidDataException(
-                        $"Unknown Bidi_Paired_Bracket_Type '{typePart}' in BidiBrackets.txt.");
-            }
+                "O" => BidiPairedBracketType.Open,
+                "C" => BidiPairedBracketType.Close,
+                "N" => BidiPairedBracketType.None,
+                _ => throw new InvalidDataException($"Unknown Bidi_Paired_Bracket_Type '{typePart}'.")
+            };
 
             result.Add(new BracketEntry(codePoint, pairedCodePoint, bracketType));
         }
@@ -445,37 +524,40 @@ public class UnicodeDataBuilder
 
 #region Writer бинарного формата
 
-static class UnicodeBinaryWriter
+public static class UnicodeBinaryWriter
 {
-    const uint magic = 0x554C5452;
-    const ushort formatVersion = 1;
+    const uint Magic = 0x554C5452; // "ULTR"
+    const ushort FormatVersion = 2;
 
+    /// <summary>
+    /// Write format version 2 (with Script and LineBreak)
+    /// </summary>
     public static void WriteBinary(
         string outputPath,
         IReadOnlyList<RangeEntry> ranges,
         IReadOnlyList<MirrorEntry> mirrors,
         IReadOnlyList<BracketEntry> brackets,
+        IReadOnlyList<ScriptRangeEntry> scripts,
+        IReadOnlyList<LineBreakRangeEntry> lineBreaks,
         int unicodeVersionRaw)
     {
         using var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
         using var writer = new BinaryWriter(stream);
 
+        // Header placeholder
         long headerPosition = stream.Position;
 
-        writer.Write(magic);
-        writer.Write((ushort)formatVersion);
-        writer.Write((ushort)0);
+        writer.Write(Magic);
+        writer.Write(FormatVersion);
+        writer.Write((ushort)0); // Reserved
         writer.Write((uint)unicodeVersionRaw);
 
-        writer.Write((uint)0);
-        writer.Write((uint)0);
-        writer.Write((uint)0);
-        writer.Write((uint)0);
-        writer.Write((uint)0);
-        writer.Write((uint)0);
+        // Section offsets placeholder (6 sections * 8 bytes)
+        for (int i = 0; i < 12; i++)
+            writer.Write((uint)0);
 
+        // Write Range section
         long rangeOffset = stream.Position;
-
         writer.Write((uint)ranges.Count);
         foreach (var r in ranges)
         {
@@ -484,26 +566,22 @@ static class UnicodeBinaryWriter
             writer.Write((byte)r.bidiClass);
             writer.Write((byte)r.joiningType);
             writer.Write((byte)r.joiningGroup);
-            writer.Write((byte)0);
+            writer.Write((byte)0); // padding
         }
+        uint rangeLength = (uint)(stream.Position - rangeOffset);
 
-        long rangeEndPos = stream.Position;
-        uint rangeLength = (uint)(rangeEndPos - rangeOffset);
-
+        // Write Mirror section
         long mirrorOffset = stream.Position;
-
         writer.Write((uint)mirrors.Count);
         foreach (var m in mirrors)
         {
             writer.Write((uint)m.codePoint);
             writer.Write((uint)m.mirroredCodePoint);
         }
+        uint mirrorLength = (uint)(stream.Position - mirrorOffset);
 
-        long mirrorEndPos = stream.Position;
-        uint mirrorLength = (uint)(mirrorEndPos - mirrorOffset);
-
+        // Write Bracket section
         long bracketOffset = stream.Position;
-
         writer.Write((uint)brackets.Count);
         foreach (var b in brackets)
         {
@@ -514,14 +592,123 @@ static class UnicodeBinaryWriter
             writer.Write((byte)0);
             writer.Write((byte)0);
         }
+        uint bracketLength = (uint)(stream.Position - bracketOffset);
 
-        long bracketEndPos = stream.Position;
-        uint bracketLength = (uint)(bracketEndPos - bracketOffset);
+        // Write Script section
+        long scriptOffset = stream.Position;
+        writer.Write((uint)scripts.Count);
+        foreach (var s in scripts)
+        {
+            writer.Write((uint)s.startCodePoint);
+            writer.Write((uint)s.endCodePoint);
+            writer.Write((byte)s.script);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+        }
+        uint scriptLength = (uint)(stream.Position - scriptOffset);
+
+        // Write LineBreak section
+        long lineBreakOffset = stream.Position;
+        writer.Write((uint)lineBreaks.Count);
+        foreach (var lb in lineBreaks)
+        {
+            writer.Write((uint)lb.startCodePoint);
+            writer.Write((uint)lb.endCodePoint);
+            writer.Write((byte)lb.lineBreakClass);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+        }
+        uint lineBreakLength = (uint)(stream.Position - lineBreakOffset);
+
+        // Go back and write header with offsets
+        stream.Position = headerPosition;
+
+        writer.Write(Magic);
+        writer.Write(FormatVersion);
+        writer.Write((ushort)0);
+        writer.Write((uint)unicodeVersionRaw);
+
+        writer.Write((uint)rangeOffset);
+        writer.Write(rangeLength);
+        writer.Write((uint)mirrorOffset);
+        writer.Write(mirrorLength);
+        writer.Write((uint)bracketOffset);
+        writer.Write(bracketLength);
+        writer.Write((uint)scriptOffset);
+        writer.Write(scriptLength);
+        writer.Write((uint)lineBreakOffset);
+        writer.Write(lineBreakLength);
+
+        writer.Flush();
+    }
+
+    /// <summary>
+    /// Write format version 1 (backward compatible, no Script/LineBreak)
+    /// </summary>
+    public static void WriteBinaryV1(
+        string outputPath,
+        IReadOnlyList<RangeEntry> ranges,
+        IReadOnlyList<MirrorEntry> mirrors,
+        IReadOnlyList<BracketEntry> brackets,
+        int unicodeVersionRaw)
+    {
+        using var stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None);
+        using var writer = new BinaryWriter(stream);
+
+        const ushort v1 = 1;
+
+        long headerPosition = stream.Position;
+
+        writer.Write(Magic);
+        writer.Write(v1);
+        writer.Write((ushort)0);
+        writer.Write((uint)unicodeVersionRaw);
+
+        // 3 sections
+        for (int i = 0; i < 6; i++)
+            writer.Write((uint)0);
+
+        long rangeOffset = stream.Position;
+        writer.Write((uint)ranges.Count);
+        foreach (var r in ranges)
+        {
+            writer.Write((uint)r.startCodePoint);
+            writer.Write((uint)r.endCodePoint);
+            writer.Write((byte)r.bidiClass);
+            writer.Write((byte)r.joiningType);
+            writer.Write((byte)r.joiningGroup);
+            writer.Write((byte)0);
+        }
+        uint rangeLength = (uint)(stream.Position - rangeOffset);
+
+        long mirrorOffset = stream.Position;
+        writer.Write((uint)mirrors.Count);
+        foreach (var m in mirrors)
+        {
+            writer.Write((uint)m.codePoint);
+            writer.Write((uint)m.mirroredCodePoint);
+        }
+        uint mirrorLength = (uint)(stream.Position - mirrorOffset);
+
+        long bracketOffset = stream.Position;
+        writer.Write((uint)brackets.Count);
+        foreach (var b in brackets)
+        {
+            writer.Write((uint)b.codePoint);
+            writer.Write((uint)b.pairedCodePoint);
+            writer.Write((byte)b.bracketType);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+            writer.Write((byte)0);
+        }
+        uint bracketLength = (uint)(stream.Position - bracketOffset);
 
         stream.Position = headerPosition;
 
-        writer.Write(magic);
-        writer.Write((ushort)formatVersion);
+        writer.Write(Magic);
+        writer.Write(v1);
         writer.Write((ushort)0);
         writer.Write((uint)unicodeVersionRaw);
 

@@ -30,6 +30,7 @@ public readonly struct RangeEntry
     }
 }
 
+
 public readonly struct MirrorEntry
 {
     public readonly int codePoint;
@@ -41,6 +42,7 @@ public readonly struct MirrorEntry
         this.mirroredCodePoint = mirroredCodePoint;
     }
 }
+
 
 public readonly struct BracketEntry
 {
@@ -56,16 +58,51 @@ public readonly struct BracketEntry
     }
 }
 
+
+public readonly struct ScriptRangeEntry
+{
+    public readonly int startCodePoint;
+    public readonly int endCodePoint;
+    public readonly UnicodeScript script;
+
+    public ScriptRangeEntry(int startCodePoint, int endCodePoint, UnicodeScript script)
+    {
+        this.startCodePoint = startCodePoint;
+        this.endCodePoint = endCodePoint;
+        this.script = script;
+    }
+}
+
+
+public readonly struct LineBreakRangeEntry
+{
+    public readonly int startCodePoint;
+    public readonly int endCodePoint;
+    public readonly LineBreakClass lineBreakClass;
+
+    public LineBreakRangeEntry(int startCodePoint, int endCodePoint, LineBreakClass lineBreakClass)
+    {
+        this.startCodePoint = startCodePoint;
+        this.endCodePoint = endCodePoint;
+        this.lineBreakClass = lineBreakClass;
+    }
+}
+
+
 public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
 {
-    private const uint magic = 0x554C5452;
-    private const ushort supportedFormatVersion = 1;
+    private const uint Magic = 0x554C5452; // "ULTR"
+    private const ushort FormatVersion1 = 1;
+    private const ushort FormatVersion2 = 2;
 
     private readonly RangeEntry[] ranges;
     private readonly MirrorEntry[] mirrors;
     private readonly BracketEntry[] brackets;
+    private readonly ScriptRangeEntry[] scriptRanges;
+    private readonly LineBreakRangeEntry[] lineBreakRanges;
 
-    public int unicodeVersionRaw { get; }
+    public int UnicodeVersionRaw { get; }
+    public ushort FormatVersion { get; }
 
     public BinaryUnicodeDataProvider(byte[] data)
     {
@@ -76,18 +113,19 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         using var reader = new BinaryReader(stream);
 
         uint fileMagic = reader.ReadUInt32();
-        if (fileMagic != magic)
+        if (fileMagic != Magic)
             throw new InvalidDataException("Invalid Unicode data blob: magic mismatch.");
 
-        ushort formatVersion = reader.ReadUInt16();
-        if (formatVersion != supportedFormatVersion)
-            throw new InvalidDataException($"Unsupported Unicode data format version: {formatVersion}.");
+        FormatVersion = reader.ReadUInt16();
+        if (FormatVersion != FormatVersion1 && FormatVersion != FormatVersion2)
+            throw new InvalidDataException($"Unsupported Unicode data format version: {FormatVersion}.");
 
-        reader.ReadUInt16();
+        reader.ReadUInt16(); // Reserved
 
         uint unicodeVersion = reader.ReadUInt32();
-        unicodeVersionRaw = unchecked((int)unicodeVersion);
+        UnicodeVersionRaw = unchecked((int)unicodeVersion);
 
+        // Read section offsets (format v1)
         uint rangeOffset = reader.ReadUInt32();
         uint rangeLength = reader.ReadUInt32();
         uint mirrorOffset = reader.ReadUInt32();
@@ -95,6 +133,19 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         uint bracketOffset = reader.ReadUInt32();
         uint bracketLength = reader.ReadUInt32();
 
+        // Format v2 adds Script and LineBreak sections
+        uint scriptOffset = 0, scriptLength = 0;
+        uint lineBreakOffset = 0, lineBreakLength = 0;
+        
+        if (FormatVersion >= FormatVersion2)
+        {
+            scriptOffset = reader.ReadUInt32();
+            scriptLength = reader.ReadUInt32();
+            lineBreakOffset = reader.ReadUInt32();
+            lineBreakLength = reader.ReadUInt32();
+        }
+
+        // Read Range section
         if (rangeOffset == 0 || rangeLength == 0)
             throw new InvalidDataException("Unicode data blob is missing Range section.");
 
@@ -109,7 +160,7 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
             byte bidi = reader.ReadByte();
             byte jt = reader.ReadByte();
             byte jg = reader.ReadByte();
-            reader.ReadByte();
+            reader.ReadByte(); // padding
 
             ranges[i] = new RangeEntry(
                 startCodePoint: unchecked((int)start),
@@ -119,6 +170,7 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
                 joiningGroup: (JoiningGroup)jg);
         }
 
+        // Read Mirror section
         if (mirrorOffset != 0 && mirrorLength != 0)
         {
             stream.Position = mirrorOffset;
@@ -140,6 +192,7 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
             mirrors = Array.Empty<MirrorEntry>();
         }
 
+        // Read Bracket section
         if (bracketOffset != 0 && bracketLength != 0)
         {
             stream.Position = bracketOffset;
@@ -164,6 +217,60 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         else
         {
             brackets = Array.Empty<BracketEntry>();
+        }
+
+        // Read Script section (format v2)
+        if (scriptOffset != 0 && scriptLength != 0)
+        {
+            stream.Position = scriptOffset;
+            uint scriptCount = reader.ReadUInt32();
+            scriptRanges = new ScriptRangeEntry[scriptCount];
+
+            for (uint i = 0; i < scriptCount; i++)
+            {
+                uint start = reader.ReadUInt32();
+                uint end = reader.ReadUInt32();
+                byte script = reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+
+                scriptRanges[i] = new ScriptRangeEntry(
+                    startCodePoint: unchecked((int)start),
+                    endCodePoint: unchecked((int)end),
+                    script: (UnicodeScript)script);
+            }
+        }
+        else
+        {
+            scriptRanges = Array.Empty<ScriptRangeEntry>();
+        }
+
+        // Read LineBreak section (format v2)
+        if (lineBreakOffset != 0 && lineBreakLength != 0)
+        {
+            stream.Position = lineBreakOffset;
+            uint lineBreakCount = reader.ReadUInt32();
+            lineBreakRanges = new LineBreakRangeEntry[lineBreakCount];
+
+            for (uint i = 0; i < lineBreakCount; i++)
+            {
+                uint start = reader.ReadUInt32();
+                uint end = reader.ReadUInt32();
+                byte lbc = reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+                reader.ReadByte();
+
+                lineBreakRanges[i] = new LineBreakRangeEntry(
+                    startCodePoint: unchecked((int)start),
+                    endCodePoint: unchecked((int)end),
+                    lineBreakClass: (LineBreakClass)lbc);
+            }
+        }
+        else
+        {
+            lineBreakRanges = Array.Empty<LineBreakRangeEntry>();
         }
     }
 
@@ -208,6 +315,18 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
         return entry?.joiningGroup ?? JoiningGroup.NoJoiningGroup;
     }
 
+    public UnicodeScript GetScript(int codePoint)
+    {
+        var entry = FindScriptRange(codePoint);
+        return entry?.script ?? UnicodeScript.Unknown;
+    }
+
+    public LineBreakClass GetLineBreakClass(int codePoint)
+    {
+        var entry = FindLineBreakRange(codePoint);
+        return entry?.lineBreakClass ?? LineBreakClass.XX; // XX = Unknown
+    }
+
     private RangeEntry? FindRange(int codePoint)
     {
         int lo = 0;
@@ -219,17 +338,11 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
             var entry = ranges[mid];
 
             if (codePoint < entry.startCodePoint)
-            {
                 hi = mid - 1;
-            }
             else if (codePoint > entry.endCodePoint)
-            {
                 lo = mid + 1;
-            }
             else
-            {
                 return entry;
-            }
         }
 
         return null;
@@ -246,17 +359,11 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
             var entry = mirrors[mid];
 
             if (codePoint < entry.codePoint)
-            {
                 hi = mid - 1;
-            }
             else if (codePoint > entry.codePoint)
-            {
                 lo = mid + 1;
-            }
             else
-            {
                 return entry;
-            }
         }
 
         return null;
@@ -273,17 +380,53 @@ public sealed class BinaryUnicodeDataProvider : IUnicodeDataProvider
             var entry = brackets[mid];
 
             if (codePoint < entry.codePoint)
-            {
                 hi = mid - 1;
-            }
             else if (codePoint > entry.codePoint)
-            {
                 lo = mid + 1;
-            }
             else
-            {
                 return entry;
-            }
+        }
+
+        return null;
+    }
+
+    private ScriptRangeEntry? FindScriptRange(int codePoint)
+    {
+        int lo = 0;
+        int hi = scriptRanges.Length - 1;
+
+        while (lo <= hi)
+        {
+            int mid = (lo + hi) >> 1;
+            var entry = scriptRanges[mid];
+
+            if (codePoint < entry.startCodePoint)
+                hi = mid - 1;
+            else if (codePoint > entry.endCodePoint)
+                lo = mid + 1;
+            else
+                return entry;
+        }
+
+        return null;
+    }
+
+    private LineBreakRangeEntry? FindLineBreakRange(int codePoint)
+    {
+        int lo = 0;
+        int hi = lineBreakRanges.Length - 1;
+
+        while (lo <= hi)
+        {
+            int mid = (lo + hi) >> 1;
+            var entry = lineBreakRanges[mid];
+
+            if (codePoint < entry.startCodePoint)
+                hi = mid - 1;
+            else if (codePoint > entry.endCodePoint)
+                lo = mid + 1;
+            else
+                return entry;
         }
 
         return null;
