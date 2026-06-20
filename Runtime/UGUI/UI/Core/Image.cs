@@ -958,7 +958,7 @@ namespace UnityEngine.UI
 
                 for (var i = 0; i < array1.Length; ++i)
                 {
-                    if (array1[i] != array2[i])
+                    if (array1[i].name != array2[i].name || array1[i].texture != array2[i].texture)
                         return false;
                 }
 
@@ -1005,6 +1005,7 @@ namespace UnityEngine.UI
                 }
             }
 
+#if UNITY_6000_0_OR_NEWER
             renderer.SetSecondaryTextureCount(m_SecondaryTextures?.Length ?? 0);
 
             if (m_SecondaryTextures != null)
@@ -1012,10 +1013,11 @@ namespace UnityEngine.UI
                 for (var i = 0; i < m_SecondaryTextures.Length; ++i)
                 {
                     var secondaryTex = m_SecondaryTextures[i];
-                
+
                     renderer.SetSecondaryTexture(i, secondaryTex.name, secondaryTex.texture);
                 }
             }
+#endif
 
             ClearArray(ref s_TempNewSecondaryTextures);
         }
