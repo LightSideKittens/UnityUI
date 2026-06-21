@@ -65,7 +65,7 @@ namespace UnityEngine.UI
         /// </returns>
         public static float GetPreferredWidth(RectTransform rect)
         {
-            return Mathf.Max(GetLayoutProperty(rect, e => e.minWidth, 0), GetLayoutProperty(rect, e => e.preferredWidth, 0));
+            return GetMaxLayoutProperty(rect, e => e.minWidth, e => e.preferredWidth);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace UnityEngine.UI
         /// </remarks>
         public static float GetPreferredHeight(RectTransform rect)
         {
-            return Mathf.Max(GetLayoutProperty(rect, e => e.minHeight, 0), GetLayoutProperty(rect, e => e.preferredHeight, 0));
+            return GetMaxLayoutProperty(rect, e => e.minHeight, e => e.preferredHeight);
         }
 
         /// <summary>
@@ -182,6 +182,59 @@ namespace UnityEngine.UI
 
             ListPool<Component>.Release(components);
             return min;
+        }
+
+        /// <summary>
+        /// Resolves two layout properties (e.g. min and preferred for one axis) over a single GetComponents query
+        /// and returns the larger result. Equivalent to <c>Mathf.Max(GetLayoutProperty(a), GetLayoutProperty(b))</c>
+        /// — same per-property priority resolution — but halves the component lookups for preferred-size queries,
+        /// which dominate layout-group child measurement.
+        /// </summary>
+        static float GetMaxLayoutProperty(RectTransform rect, System.Func<ILayoutElement, float> propertyA, System.Func<ILayoutElement, float> propertyB)
+        {
+            if (rect == null)
+                return 0;
+
+            float a = 0f;
+            float b = 0f;
+            int aPriority = System.Int32.MinValue;
+            int bPriority = System.Int32.MinValue;
+
+            var components = ListPool<Component>.Get();
+            rect.GetComponents(typeof(ILayoutElement), components);
+
+            var componentsCount = components.Count;
+            for (int i = 0; i < componentsCount; i++)
+            {
+                var layoutComp = components[i] as ILayoutElement;
+                if (layoutComp is Behaviour && !((Behaviour)layoutComp).isActiveAndEnabled)
+                    continue;
+
+                int priority = layoutComp.layoutPriority;
+
+                if (priority >= aPriority)
+                {
+                    float prop = propertyA(layoutComp);
+                    if (prop >= 0)
+                    {
+                        if (priority > aPriority) { a = prop; aPriority = priority; }
+                        else if (prop > a) { a = prop; }
+                    }
+                }
+
+                if (priority >= bPriority)
+                {
+                    float prop = propertyB(layoutComp);
+                    if (prop >= 0)
+                    {
+                        if (priority > bPriority) { b = prop; bPriority = priority; }
+                        else if (prop > b) { b = prop; }
+                    }
+                }
+            }
+
+            ListPool<Component>.Release(components);
+            return Mathf.Max(a, b);
         }
     }
 }

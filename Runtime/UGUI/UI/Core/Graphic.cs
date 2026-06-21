@@ -210,6 +210,9 @@ namespace UnityEngine.UI
         [NonSerialized] private bool m_VertsDirty;
         [NonSerialized] private bool m_MaterialDirty;
 
+        [NonSerialized] private bool m_MeshModifiersDirty = true;
+        [NonSerialized] private bool m_HasMeshModifiers;
+
         [NonSerialized] protected UnityAction m_OnDirtyLayoutCallback;
         [NonSerialized] protected UnityAction m_OnDirtyVertsCallback;
         [NonSerialized] protected UnityAction m_OnDirtyMaterialCallback;
@@ -318,6 +321,30 @@ namespace UnityEngine.UI
 
             if (m_OnDirtyMaterialCallback != null)
                 m_OnDirtyMaterialCallback();
+        }
+
+        /// <summary>
+        /// Invalidate the cached presence of <see cref="IMeshModifier"/> components so it is recomputed on the next
+        /// geometry rebuild. <see cref="BaseMeshEffect"/> calls this automatically on enable/disable; call it manually
+        /// only when adding or removing an IMeshModifier that does not derive from BaseMeshEffect.
+        /// </summary>
+        public void SetMeshModifiersDirty()
+        {
+            m_MeshModifiersDirty = true;
+        }
+
+        /// <summary>
+        /// Recomputes whether any <see cref="IMeshModifier"/> is attached. The result is cached because the modifier
+        /// set changes rarely while geometry is dirtied frequently, so the per-rebuild GetComponents is skipped in the
+        /// common (no-modifier) case. Invalidated via <see cref="SetMeshModifiersDirty"/>.
+        /// </summary>
+        private void RefreshMeshModifierFlag()
+        {
+            var components = ListPool<Component>.Get();
+            GetComponents(typeof(IMeshModifier), components);
+            m_HasMeshModifiers = components.Count > 0;
+            ListPool<Component>.Release(components);
+            m_MeshModifiersDirty = false;
         }
 
         public void SetRaycastDirty()
@@ -698,13 +725,19 @@ namespace UnityEngine.UI
             else
                 s_VertexHelper.Clear(); // clear the vertex helper so invalid graphics dont draw.
 
-            var components = ListPool<Component>.Get();
-            GetComponents(typeof(IMeshModifier), components);
+            if (m_MeshModifiersDirty)
+                RefreshMeshModifierFlag();
 
-            for (var i = 0; i < components.Count; i++)
-                ((IMeshModifier)components[i]).ModifyMesh(s_VertexHelper);
+            if (m_HasMeshModifiers)
+            {
+                var components = ListPool<Component>.Get();
+                GetComponents(typeof(IMeshModifier), components);
 
-            ListPool<Component>.Release(components);
+                for (var i = 0; i < components.Count; i++)
+                    ((IMeshModifier)components[i]).ModifyMesh(s_VertexHelper);
+
+                ListPool<Component>.Release(components);
+            }
 
             s_VertexHelper.FillMesh(workerMesh);
             canvasRenderer.SetMesh(workerMesh);
@@ -723,17 +756,23 @@ namespace UnityEngine.UI
                 workerMesh.Clear();
             }
 
-            var components = ListPool<Component>.Get();
-            GetComponents(typeof(IMeshModifier), components);
+            if (m_MeshModifiersDirty)
+                RefreshMeshModifierFlag();
 
-            for (var i = 0; i < components.Count; i++)
+            if (m_HasMeshModifiers)
             {
-#pragma warning disable 618
-                ((IMeshModifier)components[i]).ModifyMesh(workerMesh);
-#pragma warning restore 618
-            }
+                var components = ListPool<Component>.Get();
+                GetComponents(typeof(IMeshModifier), components);
 
-            ListPool<Component>.Release(components);
+                for (var i = 0; i < components.Count; i++)
+                {
+#pragma warning disable 618
+                    ((IMeshModifier)components[i]).ModifyMesh(workerMesh);
+#pragma warning restore 618
+                }
+
+                ListPool<Component>.Release(components);
+            }
             canvasRenderer.SetMesh(workerMesh);
         }
 
