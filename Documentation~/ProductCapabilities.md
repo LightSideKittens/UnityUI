@@ -1,6 +1,6 @@
 # uGUI Fork capabilities
 
-Unity UI without bundled TextMeshPro. Canvas rendering, layout, controls, events and masks through the standard uGUI API. Free, without an account or access token.
+The Unity Canvas UI foundation for LightSide, without bundled TextMeshPro. Its systems include Canvas rendering, layout, controls, events and masking through the standard uGUI API. UniText, UniShapes and UniLottie add their own content through this foundation. Free to browse and install without an account or access token.
 
 The fork uses the official Unity UI codebase with the bundled TextMeshPro runtime and editor removed. A small compatibility assembly resolves selected TMP references.
 
