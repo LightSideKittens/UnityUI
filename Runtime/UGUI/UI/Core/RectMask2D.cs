@@ -5,10 +5,11 @@ using UnityEngine.Pool;
 
 namespace UnityEngine.UI
 {
-    [AddComponentMenu("UI/Rect Mask 2D", 14)]
+    [AddComponentMenu("UI (Canvas)/Rect Mask 2D", 14)]
     [ExecuteAlways]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
+    [UGUIHelpURL("RectMask2D")]
     /// <summary>
     /// A 2D rectangular mask that allows for clipping / masking of areas outside the mask.
     /// </summary>

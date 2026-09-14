@@ -8,6 +8,7 @@ namespace UnityEngine.EventSystems
     /// </summary>
     [AddComponentMenu("Event/Physics Raycaster")]
     [RequireComponent(typeof(Camera))]
+    [UGUIHelpURL("PhysicsRaycaster")]
     /// <summary>
     /// Raycaster for casting against 3D Physics components.
     /// </summary>
@@ -128,7 +129,7 @@ namespace UnityEngine.EventSystems
 
             ray = eventCamera.ScreenPointToRay(eventPosition);
             // compensate far plane distance - see MouseEvents.cs
-            float projectionDirection = ray.direction.z;
+            float projectionDirection = Vector3.Dot(ray.direction, eventCamera.transform.forward);
             distanceToClipPlane = Mathf.Approximately(0.0f, projectionDirection)
                 ? Mathf.Infinity
                 : Mathf.Abs((eventCamera.farClipPlane - eventCamera.nearClipPlane) / projectionDirection);

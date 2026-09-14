@@ -19,18 +19,19 @@ namespace UnityEditor.UI
             RawImage = 2002,
             Panel = 2003,
             // 2020 - Button (TMP)
-            Toggle = 2021,
+            Toggle = 2101,
             // 2022 - Dropdown (TMP)
             // 2023 - Input Field (TMP)
-            Slider = 2024,
-            Scrollbar = 2025,
-            ScrollView = 2026,
-            Canvas = 2060,
-            EventSystem = 2061,
-            Text = 2080,
-            Button = 2081,
-            Dropdown = 2082,
-            InputField = 2083,
+            Slider = 2104,
+            Scrollbar = 2105,
+            ScrollView = 2106,
+            RaycastReceiver = 2210,
+            Canvas = 2300,
+            EventSystem = 2301,
+            Text = 2400,
+            Button = 2401,
+            Dropdown = 2402,
+            InputField = 2403,
         };
 
         private const string kUILayerName = "UI";
@@ -86,56 +87,12 @@ namespace UnityEditor.UI
             }
         }
 
-        private static void SetPositionVisibleinSceneView(RectTransform canvasRTransform, RectTransform itemTransform)
-        {
-            SceneView sceneView = SceneView.lastActiveSceneView;
-
-            // Couldn't find a SceneView. Don't set position.
-            if (sceneView == null || sceneView.camera == null)
-                return;
-
-            // Create world space Plane from canvas position.
-            Vector2 localPlanePosition;
-            Camera camera = sceneView.camera;
-            Vector3 position = Vector3.zero;
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRTransform, new Vector2(camera.pixelWidth / 2, camera.pixelHeight / 2), camera, out localPlanePosition))
-            {
-                // Adjust for canvas pivot
-                localPlanePosition.x = localPlanePosition.x + canvasRTransform.sizeDelta.x * canvasRTransform.pivot.x;
-                localPlanePosition.y = localPlanePosition.y + canvasRTransform.sizeDelta.y * canvasRTransform.pivot.y;
-
-                localPlanePosition.x = Mathf.Clamp(localPlanePosition.x, 0, canvasRTransform.sizeDelta.x);
-                localPlanePosition.y = Mathf.Clamp(localPlanePosition.y, 0, canvasRTransform.sizeDelta.y);
-
-                // Adjust for anchoring
-                position.x = localPlanePosition.x - canvasRTransform.sizeDelta.x * itemTransform.anchorMin.x;
-                position.y = localPlanePosition.y - canvasRTransform.sizeDelta.y * itemTransform.anchorMin.y;
-
-                Vector3 minLocalPosition;
-                minLocalPosition.x = canvasRTransform.sizeDelta.x * (0 - canvasRTransform.pivot.x) + itemTransform.sizeDelta.x * itemTransform.pivot.x;
-                minLocalPosition.y = canvasRTransform.sizeDelta.y * (0 - canvasRTransform.pivot.y) + itemTransform.sizeDelta.y * itemTransform.pivot.y;
-
-                Vector3 maxLocalPosition;
-                maxLocalPosition.x = canvasRTransform.sizeDelta.x * (1 - canvasRTransform.pivot.x) - itemTransform.sizeDelta.x * itemTransform.pivot.x;
-                maxLocalPosition.y = canvasRTransform.sizeDelta.y * (1 - canvasRTransform.pivot.y) - itemTransform.sizeDelta.y * itemTransform.pivot.y;
-
-                position.x = Mathf.Clamp(position.x, minLocalPosition.x, maxLocalPosition.x);
-                position.y = Mathf.Clamp(position.y, minLocalPosition.y, maxLocalPosition.y);
-            }
-
-            itemTransform.anchoredPosition = position;
-            itemTransform.localRotation = Quaternion.identity;
-            itemTransform.localScale = Vector3.one;
-        }
-
         private static void PlaceUIElementRoot(GameObject element, MenuCommand menuCommand)
         {
             GameObject parent = menuCommand.context as GameObject;
-            bool explicitParentChoice = true;
             if (parent == null)
             {
                 parent = GetOrCreateCanvasGameObject();
-                explicitParentChoice = false;
 
                 // If in Prefab Mode, Canvas has to be part of Prefab contents,
                 // otherwise use Prefab root instead.
@@ -155,8 +112,6 @@ namespace UnityEditor.UI
             GameObjectUtility.EnsureUniqueNameForSibling(element);
 
             SetParentAndAlign(element, parent);
-            if (!explicitParentChoice) // not a context click, so center in sceneview
-                SetPositionVisibleinSceneView(parent.GetComponent<RectTransform>(), element.GetComponent<RectTransform>());
 
             // This call ensure any change made to created Objects after they where registered will be part of the Undo.
             Undo.RegisterFullObjectHierarchyUndo(parent == null ? element : parent, "");
@@ -202,7 +157,7 @@ namespace UnityEditor.UI
 
         // Graphic elements
 
-        [MenuItem("GameObject/UI/Image", false, (int)MenuOptionsPriorityOrder.Image)]
+        [MenuItem("GameObject/UI (Canvas)/Image", false, (int)MenuOptionsPriorityOrder.Image)]
         static public void AddImage(MenuCommand menuCommand)
         {
             GameObject go;
@@ -211,7 +166,7 @@ namespace UnityEditor.UI
             PlaceUIElementRoot(go, menuCommand);
         }
 
-        [MenuItem("GameObject/UI/Raw Image", false, (int)MenuOptionsPriorityOrder.RawImage)]
+        [MenuItem("GameObject/UI (Canvas)/Raw Image", false, (int)MenuOptionsPriorityOrder.RawImage)]
         static public void AddRawImage(MenuCommand menuCommand)
         {
             GameObject go;
@@ -220,7 +175,7 @@ namespace UnityEditor.UI
             PlaceUIElementRoot(go, menuCommand);
         }
 
-        [MenuItem("GameObject/UI/Panel", false, (int)MenuOptionsPriorityOrder.Panel)]
+        [MenuItem("GameObject/UI (Canvas)/Panel", false, (int)MenuOptionsPriorityOrder.Panel)]
         static public void AddPanel(MenuCommand menuCommand)
         {
             GameObject go;
@@ -238,7 +193,7 @@ namespace UnityEditor.UI
 
         // Toggle is a control you just click on.
 
-        [MenuItem("GameObject/UI/Toggle", false, (int)MenuOptionsPriorityOrder.Toggle)]
+        [MenuItem("GameObject/UI (Canvas)/Toggle", false, (int)MenuOptionsPriorityOrder.Toggle)]
         static public void AddToggle(MenuCommand menuCommand)
         {
             GameObject go;
@@ -249,7 +204,7 @@ namespace UnityEditor.UI
 
         // Slider and Scrollbar modify a number
 
-        [MenuItem("GameObject/UI/Slider", false, (int)MenuOptionsPriorityOrder.Slider)]
+        [MenuItem("GameObject/UI (Canvas)/Slider", false, (int)MenuOptionsPriorityOrder.Slider)]
         static public void AddSlider(MenuCommand menuCommand)
         {
             GameObject go;
@@ -258,7 +213,7 @@ namespace UnityEditor.UI
             PlaceUIElementRoot(go, menuCommand);
         }
 
-        [MenuItem("GameObject/UI/Scrollbar", false, (int)MenuOptionsPriorityOrder.Scrollbar)]
+        [MenuItem("GameObject/UI (Canvas)/Scrollbar", false, (int)MenuOptionsPriorityOrder.Scrollbar)]
         static public void AddScrollbar(MenuCommand menuCommand)
         {
             GameObject go;
@@ -267,7 +222,7 @@ namespace UnityEditor.UI
             PlaceUIElementRoot(go, menuCommand);
         }
 
-        [MenuItem("GameObject/UI/Scroll View", false, (int)MenuOptionsPriorityOrder.ScrollView)]
+        [MenuItem("GameObject/UI (Canvas)/Scroll View", false, (int)MenuOptionsPriorityOrder.ScrollView)]
         static public void AddScrollView(MenuCommand menuCommand)
         {
             GameObject go;
@@ -278,7 +233,7 @@ namespace UnityEditor.UI
 
         // Containers
 
-        [MenuItem("GameObject/UI/Canvas", false, (int)MenuOptionsPriorityOrder.Canvas)]
+        [MenuItem("GameObject/UI (Canvas)/Canvas", false, (int)MenuOptionsPriorityOrder.Canvas)]
         static public void AddCanvas(MenuCommand menuCommand)
         {
             var go = CreateNewUI();
@@ -296,7 +251,7 @@ namespace UnityEditor.UI
 
         // Legacy Elements
 
-        [MenuItem("GameObject/UI/Legacy/Text", false, (int)MenuOptionsPriorityOrder.Text)]
+        [MenuItem("GameObject/UI (Canvas)/Legacy/Text", false, (int)MenuOptionsPriorityOrder.Text)]
         static public void AddText(MenuCommand menuCommand)
         {
             GameObject go;
@@ -305,7 +260,7 @@ namespace UnityEditor.UI
             PlaceUIElementRoot(go, menuCommand);
         }
 
-        [MenuItem("GameObject/UI/Legacy/Button", false, (int)MenuOptionsPriorityOrder.Button)]
+        [MenuItem("GameObject/UI (Canvas)/Legacy/Button", false, (int)MenuOptionsPriorityOrder.Button)]
         static public void AddButton(MenuCommand menuCommand)
         {
             GameObject go;
@@ -314,7 +269,7 @@ namespace UnityEditor.UI
             PlaceUIElementRoot(go, menuCommand);
         }
 
-        [MenuItem("GameObject/UI/Legacy/Dropdown", false, (int)MenuOptionsPriorityOrder.Dropdown)]
+        [MenuItem("GameObject/UI (Canvas)/Legacy/Dropdown", false, (int)MenuOptionsPriorityOrder.Dropdown)]
         static public void AddDropdown(MenuCommand menuCommand)
         {
             GameObject go;
@@ -323,12 +278,21 @@ namespace UnityEditor.UI
             PlaceUIElementRoot(go, menuCommand);
         }
 
-        [MenuItem("GameObject/UI/Legacy/Input Field", false, (int)MenuOptionsPriorityOrder.InputField)]
+        [MenuItem("GameObject/UI (Canvas)/Legacy/Input Field", false, (int)MenuOptionsPriorityOrder.InputField)]
         public static void AddInputField(MenuCommand menuCommand)
         {
             GameObject go;
             using (new FactorySwapToEditor())
                 go = DefaultControls.CreateInputField(GetStandardResources());
+            PlaceUIElementRoot(go, menuCommand);
+        }
+
+        [MenuItem("GameObject/UI (Canvas)/Raycast Receiver", false, (int)MenuOptionsPriorityOrder.RaycastReceiver)]
+        public static void AddRaycastReceiver(MenuCommand menuCommand)
+        {
+            GameObject go;
+            using (new FactorySwapToEditor())
+                go = DefaultControls.CreateRaycastReceiver(GetStandardResources());
             PlaceUIElementRoot(go, menuCommand);
         }
 
@@ -363,7 +327,7 @@ namespace UnityEditor.UI
             return root;
         }
 
-        [MenuItem("GameObject/UI/Event System", false, (int)MenuOptionsPriorityOrder.EventSystem)]
+        [MenuItem("GameObject/UI (Canvas)/Event System", false, (int)MenuOptionsPriorityOrder.EventSystem)]
         public static void CreateEventSystem(MenuCommand menuCommand)
         {
             GameObject parent = menuCommand.context as GameObject;

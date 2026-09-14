@@ -2,11 +2,16 @@ using System;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace UnityEngine.UI
 {
-    [AddComponentMenu("UI/Slider", 34)]
+    [AddComponentMenu("UI (Canvas)/Slider", 34)]
     [ExecuteAlways]
     [RequireComponent(typeof(RectTransform))]
+    [UGUIHelpURL("Slider")]
     /// <summary>
     /// A standard slider that can be moved between a minimum and maximum value.
     /// </summary>
@@ -428,10 +433,17 @@ namespace UnityEngine.UI
             Set(m_Value, false);
             // Update rects since they need to be initialized correctly.
             UpdateVisuals();
+#if UNITY_EDITOR
+            Undo.undoRedoEvent -= OnUndoRedoEvent;
+            Undo.undoRedoEvent += OnUndoRedoEvent;
+#endif
         }
 
         protected override void OnDisable()
         {
+#if UNITY_EDITOR
+            Undo.undoRedoEvent -= OnUndoRedoEvent;
+#endif
             m_Tracker.Clear();
             base.OnDisable();
         }
@@ -552,6 +564,13 @@ namespace UnityEngine.UI
 
             UpdateVisuals();
         }
+
+#if UNITY_EDITOR
+        void OnUndoRedoEvent(in UndoRedoInfo undo)
+        {
+            UpdateVisuals();
+        }
+#endif
 
         enum Axis
         {

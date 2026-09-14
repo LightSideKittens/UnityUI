@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace UnityEngine.UI
 {
     [AddComponentMenu("Layout/Grid Layout Group", 152)]
+    [UGUIHelpURL("GridLayoutGroup")]
     /// <summary>
     /// Layout class to arrange child elements in a grid format.
     /// </summary>
@@ -120,6 +121,26 @@ namespace UnityEngine.UI
         /// </summary>
         public int constraintCount { get { return m_ConstraintCount; } set { SetProperty(ref m_ConstraintCount, Mathf.Max(1, value)); } }
 
+        /// <summary>
+        /// The number of rows that the layout group generates after the layout process is complete.
+        /// </summary>
+        /// <remarks>
+        /// The layout system sets this value to `0` if there are no child GameObjects participating in layout.
+        /// When you set <see cref="constraint"/> to <see cref="Constraint.FixedRowCount"/>, this value is equal
+        /// to the minimum of <see cref="constraintCount"/> and the number of child GameObjects.
+        /// </remarks>
+        public int generatedRowCount { get; private set; }
+
+        /// <summary>
+        /// The number of columns that the layout group generates after the layout process is complete.
+        /// </summary>
+        /// <remarks>
+        /// The layout system sets this value to `0` if there are no child GameObjects participating in layout.
+        /// When you set <see cref="constraint"/> to <see cref="Constraint.FixedColumnCount"/>, this value is equal
+        /// to the minimum of <see cref="constraintCount"/> and the number of child GameObjects.
+        /// </remarks>
+        public int generatedColumnCount { get; private set; }
+
         protected GridLayoutGroup()
         {}
 
@@ -194,6 +215,7 @@ namespace UnityEngine.UI
         /// </summary>
         public override void SetLayoutHorizontal()
         {
+            ResetGeneratedCounts();
             SetCellsAlongAxis(0);
         }
 
@@ -309,9 +331,6 @@ namespace UnityEngine.UI
                 if (rectChildrenCount % cellsPerMainAxis == 1)
                     childrenToMove += 1;
             }
-            
-            var xRemaining = rectChildrenCount % actualCellCountX;
-            var yRemaining = rectChildrenCount % actualCellCountY;
 
             for (int i = 0; i < rectChildrenCount; i++)
             {
@@ -328,17 +347,6 @@ namespace UnityEngine.UI
                     {
                         positionX = i % cellsPerMainAxis;
                         positionY = i / cellsPerMainAxis;
-                        if (rectChildrenCount - i == xRemaining)
-                        {
-                            requiredSpace = new Vector2(
-                                xRemaining * cellSize.x + (xRemaining - 1) * spacing.x,
-                                actualCellCountY * cellSize.y + (actualCellCountY - 1) * spacing.y
-                            );
-                            startOffset = new Vector2(
-                                GetStartOffset(0, requiredSpace.x),
-                                GetStartOffset(1, requiredSpace.y)
-                            );
-                        }
                     }
                 }
                 else
@@ -352,17 +360,6 @@ namespace UnityEngine.UI
                     {
                         positionX = i / cellsPerMainAxis;
                         positionY = i % cellsPerMainAxis;
-                        if (rectChildrenCount - i == yRemaining)
-                        {
-                            requiredSpace = new Vector2(
-                                actualCellCountX * cellSize.x + (actualCellCountX - 1) * spacing.x,
-                                yRemaining * cellSize.y + (yRemaining - 1) * spacing.y
-                            );
-                            startOffset = new Vector2(
-                                GetStartOffset(0, requiredSpace.x),
-                                GetStartOffset(1, requiredSpace.y)
-                            );
-                        }
                     }
                 }
 
@@ -374,6 +371,19 @@ namespace UnityEngine.UI
                 SetChildAlongAxis(rectChildren[i], 0, startOffset.x + (cellSize[0] + spacing[0]) * positionX, cellSize[0]);
                 SetChildAlongAxis(rectChildren[i], 1, startOffset.y + (cellSize[1] + spacing[1]) * positionY, cellSize[1]);
             }
+
+            generatedRowCount = actualCellCountY;
+            generatedColumnCount = actualCellCountX;
+        }
+
+        /// <summary>
+        /// Resets <see cref="generatedRowCount"/> and <see cref="generatedColumnCount"/> to default values.
+        /// </summary>
+        /// <exclude />
+        private void ResetGeneratedCounts()
+        {
+            generatedRowCount = 0;
+            generatedColumnCount = 0;
         }
     }
 }
