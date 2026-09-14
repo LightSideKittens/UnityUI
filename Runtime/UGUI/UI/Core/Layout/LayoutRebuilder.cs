@@ -18,7 +18,15 @@ namespace UnityEngine.UI
         // So this struct gets used as a key to a dictionary, so we need to guarantee a constant Hash value.
         private int m_CachedHashFromTransform;
 
-        static ObjectPool<LayoutRebuilder> s_Rebuilders = new ObjectPool<LayoutRebuilder>(() => new LayoutRebuilder(), null, x => x.Clear());
+        static readonly ObjectPool<LayoutRebuilder> s_Rebuilders = new ObjectPool<LayoutRebuilder>(() => new LayoutRebuilder(), null, x => x.Clear());
+
+#if UNITY_EDITOR
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void ResetStaticsOnLoad()
+        {
+            s_Rebuilders.Clear();
+        }
+#endif
 
         private void Initialize(RectTransform controller)
         {
@@ -194,6 +202,28 @@ namespace UnityEngine.UI
 
                 parent = parent.parent as RectTransform;
             }
+
+#if UNITY_EDITOR
+            //Child ILayoutGroup components from the root need to be marked for layout rebuild.
+            //UUM-100091: Ideally, we'd want a broader fix. This change narrowly addresses the bug.
+            if (!UnityEditor.EditorApplication.isPlaying)
+            {
+                using (ListPool<ILayoutGroup>.Get(out var layoutComps))
+                {
+                    layoutRoot.GetComponentsInChildren<ILayoutGroup>(layoutComps);
+                    foreach (var layout in layoutComps)
+                    {
+                        if (layout is Behaviour behaviour && behaviour.isActiveAndEnabled)
+                        {
+                            if (ReferenceEquals(behaviour.gameObject, layoutRoot.gameObject))
+                                continue;
+
+                            MarkLayoutRootForRebuild(behaviour.transform as RectTransform);
+                        }
+                    }
+                }
+            }
+#endif
 
             // We know the layout root is valid if it's not the same as the rect,
             // since we checked that above. But if they're the same we still need to check.

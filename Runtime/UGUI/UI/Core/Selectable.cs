@@ -5,10 +5,11 @@ using UnityEngine.EventSystems;
 
 namespace UnityEngine.UI
 {
-    [AddComponentMenu("UI/Selectable", 35)]
+    [AddComponentMenu("UI (Canvas)/Selectable", 35)]
     [ExecuteAlways]
     [SelectionBase]
     [DisallowMultipleComponent]
+    [UGUIHelpURL("Selectable")]
     /// <summary>
     /// Simple selectable object - derived from to create a selectable control.
     /// </summary>
@@ -22,6 +23,16 @@ namespace UnityEngine.UI
     {
         protected static Selectable[] s_Selectables = new Selectable[10];
         protected static int s_SelectableCount = 0;
+
+#if UNITY_EDITOR
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void ResetStaticsOnLoad()
+        {
+            s_Selectables = new Selectable[10];
+            s_SelectableCount = default;
+        }
+#endif
+
         private bool m_EnableCalled = false;
 
         /// <summary>
@@ -67,7 +78,7 @@ namespace UnityEngine.UI
         /// A List instance of the allSelectablesArray to maintain API compatibility.
         /// </summary>
 
-        [Obsolete("Replaced with allSelectablesArray to have better performance when disabling a element", false)]
+        [Obsolete("Replaced with allSelectablesArray to have better performance when disabling an element", true)]
         public static List<Selectable> allSelectables
         {
             get
@@ -1118,38 +1129,35 @@ namespace UnityEngine.UI
         /// Returns whether the selectable is currently 'highlighted' or not.
         /// </summary>
         /// <remarks>
-        /// Use this to check if the selectable UI element is currently highlighted.
+        /// Indicates whether the selectable UI element is currently highlighted.
         /// </remarks>
         /// <example>
         /// <code>
         /// <![CDATA[
-        /// //Create a UI element. To do this go to Create>UI and select from the list. Attach this script to the UI GameObject to see this script working. The script also works with non-UI elements, but highlighting works better with UI.
+        /// //Create a UI element. To do this, go to Create > UI and select from the list. Attach this script to the UI GameObject to see it in action.
         ///
         /// using UnityEngine;
-        /// using UnityEngine.Events;
-        /// using UnityEngine.EventSystems;
         /// using UnityEngine.UI;
-        ///
-        /// //Use the Selectable class as a base class to access the IsHighlighted method
-        /// public class Example : Selectable
+        /// public class Example : MonoBehaviour
         /// {
-        ///     //Use this to check what Events are happening
-        ///     BaseEventData m_BaseEvent;
-        ///
+        ///     public Selectable selectable;
+        ///     // Check if the GameObject is being highlighted
         ///     void Update()
         ///     {
-        ///         //Check if the GameObject is being highlighted
-        ///         if (IsHighlighted())
-        ///         {
+        ///        if (selectable.IsHighlighted())
+        ///        {
         ///             //Output that the GameObject was highlighted, or do something else
-        ///             Debug.Log("Selectable is Highlighted");
+        ///             Debug.Log("Selectable Highlighted");
         ///         }
         ///     }
         /// }
         /// ]]>
-        ///</code>
+        /// </code>
         /// </example>
-        protected bool IsHighlighted()
+        /// <returns>
+        /// Returns true if the element is highlighted; otherwise, returns false.
+        /// </returns>
+        public bool IsHighlighted()
         {
             if (!IsActive() || !IsInteractable())
                 return false;
@@ -1157,9 +1165,37 @@ namespace UnityEngine.UI
         }
 
         /// <summary>
-        /// Whether the current selectable is being pressed.
+        /// Returns true if the element is being pressed; otherwise, returns false.
         /// </summary>
-        protected bool IsPressed()
+        /// <remarks>
+        /// Indicates whether the selectable UI element is currently pressed.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// <![CDATA[
+        /// //Create a UI element. To do this, go to Create > UI and select from the list. Attach this script to the UI GameObject to see it in action.
+        ///
+        /// using UnityEngine;
+        /// using UnityEngine.UI;
+        /// public class Example : MonoBehaviour
+        /// {
+        ///     public Selectable selectable;
+        ///     // Check if the GameObject is being pressed.
+        ///     void Update()
+        ///     {
+        ///         if (selectable.IsPressed())
+        ///         {
+        ///             Debug.Log("Selectable Pressed");
+        ///         }
+        ///     }
+        /// }
+        /// ]]>
+        /// </code>
+        /// </example>
+        /// <returns>
+        /// Returns true if the element is pressed; otherwise, returns false.
+        /// </returns>
+        public bool IsPressed()
         {
             if (!IsActive() || !IsInteractable())
                 return false;
@@ -1195,7 +1231,7 @@ namespace UnityEngine.UI
         ///     }
         /// }
         /// ]]>
-        ///</code>
+        /// </code>
         /// </example>
         public virtual void OnPointerDown(PointerEventData eventData)
         {
@@ -1235,7 +1271,7 @@ namespace UnityEngine.UI
         ///     }
         /// }
         /// ]]>
-        ///</code>
+        /// </code>
         /// </example>
         public virtual void OnPointerUp(PointerEventData eventData)
         {
@@ -1267,7 +1303,7 @@ namespace UnityEngine.UI
         ///     }
         /// }
         /// ]]>
-        ///</code>
+        /// </code>
         /// </example>
         public virtual void OnPointerEnter(PointerEventData eventData)
         {
@@ -1295,7 +1331,7 @@ namespace UnityEngine.UI
         ///     }
         /// }
         /// ]]>
-        ///</code>
+        /// </code>
         /// </example>
         public virtual void OnPointerExit(PointerEventData eventData)
         {
@@ -1323,7 +1359,7 @@ namespace UnityEngine.UI
         ///     }
         /// }
         /// ]]>
-        ///</code>
+        /// </code>
         /// </example>
         public virtual void OnSelect(BaseEventData eventData)
         {
@@ -1350,7 +1386,7 @@ namespace UnityEngine.UI
         ///     }
         /// }
         /// ]]>
-        ///</code>
+        /// </code>
         /// </example>
         public virtual void OnDeselect(BaseEventData eventData)
         {
@@ -1381,7 +1417,7 @@ namespace UnityEngine.UI
         ///     }
         /// }
         /// ]]>
-        ///</code>
+        /// </code>
         /// </example>
         public virtual void Select()
         {

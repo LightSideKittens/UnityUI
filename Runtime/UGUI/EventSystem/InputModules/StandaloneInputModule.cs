@@ -1,10 +1,12 @@
 using System;
-using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine.Pool;
 using UnityEngine.Serialization;
 
 namespace UnityEngine.EventSystems
 {
     [AddComponentMenu("Event/Standalone Input Module")]
+    [UGUIHelpURL("StandaloneInputModule")]
     /// <summary>
     /// A BaseInputModule designed for mouse / keyboard / controller input.
     /// </summary>
@@ -22,7 +24,7 @@ namespace UnityEngine.EventSystems
 
         private GameObject m_CurrentFocusedGameObject;
 
-        private PointerEventData m_InputPointerEvent;
+        private readonly Dictionary<int, PointerEventData> m_InputPointerEvents = new();
 
         private const float doubleClickTime = 0.3f;
 
@@ -30,14 +32,14 @@ namespace UnityEngine.EventSystems
         {
         }
 
-        [Obsolete("Mode is no longer needed on input module as it handles both mouse and keyboard simultaneously.", false)]
+        [Obsolete("Mode is no longer needed on input module as it handles both mouse and keyboard simultaneously.", true)]
         public enum InputMode
         {
             Mouse,
             Buttons
         }
 
-        [Obsolete("Mode is no longer needed on input module as it handles both mouse and keyboard simultaneously.", false)]
+        [Obsolete("Mode is no longer needed on input module as it handles both mouse and keyboard simultaneously.", true)]
         public InputMode inputMode
         {
             get { return InputMode.Mouse; }
@@ -75,7 +77,7 @@ namespace UnityEngine.EventSystems
         [HideInInspector]
         private bool m_ForceModuleActive;
 
-        [Obsolete("allowActivationOnMobileDevice has been deprecated. Use forceModuleActive instead (UnityUpgradable) -> forceModuleActive")]
+        [Obsolete("allowActivationOnMobileDevice has been deprecated. Use forceModuleActive instead (UnityUpgradable) -> forceModuleActive", true)]
         public bool allowActivationOnMobileDevice
         {
             get { return m_ForceModuleActive; }
@@ -88,8 +90,7 @@ namespace UnityEngine.EventSystems
         /// <remarks>
         /// If there is no module active with higher priority (ordered in the inspector) this module will be forced active even if valid enabling conditions are not met.
         /// </remarks>
-
-        [Obsolete("forceModuleActive has been deprecated. There is no need to force the module awake as StandaloneInputModule works for all platforms")]
+        [Obsolete("forceModuleActive has been deprecated. There is no need to force the module awake as StandaloneInputModule works for all platforms", true)]
         public bool forceModuleActive
         {
             get { return m_ForceModuleActive; }
@@ -166,18 +167,40 @@ namespace UnityEngine.EventSystems
         {
             if (!eventSystem.isFocused && ShouldIgnoreEventsOnNoFocus())
             {
-                if (m_InputPointerEvent != null && m_InputPointerEvent.pointerDrag != null && m_InputPointerEvent.dragging)
-                {
-                    ReleaseMouse(m_InputPointerEvent, m_InputPointerEvent.pointerCurrentRaycast.gameObject);
-                }
-
-                m_InputPointerEvent = null;
-
+                ReleasePointerDrags();
                 return;
             }
 
             m_LastMousePosition = m_MousePosition;
             m_MousePosition = input.mousePosition;
+        }
+
+        private void ReleasePointerDrags()
+        {
+            using (ListPool<int>.Get(out var pointerIds))
+            {
+                // Copy all current pointer IDs into a temporary list so we can iterate over them safely.
+                // We cannot iterate m_InputPointerEvents directly because ReleaseMouse() modifies
+                // m_InputPointerEvents, which would invalidate any active enumeration.
+                foreach (var key in m_InputPointerEvents.Keys)
+                {
+                    pointerIds.Add(key);
+                }
+
+                // Release drag events for all pointers
+                foreach (var pointerId in pointerIds)
+                {
+                    if (!m_InputPointerEvents.TryGetValue(pointerId, out var inputPointerEvent))
+                        continue;
+
+                    if (inputPointerEvent != null && inputPointerEvent.pointerDrag != null && inputPointerEvent.dragging)
+                    {
+                        ReleaseMouse(inputPointerEvent, inputPointerEvent.pointerCurrentRaycast.gameObject);
+                    }
+                }
+            }
+
+            m_InputPointerEvents.Clear();
         }
 
         private void ReleaseMouse(PointerEventData pointerEvent, GameObject currentOverGo)
@@ -217,7 +240,7 @@ namespace UnityEngine.EventSystems
                 HandlePointerExitAndEnter(pointerEvent, currentOverGo);
             }
 
-            m_InputPointerEvent = pointerEvent;
+            m_InputPointerEvents[pointerEvent.pointerId] = pointerEvent;
         }
 
         public override bool ShouldActivateModule()
@@ -436,7 +459,7 @@ namespace UnityEngine.EventSystems
                 pointerEvent.pointerEnter = null;
             }
 
-            m_InputPointerEvent = pointerEvent;
+            m_InputPointerEvents[pointerEvent.pointerId] = pointerEvent;
         }
 
         /// <summary>
@@ -534,7 +557,7 @@ namespace UnityEngine.EventSystems
             ProcessMouseEvent(0);
         }
 
-        [Obsolete("This method is no longer checked, overriding it with return true does nothing!")]
+        [Obsolete("This method is no longer checked, overriding it with return true does nothing!", true)]
         protected virtual bool ForceAutoSelect()
         {
             return false;
@@ -645,7 +668,7 @@ namespace UnityEngine.EventSystems
                 if (pointerEvent.pointerDrag != null)
                     ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.initializePotentialDrag);
 
-                m_InputPointerEvent = pointerEvent;
+                m_InputPointerEvents[pointerEvent.pointerId] = pointerEvent;
             }
 
             // PointerUp notification

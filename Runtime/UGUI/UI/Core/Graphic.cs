@@ -82,13 +82,29 @@ namespace UnityEngine.UI
         : UIBehaviour,
           ICanvasElement
     {
-        static protected Material s_DefaultUI = null;
-        static protected Texture2D s_WhiteTexture = null;
+        protected static Material s_DefaultUI = null;
+        protected static Texture2D s_WhiteTexture = null;
+        protected static Mesh s_Mesh;
+        private static readonly VertexHelper s_VertexHelper = new VertexHelper();
+
+#if UNITY_EDITOR
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void ResetStaticsOnLoad()
+        {
+            s_DefaultUI = null;
+            s_WhiteTexture = null;
+
+            if (s_Mesh != null)
+            {
+                DestroyImmediate(s_Mesh);
+                s_Mesh = null;
+            }
+        }
+#endif
 
         /// <summary>
         /// Default material used to draw UI elements if no explicit material was specified.
         /// </summary>
-
         static public Material defaultGraphicMaterial
         {
             get
@@ -210,15 +226,9 @@ namespace UnityEngine.UI
         [NonSerialized] private bool m_VertsDirty;
         [NonSerialized] private bool m_MaterialDirty;
 
-        [NonSerialized] private bool m_MeshModifiersDirty = true;
-        [NonSerialized] private bool m_HasMeshModifiers;
-
         [NonSerialized] protected UnityAction m_OnDirtyLayoutCallback;
         [NonSerialized] protected UnityAction m_OnDirtyVertsCallback;
         [NonSerialized] protected UnityAction m_OnDirtyMaterialCallback;
-
-        [NonSerialized] protected static Mesh s_Mesh;
-        [NonSerialized] private static readonly VertexHelper s_VertexHelper = new VertexHelper();
 
         [NonSerialized] protected Mesh m_CachedMesh;
         [NonSerialized] protected Vector2[] m_CachedUvs;
@@ -226,6 +236,7 @@ namespace UnityEngine.UI
         [NonSerialized]
         private readonly TweenRunner<ColorTween> m_ColorTweenRunner;
 
+		[Obsolete("useLegacyMeshGeneration is deprecated now that the legacy mesh generation is no longer supported.")]
         protected bool useLegacyMeshGeneration { get; set; }
 
         // Called by Unity prior to deserialization,
@@ -235,7 +246,9 @@ namespace UnityEngine.UI
             if (m_ColorTweenRunner == null)
                 m_ColorTweenRunner = new TweenRunner<ColorTween>();
             m_ColorTweenRunner.Init(this);
-            useLegacyMeshGeneration = true;
+#pragma warning disable 618
+            useLegacyMeshGeneration = false;
+#pragma warning restore 618
         }
 
         /// <summary>
@@ -301,6 +314,12 @@ namespace UnityEngine.UI
             m_VertsDirty = true;
             CanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
 
+#if PACKAGE_POLYSPATIAL
+            // [AVPB-860] When vertices are dirtied, mark the component itself 
+            // dirty as well so that ObjectDispatcher picks it up
+            MarkDirty();
+#endif
+
             if (m_OnDirtyVertsCallback != null)
                 m_OnDirtyVertsCallback();
         }
@@ -321,30 +340,6 @@ namespace UnityEngine.UI
 
             if (m_OnDirtyMaterialCallback != null)
                 m_OnDirtyMaterialCallback();
-        }
-
-        /// <summary>
-        /// Invalidate the cached presence of <see cref="IMeshModifier"/> components so it is recomputed on the next
-        /// geometry rebuild. <see cref="BaseMeshEffect"/> calls this automatically on enable/disable; call it manually
-        /// only when adding or removing an IMeshModifier that does not derive from BaseMeshEffect.
-        /// </summary>
-        public void SetMeshModifiersDirty()
-        {
-            m_MeshModifiersDirty = true;
-        }
-
-        /// <summary>
-        /// Recomputes whether any <see cref="IMeshModifier"/> is attached. The result is cached because the modifier
-        /// set changes rarely while geometry is dirtied frequently, so the per-rebuild GetComponents is skipped in the
-        /// common (no-modifier) case. Invalidated via <see cref="SetMeshModifiersDirty"/>.
-        /// </summary>
-        private void RefreshMeshModifierFlag()
-        {
-            var components = ListPool<Component>.Get();
-            GetComponents(typeof(IMeshModifier), components);
-            m_HasMeshModifiers = components.Count > 0;
-            ListPool<Component>.Release(components);
-            m_MeshModifiersDirty = false;
         }
 
         public void SetRaycastDirty()
@@ -708,9 +703,11 @@ namespace UnityEngine.UI
         /// </summary>
         protected virtual void UpdateGeometry()
         {
+#pragma warning disable 618
             if (useLegacyMeshGeneration)
+#pragma warning restore 618
             {
-                DoLegacyMeshGeneration();
+                Debug.LogError("Legacy mesh generation is no longer supported.", this);
             }
             else
             {
@@ -725,54 +722,15 @@ namespace UnityEngine.UI
             else
                 s_VertexHelper.Clear(); // clear the vertex helper so invalid graphics dont draw.
 
-            if (m_MeshModifiersDirty)
-                RefreshMeshModifierFlag();
+            var components = ListPool<Component>.Get();
+            GetComponents(typeof(IMeshModifier), components);
 
-            if (m_HasMeshModifiers)
-            {
-                var components = ListPool<Component>.Get();
-                GetComponents(typeof(IMeshModifier), components);
+            for (var i = 0; i < components.Count; i++)
+                ((IMeshModifier)components[i]).ModifyMesh(s_VertexHelper);
 
-                for (var i = 0; i < components.Count; i++)
-                    ((IMeshModifier)components[i]).ModifyMesh(s_VertexHelper);
-
-                ListPool<Component>.Release(components);
-            }
+            ListPool<Component>.Release(components);
 
             s_VertexHelper.FillMesh(workerMesh);
-            canvasRenderer.SetMesh(workerMesh);
-        }
-
-        private void DoLegacyMeshGeneration()
-        {
-            if (rectTransform != null && rectTransform.rect.width >= 0 && rectTransform.rect.height >= 0)
-            {
-#pragma warning disable 618
-                OnPopulateMesh(workerMesh);
-#pragma warning restore 618
-            }
-            else
-            {
-                workerMesh.Clear();
-            }
-
-            if (m_MeshModifiersDirty)
-                RefreshMeshModifierFlag();
-
-            if (m_HasMeshModifiers)
-            {
-                var components = ListPool<Component>.Get();
-                GetComponents(typeof(IMeshModifier), components);
-
-                for (var i = 0; i < components.Count; i++)
-                {
-#pragma warning disable 618
-                    ((IMeshModifier)components[i]).ModifyMesh(workerMesh);
-#pragma warning restore 618
-                }
-
-                ListPool<Component>.Release(components);
-            }
             canvasRenderer.SetMesh(workerMesh);
         }
 
@@ -788,11 +746,7 @@ namespace UnityEngine.UI
                 return s_Mesh;
             }
         }
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        [Obsolete("Use OnPopulateMesh instead.", true)]
-        protected virtual void OnFillVBO(System.Collections.Generic.List<UIVertex> vbo) {}
 
-        [Obsolete("Use OnPopulateMesh(VertexHelper vh) instead.", false)]
         /// <summary>
         /// Callback function when a UI element needs to generate vertices. Fills the vertex buffer data.
         /// </summary>
@@ -800,6 +754,7 @@ namespace UnityEngine.UI
         /// <remarks>
         /// Used by Text, UI.Image, and RawImage for example to generate vertices specific to their use case.
         /// </remarks>
+        [Obsolete("Use OnPopulateMesh(VertexHelper vh) instead.", true)]
         protected virtual void OnPopulateMesh(Mesh m)
         {
             OnPopulateMesh(s_VertexHelper);
@@ -878,7 +833,16 @@ namespace UnityEngine.UI
         /// <param name="sp">Screen point being tested</param>
         /// <param name="eventCamera">Camera that is being used for the testing.</param>
         /// <returns>True if the provided point is a valid location for GraphicRaycaster raycasts.</returns>
-        public virtual bool Raycast(Vector2 sp, Camera eventCamera)
+        public virtual bool Raycast(Vector2 sp, Camera eventCamera) => Raycast(sp, eventCamera, false);
+
+        /// <summary>
+        /// When a GraphicRaycaster raycasts into the scene, it first filters the elements based on their RectTransform rect, then uses this Raycast function to determine which elements are hit.
+        /// </summary>
+        /// <param name="sp">Screen point being tested.</param>
+        /// <param name="eventCamera">Camera used for testing.</param>
+        /// <param name="ignoreMasks">If true, masks are ignored and do not prevent raycasts. </param>
+        /// <returns>True if the provided point is a valid location for GraphicRaycaster raycasts.</returns>
+        protected bool Raycast(Vector2 sp, Camera eventCamera, bool ignoreMasks)
         {
             if (!isActiveAndEnabled)
                 return false;
@@ -888,49 +852,81 @@ namespace UnityEngine.UI
 
             bool ignoreParentGroups = false;
             bool continueTraversal = true;
+            bool isParent = false;
 
             while (t != null)
             {
+                bool raycastValid = true;
+                bool hasMask = false;
+                bool maskableGraphicRaycastValid = true;
+
                 t.GetComponents(components);
                 for (var i = 0; i < components.Count; i++)
                 {
-                    var canvas = components[i] as Canvas;
+                    var component = components[i];
+                    var canvas = component as Canvas;
                     if (canvas != null && canvas.overrideSorting)
                         continueTraversal = false;
 
-                    var filter = components[i] as ICanvasRaycastFilter;
-
+                    var filter = component as ICanvasRaycastFilter;  // Image, Mask, RectMask2D, CanvasGroup
                     if (filter == null)
                         continue;
 
-                    var raycastValid = true;
+                    if (ignoreMasks && component is Mask or RectMask2D)
+                        continue;
 
-                    var group = components[i] as CanvasGroup;
-                    if (group != null)
+                    if (component is CanvasGroup group)
                     {
                         if (!group.enabled)
                             continue;
 
-                        if (ignoreParentGroups == false && group.ignoreParentGroups)
+                        if (ignoreParentGroups == false)
                         {
-                            ignoreParentGroups = true;
+                            if (group.ignoreParentGroups)
+                                ignoreParentGroups = true;
+    
                             raycastValid = filter.IsRaycastLocationValid(sp, eventCamera);
+                            if (!raycastValid)
+                                break;
                         }
-                        else if (!ignoreParentGroups)
-                            raycastValid = filter.IsRaycastLocationValid(sp, eventCamera);
                     }
                     else
                     {
-                        raycastValid = filter.IsRaycastLocationValid(sp, eventCamera);
-                    }
+                        if (isParent && component is Graphic graphic && !graphic.raycastTarget)
+                            continue;
 
-                    if (!raycastValid)
-                    {
-                        ListPool<Component>.Release(components);
-                        return false;
+                        hasMask |= component is Mask;
+
+                        raycastValid = filter.IsRaycastLocationValid(sp, eventCamera);
+
+                        // Try to early-out if the raycast is not valid
+                        if (!raycastValid)
+                        {
+                            // Cache the raycast result for parent MaskableGraphics and continue processing components
+                            // unless we already found a Mask and are not ignoring masks
+                            if (isParent && component is MaskableGraphic)
+                            {
+                                maskableGraphicRaycastValid = raycastValid;
+                                if (ignoreMasks || !hasMask)
+                                {
+                                    raycastValid = true;
+                                    continue;
+                                }
+                            }
+
+                            break;
+                        }
                     }
                 }
+
+                if (!raycastValid || (hasMask && !maskableGraphicRaycastValid))
+                {
+                    ListPool<Component>.Release(components);
+                    return false;
+                }
+
                 t = continueTraversal ? t.parent : null;
+                isParent = true;
             }
             ListPool<Component>.Release(components);
             return true;

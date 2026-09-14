@@ -12,7 +12,8 @@ namespace UnityEngine.UI
     /// </summary>
 
     [RequireComponent(typeof(CanvasRenderer))]
-    [AddComponentMenu("UI/Image", 11)]
+    [AddComponentMenu("UI (Canvas)/Image", 11)]
+    [UGUIHelpURL("Image")]
     /// <summary>
     ///   Displays a Sprite inside the UI System.
     /// </summary>
@@ -230,6 +231,23 @@ namespace UnityEngine.UI
         }
 
         static protected Material s_ETC1DefaultUI = null;
+        static SecondarySpriteTexture[] s_TempNewSecondaryTextures = Array.Empty<SecondarySpriteTexture>();
+
+        // To track textureless images, which will be rebuild if sprite atlas manager registered a Sprite Atlas that will give this image new texture
+        static readonly List<Image> m_TrackedTexturelessImages = new List<Image>();
+        static bool s_Initialized;
+
+#if UNITY_EDITOR
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterAssembliesLoaded)]
+        static void ResetStaticsOnLoad()
+        {
+            SpriteAtlasManager.atlasRegistered -= RebuildImage;
+            s_ETC1DefaultUI = null;
+            s_TempNewSecondaryTextures = Array.Empty<SecondarySpriteTexture>();
+            m_TrackedTexturelessImages.Clear();
+            s_Initialized = default;
+        }
+#endif
 
         [FormerlySerializedAs("m_Frame")]
         [SerializeField]
@@ -290,6 +308,8 @@ namespace UnityEngine.UI
 
                         ResetAlphaHitThresholdIfNeeded();
                         SetAllDirty();
+                        if (m_Tracked)
+                            UnTrackImage(this);
                         TrackSprite();
                     }
                 }
@@ -348,10 +368,10 @@ namespace UnityEngine.UI
         /// is set to /null/.
         /// </remarks>
         /// <example>
-        /// Note: The script example below has two buttons.  The button textures are loaded from the
+        /// <para>Note: The script example below has two buttons.  The button textures are loaded from the
         /// /Resources/ folder.  (They are not used in the shown example).  Two sprites are added to
         /// the example code.  /Example1/ and /Example2/ are functions called by the button OnClick
-        /// functions.  Example1 calls overrideSprite and Example2 sets overrideSprite to null.
+        /// functions.  Example1 calls overrideSprite and Example2 sets overrideSprite to null.</para>
         /// <code>
         /// <![CDATA[
         /// using System.Collections;
@@ -399,6 +419,8 @@ namespace UnityEngine.UI
                 if (SetPropertyUtility.SetClass(ref m_OverrideSprite, value))
                 {
                     SetAllDirty();
+                    if (m_Tracked)
+                        UnTrackImage(this);
                     TrackSprite();
                 }
             }
@@ -599,7 +621,7 @@ namespace UnityEngine.UI
         // Whether this is being tracked for Atlas Binding.
         private bool m_Tracked = false;
 
-        [Obsolete("eventAlphaThreshold has been deprecated. Use eventMinimumAlphaThreshold instead (UnityUpgradable) -> alphaHitTestMinimumThreshold")]
+        [Obsolete("eventAlphaThreshold has been deprecated. Use eventMinimumAlphaThreshold instead (UnityUpgradable) -> alphaHitTestMinimumThreshold", true)]
 
         /// <summary>
         /// Obsolete. You should use UI.Image.alphaHitTestMinimumThreshold instead.
@@ -660,7 +682,6 @@ namespace UnityEngine.UI
 
         protected Image()
         {
-            useLegacyMeshGeneration = false;
         }
 
         /// <summary>
@@ -930,7 +951,6 @@ namespace UnityEngine.UI
                 UnTrackImage(this);
         }
 
-        static SecondarySpriteTexture[] s_TempNewSecondaryTextures = {};
         SecondarySpriteTexture [] m_SecondaryTextures;
 
         internal SecondarySpriteTexture [] secondaryTextures => m_SecondaryTextures; // Internal for testing only
@@ -958,7 +978,7 @@ namespace UnityEngine.UI
 
                 for (var i = 0; i < array1.Length; ++i)
                 {
-                    if (array1[i].name != array2[i].name || array1[i].texture != array2[i].texture)
+                    if (array1[i] != array2[i])
                         return false;
                 }
 
@@ -1005,7 +1025,6 @@ namespace UnityEngine.UI
                 }
             }
 
-#if UNITY_6000_0_OR_NEWER
             renderer.SetSecondaryTextureCount(m_SecondaryTextures?.Length ?? 0);
 
             if (m_SecondaryTextures != null)
@@ -1013,11 +1032,9 @@ namespace UnityEngine.UI
                 for (var i = 0; i < m_SecondaryTextures.Length; ++i)
                 {
                     var secondaryTex = m_SecondaryTextures[i];
-
                     renderer.SetSecondaryTexture(i, secondaryTex.name, secondaryTex.texture);
                 }
             }
-#endif
 
             ClearArray(ref s_TempNewSecondaryTextures);
         }
@@ -1838,6 +1855,9 @@ namespace UnityEngine.UI
         /// </summary>
         public virtual float minWidth { get { return 0; } }
 
+        /// <inheritdoc/>
+        public virtual float maxWidth { get { return LayoutUtility.DefaultMaxSize; } }
+
         /// <summary>
         /// If there is a sprite being rendered returns the size of that sprite.
         /// In the case of a slided or tiled sprite will return the calculated minimum size possible
@@ -1863,6 +1883,9 @@ namespace UnityEngine.UI
         /// See ILayoutElement.minHeight.
         /// </summary>
         public virtual float minHeight { get { return 0; } }
+
+        /// <inheritdoc/>
+        public virtual float maxHeight { get { return LayoutUtility.DefaultMaxSize; } }
 
         /// <summary>
         /// If there is a sprite being rendered returns the size of that sprite.
@@ -1927,12 +1950,6 @@ namespace UnityEngine.UI
             float x = local.x / activeSprite.texture.width;
             float y = local.y / activeSprite.texture.height;
 
-            // Locations outside the image are always considered valid.
-            // This guarantees that the behavior remains consistent with the case where alphaHitTestMinimumThreshold <= 0.
-            // Without this check, we would continue to sample a pixel outside the texture.
-            if (x < 0 || x > 1 || y < 0 || y > 1)
-                return true;
-
             try
             {
                 return activeSprite.texture.GetPixelBilinear(x, y).a >= alphaHitTestMinimumThreshold;
@@ -1979,10 +1996,6 @@ namespace UnityEngine.UI
 
             return local + spriteRect.position;
         }
-
-        // To track textureless images, which will be rebuild if sprite atlas manager registered a Sprite Atlas that will give this image new texture
-        static List<Image> m_TrackedTexturelessImages = new List<Image>();
-        static bool s_Initialized;
 
         static void RebuildImage(SpriteAtlas spriteAtlas)
         {
