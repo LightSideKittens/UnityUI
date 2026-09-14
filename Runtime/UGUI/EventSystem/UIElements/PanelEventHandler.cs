@@ -11,6 +11,7 @@ namespace UnityEngine.UIElements
     /// Use this class to handle input and send events to UI Toolkit runtime panels.
     /// </summary>
     [AddComponentMenu("UI Toolkit/Panel Event Handler (UI Toolkit)")]
+    [UGUIHelpURL("PanelEventHandler")]
     public class PanelEventHandler : UIBehaviour, IPointerMoveHandler, IPointerUpHandler, IPointerDownHandler,
         ISubmitHandler, ICancelHandler, IMoveHandler, IScrollHandler, ISelectHandler, IDeselectHandler,
         IPointerExitHandler, IPointerEnterHandler, IRuntimePanelComponent, IPointerClickHandler
@@ -150,6 +151,10 @@ namespace UnityEngine.UIElements
         {
             if (!ReadPointerData(m_PointerEvent, eventData, PointerEventType.Down))
                 return;
+
+            // Allow KeyDown/KeyUp events to be processed before pointer events.
+            var target = currentFocusedElement ?? m_Panel.visualTree;
+            ProcessImguiEvents(target);
 
             if (eventSystem != null)
                 eventSystem.SetSelectedGameObject(selectableGameObject);
@@ -507,7 +512,7 @@ namespace UnityEngine.UIElements
                 Vector3 eventPosition = MultipleDisplayUtilities.GetRelativeMousePositionForRaycast(eventData);
                 int eventDisplayIndex = (int)eventPosition.z;
 
-                if (eventDisplayIndex > 0 && eventDisplayIndex < Display.displays.Length)
+                if (UnityEngineInternal.DisplayInternal.IsASecondaryDisplayIndex(eventDisplayIndex))
                 {
 #if UNITY_ANDROID
                     // Changed for UITK to be coherent for Android which passes display-relative rendering coordinates

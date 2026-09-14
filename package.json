@@ -1,7 +1,7 @@
 {
   "name": "com.unity.ugui",
-  "displayName": "Unity UI",
-  "version": "2.0.3",
+  "displayName": "uGUI",
+  "version": "2.0.0",
   "unity": "2019.2",
   "keywords": [
     "UI",
@@ -14,17 +14,9 @@
     "TMP",
     "SDF"
   ],
-  "description": "Unity UI is a set of tools for developing user interfaces for games and applications. It is a GameObject-based UI system that uses Components and the Game View to arrange, position, and style user interfaces. ​ You cannot use Unity UI to create or change user interfaces in the Unity Editor.",
+  "description": "uGUI (Unity UI) is a set of tools for developing user interfaces for games and applications. It is a GameObject-based UI system that uses Components and the Game View to arrange, position, and style user interfaces. ​ You cannot use Unity UI to create or change user interfaces in the Unity Editor.",
   "dependencies": {
     "com.unity.modules.ui": "1.0.0",
-    "com.unity.modules.imgui": "1.0.0"
-  },
-  "samples": [
-    {
-      "displayName": "UI Stress Benchmark",
-      "description": "Procedural heavy-UI benchmark for layout, mesh generation, batching and raycast. Self-bootstraps a rig and reports CPU/GC/render metrics to console + CSV. Uses only public UGUI API, so it can A/B compare the stock package against a fork.",
-      "path": "Samples~/UIStressBenchmark"
-    }
-  ],
-  "_fingerprint": "423bc642aff1ba4fed4feef1d7b45461138cbb32"
+    "com.unity.modules.imgui":"1.0.0"
+  }
 }

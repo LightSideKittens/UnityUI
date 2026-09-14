@@ -13,6 +13,7 @@ namespace UnityEngine.UIElements
     /// A derived BaseRaycaster to raycast against UI Toolkit panel instances at runtime.
     /// </summary>
     [AddComponentMenu("UI Toolkit/Panel Raycaster (UI Toolkit)")]
+    [UGUIHelpURL("PanelRaycaster")]
     public class PanelRaycaster : BaseRaycaster, IRuntimePanelComponent
     {
         private BaseRuntimePanel m_Panel;
@@ -76,7 +77,7 @@ namespace UnityEngine.UIElements
             var delta = eventData.delta;
 
             float h = Screen.height;
-            if (displayIndex > 0 && displayIndex < Display.displays.Length)
+            if (UnityEngineInternal.DisplayInternal.IsASecondaryDisplayIndex(displayIndex))
             {
 #if UNITY_ANDROID
                     // Changed for UITK to be coherent for Android which passes display-relative rendering coordinates

@@ -6,10 +6,11 @@ using UnityEngine.Serialization;
 
 namespace UnityEngine.UI
 {
-    [AddComponentMenu("UI/Mask", 13)]
+    [AddComponentMenu("UI (Canvas)/Mask", 13)]
     [ExecuteAlways]
     [RequireComponent(typeof(RectTransform))]
     [DisallowMultipleComponent]
+    [UGUIHelpURL("Mask")]
     /// <summary>
     /// A component for masking children elements.
     /// </summary>

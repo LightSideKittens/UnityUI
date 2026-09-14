@@ -5,10 +5,11 @@ using UnityEngine.EventSystems;
 
 namespace UnityEngine.UI
 {
-    [AddComponentMenu("UI/Selectable", 35)]
+    [AddComponentMenu("UI (Canvas)/Selectable", 35)]
     [ExecuteAlways]
     [SelectionBase]
     [DisallowMultipleComponent]
+    [UGUIHelpURL("Selectable")]
     /// <summary>
     /// Simple selectable object - derived from to create a selectable control.
     /// </summary>
@@ -540,6 +541,10 @@ namespace UnityEngine.UI
             else
 #endif
             DoStateTransition(currentSelectionState, false);
+
+#if PACKAGE_POLYSPATIAL
+            MarkDirty();
+#endif
         }
 
         // Remove from the list.

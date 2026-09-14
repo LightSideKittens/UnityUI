@@ -4,11 +4,12 @@ using UnityEngine.EventSystems;
 
 namespace UnityEngine.UI
 {
-    [AddComponentMenu("UI/Scroll Rect", 37)]
+    [AddComponentMenu("UI (Canvas)/Scroll Rect", 37)]
     [SelectionBase]
     [ExecuteAlways]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
+    [UGUIHelpURL("ScrollRect")]
     /// <summary>
     /// A component for making a child RectTransform scroll.
     /// </summary>
@@ -644,73 +645,6 @@ namespace UnityEngine.UI
             m_Velocity = Vector2.zero;
         }
 
-        public Vector3 GetGoToPos(RectTransform target)
-        {
-            var contentCenter = content.localPosition;
-            var viewportCenter = GetCenter(viewport);
-            var targetCenter = GetCenter(target);
-
-            Vector3 dir = targetCenter - viewportCenter;
-            
-            var contentRect = content.rect;
-            var contentMax = contentRect.max;
-            var contentMin = contentRect.min;
-            var viewportMax = GetMax(viewport);
-            var viewportMin = GetMin(viewport);
-
-            if (vertical && horizontal) { }
-            else if (vertical)
-            {
-                dir.x = 0;
-            }
-            else if(horizontal)
-            {
-                dir.y = 0;
-            }
-            
-            if (dir.x > contentMax.x - viewportMax.x)
-            {
-                dir.x = contentMax.x - viewportMax.x;
-            }
-            else if (dir.x < contentMin.x - viewportMin.x)
-            {
-                dir.x = contentMin.x - viewportMin.x;
-            }
-            else if (dir.y > contentMax.y - viewportMax.y)
-            {
-                dir.y = contentMax.y - viewportMax.y;
-            }
-            else if (dir.y < contentMin.y - viewportMin.y)
-            {
-                dir.y = contentMin.y - viewportMin.y;
-            }
-            
-            return contentCenter - dir;
-        }
-
-        public virtual void GoTo(RectTransform target)
-        {
-            content.localPosition = GetGoToPos(target);
-        }
-        
-        private Vector3 GetCenter(RectTransform rt)
-        {
-            Vector2 localCenter = rt.rect.center;
-            return content.InverseTransformPoint(rt.TransformPoint(localCenter));
-        }
-        
-        private Vector3 GetMax(RectTransform rt)
-        {
-            Vector2 val = rt.rect.max;
-            return content.InverseTransformPoint(rt.TransformPoint(val));
-        }
-        
-        private Vector3 GetMin(RectTransform rt)
-        {
-            Vector2 val = rt.rect.min;
-            return content.InverseTransformPoint(rt.TransformPoint(val));
-        }
-
         public virtual void OnScroll(PointerEventData data)
         {
             if (!IsActive())
@@ -1118,8 +1052,8 @@ namespace UnityEngine.UI
             }
         }
 
-        private void SetHorizontalNormalizedPosition(float value) { SetNormalizedPosition(value, 0); }
-        private void SetVerticalNormalizedPosition(float value) { SetNormalizedPosition(value, 1); }
+        private void SetHorizontalNormalizedPosition(float value) { if(horizontalNormalizedPosition != value) SetNormalizedPosition(value, 0); }
+        private void SetVerticalNormalizedPosition(float value) { if(verticalNormalizedPosition != value) SetNormalizedPosition(value, 1); }
 
         /// <summary>
         /// >Set the horizontal or vertical scroll position as a value between 0 and 1, with 0 being at the left or at the bottom.

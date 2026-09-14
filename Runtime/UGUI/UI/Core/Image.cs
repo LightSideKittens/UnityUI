@@ -12,7 +12,8 @@ namespace UnityEngine.UI
     /// </summary>
 
     [RequireComponent(typeof(CanvasRenderer))]
-    [AddComponentMenu("UI/Image", 11)]
+    [AddComponentMenu("UI (Canvas)/Image", 11)]
+    [UGUIHelpURL("Image")]
     /// <summary>
     ///   Displays a Sprite inside the UI System.
     /// </summary>
@@ -958,7 +959,7 @@ namespace UnityEngine.UI
 
                 for (var i = 0; i < array1.Length; ++i)
                 {
-                    if (array1[i].name != array2[i].name || array1[i].texture != array2[i].texture)
+                    if (array1[i] != array2[i])
                         return false;
                 }
 
@@ -1005,7 +1006,6 @@ namespace UnityEngine.UI
                 }
             }
 
-#if UNITY_6000_0_OR_NEWER
             renderer.SetSecondaryTextureCount(m_SecondaryTextures?.Length ?? 0);
 
             if (m_SecondaryTextures != null)
@@ -1013,11 +1013,10 @@ namespace UnityEngine.UI
                 for (var i = 0; i < m_SecondaryTextures.Length; ++i)
                 {
                     var secondaryTex = m_SecondaryTextures[i];
-
+                
                     renderer.SetSecondaryTexture(i, secondaryTex.name, secondaryTex.texture);
                 }
             }
-#endif
 
             ClearArray(ref s_TempNewSecondaryTextures);
         }
@@ -1926,12 +1925,6 @@ namespace UnityEngine.UI
             // Convert local coordinates to texture space.
             float x = local.x / activeSprite.texture.width;
             float y = local.y / activeSprite.texture.height;
-
-            // Locations outside the image are always considered valid.
-            // This guarantees that the behavior remains consistent with the case where alphaHitTestMinimumThreshold <= 0.
-            // Without this check, we would continue to sample a pixel outside the texture.
-            if (x < 0 || x > 1 || y < 0 || y > 1)
-                return true;
 
             try
             {

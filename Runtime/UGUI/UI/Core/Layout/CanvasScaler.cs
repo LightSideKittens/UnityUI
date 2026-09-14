@@ -8,6 +8,7 @@ namespace UnityEngine.UI
     [ExecuteAlways]
     [AddComponentMenu("Layout/Canvas Scaler", 101)]
     [DisallowMultipleComponent]
+    [UGUIHelpURL("CanvasScaler")]
     /// <summary>
     ///   The Canvas Scaler component is used for controlling the overall scale and pixel density of UI elements in the Canvas. This scaling affects everything under the Canvas, including font sizes and image borders.
     /// </summary>
@@ -373,7 +374,7 @@ namespace UnityEngine.UI
         /// <param name="scaleFactor">The scale factor to use.</param>
         protected void SetScaleFactor(float scaleFactor)
         {
-            if (scaleFactor == m_PrevScaleFactor)
+            if (Mathf.Abs(scaleFactor - m_PrevScaleFactor) < 0.000005f)
                 return;
 
             m_Canvas.scaleFactor = scaleFactor;

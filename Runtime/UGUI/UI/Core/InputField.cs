@@ -13,7 +13,8 @@ namespace UnityEngine.UI
     /// Turn a simple label into a interactable input field.
     /// </summary>
 
-    [AddComponentMenu("UI/Legacy/Input Field", 103)]
+    [AddComponentMenu("UI (Canvas)/Legacy/Input Field", 103)]
+    [UGUIHelpURL("InputField")]
     public class InputField
         : Selectable,
         IUpdateSelectedHandler,
@@ -1483,9 +1484,12 @@ namespace UnityEngine.UI
                         m_WasCanceled = true;
                     else if (m_Keyboard.status == TouchScreenKeyboard.Status.Done)
                         SendOnSubmit();
+
+#if UNITY_ANDROID || UNITY_IOS
+                    DeactivateInputField();
+#endif
                 }
 
-                OnDeselect(null);
                 return;
             }
 
@@ -3274,6 +3278,11 @@ namespace UnityEngine.UI
         /// <param name="eventData">The data sent by the EventSystem</param>
         public override void OnDeselect(BaseEventData eventData)
         {
+            if (compositionString.Length > 0)
+            {
+                Append(compositionString);
+            }
+
             DeactivateInputField();
             base.OnDeselect(eventData);
         }

@@ -10,6 +10,7 @@ namespace UnityEngine.EventSystems
 {
     [AddComponentMenu("Event/Event System")]
     [DisallowMultipleComponent]
+    [UGUIHelpURL("EventSystem")]
     /// <summary>
     /// Handles input, raycasting, and sending events.
     /// </summary>
@@ -363,7 +364,7 @@ namespace UnityEngine.EventSystems
 
         /// <summary>
         /// Sets how UI Toolkit runtime panels receive events and handle selection
-        /// when interacting with other objects that use the EventSystem, such as components from the Unity UI package.
+        /// when interacting with other objects that use the EventSystem, such as components from the uGUI (Unity UI) package.
         /// </summary>
         /// <remarks>
         /// This method is obsolete. Use the PanelInputConfiguration component instead.
@@ -468,7 +469,6 @@ namespace UnityEngine.EventSystems
                 TickModules();
         }
 
-        public static event Action Updated;
         protected virtual void Update()
         {
 #if PACKAGE_UITOOLKIT
@@ -528,7 +528,6 @@ namespace UnityEngine.EventSystems
                     Debug.LogWarning("There are " + eventSystemCount + " event systems in the scene. Please ensure there is always exactly one event system in the scene");
             }
 #endif
-            Updated?.Invoke();
         }
 
         private void ChangeEventModule(BaseInputModule module)

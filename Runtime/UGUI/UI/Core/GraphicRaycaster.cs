@@ -8,6 +8,7 @@ namespace UnityEngine.UI
 {
     [AddComponentMenu("Event/Graphic Raycaster")]
     [RequireComponent(typeof(Canvas))]
+    [UGUIHelpURL("GraphicRaycaster")]
     /// <summary>
     /// A derived BaseRaycaster to raycast against Graphic elements.
     /// </summary>
@@ -118,10 +119,6 @@ namespace UnityEngine.UI
 
         [NonSerialized] private List<Graphic> m_RaycastResults = new List<Graphic>();
 
-        [NonSerialized] private int m_ScreenRectCacheFrame = -1;
-        [NonSerialized] private readonly List<Rect> m_ScreenRectCache = new List<Rect>();
-        [NonSerialized] private static readonly Vector3[] s_WorldCorners = new Vector3[4];
-
         /// <summary>
         /// Perform the raycast against the list of graphics associated with the Canvas.
         /// </summary>
@@ -159,7 +156,7 @@ namespace UnityEngine.UI
                 // so we use the standard none multiple display method. (case 741751)
                 float w = Screen.width;
                 float h = Screen.height;
-                if (displayIndex > 0 && displayIndex < Display.displays.Length)
+                if (UnityEngineInternal.DisplayInternal.IsASecondaryDisplayIndex(displayIndex))
                 {
 #if UNITY_ANDROID
                     // Changed to be coherent for Android which passes display-relative rendering coordinates
@@ -315,27 +312,13 @@ namespace UnityEngine.UI
         /// Perform a raycast into the screen and collect all graphics underneath it.
         /// </summary>
         [NonSerialized] static readonly List<Graphic> s_SortedGraphics = new List<Graphic>();
-        private void Raycast(Canvas canvas, Camera eventCamera, Vector2 pointerPosition, IList<Graphic> foundGraphics, List<Graphic> results)
+        private static void Raycast(Canvas canvas, Camera eventCamera, Vector2 pointerPosition, IList<Graphic> foundGraphics, List<Graphic> results)
         {
             // Necessary for the event system
             int totalCount = foundGraphics.Count;
-
-            bool useBroadphase = canvas.renderMode == RenderMode.ScreenSpaceOverlay;
-            if (useBroadphase)
-                EnsureScreenRectCache(foundGraphics, eventCamera);
-            bool cacheValid = useBroadphase && m_ScreenRectCache.Count == totalCount;
-
             for (int i = 0; i < totalCount; ++i)
             {
                 Graphic graphic = foundGraphics[i];
-
-                if (cacheValid && graphic.raycastPadding == Vector4.zero)
-                {
-                    Rect r = m_ScreenRectCache[i];
-                    if (pointerPosition.x < r.xMin || pointerPosition.x > r.xMax ||
-                        pointerPosition.y < r.yMin || pointerPosition.y > r.yMax)
-                        continue;
-                }
 
                 // -1 means it hasn't been processed by the canvas, which means it isn't actually drawn
                 if (!graphic.raycastTarget || graphic.canvasRenderer.cull || graphic.depth == -1)
@@ -359,41 +342,6 @@ namespace UnityEngine.UI
                 results.Add(s_SortedGraphics[i]);
 
             s_SortedGraphics.Clear();
-        }
-
-        /// <summary>
-        /// Rebuilds the per-graphic screen-space bounding rects once per frame so the per-cast loop can reject
-        /// non-overlapping graphics with a cheap test instead of a full <see cref="RectTransformUtility.RectangleContainsScreenPoint"/>
-        /// (which fetches world corners). Recomputed fresh every frame, so it never goes stale when graphics move.
-        /// Screen-space overlay only, where corner projection is well-behaved.
-        /// </summary>
-        private void EnsureScreenRectCache(IList<Graphic> graphics, Camera eventCamera)
-        {
-            int frame = Time.frameCount;
-            int count = graphics.Count;
-            if (m_ScreenRectCacheFrame == frame && m_ScreenRectCache.Count == count)
-                return;
-
-            m_ScreenRectCacheFrame = frame;
-            m_ScreenRectCache.Clear();
-            for (int i = 0; i < count; i++)
-                m_ScreenRectCache.Add(ComputeScreenRect(graphics[i].rectTransform, eventCamera));
-        }
-
-        private static Rect ComputeScreenRect(RectTransform rt, Camera eventCamera)
-        {
-            rt.GetWorldCorners(s_WorldCorners);
-            Vector2 p = RectTransformUtility.WorldToScreenPoint(eventCamera, s_WorldCorners[0]);
-            float minX = p.x, maxX = p.x, minY = p.y, maxY = p.y;
-            for (int i = 1; i < 4; i++)
-            {
-                p = RectTransformUtility.WorldToScreenPoint(eventCamera, s_WorldCorners[i]);
-                if (p.x < minX) minX = p.x;
-                else if (p.x > maxX) maxX = p.x;
-                if (p.y < minY) minY = p.y;
-                else if (p.y > maxY) maxY = p.y;
-            }
-            return new Rect(minX, minY, maxX - minX, maxY - minY);
         }
     }
 }
