@@ -29,6 +29,8 @@ namespace InputfieldTests
         {
 #if UNITY_SWITCH && !UNITY_EDITOR
             UnityEngine.Switch.TouchscreenKeyboard.useBackgroundThread = true;
+#elif UNITY_SWITCH2 && !UNITY_EDITOR
+            UnityEngine.Nintendo.Switch2.TouchscreenKeyboard.useBackgroundThread = true;
 #endif
         }
 
@@ -59,6 +61,8 @@ namespace InputfieldTests
 
 #if UNITY_SWITCH && !UNITY_EDITOR
             UnityEngine.Switch.TouchscreenKeyboard.useBackgroundThread = false;
+#elif UNITY_SWITCH2 && !UNITY_EDITOR
+            UnityEngine.Nintendo.Switch2.TouchscreenKeyboard.useBackgroundThread = false;
 #endif
         }
 
@@ -254,7 +258,7 @@ namespace InputfieldTests
         }
 
         [UnityTest]
-        [UnityPlatform(exclude = new[] { RuntimePlatform.tvOS})] // UUM-71764 (tvOS)
+        [UnityPlatform(exclude = new[] { RuntimePlatform.tvOS })] // UUM-71764 (tvOS)
         public IEnumerator FocusOpensTouchScreenKeyboard()
         {
             var isInPlaceEditingDisabled = typeof(TouchScreenKeyboard).GetProperty("disableInPlaceEditing",
