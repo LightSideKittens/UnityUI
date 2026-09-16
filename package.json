@@ -1,9 +1,9 @@
 {
   "name": "com.unity.ugui",
   "displayName": "Unity UI",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "unity": "6000.3",
-  "unityRelease": "2f1",
+  "unityRelease": "3f1",
   "keywords": [
     "UI",
     "ugui",
