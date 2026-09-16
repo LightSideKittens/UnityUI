@@ -1,0 +1,26 @@
+{
+  "name": "com.unity.ugui",
+  "displayName": "uGUI",
+  "version": "2.5.1",
+  "unity": "6000.5",
+  "unityRelease": "0f1",
+  "keywords": [
+    "UI",
+    "ugui",
+    "Unity UI",
+    "Canvas",
+    "TextMeshPro",
+    "TextMesh Pro",
+    "Text",
+    "TMP",
+    "SDF"
+  ],
+  "description": "The Unity Canvas UI foundation for LightSide, without bundled TextMeshPro. Its systems include Canvas rendering, layout, controls, events and masking through the standard uGUI API. UniText, UniShapes and UniLottie add their own content through this foundation. Free to browse and install without an account or access token.",
+  "dependencies": {
+    "com.unity.modules.ui": "1.0.0",
+    "com.unity.modules.imgui": "1.0.0",
+    "com.unity.modules.audio": "1.0.0",
+    "com.unity.modules.physics2d": "1.0.0",
+    "com.unity.modules.physics": "1.0.0"
+  }
+}
